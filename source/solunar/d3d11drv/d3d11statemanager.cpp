@@ -54,8 +54,7 @@ void D3D11StateManager::shutdown()
 {
     for (auto it : m_rasterizerStates)
     {
-        ID3D11RasterizerState* rasterizerState = (ID3D11RasterizerState*)it.second;
-        rasterizerState->Release();
+        destroyRasterizerState(it.second);
     }
 
     m_rasterizerStates.clear();
@@ -89,6 +88,12 @@ IRasterizerState* D3D11StateManager::createRasterizerState(const RasterizerState
     m_rasterizerStates.emplace(rasterizerDesc, rasterizerState);
 
 	return rasterizerState;
+}
+
+void D3D11StateManager::destroyRasterizerState(IRasterizerState* rasterizerState)
+{
+    ID3D11RasterizerState* d3drasterizerState = (ID3D11RasterizerState*)rasterizerState;
+    d3drasterizerState->Release();
 }
 
 }

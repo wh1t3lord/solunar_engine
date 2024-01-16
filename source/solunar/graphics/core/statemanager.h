@@ -22,7 +22,8 @@ namespace engine
 //	virtual ~IBlendState() = default;
 //};
 
-typedef void* IRasterizerState;
+struct IRasterizerState;
+struct IBlendState;
 
 class IStateManager
 {
@@ -30,6 +31,7 @@ public:
 	virtual ~IStateManager() = default;
 
 	virtual IRasterizerState* createRasterizerState(const RasterizerStateDesc& rasterizerDesc) = 0;
+	virtual void destroyRasterizerState(IRasterizerState* rasterizerState) = 0;
 };
 
 extern IStateManager* g_stateManager;

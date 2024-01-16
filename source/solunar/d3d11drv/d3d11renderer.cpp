@@ -194,6 +194,7 @@ void D3D11Renderer::createRasterizerState()
 	rasterizerState.m_fillMode = FillMode::Solid;
 
 	m_rasterizerState = g_stateManager->createRasterizerState(rasterizerState);
+	m_rasterizerState = g_stateManager->createRasterizerState(rasterizerState);
 }
 
 void D3D11Renderer::shutdown()

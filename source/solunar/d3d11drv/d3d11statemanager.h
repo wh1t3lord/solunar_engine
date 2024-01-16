@@ -7,11 +7,6 @@
 namespace engine
 {
 
-inline bool FAreSame(double a, double b)
-{
-	return fabs(a - b) < maths::EPSILON;
-}
-
 struct RasterizerStateKey
 {
 	RasterizerStateDesc m_rasterizerDesc;
@@ -46,9 +41,11 @@ public:
 	void shutdown();
 
 	IRasterizerState* createRasterizerState(const RasterizerStateDesc& rasterizerDesc) override;
+	void destroyRasterizerState(IRasterizerState* rasterizerState) override;
 
 private:
 	std::map<RasterizerStateKey, IRasterizerState*> m_rasterizerStates;
+	
 };
 
 #define g_d3d11StateManager ((D3D11StateManager*)g_stateManager)
