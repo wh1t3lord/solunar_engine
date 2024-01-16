@@ -3,6 +3,7 @@
 
 #include "core/math/math_types.h"
 #include "graphics/core/statemanager.h"
+#include "graphics/core/texture.h"
 
 namespace engine
 {
@@ -31,6 +32,26 @@ inline const bool RasterizerStateKey::operator<(const RasterizerStateKey& key) c
 			m_rasterizerDesc.m_antialiasedLineEnable < key.m_rasterizerDesc.m_antialiasedLineEnable;
 }
 
+struct SamplerStateKey
+{
+	SamplerDesc m_samplerDesc;
+
+	SamplerStateKey() = default;
+	SamplerStateKey(const SamplerDesc& samplerDesc) : m_samplerDesc(samplerDesc) {}
+
+	const bool operator<(const SamplerStateKey& key) const;
+};
+
+inline const bool SamplerStateKey::operator<(const SamplerStateKey& key) const
+{
+	return	m_samplerDesc.m_minFilter < key.m_samplerDesc.m_minFilter &&
+			m_samplerDesc.m_magFilter < key.m_samplerDesc.m_magFilter &&
+			m_samplerDesc.m_wrapS < key.m_samplerDesc.m_wrapS &&
+			m_samplerDesc.m_wrapT < key.m_samplerDesc.m_wrapT &&
+			m_samplerDesc.m_wrapRepeat < key.m_samplerDesc.m_wrapRepeat &&
+			m_samplerDesc.m_anisotropyLevel <= key.m_samplerDesc.m_anisotropyLevel;			
+}
+
 class D3D11StateManager : public IStateManager
 {
 public:
@@ -45,6 +66,7 @@ public:
 
 private:
 	std::map<RasterizerStateKey, IRasterizerState*> m_rasterizerStates;
+	std::map<SamplerStateKey, ISamplerState*> m_samplerStates;
 	
 };
 
