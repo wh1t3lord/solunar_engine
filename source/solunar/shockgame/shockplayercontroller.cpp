@@ -1,0 +1,134 @@
+#include "shockgamepch.h"
+#include "shockgame/shockplayercontroller.h"
+
+namespace engine
+{
+
+ShockPlayerController::ShockPlayerController()
+{
+}
+
+ShockPlayerController::~ShockPlayerController()
+{
+}
+
+void ShockPlayerController::registerObject()
+{
+	g_typeManager->registerObject<ShockPlayerController>();
+}
+
+void ShockPlayerController::onEntitySet(Entity* entity)
+{
+	PlayerControllerComponent::onEntitySet(entity);
+
+	initializeCamera();
+	initializeComponents();
+}
+
+void ShockPlayerController::onEntityRemove()
+{
+	// m_cameraNode = nullptr;
+	// m_cameraTransform = nullptr;
+	// m_camera = nullptr;
+	// m_rigidBody = nullptr;
+
+	PlayerControllerComponent::onEntityRemove();
+}
+
+void ShockPlayerController::activateCamera()
+{
+	// CameraProxy::getInstance()->setCameraComponent(m_camera.get());
+}
+
+void ShockPlayerController::initializeCamera()
+{
+	// m_cameraNode = getNode()->createChild();
+	// m_cameraTransform = m_cameraNode->createComponentByType<TransformComponent>();
+	// m_camera = m_cameraNode->createComponentByType<CameraFirstPersonComponent>();
+
+	activateCamera();
+}
+
+void ShockPlayerController::initializeComponents()
+{
+	// m_transform = getNode()->getComponentByTypeSafe<TransformComponent>();
+	// m_rigidBody = getNode()->getComponentByTypeSafe<RigidBodyComponent>();
+}
+
+void ShockPlayerController::update(float dt)
+{
+	// if (m_rigidBody == nullptr)
+	// {
+	// 	initializeComponents();
+	// 	//ASSERT2(m_rigidBody, "Node don't have rigid body component.");
+	// }
+
+	// update camera look
+	updateCamera(dt);
+
+	// update player movement
+	//updateMovement(dt);
+}
+
+void ShockPlayerController::updateCamera(float dt)
+{
+	// InputManager* input = InputManager::getInstance();
+	// glm::vec2 mousePos = input->getCursorPos();
+	// glm::vec2 deltaMousePos = input->getDeltaCursorPos();
+	// 
+	// if (input->getCursorPosCallback())
+	// {
+	// 	m_camera->updateFromMousePosition(deltaMousePos);
+	// 	m_cameraTransform->setRotation(m_camera->getDirection());
+	// 	input->setCursorPosCallback(false);
+	// }
+	// 
+	// glm::vec3 cameraDirection = CameraProxy::getInstance()->getDirection();
+	// glm::vec3 pos = m_transform->getPosition();
+	// float camSpeed = 10.0f * dt;
+	// 
+	// if (input->getKey(KeyboardKeys::KEY_W))
+	// 	pos += camSpeed * cameraDirection;
+	// if (input->getKey(KeyboardKeys::KEY_S))
+	// 	pos -= camSpeed * cameraDirection;
+	// 
+	// if (input->getKey(KeyboardKeys::KEY_A))
+	// 	pos -= glm::normalize(glm::cross(cameraDirection, glm::vec3(0.0f, 1.0f, 0.0f))) * camSpeed;
+	// if (input->getKey(KeyboardKeys::KEY_D))
+	// 	pos += glm::normalize(glm::cross(cameraDirection, glm::vec3(0.0f, 1.0f, 0.0f))) * camSpeed;
+	// 
+	// m_transform->setPosition(pos);
+}
+
+void ShockPlayerController::updateMovement(float dt)
+{
+	// glm::vec3 moveVector = glm::vec3(0.0f);
+	// 
+	// InputManager* inputManager = InputManager::getInstance();
+	// 
+	// bool isPlayerMove = (inputManager->getKey(KeyboardKeys::KEY_W)) ||
+	// 					(inputManager->getKey(KeyboardKeys::KEY_S)) ||
+	// 					(inputManager->getKey(KeyboardKeys::KEY_A)) ||
+	// 					(inputManager->getKey(KeyboardKeys::KEY_D));
+	// 
+	// Camera* camera = CameraProxy::getInstance();
+	// 
+	// m_onTheGround = true;
+	// if (isPlayerMove && m_onTheGround)
+	// {
+	// 	glm::vec3 dir = glm::vec3(0.0f);
+	// 	if (inputManager->getKey(KeyboardKeys::KEY_W))
+	// 		dir += camera->getDirection();
+	// 	if (inputManager->getKey(KeyboardKeys::KEY_S))
+	// 		dir -= camera->getDirection();
+	// 	if (inputManager->getKey(KeyboardKeys::KEY_A))
+	// 		dir -= glm::normalize(glm::cross(camera->getDirection(), glm::vec3(0.0f, 1.0f, 0.0f)));
+	// 	if (inputManager->getKey(KeyboardKeys::KEY_D))
+	// 		dir += glm::normalize(glm::cross(camera->getDirection(), glm::vec3(0.0f, 1.0f, 0.0f)));
+	// 
+	// 	// apply impulse to rigid body
+	// 	m_rigidBody->applyCentralImpulse(dir);
+	// }
+}
+
+}
