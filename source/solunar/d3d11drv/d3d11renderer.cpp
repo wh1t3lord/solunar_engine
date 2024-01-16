@@ -2,6 +2,7 @@
 #include "d3d11drv/d3d11renderer.h"
 #include "d3d11drv/d3d11device.h"
 #include "d3d11drv/d3d11shaderprogrammanager.h"
+#include "d3d11drv/d3d11statemanager.h"
 
 // filesystem
 #include "core/file/filesystem.h"
@@ -65,6 +66,10 @@ void D3D11Renderer::init()
 
 	// initalize swap chain
 	createSwapChain();
+
+	// initialize device state manager
+	g_stateManager = mem_new<D3D11StateManager>();
+	g_d3d11StateManager->init();
 
 	createRasterizerState();
 
@@ -182,17 +187,13 @@ void D3D11Renderer::createSwapChain()
 
 void D3D11Renderer::createRasterizerState()
 {
-	D3D11Device* device = reinterpret_cast<D3D11Device*>(g_renderDevice);
-
-	D3D11_RASTERIZER_DESC rasterizerState;
+	RasterizerStateDesc rasterizerState;
 	memset(&rasterizerState, 0, sizeof(rasterizerState));
-	rasterizerState.CullMode = D3D11_CULL_BACK;
-	rasterizerState.FrontCounterClockwise = true;
-	rasterizerState.FillMode = D3D11_FILL_SOLID;
+	rasterizerState.m_cullMode = CullMode::Back;
+	rasterizerState.m_frontCCW = true;
+	rasterizerState.m_fillMode = FillMode::Solid;
 
-	D3D11_CHECK(device->getD3DDevice()->CreateRasterizerState(&rasterizerState, &m_rasterizerState));
-
-	device->getDeviceContext()->RSSetState(m_rasterizerState);
+	m_rasterizerState = g_stateManager->createRasterizerState(rasterizerState);
 }
 
 void D3D11Renderer::shutdown()
@@ -205,11 +206,7 @@ void D3D11Renderer::shutdown()
 		g_shaderManager = nullptr;
 	}
 
-	if (m_rasterizerState)
-	{
-		m_rasterizerState->Release();
-		m_rasterizerState = nullptr;
-	}
+	g_d3d11StateManager->shutdown();
 
 	if (m_depthStencilState)
 	{
@@ -240,6 +237,9 @@ void D3D11Renderer::shutdown()
 		m_swapChain->Release();
 		m_swapChain = nullptr;
 	}
+
+	mem_delete(g_stateManager);
+	g_stateManager = nullptr;
 
 	mem_delete(g_renderDevice);
 	g_renderDevice = nullptr;

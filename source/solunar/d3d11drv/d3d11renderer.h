@@ -2,6 +2,7 @@
 #define GRAPHICS_D3D11_D3D11RENDERER_H
 
 #include "graphics/renderer.h"
+#include "graphics/core/statemanager.h"
 // #include "graphics/shaderconstantmanager.h"
 #include "d3d11drv/d3d11device.h"
 
@@ -49,7 +50,8 @@ private:
 	ID3D11DepthStencilView* m_depthStencilView;
 	
 	ID3D11DepthStencilState* m_depthStencilState;
-	ID3D11RasterizerState* m_rasterizerState;
+
+	IRasterizerState* m_rasterizerState;
 
 	IDXGISwapChain* m_swapChain;
 

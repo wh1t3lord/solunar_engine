@@ -46,9 +46,29 @@ D3D11StateManager::~D3D11StateManager()
 {
 }
 
+void D3D11StateManager::init()
+{
+}
+
+void D3D11StateManager::shutdown()
+{
+    for (auto it : m_rasterizerStates)
+    {
+        ID3D11RasterizerState* rasterizerState = (ID3D11RasterizerState*)it.second;
+        rasterizerState->Release();
+    }
+
+    m_rasterizerStates.clear();
+}
+
 IRasterizerState* D3D11StateManager::createRasterizerState(const RasterizerStateDesc& rasterizerDesc)
 {
-	//auto it = m_rasterizerStates.find(rasterizerDesc);
+    // Find already created IRasterizerState
+	auto it = m_rasterizerStates.find(rasterizerDesc);
+    if (it != m_rasterizerStates.end())
+    {
+        return (*it).second;
+    }
 
 	D3D11_RASTERIZER_DESC d3drasterizerDesc = {};
     d3drasterizerDesc.FillMode              = getD3DFillMode(rasterizerDesc.m_fillMode);

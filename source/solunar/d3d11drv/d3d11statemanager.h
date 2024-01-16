@@ -16,23 +16,11 @@ struct RasterizerStateKey
 {
 	RasterizerStateDesc m_rasterizerDesc;
 
-	const bool operator<(const RasterizerStateKey& key) const;
-	bool operator()(const RasterizerStateKey& lhs, const RasterizerStateKey& rhs) const;
-};
+	RasterizerStateKey() = default;
+	RasterizerStateKey(const RasterizerStateDesc& desc) : m_rasterizerDesc(desc) {}
 
-bool operator<(const RasterizerStateKey& lhs, const RasterizerStateKey& rhs)
-{
-	return	lhs.m_rasterizerDesc.m_fillMode < rhs.m_rasterizerDesc.m_fillMode &&
-			lhs.m_rasterizerDesc.m_cullMode < rhs.m_rasterizerDesc.m_cullMode &&
-			lhs.m_rasterizerDesc.m_frontCCW < rhs.m_rasterizerDesc.m_frontCCW &&
-			lhs.m_rasterizerDesc.m_depthBias < rhs.m_rasterizerDesc.m_depthBias &&
-			lhs.m_rasterizerDesc.m_depthBiasClamp <= rhs.m_rasterizerDesc.m_depthBiasClamp &&
-			lhs.m_rasterizerDesc.m_slopeScaledDepthBias <= rhs.m_rasterizerDesc.m_slopeScaledDepthBias &&
-			lhs.m_rasterizerDesc.m_depthClipEnable < rhs.m_rasterizerDesc.m_depthClipEnable &&
-			lhs.m_rasterizerDesc.m_scissorEnable < rhs.m_rasterizerDesc.m_scissorEnable &&
-			lhs.m_rasterizerDesc.m_multisampleEnable < rhs.m_rasterizerDesc.m_multisampleEnable &&
-			lhs.m_rasterizerDesc.m_antialiasedLineEnable < rhs.m_rasterizerDesc.m_antialiasedLineEnable;
-}
+	const bool operator<(const RasterizerStateKey& key) const;
+};
 
 inline const bool RasterizerStateKey::operator<(const RasterizerStateKey& key) const
 {
@@ -48,31 +36,22 @@ inline const bool RasterizerStateKey::operator<(const RasterizerStateKey& key) c
 			m_rasterizerDesc.m_antialiasedLineEnable < key.m_rasterizerDesc.m_antialiasedLineEnable;
 }
 
-inline bool RasterizerStateKey::operator()(const RasterizerStateKey& lhs, const RasterizerStateKey& rhs) const
-{
-	return	lhs.m_rasterizerDesc.m_fillMode < rhs.m_rasterizerDesc.m_fillMode &&
-			lhs.m_rasterizerDesc.m_cullMode < rhs.m_rasterizerDesc.m_cullMode &&
-			lhs.m_rasterizerDesc.m_frontCCW < rhs.m_rasterizerDesc.m_frontCCW &&
-			lhs.m_rasterizerDesc.m_depthBias < rhs.m_rasterizerDesc.m_depthBias &&
-			lhs.m_rasterizerDesc.m_depthBiasClamp <= rhs.m_rasterizerDesc.m_depthBiasClamp &&
-			lhs.m_rasterizerDesc.m_slopeScaledDepthBias <= rhs.m_rasterizerDesc.m_slopeScaledDepthBias &&
-			lhs.m_rasterizerDesc.m_depthClipEnable < rhs.m_rasterizerDesc.m_depthClipEnable &&
-			lhs.m_rasterizerDesc.m_scissorEnable < rhs.m_rasterizerDesc.m_scissorEnable &&
-			lhs.m_rasterizerDesc.m_multisampleEnable < rhs.m_rasterizerDesc.m_multisampleEnable &&
-			lhs.m_rasterizerDesc.m_antialiasedLineEnable < rhs.m_rasterizerDesc.m_antialiasedLineEnable;
-}
-
 class D3D11StateManager : public IStateManager
 {
 public:
 	D3D11StateManager();
 	~D3D11StateManager();
 
+	void init();
+	void shutdown();
+
 	IRasterizerState* createRasterizerState(const RasterizerStateDesc& rasterizerDesc) override;
 
 private:
 	std::map<RasterizerStateKey, IRasterizerState*> m_rasterizerStates;
 };
+
+#define g_d3d11StateManager ((D3D11StateManager*)g_stateManager)
 
 }
 
