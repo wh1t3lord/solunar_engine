@@ -25,6 +25,7 @@
 #include "graphics/fontmanager.h"
 #include "graphics/mesh.h"
 #include "graphics/ui/rmlsystem.h"
+#include "graphics/postfxmanager.h"
 
 #include "engine/camera.h"
 #include "engine/engine.h"
@@ -109,9 +110,9 @@ namespace engine
 		// RmlSystem::getInstance()->init();
 		// RmlSystem::getInstance()->createContext(view->getWidth(), view->getHeight());
 
-	//	initFramebuffer(view);
+		//initFramebuffer(CameraProxy::getInstance()->getView());
 
-	//	g_postProcessing.init(view);
+		//g_postFxManager.init(CameraProxy::getInstance()->getView());
 
 		ShadowsRenderer::getInstance()->init();
 	}
@@ -120,7 +121,7 @@ namespace engine
 	{
 		ShadowsRenderer::getInstance()->shutdown();
 
-		//g_postProcessing.shutdown();
+		//g_postFxManager.shutdown();
 
 		g_debugRender.shutdown();
 
@@ -273,7 +274,7 @@ namespace engine
 		//////////////////
 		// post processing
 		//////////////////
-		//g_postProcessing.hdrPass(m_screenColorTexture);
+		//g_postFxManager.hdrPass(m_screenColorTexture);
 	}
 
 	void Renderer::renderSky(View* view, SkyMeshComponent* skyMesh)
