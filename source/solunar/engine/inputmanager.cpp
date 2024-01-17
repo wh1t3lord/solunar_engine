@@ -1,5 +1,6 @@
 #include "enginepch.h"
 #include "engine/inputmanager.h"
+#include "main/main.h"
 
 namespace engine
 {
@@ -21,6 +22,13 @@ namespace engine
 	void InputManager::update()
 	{
 		m_lastCodePoint = 0;
+
+		if (GetForegroundWindow() == (HWND)appGetWindow())
+		{
+			POINT pt = {};
+			GetCursorPos(&pt);
+			cursorPosAction(static_cast<float>(pt.x), static_cast<float>(pt.y));
+		}
 	}
 
 	void InputManager::keyboardAction(uint32_t keyId, bool state)
