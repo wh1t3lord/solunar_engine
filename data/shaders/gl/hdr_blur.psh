@@ -1,0 +1,44 @@
+#version 330 core
+
+out vec4 fragColor;
+in vec2 v_texcoord;
+
+uniform sampler2D u_texture;
+
+layout (std140) uniform HDRConstants
+{
+    vec4 weight[3];
+	vec4 texOffset;
+};
+
+void main()
+{
+    // sampled texture
+    vec4 color = texture(u_texture, v_texcoord);
+    
+    // how much current fragment is affect on frame
+    vec4 result = color * weight[0];
+
+    bool u_horizontal = texOffset.w >= 10.0f;
+
+    // loop
+	const int sampleCount = 3;
+    if (u_horizontal)
+    {
+        for (int i = 0; i < sampleCount; ++i)
+        {
+            result += texture(u_texture, v_texcoord + vec2(texOffset.x * i, 0.0)) * weight[i];
+            result += texture(u_texture, v_texcoord - vec2(texOffset.x * i, 0.0)) * weight[i];
+        }
+    }
+    else
+    {
+        for (int i = 0; i < sampleCount; ++i)
+        {
+            result += texture(u_texture, v_texcoord + vec2(0.0, texOffset.y * i)) * weight[i];
+            result += texture(u_texture, v_texcoord - vec2(0.0, texOffset.y * i)) * weight[i];
+        }
+    }
+    
+    fragColor = result * 0.5;
+}

@@ -1,7 +1,7 @@
 #ifndef GRAPHICS_MESH_H
 #define GRAPHICS_MESH_H
 
-// #include "graphics/drawablecomponent.h"
+#include "core/math/boundingbox.h"
 
 namespace engine {
 
@@ -16,20 +16,24 @@ namespace engine {
 	//	~MeshResource();
 	//};
 
-	//class MeshComponent : public DrawableComponent
-	//{
-	//	ImplementObject(MeshComponent, DrawableComponent);
-	//public:
-	//	static void registerObject();
+	class MeshComponent : public Component
+	{
+		ImplementObject(MeshComponent, Component);
+	public:
+		static void registerObject();
 
-	//public:
-	//	MeshComponent();
-	//	~MeshComponent();
+	public:
+		MeshComponent();
+		~MeshComponent();
 
-	//	void loadXML(tinyxml2::XMLElement& element) override;
-	//	void saveXML(tinyxml2::XMLElement& element) override;
+		void loadXML(tinyxml2::XMLElement& element) override;
+		void saveXML(tinyxml2::XMLElement& element) override;
 
-	//};
+		virtual void render();
+
+	private:
+		BoundingBox m_boundingBox;
+	};
 
 }
 

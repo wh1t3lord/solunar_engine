@@ -6,6 +6,7 @@
 #include "core/file/contentdevice.h"
 #include "core/file/filesystem.h"
 #include "core/file/datastreamfactory.h"
+#include "core/file/filestream.h"
 
 namespace engine
 {
@@ -31,8 +32,8 @@ DataStreamPtr ContentDevice::openStream(const std::string& filename)
 	path += "/";
 	path += filename;
 
-	return nullptr;
-	// return g_fileSystem->openStream(path, true);
+	// create object
+	return std::make_shared<FileStream>(path);
 }
 
 

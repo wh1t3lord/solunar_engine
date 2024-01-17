@@ -4,7 +4,7 @@
 #include "d3d11drv/d3d11device.h"
 
 #include "core/file/filesystem.h"
-
+#include "core/file/contentmanager.h"
 namespace engine
 {
 
@@ -12,16 +12,17 @@ std::string loadShaderText(const std::string& filename)
 {
 	std::string content;
 
-	FileHandle f = g_fileSystem->open(filename.c_str());
-	g_fileSystem->seek(f, Seek_End, 0);
-	size_t fileLength = g_fileSystem->tell(f);
-	g_fileSystem->seek(f, Seek_Begin, 0);
+	DataStreamPtr f = g_contentManager->openStream(filename);
+
+	f->seek(Seek_End, 0);
+	size_t fileLength = f->tell();
+	f->seek(Seek_Begin, 0);
 
 	content.resize(fileLength + 1);
-	g_fileSystem->read(f, (void*)content.data(), fileLength);
+	f->read((void*)content.data(), fileLength);
 	content[fileLength] = '\0';
 
-	g_fileSystem->close(f);
+	f = nullptr;
 
 	return content;
 }

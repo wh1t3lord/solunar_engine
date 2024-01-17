@@ -1,9 +1,6 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "engine/entity/entity.h"
-#include "engine/entity/cameracomponent.h"
-
 #include "graphics/view.h"
 #include "graphics/camerafrustum.h"
 
@@ -41,6 +38,7 @@ namespace engine
 		float roll = 0.0f;
 	};
 
+	class CameraComponent;
 
 	class CameraProxy : public Singleton<CameraProxy>,
 						public Camera

@@ -36,12 +36,7 @@ private:
 
 private:
 	ShockPlayerStats m_playerStats;
-
-	// std::shared_ptr<TransformComponent> m_transform;
-	// std::shared_ptr<RigidBodyComponent> m_rigidBody;
-	// 
-	// std::shared_ptr<CameraFirstPersonComponent> m_camera;
-	// std::shared_ptr<TransformComponent> m_cameraTransform;
+	CameraFirstPersonComponent* m_camera;
 };
 
 }

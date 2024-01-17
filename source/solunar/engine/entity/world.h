@@ -18,6 +18,8 @@ namespace engine
 		void loadXML(tinyxml2::XMLElement& element) override;
 		void saveXML(tinyxml2::XMLElement& element) override;
 
+		void updateLogicWorld();
+
 		Entity* createEntity();
 		Entity* createEntityEx(const TypeInfo* typeInfo);
 

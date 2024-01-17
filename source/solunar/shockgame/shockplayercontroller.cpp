@@ -1,10 +1,13 @@
 #include "shockgamepch.h"
 #include "shockgame/shockplayercontroller.h"
 
+#include "engine/inputmanager.h"
+
 namespace engine
 {
 
-ShockPlayerController::ShockPlayerController()
+ShockPlayerController::ShockPlayerController() :
+	m_camera(nullptr)
 {
 }
 
@@ -37,7 +40,7 @@ void ShockPlayerController::onEntityRemove()
 
 void ShockPlayerController::activateCamera()
 {
-	// CameraProxy::getInstance()->setCameraComponent(m_camera.get());
+	CameraProxy::getInstance()->setCameraComponent(m_camera);
 }
 
 void ShockPlayerController::initializeCamera()
@@ -45,6 +48,8 @@ void ShockPlayerController::initializeCamera()
 	// m_cameraNode = getNode()->createChild();
 	// m_cameraTransform = m_cameraNode->createComponentByType<TransformComponent>();
 	// m_camera = m_cameraNode->createComponentByType<CameraFirstPersonComponent>();
+
+	m_camera = getEntity()->createComponent<CameraFirstPersonComponent>();
 
 	activateCamera();
 }
@@ -72,32 +77,32 @@ void ShockPlayerController::update(float dt)
 
 void ShockPlayerController::updateCamera(float dt)
 {
-	// InputManager* input = InputManager::getInstance();
-	// glm::vec2 mousePos = input->getCursorPos();
-	// glm::vec2 deltaMousePos = input->getDeltaCursorPos();
-	// 
-	// if (input->getCursorPosCallback())
-	// {
-	// 	m_camera->updateFromMousePosition(deltaMousePos);
-	// 	m_cameraTransform->setRotation(m_camera->getDirection());
-	// 	input->setCursorPosCallback(false);
-	// }
-	// 
-	// glm::vec3 cameraDirection = CameraProxy::getInstance()->getDirection();
-	// glm::vec3 pos = m_transform->getPosition();
-	// float camSpeed = 10.0f * dt;
-	// 
-	// if (input->getKey(KeyboardKeys::KEY_W))
-	// 	pos += camSpeed * cameraDirection;
-	// if (input->getKey(KeyboardKeys::KEY_S))
-	// 	pos -= camSpeed * cameraDirection;
-	// 
-	// if (input->getKey(KeyboardKeys::KEY_A))
-	// 	pos -= glm::normalize(glm::cross(cameraDirection, glm::vec3(0.0f, 1.0f, 0.0f))) * camSpeed;
-	// if (input->getKey(KeyboardKeys::KEY_D))
-	// 	pos += glm::normalize(glm::cross(cameraDirection, glm::vec3(0.0f, 1.0f, 0.0f))) * camSpeed;
-	// 
-	// m_transform->setPosition(pos);
+	 InputManager* input = InputManager::getInstance();
+	 glm::vec2 mousePos = input->getCursorPos();
+	 glm::vec2 deltaMousePos = input->getDeltaCursorPos();
+	 
+	 if (input->getCursorPosCallback())
+	 {
+	 	m_camera->updateFromMousePosition(deltaMousePos);
+	 	getEntity()->setRotation(m_camera->getDirection());
+	 	input->setCursorPosCallback(false);
+	 }
+	 
+	 glm::vec3 cameraDirection = CameraProxy::getInstance()->getDirection();
+	 glm::vec3 pos = getEntity()->getPosition();
+	 float camSpeed = 10.0f * dt;
+	 
+	 if (input->getKey(KeyboardKeys::KEY_W))
+	 	pos += camSpeed * cameraDirection;
+	 if (input->getKey(KeyboardKeys::KEY_S))
+	 	pos -= camSpeed * cameraDirection;
+	 
+	 if (input->getKey(KeyboardKeys::KEY_A))
+	 	pos -= glm::normalize(glm::cross(cameraDirection, glm::vec3(0.0f, 1.0f, 0.0f))) * camSpeed;
+	 if (input->getKey(KeyboardKeys::KEY_D))
+	 	pos += glm::normalize(glm::cross(cameraDirection, glm::vec3(0.0f, 1.0f, 0.0f))) * camSpeed;
+	 
+	 getEntity()->setPosition(pos);
 }
 
 void ShockPlayerController::updateMovement(float dt)

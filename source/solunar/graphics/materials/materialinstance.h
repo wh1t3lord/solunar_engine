@@ -4,6 +4,10 @@
 namespace engine
 {
 
+enum VertexFactory
+{
+};
+
 class IShaderProgram;
 
 class MaterialInstance

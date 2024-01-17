@@ -23,11 +23,14 @@
 #include "graphics/debugrenderer.h"
 #include "graphics/ifontmanager.h"
 #include "graphics/fontmanager.h"
+#include "graphics/mesh.h"
 #include "graphics/ui/rmlsystem.h"
 
 #include "engine/camera.h"
 #include "engine/engine.h"
 #include "engine/entity/world.h"
+#include "engine/entity/entitymanager.h"
+#include "engine/entity/entity.h"
 
 namespace engine
 {
@@ -79,9 +82,10 @@ namespace engine
 		m_screenRenderTarget = g_renderDevice->createRenderTarget(renderTargetDesc);
 	}
 
-	void Renderer::initForView(View* view)
+	void Renderer::init()
 	{
-		m_view = view;
+		// set as lit
+		setRenderMode(RendererViewMode::Lit);
 
 		RenderContext::init();
 
@@ -110,12 +114,6 @@ namespace engine
 	//	g_postProcessing.init(view);
 
 		ShadowsRenderer::getInstance()->init();
-	}
-
-	void Renderer::init()
-	{
-		// set as lit
-		setRenderMode(RendererViewMode::Lit);
 	}
 
 	void Renderer::shutdown()
@@ -183,6 +181,18 @@ namespace engine
 		// get camera
 		Camera* camera = CameraProxy::getInstance();
 
+		World* world = Engine::ms_world;
+		if (world)
+		{
+			EntityManager& entityManager = world->getEntityManager();
+
+			std::vector<Entity*> drawableEntities = entityManager.getEntitiesWithComponent<MeshComponent>();
+			for (auto entity : drawableEntities)
+			{
+				MeshComponent* meshComponent = entity->getComponent<MeshComponent>();
+				meshComponent->render();
+			}
+		}
 #if 0
 		const std::shared_ptr<World> world = WorldManager::getActiveWorld();
 		if (world)
@@ -249,7 +259,7 @@ namespace engine
 		g_renderDevice->setViewport(&vp);
 
 		// initialize render context
-		RenderContext& renderContext = RenderContext::getContext();
+		RenderContext renderContext = RenderContext::getContext();
 		renderContext.width = view->m_width;
 		renderContext.height = view->m_height;
 		renderContext.proj = view->m_projection;

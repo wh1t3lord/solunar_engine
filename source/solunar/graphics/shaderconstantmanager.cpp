@@ -15,6 +15,8 @@
 
 namespace engine
 {
+	static ShaderConstantManager s_shaderConstantManager;
+
 	ShaderConstantManager::ShaderConstantManager() :
 		m_staticMeshConstantBuffer(nullptr)
 	{

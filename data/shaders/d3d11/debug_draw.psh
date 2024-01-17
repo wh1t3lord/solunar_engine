@@ -1,0 +1,13 @@
+// Debug primitive drawing shader
+//
+
+struct VSOutput
+{
+	float4 position : SV_POSITION;
+	float3 color : COLOR;
+};
+
+float4 PSMain(VSOutput input) : SV_Target
+{
+	return float4(input.color, 1.0f);
+}

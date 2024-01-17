@@ -5,7 +5,9 @@
 #include "core/timer.h"
 
 #include "engine/engine.h"
+#include "engine/inputmanager.h"
 #include "engine/gameinterface.h"
+#include "engine/camera.h"
 
 #include "graphics/graphics.h"
 #include "graphics/graphicsoptions.h"
@@ -76,6 +78,14 @@ namespace engine {
 		//	model->saveBinary(g_modelConvertName);
 		//}
 
+		if (g_commandLine.hasOption("-world"))
+		{
+			const char* worldFileName = g_commandLine.getOptionParameter("-world");
+			char stringBuffer[256];
+			snprintf(stringBuffer, sizeof(stringBuffer), "worlds/%s.xml", worldFileName);
+			EngineStateManager::getInstance()->loadWorld(stringBuffer);
+		}
+
 		//if (g_commandLine.hasOption("-world"))
 		//{
 		//	// #TODO: Refactor this
@@ -115,16 +125,9 @@ namespace engine {
 	bool EngineLoop::update()
 	{
 //		OPTICK_EVENT("EngineLoop::update");
-//
-//		InputManager* input = InputManager::getInstance();
-//		GameState* gameState = GameState::getInstance();
-//
-//		if (input->getKey(KeyboardKeys::KEY_F11))
-//			g_renderer->takeScreenshot();
-//
-//		if (input->getKeyWithReset(KeyboardKeys::KEY_TAB))
-//			g_console->toggleConsole();
-//
+
+		InputManager* input = InputManager::getInstance();
+
 		if (g_quitAtStart)
 			return true;
 
@@ -133,10 +136,10 @@ namespace engine {
 
 		if (g_slowdown2X)
 			Sleep(200);
-//			
-//		// update delta cursor pos and others input stuff
-//		input->update();
-//
+			
+		// update delta cursor pos and others input stuff
+		input->update();
+
 //		glfwPollEvents();
 //
 //		if (gameState->getGameState() == GameState::GAME_STATE_RUNNING &&
@@ -150,26 +153,26 @@ namespace engine {
 //			appToggleShowMousePointer(true);
 //		}
 //		
-//		// update timer
-//		Timer::getInstance()->update();
+		// update timer
+		Timer::getInstance()->update();
 //
 //		ImguiManager::getInstance()->beginFrame();
 //
 //		// update game specific state
 //		gameState->update();
-//		
-//		// update camera
-//		CameraProxy::getInstance()->updateProxy();
-//
-//		// run engine frame
-//		Engine::update();
-//
-//		// sound
-//		AudioManager::getInstance()->update();
-//
+		
+		// update camera
+		CameraProxy::getInstance()->updateProxy();
+
+		// run engine frame
+		Engine::update();
+
+		// sound
+		//AudioManager::getInstance()->update();
+
 		g_renderer->beginFrame();
-//		
-//		g_renderer->renderView(g_engineView);
+		
+		g_renderer->renderView(appGetView());
 //
 //		if (g_console->isToggled())
 //			g_console->onRender();
@@ -187,7 +190,7 @@ namespace engine {
 //		//appPresent();
 //
 //		Sleep(1);
-		return false;
+		return true;
 	}
 
 }

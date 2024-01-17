@@ -1,0 +1,33 @@
+#version 330 core
+
+out vec4 fragColor;
+in vec2 v_texcoord;
+
+uniform sampler2D u_hdrTexture;
+uniform sampler2D u_bloomTexture;
+
+//uniform float exposure = 0.75;
+uniform float exposure = 0.125;
+uniform float bloomScale = 0.1;
+
+vec3 toneMapping(vec3 v)
+{
+    return v / (1.0 + v);
+}
+
+void main()
+{
+    // hdr buffer texture
+    vec3 color = texture(u_hdrTexture, v_texcoord).rgb;
+    
+    // bloom buffer texture
+    vec3 bloomColor = texture(u_bloomTexture, v_texcoord).rgb * bloomScale;
+	color += bloomColor;
+	
+	color *= exposure;
+	color = toneMapping(color);
+ 	
+    // apply gamma correction
+    float gamma = 2.2;
+    fragColor.rgb = pow(color, vec3(1.0 / gamma));
+}

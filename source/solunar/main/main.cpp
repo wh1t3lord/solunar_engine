@@ -30,6 +30,8 @@ namespace engine
 
 	void appInit(int argc, char** argv)
 	{
+		g_commandLine.init(argc, argv);
+
 		Core::init();
 
 		// create game content device
@@ -116,7 +118,7 @@ namespace engine
 		g_engineView->m_zfar = 10000.0f;
 		g_engineView->updateInternalValues();
 
-		// CameraProxy::getInstance()->setView(g_engineView);
+		CameraProxy::getInstance()->setView(g_engineView);
 	}
 
 	void appPresent()
@@ -127,6 +129,11 @@ namespace engine
 	void* appGetWindow()
 	{
 		return g_engineWindow;
+	}
+
+	View* appGetView()
+	{
+		return g_engineView;
 	}
 
 	void mainLoop(EngineLoop* engineLoop)
@@ -141,7 +148,7 @@ namespace engine
 			}
 			else
 			{
-				if (engineLoop->update())
+				if (!engineLoop->update())
 					break;
 			}
 		}

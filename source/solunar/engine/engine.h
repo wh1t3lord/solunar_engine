@@ -24,6 +24,31 @@ namespace engine
 		static void setGameInterface(IGameInterface* gameInterface);
 		static IGameInterface* getGameInterface();
 	};
+
+	enum class EngineState : uint16_t
+	{
+		None,
+		Running,
+		LoadWorld,
+
+		Count
+	};
+
+	class EngineStateManager : public Singleton<EngineStateManager>
+	{
+	public:
+		EngineStateManager();
+		~EngineStateManager();
+
+		void loadWorld(const std::string& filename);
+		void loadEmptyWorld();
+	
+		void update();
+	private:
+		std::string m_worldName;
+		EngineState m_currentState;
+		EngineState m_nextState;
+	};
 }
 
 #endif // !ENGINE_H

@@ -1,0 +1,31 @@
+#version 330 core
+
+in vec2 v_texcoord;
+
+out vec4 fragColor;
+
+uniform sampler2D u_texture;
+
+void main()
+{
+	// flip texture coordinate
+	//vec2 flippedTextureCoord = v_texcoord.st * vec2(1.0, -1.0);
+
+	vec4 color = texture(u_texture, v_texcoord);
+	
+#ifdef TRANSPARENT
+	if (color.a < 0.1)
+		discard;
+#endif
+
+#ifdef INVTRANSPARENT
+	float arvg = (color.x + color.y + color.z) / 3;
+	if (arvg < 0.1)
+		discard;
+#endif
+
+	// we using texture with single channel (red)
+	fragColor.r = color.r;
+	fragColor.g = color.r;
+	fragColor.b = color.r;
+}

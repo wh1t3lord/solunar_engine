@@ -1,5 +1,6 @@
 #include "enginepch.h"
 #include "engine/camera.h"
+#include "engine/entity/entity.h"
 #include "engine/entity/cameracomponent.h"
 
 namespace engine

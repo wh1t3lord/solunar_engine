@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<World>
+	<!-- Test entity with mesh -->
+	<Entity>
+		<Position x="0" y="0" z="0"/>
+		<Rotation x="0" y="0" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		
+		<MeshComponent/>
+	</Entity>
+	
+	<!-- Player -->
+	<Entity>
+		<Position x="0" y="0" z="0"/>
+		<Rotation x="0" y="0" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		
+		<ShockPlayerController/>
+	</Entity>
+</World>

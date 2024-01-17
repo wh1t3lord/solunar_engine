@@ -1,0 +1,57 @@
+// Material Instance shader - Generic material
+//
+
+// C++ defines:
+//	UNLIT
+//	DIRECTIONLIGHT
+//	POINTLIGHT
+
+struct VSOutput
+{
+	float4 position		: SV_Position;
+	float3 worldPos		: TEXCOORD0;
+	float3 normal		: NORMAL;
+	float2 texcoord		: TEXCOORD1;
+	float3 tangent		: TANGENT;
+	float3 bitangent	: BINORMAL;
+};
+
+cbuffer GlobalData : register(b0)
+{
+	row_major float4x4 g_modelMatrix;
+	row_major float4x4 g_viewMatrix;
+	row_major float4x4 g_projectionMatrix;
+	row_major float4x4 g_modelViewProjection;
+
+	float4 g_viewPos;
+	float4 g_viewDir;
+
+	float4 g_directionLightVec;
+	float4 g_directionLightColor;
+};
+
+Texture2D g_albedoTexture;
+SamplerState g_albedoSampler;
+
+float4 PSMain(VSOutput input) : SV_Target
+{
+	float3 ambientColor = float3(0.2f, 0.2f, 0.2f);
+
+	float3 albedoColor = g_albedoTexture.Sample(g_albedoSampler, input.texcoord).rgb;
+
+#define UNLIT
+
+#ifdef UNLIT
+	return float4(albedoColor, 1.0f);
+#endif
+
+	float3 N = input.normal;
+	float3 L = -g_directionLightVec.xyz;
+	float3 V = g_viewDir.xyz;
+
+	float NdotL = max(0, dot(N, L));
+
+	float3 finalColor = albedoColor * (ambientColor + NdotL * g_directionLightColor.rgb);
+
+	return float4(finalColor, 1.0f);
+}

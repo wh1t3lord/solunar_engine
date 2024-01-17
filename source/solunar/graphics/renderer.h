@@ -34,7 +34,7 @@ namespace engine
 		virtual void init();
 		virtual void shutdown();
 
-		void initForView(View* view);
+	//	void initForView(View* view);
 	
 		View* getView() { return m_view; }
 

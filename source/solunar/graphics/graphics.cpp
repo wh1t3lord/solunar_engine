@@ -7,6 +7,8 @@
 #include "graphics/mesh.h"
 #include "graphics/model.h"
 
+#include "graphics/mesh.h"
+
 #include "graphics/renderer.h"
 
 namespace engine
@@ -14,6 +16,8 @@ namespace engine
 
 void registerGraphicsObjects()
 {
+	// Graphics objects
+
 	g_typeManager->registerObject<GraphicsObject>();
 	g_typeManager->registerObject<TextureMap>();
 	g_typeManager->registerObject<Material>();
@@ -23,6 +27,9 @@ void registerGraphicsObjects()
 	g_typeManager->registerObject<ModelBase>();
 	g_typeManager->registerObject<Model>();
 	g_typeManager->registerObject<ModelSubmesh>();
+
+	// Components
+	g_typeManager->registerObject<MeshComponent>();
 }
 
 void graphicsInit()

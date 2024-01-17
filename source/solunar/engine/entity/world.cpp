@@ -1,8 +1,10 @@
 #include "enginepch.h"
+#include "core/timer.h"
 #include "core/object/typemanager.h"
 #include "engine/entity/entity.h"
 #include "engine/entity/entitymanager.h"
 #include "engine/entity/world.h"
+#include "engine/entity/logiccomponent.h"
 
 namespace engine
 {
@@ -47,6 +49,16 @@ namespace engine
 	{
 	}
 
+	void World::updateLogicWorld()
+	{
+		std::vector<Entity*> logicEntities = m_entityManager.getEntitiesWithComponent<LogicComponent>();
+		for (auto entity : logicEntities)
+		{
+			LogicComponent* logicComponent = entity->getComponent<LogicComponent>();
+			logicComponent->update(Timer::getInstance()->getDelta());
+		}
+	}
+
 	Entity* World::createEntity()
 	{
 		Entity* entity = m_entityManager.createEntity();
@@ -56,7 +68,9 @@ namespace engine
 
 	Entity* World::createEntityEx(const TypeInfo* typeInfo)
 	{
-		return nullptr;
+		Entity* entity = m_entityManager.createEntityEx(typeInfo);
+		entity->onWorldSet(this);
+		return entity;
 	}
 
 }

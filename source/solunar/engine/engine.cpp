@@ -9,44 +9,38 @@
 
 namespace engine
 {
-	namespace
+	void registerEngineObjects()
 	{
-		// IGameInterface* g_gameInterface = nullptr;
+		TypeManager::getInstance()->registerObject<Entity>();
+		TypeManager::getInstance()->registerObject<Component>();
+		TypeManager::getInstance()->registerObject<World>();
 
-		void registerEngineObjects()
-		{
-			TypeManager::getInstance()->registerObject<Entity>();
-			TypeManager::getInstance()->registerObject<Component>();
-			TypeManager::getInstance()->registerObject<World>();
+		TypeManager::getInstance()->registerObject<CameraComponent>();
+		TypeManager::getInstance()->registerObject<CameraYawPitchRollComponent>();
+		TypeManager::getInstance()->registerObject<CameraFirstPersonComponent>();
 
-			TypeManager::getInstance()->registerObject<CameraComponent>();
-			TypeManager::getInstance()->registerObject<CameraYawPitchRollComponent>();
-			TypeManager::getInstance()->registerObject<CameraFirstPersonComponent>();
+		TypeManager::getInstance()->registerObject<LogicComponent>();
 
-			TypeManager::getInstance()->registerObject<LogicComponent>();
+		/*Node::registerObject();
+		CameraNode::registerObject();
 
-			/*Node::registerObject();
-			CameraNode::registerObject();
-
-			Component::registerObject();
-			TransformComponent::registerObject();
-			LogicComponent::registerObject();
+		Component::registerObject();
+		TransformComponent::registerObject();
+		LogicComponent::registerObject();
 
 
-			WorldComponent::registerObject();
-			WorldEnvironmentComponent::registerObject();
+		WorldComponent::registerObject();
+		WorldEnvironmentComponent::registerObject();
 
-			World::registerObject();
-			LoadingRoomManager::registerObject();
+		World::registerObject();
+		LoadingRoomManager::registerObject();
 
-			ShapeComponent::registerObject();
-			BoxShapeComponent::registerObject();
-			SphereShapeComponent::registerObject();
-			CylinderShapeComponent::registerObject();
-			CapsuleShapeComponent::registerObject();
-			RigidBodyComponent::registerObject();*/
-		}
-
+		ShapeComponent::registerObject();
+		BoxShapeComponent::registerObject();
+		SphereShapeComponent::registerObject();
+		CylinderShapeComponent::registerObject();
+		CapsuleShapeComponent::registerObject();
+		RigidBodyComponent::registerObject();*/
 	}
 
 	World* Engine::ms_world = nullptr;
@@ -67,7 +61,13 @@ namespace engine
 
 	void Engine::shutdown()
 	{		
-		//WorldManager::shutdown();
+		if (ms_world)
+		{
+			Core::msg("Engine: world is present on engine shutdown, deleting ...");
+
+			mem_delete(ms_world);
+			ms_world = nullptr;
+		}
 
 		// shutdown console
 	//	g_console->shutdown();
@@ -84,6 +84,8 @@ namespace engine
 			mem_delete(ms_world);
 			ms_world = nullptr;
 		}
+
+		Core::msg("Engine::loadWorld() Loading %s", filename.c_str());
 
 		std::shared_ptr<DataStream> stream = g_contentManager->openStream(filename);
 
@@ -121,6 +123,8 @@ namespace engine
 			ms_world = nullptr;
 		}
 
+		Core::msg("Engine::loadEmptyWorld() Creating ...");
+
 		World* world = g_typeManager->createObject<World>();
 		ms_world = world;
 	}
@@ -129,15 +133,18 @@ namespace engine
 	{
 		//OPTICK_EVENT("Engine::update");
 
+		EngineStateManager::getInstance()->update();
+
 		//g_eventManager.update();
 
-		//std::shared_ptr<World> world = WorldManager::getActiveWorld();
-		//if (world)
-		//{
+		World* world = Engine::ms_world;
+		if (world)
+		{
 		//	world->updatePhysicsWorld();
-		//	world->updateLogicWorld();
-		//}
+			world->updateLogicWorld();
+		}
 	}
+
 	void Engine::setGameInterface(IGameInterface* gameInterface)
 	{
 	}
@@ -145,5 +152,51 @@ namespace engine
 	IGameInterface* Engine::getGameInterface()
 	{
 		return nullptr;
+	}
+
+	static EngineStateManager s_engineStateManager;
+
+	EngineStateManager::EngineStateManager()
+	{
+		m_currentState = EngineState::None;
+		m_nextState = EngineState::None;
+	}
+
+	EngineStateManager::~EngineStateManager()
+	{
+	}
+
+	void EngineStateManager::loadWorld(const std::string& filename)
+	{
+		m_nextState = EngineState::LoadWorld;
+		m_worldName = filename;
+	}
+
+	void EngineStateManager::loadEmptyWorld()
+	{
+		m_nextState = EngineState::LoadWorld;
+		m_worldName.clear();
+	}
+
+	void EngineStateManager::update()
+	{
+		m_currentState = m_nextState;
+		switch (m_currentState)
+		{
+		case EngineState::Running:
+			break;
+		case EngineState::LoadWorld:
+			if (m_worldName.empty())
+				Engine::loadEmptyWorld();
+			else
+				Engine::loadWorld(m_worldName);
+
+			m_nextState = EngineState::Running;
+
+			break;
+		
+		default:
+			break;
+		}
 	}
 }

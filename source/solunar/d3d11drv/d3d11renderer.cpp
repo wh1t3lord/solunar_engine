@@ -73,12 +73,12 @@ void D3D11Renderer::init()
 
 	createRasterizerState();
 
-	// initialize base renderer after device creation
-	Renderer::init();
-
 	// Initialize shader manager with current api
 	g_shaderManager = mem_new<D3D11ShaderProgramManager>();
 	g_shaderManager->init("shaders/d3d11");
+
+	// initialize base renderer
+	Renderer::init();
 }
 
 void D3D11Renderer::createSwapChain()

@@ -1,0 +1,23 @@
+// Offscreen shader
+#version 330 core
+
+out vec4 fragColor;
+
+in vec2 v_texcoord;
+
+uniform sampler2D u_texture;
+
+vec3 toneMapping(vec3 v)
+{
+	return v / (1.0f + v);
+}
+
+void main()
+{
+	// tone mapping
+	vec3 color = toneMapping(texture(u_texture, texCoord).rgb);
+	
+	// apply gamma correction
+	float gamma = 2.2;
+	fragColor.rgb = pow(color, vec3(1.0 / gamma));
+}

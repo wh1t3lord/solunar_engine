@@ -1,0 +1,24 @@
+#version 330 core
+
+in vec2 v_texcoord;
+
+out vec4 fragColor;
+
+uniform sampler2D u_texture;
+
+void main()
+{
+
+#if 1
+    fragColor = texture(u_texture, v_texcoord);
+#else
+    vec3 color = texture(u_texture, v_texcoord).rgb;
+    
+    // black by default
+    fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    
+    float brightness = dot(color, vec3(0.2126, 0.7152, 0.0722));
+    if (brightness > 1.0)
+        fragColor = vec4(color.rgb, 1.0);
+#endif
+}
