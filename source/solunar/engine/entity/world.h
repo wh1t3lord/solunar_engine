@@ -6,6 +6,8 @@
 namespace engine
 {
 
+	class PhysicsWorld;
+
 	class World : public SerializableObject
 	{
 	public:
@@ -19,14 +21,19 @@ namespace engine
 		void saveXML(tinyxml2::XMLElement& element) override;
 
 		void updateLogicWorld();
+		void updatePhysicsWorld();
 
 		Entity* createEntity();
 		Entity* createEntityEx(const TypeInfo* typeInfo);
 
 		EntityManager& getEntityManager() { return m_entityManager; }
 
+		PhysicsWorld* getPhysicsWorld() { return m_physicsWorld; }
+
 	private:
 		EntityManager m_entityManager;
+
+		PhysicsWorld* m_physicsWorld;
 	};
 
 }

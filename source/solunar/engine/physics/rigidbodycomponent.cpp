@@ -42,8 +42,7 @@ namespace engine {
 	void RigidBodyComponent::onWorldSet(World* world)
 	{
 		Component::onWorldSet(world);
-
-		//m_physicsWorld = world->getPhysicsWorld();
+		m_physicsWorld = world->getPhysicsWorld();
 	}
 
 	void RigidBodyComponent::onEntityRemove()

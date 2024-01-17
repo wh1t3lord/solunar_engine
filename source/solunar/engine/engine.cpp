@@ -146,7 +146,7 @@ namespace engine
 		World* world = Engine::ms_world;
 		if (world)
 		{
-		//	world->updatePhysicsWorld();
+			world->updatePhysicsWorld();
 			world->updateLogicWorld();
 		}
 	}

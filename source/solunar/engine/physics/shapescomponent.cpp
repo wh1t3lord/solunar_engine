@@ -46,7 +46,7 @@ namespace engine {
 	void ShapeComponent::onWorldSet(World* world)
 	{
 		Component::onWorldSet(world);
-		//m_physicsWorld = world->getPhysicsWorld();
+		m_physicsWorld = world->getPhysicsWorld();
 	}
 
 	void ShapeComponent::loadXML(tinyxml2::XMLElement& element)
@@ -60,6 +60,8 @@ namespace engine {
 
 	void ShapeComponent::saveXML(tinyxml2::XMLElement& element)
 	{
+		tinyxml2::XMLElement* positionElement = element.InsertNewChildElement("Position");
+		saveVector3ToXMLElement(*positionElement, m_localPosition);
 	}
 
 	void ShapeComponent::initializeShape()

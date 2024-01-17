@@ -5,15 +5,23 @@
 #include "engine/entity/entitymanager.h"
 #include "engine/entity/world.h"
 #include "engine/entity/logiccomponent.h"
+#include "engine/physics/physicsworld.h"
+#include "engine/physics/rigidbodycomponent.h"
 
 namespace engine
 {
-	World::World()
+	World::World() :
+		m_physicsWorld(nullptr)
 	{
+		m_physicsWorld = mem_new<PhysicsWorld>();
 	}
 
 	World::~World()
 	{
+		if (m_physicsWorld)
+		{
+			mem_delete(m_physicsWorld); m_physicsWorld = nullptr;
+		}
 	}
 
 	void World::loadXML(tinyxml2::XMLElement& element)
@@ -56,6 +64,24 @@ namespace engine
 		{
 			LogicComponent* logicComponent = entity->getComponent<LogicComponent>();
 			logicComponent->update(Timer::getInstance()->getDelta());
+		}
+	}
+
+	void World::updatePhysicsWorld()
+	{
+		float delta = Timer::getInstance()->getDelta();
+		m_physicsWorld->step(delta);
+
+		std::vector<Entity*> physicsEntities = m_entityManager.getEntitiesWithComponent<RigidBodyComponent>();
+
+		for (auto it : physicsEntities)
+		{
+			RigidBodyComponent* rigidBody = it->getComponent<RigidBodyComponent>();
+			if (rigidBody)
+			{
+				rigidBody->updateBodyTranslationDirty();
+				//rigidBody->updateNodeTranslationDirty();
+			}
 		}
 	}
 
