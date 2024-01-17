@@ -1,4 +1,5 @@
 #include "core/core.h"
+#include "core/timer.h"
 #include "core/utils/logger.h"
 #include "core/memory/memorymanager.h"
 #include "core/file/filesystem_win32.h"
@@ -26,6 +27,8 @@ namespace engine
 		Logger::logPrint("Core builted at %s %s", __TIME__, __DATE__);
 
 		MemoryManager::initialize();
+
+		Timer::getInstance()->init();
 
 		// Allocate native filesystem
 		g_fileSystem = mem_new<FileSystem_Win32>();

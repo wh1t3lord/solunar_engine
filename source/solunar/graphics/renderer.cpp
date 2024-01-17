@@ -147,7 +147,7 @@ namespace engine
 		//m_postProcessingRenderer->shutdown();
 		//m_postProcessingRenderer = nullptr;
 
-	//	MaterialInstanceFactory::destroyInstance();
+		MaterialInstanceFactory::destroyInstance();
 
 		// shutdown font manager
 		//g_fontManager->shutdown();
@@ -157,7 +157,7 @@ namespace engine
 
 	//	ContentManager::getInstance()->releaseGraphicsObjects();
 
-		//ShaderConstantManager::getInstance()->shutdown();
+		ShaderConstantManager::getInstance()->shutdown();
 
 		RenderContext::shutdown();
 	}

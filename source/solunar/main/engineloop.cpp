@@ -152,14 +152,14 @@ namespace engine {
 //		{
 //			appToggleShowMousePointer(true);
 //		}
-//		
+
 		// update timer
 		Timer::getInstance()->update();
-//
-//		ImguiManager::getInstance()->beginFrame();
-//
-//		// update game specific state
-//		gameState->update();
+
+		//ImguiManager::getInstance()->beginFrame();
+
+		// update game specific state
+		//gameState->update();
 		
 		// update camera
 		CameraProxy::getInstance()->updateProxy();
