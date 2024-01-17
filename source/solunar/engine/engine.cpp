@@ -7,10 +7,15 @@
 #include "engine/entity/cameracomponent.h"
 #include "engine/entity/logiccomponent.h"
 
+#include "engine/physics/shapescomponent.h"
+#include "engine/physics/rigidbodycomponent.h"
+
 namespace engine
 {
 	void registerEngineObjects()
 	{
+		// TODO: Rewrite to Class::registerObject()
+
 		TypeManager::getInstance()->registerObject<Entity>();
 		TypeManager::getInstance()->registerObject<Component>();
 		TypeManager::getInstance()->registerObject<World>();
@@ -20,6 +25,14 @@ namespace engine
 		TypeManager::getInstance()->registerObject<CameraFirstPersonComponent>();
 
 		TypeManager::getInstance()->registerObject<LogicComponent>();
+
+		// Physics
+		ShapeComponent::registerObject();
+		BoxShapeComponent::registerObject();
+		SphereShapeComponent::registerObject();
+		CylinderShapeComponent::registerObject();
+		CapsuleShapeComponent::registerObject();
+		RigidBodyComponent::registerObject();
 
 		/*Node::registerObject();
 		CameraNode::registerObject();
@@ -33,14 +46,7 @@ namespace engine
 		WorldEnvironmentComponent::registerObject();
 
 		World::registerObject();
-		LoadingRoomManager::registerObject();
-
-		ShapeComponent::registerObject();
-		BoxShapeComponent::registerObject();
-		SphereShapeComponent::registerObject();
-		CylinderShapeComponent::registerObject();
-		CapsuleShapeComponent::registerObject();
-		RigidBodyComponent::registerObject();*/
+		LoadingRoomManager::registerObject();*/
 	}
 
 	World* Engine::ms_world = nullptr;
