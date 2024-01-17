@@ -13,7 +13,8 @@ namespace engine {
 		g_typeManager->registerObject<ShapeComponent>();
 	}
 
-	ShapeComponent::ShapeComponent()
+	ShapeComponent::ShapeComponent() :
+		m_shape(nullptr)
 	{
 		m_localPosition = glm::vec3(0.0f);
 	}

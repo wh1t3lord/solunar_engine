@@ -7,6 +7,7 @@
 #include "engine/entity/logiccomponent.h"
 #include "engine/physics/physicsworld.h"
 #include "engine/physics/rigidbodycomponent.h"
+#include "engine/physics/shapescomponent.h"
 
 namespace engine
 {
@@ -48,13 +49,25 @@ namespace engine
 			Entity* entity = createEntityEx(entityTypeInfo);
 			entity->loadXML(*entityElement);
 
+			postInitializeEntity(entity);
+
 			entityElement = entityElement->NextSiblingElement("Entity");
 		}
-
 	}
 
 	void World::saveXML(tinyxml2::XMLElement& element)
 	{
+	}
+
+	void World::postInitializeEntity(Entity* entity)
+	{
+		// initialize physics shapes
+		std::vector<ShapeComponent*> shapes = entity->getComponents<ShapeComponent>();
+		if (!shapes.empty())
+		{
+			for (auto it : shapes)
+				it->initializeShape();
+		}
 	}
 
 	void World::updateLogicWorld()

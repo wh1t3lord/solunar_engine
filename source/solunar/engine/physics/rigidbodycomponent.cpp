@@ -159,7 +159,7 @@ namespace engine {
 		// remove user pointer from this component
 		m_rigidBody->setUserPointer(nullptr);
 
-		btDiscreteDynamicsWorld* physicsWorld = m_physicsWorld->getWorld();
+		btDynamicsWorld* physicsWorld = m_physicsWorld->getWorld();
 		physicsWorld->removeRigidBody(m_rigidBody);
 
 		mem_delete(m_rigidBody);

@@ -51,6 +51,9 @@ public:
 	template <typename T>
 	T* getComponent();
 
+	template <typename T>
+	inline std::vector<T*> getComponents();
+
 private:
 	void updateWorldTransform();
 

@@ -9,6 +9,7 @@
 
 #include "engine/physics/shapescomponent.h"
 #include "engine/physics/rigidbodycomponent.h"
+#include "engine/physics/trianglemeshshape.h"
 
 namespace engine
 {
@@ -32,6 +33,7 @@ namespace engine
 		SphereShapeComponent::registerObject();
 		CylinderShapeComponent::registerObject();
 		CapsuleShapeComponent::registerObject();
+		TriangleMeshShapeComponent::registerObject();
 		RigidBodyComponent::registerObject();
 
 		/*Node::registerObject();

@@ -17,7 +17,7 @@ namespace engine
 
 		void step(float delta);
 
-		btDiscreteDynamicsWorld* getWorld() { return m_world; }
+		btDynamicsWorld* getWorld() { return m_world; }
 
 		float getFixedTimeStep() { return m_stepTime; }
 
