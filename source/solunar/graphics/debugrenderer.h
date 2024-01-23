@@ -27,7 +27,7 @@ public:
 
 	void drawDebugPositionOrNormal(const glm::vec3& vec);
 	void drawLine(const glm::vec3& from, const glm::vec3& to, const glm::vec3& color);
-	void DrawBoundingBox(const BoundingBox& box, const glm::vec3& color);
+	void drawBoundingBox(const BoundingBox& box, const glm::vec3& color);
 
 	void renderFrame(View* view);
 

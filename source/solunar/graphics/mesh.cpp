@@ -42,6 +42,6 @@ namespace engine {
 
 	void MeshComponent::render()
 	{
-		g_debugRender.DrawBoundingBox(m_boundingBox, glm::vec3(1.f));
+		g_debugRender.drawBoundingBox(m_boundingBox, glm::vec3(1.f));
 	}
 }

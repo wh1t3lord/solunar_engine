@@ -90,7 +90,7 @@ void DebugRender::drawLine(const glm::vec3& from, const glm::vec3& to, const glm
 	m_lines.push_back(line);
 }
 
-void DebugRender::DrawBoundingBox(const BoundingBox& box, const glm::vec3& color)
+void DebugRender::drawBoundingBox(const BoundingBox& box, const glm::vec3& color)
 {
 	glm::vec3 from = glm::vec3(box.m_min.x, box.m_min.y, box.m_min.z);
 	glm::vec3 to = glm::vec3(box.m_max.x, box.m_max.y, box.m_max.z);
