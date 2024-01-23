@@ -1,5 +1,6 @@
 #include "d3d11drv_pch.h"
 #include "d3d11drv/d3d11statemanager.h"
+#include "d3d11drv/d3d11device.h"
 
 namespace engine
 {
@@ -94,6 +95,28 @@ void D3D11StateManager::destroyRasterizerState(IRasterizerState* rasterizerState
 {
     ID3D11RasterizerState* d3drasterizerState = (ID3D11RasterizerState*)rasterizerState;
     d3drasterizerState->Release();
+}
+
+ISamplerState* D3D11StateManager::createSamplerState(const SamplerDesc& samplerDesc)
+{
+    // Find already created ISamplerState
+    auto it = m_samplerStates.find(samplerDesc);
+    if (it != m_samplerStates.end())
+    {
+        return (*it).second;
+    }
+
+    ISamplerState* samplerState = g_renderDevice->createSamplerState(samplerDesc);
+
+    m_samplerStates.emplace(samplerDesc, samplerState);
+
+    return samplerState;
+}
+
+void D3D11StateManager::destroySamplerState(ISamplerState* samplerState)
+{
+    // ???
+    mem_delete(samplerState);
 }
 
 }

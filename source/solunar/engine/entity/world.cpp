@@ -112,4 +112,41 @@ namespace engine
 		return entity;
 	}
 
+	Entity* World::rayCast(const glm::vec3& rayStart, const glm::vec3& rayEnd)
+	{
+		Assert2(m_physicsWorld, "Physics world is not initialized for ray casting");
+
+		btDynamicsWorld::ClosestRayResultCallback rayCallback(glmVectorToBt(rayStart), glmVectorToBt(rayEnd));
+		m_physicsWorld->getWorld()->rayTest(glmVectorToBt(rayStart), glmVectorToBt(rayEnd), rayCallback);
+		if (rayCallback.hasHit())
+		{
+			// Query entity
+			
+			RigidBodyComponent* rigidbody = reinterpret_cast<RigidBodyComponent*>(rayCallback.m_collisionObject->getUserPointer());
+			Entity* entity = rigidbody->getEntity();
+			Assert2(entity, "Critital skill issue, rigid body component assigned to nullptr entity!");
+			return entity;
+		}
+
+		return nullptr;
+	}
+
+	std::vector<Entity*> World::boxCast(const glm::vec3& boxPos, const glm::vec3& boxSize)
+	{
+		std::vector<Entity*> entities;
+		
+		glm::vec3 halfSize = boxSize / glm::vec3(2.0f);
+		btConvexShape* convexShape = mem_new<btBoxShape>(glmVectorToBt(halfSize));
+
+		btTransform transform;
+		transform.setIdentity();
+		transform.setOrigin(glmVectorToBt(boxPos));
+
+	//	m_physicsWorld->getWorld()->convexSweepTest(convexShape, transform, )
+
+		//btDynamicsWorld::ClosestConvexResultCallback convexCallback()
+
+		return entities;
+	}
+
 }

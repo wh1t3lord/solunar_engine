@@ -16,10 +16,10 @@ public:
 	Thread();
 	virtual ~Thread();
 
-	bool startThread();
+	bool start();
 	void setThreadName(const char* name);
 
-	void stopThread();
+	void stop();
 
 	virtual void execute() = 0;
 

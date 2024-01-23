@@ -20,7 +20,9 @@ namespace engine
 	class PixelShader;
 	class MaterialInstance;
 	class IShaderProgram;
-	
+	struct IRasterizerState;
+	struct IBlendState;
+
 	struct MaterialUniforms
 	{
 		// Material data
@@ -77,7 +79,6 @@ namespace engine
 
 	public:
 		Material();
-
 		~Material();
 
 		void load(const std::shared_ptr<DataStream>& dataStream) override;
@@ -133,6 +134,8 @@ namespace engine
 		bool m_skipmips;
 		bool m_selfillum;
 		bool m_clampToEdge;
+
+		IRasterizerState* m_rasterizerDesc;
 	};
 
 	class NullMaterial : public Material

@@ -32,6 +32,11 @@ namespace engine
 
 		PhysicsWorld* getPhysicsWorld() { return m_physicsWorld; }
 
+		// Casting functions
+
+		Entity* rayCast(const glm::vec3& rayStart, const glm::vec3& rayEnd);
+		std::vector<Entity*> boxCast(const glm::vec3& boxPos, const glm::vec3& boxSize);
+
 	private:
 		EntityManager m_entityManager;
 

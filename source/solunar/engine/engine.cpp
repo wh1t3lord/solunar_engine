@@ -51,6 +51,47 @@ namespace engine
 		LoadingRoomManager::registerObject();*/
 	}
 
+	bool g_harakiriLogicThread = false;
+	bool g_worldIsReady = false;
+
+	class LogicThread : public Thread
+	{
+	public:
+		LogicThread();
+		~LogicThread();
+
+		void execute() override;
+	};
+
+	LogicThread::LogicThread()
+	{
+	}
+
+	LogicThread::~LogicThread()
+	{
+	}
+
+	void LogicThread::execute()
+	{
+		setThreadName("Logic Thread");
+
+		while (!g_harakiriLogicThread)
+		{
+			if (g_worldIsReady)
+			{
+				Assert2(Engine::ms_world, "Trying to update nullptr world. Check g_worldIsReady!");
+
+				Engine::ms_world->updateLogicWorld();
+			}
+
+			Sleep(10);
+		}
+
+		Core::msg("LogicThread: exiting ...");
+	}
+
+	LogicThread g_logicThread;
+
 	World* Engine::ms_world = nullptr;
 
 	void Engine::init()
@@ -59,16 +100,26 @@ namespace engine
 
 		registerEngineObjects();
 
+		// Start logic thread
+		g_logicThread.start();
+
 		//ScriptManager::getInstance()->init();
 
 		// initalize console
 		//g_console->init();
 
 		//WorldManager::init();
+
+		//g_harakiriLogicThread = true;
+		//g_logicThread.stop();
 	}
 
 	void Engine::shutdown()
-	{		
+	{
+		// harakiri logic thread
+		g_harakiriLogicThread = true;
+		g_logicThread.stop();
+
 		if (ms_world)
 		{
 			Core::msg("Engine: world is present on engine shutdown, deleting ...");

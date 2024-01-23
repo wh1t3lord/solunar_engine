@@ -11,6 +11,7 @@
 #include "graphics/graphicsoptions.h"
 
 #include "graphics/core/device.h"
+#include "graphics/core/statemanager.h"
 
 #include "graphics/materials/materialinstance.h"
 #include "graphics/materials/materialinstancefactory.h"
@@ -93,12 +94,6 @@ namespace engine
 
 	Material::~Material()
 	{
-		if (m_albedoSampler)
-		{
-			mem_delete(m_albedoSampler);
-			m_albedoSampler = nullptr;
-		}
-
 		if (m_materialInstance)
 		{
 			mem_delete(m_materialInstance);
@@ -110,6 +105,8 @@ namespace engine
 		m_specularTexture.reset();
 		m_normalTexture.reset();
 		m_albedoTexture.reset();
+	
+		m_albedoSampler = nullptr;
 	}
 
 	void Material::load(const std::shared_ptr<DataStream>& dataStream)
@@ -391,7 +388,7 @@ namespace engine
 
 		albedoSamplerDesc.m_anisotropyLevel = (float)anisotropicQuality;
 
-		m_albedoSampler = g_renderDevice->createSamplerState(albedoSamplerDesc);
+		m_albedoSampler = g_stateManager->createSamplerState(albedoSamplerDesc); //g_renderDevice->createSamplerState(albedoSamplerDesc);
 
 		//ContentManager* contentManager = ContentManager::getInstance();
 
@@ -437,7 +434,6 @@ namespace engine
 			glGenerateTextureMipmapEXT(texture2DImpl->getHandle(), GL_TEXTURE_2D);
 		}
 #endif
-
 	}
 
 	void Material::releaseHw()

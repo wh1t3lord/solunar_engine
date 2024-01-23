@@ -30,6 +30,7 @@ namespace engine
 		Renderer();
 		virtual ~Renderer();
 		void initFramebuffer(View* view);
+		void initInplaceResources();
 
 		virtual void init();
 		virtual void shutdown();

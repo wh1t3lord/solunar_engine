@@ -447,8 +447,6 @@ void D3D11Renderer::takeScreenshotInternal()
 	image.createRaw((void*)screenBuffer, width, height, 4);
 	image.setFlip(false);
 
-	
-
 	char buffer[256];
 	for (int i = 0;; i++)
 	{

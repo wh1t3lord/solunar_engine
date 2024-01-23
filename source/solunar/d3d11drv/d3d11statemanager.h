@@ -64,6 +64,9 @@ public:
 	IRasterizerState* createRasterizerState(const RasterizerStateDesc& rasterizerDesc) override;
 	void destroyRasterizerState(IRasterizerState* rasterizerState) override;
 
+	ISamplerState* createSamplerState(const SamplerDesc& samplerDesc) override;
+	void destroySamplerState(ISamplerState* samplerState) override;
+
 private:
 	std::map<RasterizerStateKey, IRasterizerState*> m_rasterizerStates;
 	std::map<SamplerStateKey, ISamplerState*> m_samplerStates;

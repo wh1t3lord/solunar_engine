@@ -47,7 +47,7 @@ void Thread::setThreadName(const char* name)
 	::SetThreadName(GetCurrentThreadId(), name);
 }
 
-void Thread::stopThread()
+void Thread::stop()
 {
 	if (!m_isRunning)
 		return;
@@ -66,7 +66,7 @@ static unsigned threadProc(void* data)
 	return 0;
 }
 
-bool Thread::startThread()
+bool Thread::start()
 {
 	m_threadId = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)threadProc, this, 0, 0);
 	m_threadHandle = (HANDLE)m_threadId;
@@ -88,7 +88,7 @@ Thread::Thread()
 Thread::~Thread()
 {
 	if (m_isRunning)
-		stopThread();
+		stop();
 }
 
 }

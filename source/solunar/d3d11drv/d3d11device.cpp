@@ -55,7 +55,7 @@ void D3D11Device::create()
 
 	UINT deviceCreationFlags = 0;
 #ifndef NDEBUG
-	deviceCreationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+	//deviceCreationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
 	HRESULT hr = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, 0, deviceCreationFlags, &needFeatureLevel, 1, D3D11_SDK_VERSION,
@@ -63,10 +63,7 @@ void D3D11Device::create()
 
 	if (FAILED(hr))
 	{
-		/////////////////////////////////////////////////////////////////////////////
 		// #TODO: Move get win api error string to something outside device creation.
-		/////////////////////////////////////////////////////////////////////////////
-
 		const DWORD kStringBufferSize = 512;
 		char stringBuffer[kStringBufferSize];
 
@@ -81,7 +78,7 @@ void D3D11Device::create()
 		Core::error("Failed to create DirectX 11 Device. Error: %s\nMake sure you has install DirectX 11 Runtime already\nand you video card drivers\nare up to date.",
 			stringBuffer);
 #else
-		Core::error("Failed to create D3D11 Device. %uz %s", hr, stringBuffer);
+		Core::error("Failed to create D3D11 Device. 0x%08X %s", hr, stringBuffer);
 #endif
 	}
 

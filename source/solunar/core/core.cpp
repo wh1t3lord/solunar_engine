@@ -2,6 +2,8 @@
 #include "core/utils/logger.h"
 
 #include <exception>
+#include <thread>
+#include <mutex>
 
 namespace engine
 {
@@ -19,8 +21,12 @@ namespace engine
 #endif
 	}
 
+	static std::mutex g_loggerMutex;
+
 	void Core::msg(const char* msg, ...)
 	{
+		std::lock_guard<std::mutex> lockGuard(g_loggerMutex);
+
 		static char buf[2048 * 2];
 		va_list args;
 
@@ -33,6 +39,8 @@ namespace engine
 
 	void Core::error(const char* msg, ...)
 	{
+		std::lock_guard<std::mutex> lockGuard(g_loggerMutex);
+
 		static char buf[2048 * 2];
 		va_list args;
 

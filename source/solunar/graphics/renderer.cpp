@@ -37,6 +37,9 @@ namespace engine
 {
 	Renderer* g_renderer = nullptr;
 
+	static std::weak_ptr<TextureMap> g_defaultTexture;
+	static std::weak_ptr<TextureMap> g_notFoundTexture;
+
 	Renderer::Renderer()
 	{
 		m_meshPolysWireframe	= false;
@@ -49,6 +52,24 @@ namespace engine
 	Renderer::~Renderer()
 	{
 
+	}
+
+	void Renderer::initInplaceResources()
+	{
+#if 0
+		// check for shaders
+		// #TODO: rewrite to content manager (should return nullptr on stream open failure)
+		if (!g_fileSystem->exist("data/shaders/dx11/quad.vsh") ||
+			!g_fileSystem->exist("data/shaders/dx11/quad.psh"))
+		{
+			Core::error("Game files is corrupted or incomplete.\nFor devs: wrong working directory???");
+		}
+#endif
+
+		// load textures
+
+		g_defaultTexture = dynamicCastPtr<TextureMap>(g_contentManager->load("textures/default.png", TextureMap::getStaticTypeInfo()));
+		g_notFoundTexture = dynamicCastPtr<TextureMap>(g_contentManager->load("textures/notexture.png", TextureMap::getStaticTypeInfo()));
 	}
 
 	void Renderer::initFramebuffer(View* view)
@@ -85,6 +106,14 @@ namespace engine
 
 	void Renderer::init()
 	{
+		View* view = CameraProxy::getInstance()->getView();
+
+		// shader manager is inited
+		//initInplaceResources();
+
+		// initialize default framebuffer
+		initFramebuffer(view);
+
 		// set as lit
 		setRenderMode(RendererViewMode::Lit);
 
@@ -119,6 +148,8 @@ namespace engine
 
 	void Renderer::shutdown()
 	{
+		// release inplace resources
+
 		ShadowsRenderer::getInstance()->shutdown();
 
 		//g_postFxManager.shutdown();
