@@ -12,6 +12,8 @@
 #include "graphics/graphicsoptions.h"
 #include "graphics/view.h"
 
+#include "main/win32_keys.h"
+
 namespace engine
 {
 	View* g_engineView = nullptr;
@@ -75,6 +77,20 @@ namespace engine
 		case WM_CLOSE:
 			PostQuitMessage(0);
 			return 0;
+
+		case WM_KEYDOWN:
+		{
+			Win32Keys::Keys key = static_cast<Win32Keys::Keys>(wParam);
+			InputManager::getInstance()->keyboardAction(static_cast<int>(getKeyFromWin32(key)), true);
+			break;
+		}
+
+		case WM_KEYUP:
+		{
+			Win32Keys::Keys key = static_cast<Win32Keys::Keys>(wParam);
+			InputManager::getInstance()->keyboardAction(static_cast<int>(getKeyFromWin32(key)), false);
+			break;
+		}
 
 		default:
 			break;

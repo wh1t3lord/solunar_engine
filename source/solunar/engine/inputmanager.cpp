@@ -68,15 +68,6 @@ namespace engine
 		if ((uint32_t)key >= 420)
 			return false;
 
-		if (key == KeyboardKeys::KEY_W)
-			return GetAsyncKeyState('W');
-		if (key == KeyboardKeys::KEY_S)
-			return GetAsyncKeyState('S');
-		if (key == KeyboardKeys::KEY_A)
-			return GetAsyncKeyState('A');
-		if (key == KeyboardKeys::KEY_D)
-			return GetAsyncKeyState('D');
-
 		return m_keys[(uint32_t)key];
 	}
 
@@ -84,15 +75,6 @@ namespace engine
 	{
 		if ((uint32_t)key >= 420)
 			return false;
-
-		if (key == KeyboardKeys::KEY_W)
-			return GetAsyncKeyState('W');
-		if (key == KeyboardKeys::KEY_S)
-			return GetAsyncKeyState('S');
-		if (key == KeyboardKeys::KEY_A)
-			return GetAsyncKeyState('A');
-		if (key == KeyboardKeys::KEY_D)
-			return GetAsyncKeyState('D');
 
 		if (m_keys[(uint32_t)key])
 		{
