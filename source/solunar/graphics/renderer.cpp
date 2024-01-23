@@ -67,9 +67,8 @@ namespace engine
 #endif
 
 		// load textures
-
-		g_defaultTexture = dynamicCastPtr<TextureMap>(g_contentManager->load("textures/default.png", TextureMap::getStaticTypeInfo()));
-		g_notFoundTexture = dynamicCastPtr<TextureMap>(g_contentManager->load("textures/notexture.png", TextureMap::getStaticTypeInfo()));
+		g_defaultTexture = g_contentManager->loadObject<TextureMap>("textures/default.png");
+		g_notFoundTexture = g_contentManager->loadObject<TextureMap>("textures/notexture.png");
 	}
 
 	void Renderer::initFramebuffer(View* view)
@@ -112,7 +111,7 @@ namespace engine
 		//initInplaceResources();
 
 		// initialize default framebuffer
-		initFramebuffer(view);
+		//initFramebuffer(view);
 
 		// set as lit
 		setRenderMode(RendererViewMode::Lit);

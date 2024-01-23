@@ -27,6 +27,9 @@ public:
 	DataStreamPtr openStream(const std::string& name, const std::string& path);
 
 	std::weak_ptr<SerializableObject> load(const std::string& filename, const TypeInfo* pTypeInfo);
+
+	template <typename T>
+	std::weak_ptr<T> loadObject(const std::string& filename);
 	
 	//void loadExisted(const std::string& filename, std::shared_ptr<SerializableObject> object);
 
@@ -45,6 +48,12 @@ private:
 };
 
 extern ContentManager* g_contentManager;
+
+template<typename T>
+inline std::weak_ptr<T> ContentManager::loadObject(const std::string& filename)
+{
+	return dynamicCastPtr<T>(load(filename, T::getStaticTypeInfo()));
+}
 
 }
 
