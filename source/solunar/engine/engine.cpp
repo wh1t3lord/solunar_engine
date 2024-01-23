@@ -69,6 +69,7 @@ namespace engine
 
 	LogicThread::~LogicThread()
 	{
+		g_harakiriLogicThread = true;
 	}
 
 	void LogicThread::execute()
@@ -101,7 +102,7 @@ namespace engine
 		registerEngineObjects();
 
 		// Start logic thread
-		g_logicThread.start();
+//		g_logicThread.start();
 
 		//ScriptManager::getInstance()->init();
 
@@ -117,8 +118,8 @@ namespace engine
 	void Engine::shutdown()
 	{
 		// harakiri logic thread
-		g_harakiriLogicThread = true;
-		g_logicThread.stop();
+	//	g_harakiriLogicThread = true;
+	//	g_logicThread.stop();
 
 		if (ms_world)
 		{
