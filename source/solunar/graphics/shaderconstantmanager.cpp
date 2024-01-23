@@ -16,9 +16,51 @@
 namespace engine
 {
 	static ShaderConstantManager s_shaderConstantManager;
+	ConstantBufferProxy g_staticMeshConstantBuffer;
 
-	ShaderConstantManager::ShaderConstantManager() :
-		m_staticMeshConstantBuffer(nullptr)
+	ConstantBufferProxy::ConstantBufferProxy(IBufferBase* buffer)
+	{
+		Assert(buffer);
+		m_buffer = buffer;
+	}
+
+	ConstantBufferProxy::ConstantBufferProxy(IBufferBase* buffer, const std::string& name)
+	{
+		Assert(buffer);
+		Assert(name.empty());
+		m_buffer = buffer;
+		m_name = name;
+	}
+
+	ConstantBufferProxy::ConstantBufferProxy(const ConstantBufferProxy& proxy)
+	{
+		Assert(proxy.m_buffer);
+		Assert(proxy.m_name.empty());
+		m_buffer = proxy.m_buffer;
+		m_name = proxy.m_name;
+	}
+
+	ConstantBufferProxy::~ConstantBufferProxy()
+	{
+		m_buffer = nullptr;
+	}
+
+	IBufferBase* ConstantBufferProxy::get()
+	{
+		return m_buffer;
+	}
+
+	IBufferBase* ConstantBufferProxy::operator->()
+	{
+		return m_buffer;
+	}
+
+	std::string ConstantBufferProxy::name()
+	{
+		return m_name;
+	}
+
+	ShaderConstantManager::ShaderConstantManager()
 	{
 	}
 
@@ -28,36 +70,39 @@ namespace engine
 
 	void ShaderConstantManager::init()
 	{
-		Core::msg("[graphics]: initialize constant buffers ...");
+		Core::msg("ShaderConstantManager: initialize constant buffers ...");
 
-		// Create constant buffer for static mesh
-
-		BufferDesc bufferDesc;
-		memset(&bufferDesc, 0, sizeof(bufferDesc));
-		bufferDesc.m_bufferType = BufferType::ConstantBuffer;
-		bufferDesc.m_bufferAccess = BufferAccess::Stream;
-		bufferDesc.m_bufferMemorySize = sizeof(StaticMeshGlobalData);
-
-		SubresourceDesc subresourceDesc;
-		memset(&subresourceDesc, 0, sizeof(subresourceDesc));
-
-		m_staticMeshConstantBuffer = g_renderDevice->createBuffer(bufferDesc, subresourceDesc);
+		g_staticMeshConstantBuffer = create<StaticMeshGlobalData>("StaticMeshGlobalData");
 	}
 
 	void ShaderConstantManager::shutdown()
 	{
-		if (m_staticMeshConstantBuffer)
+		for (auto it : m_constantBuffers)
 		{
-			mem_delete(m_staticMeshConstantBuffer);
-			m_staticMeshConstantBuffer = nullptr;
+			Core::msg("ShaderConstantManager: releasing constant buffer %s", it.first.c_str());
+			mem_delete(it.second);
 		}
+
+		m_constantBuffers.clear();
 	}
+
+	ConstantBufferProxy ShaderConstantManager::get(const std::string& name)
+	{
+		auto it = m_constantBuffers.find(name);
+		if (it != m_constantBuffers.end())
+		{
+			return ConstantBufferProxy(it->second);
+		}
+
+		return ConstantBufferProxy(nullptr);
+	}
+
 
 	void ShaderConstantManager::setStaticMeshGlobalData(StaticMeshComponent* meshComponent, View* view, RenderContext& renderContext, GraphicsWorld* graphicsWorld)
 	{
 		// OPTICK_EVENT("ShaderConstantManager::setStaticMeshGlobalData");
-#if 0
-		StaticMeshGlobalData* globalData = (StaticMeshGlobalData*)m_staticMeshConstantBuffer->map(BufferMapping::WriteOnly);
+
+		StaticMeshGlobalData* globalData = (StaticMeshGlobalData*)g_staticMeshConstantBuffer->map(BufferMapping::WriteOnly);
 		globalData->m_modelMatrix = renderContext.model;
 		globalData->m_viewMatrix = renderContext.view;
 		globalData->m_projectionMatrix = renderContext.proj;
@@ -67,13 +112,14 @@ namespace engine
 
 		globalData->m_modelViewProjection = modelViewProjection;
 
-		CameraProxy* cameraProxy = CameraProxy::getInstance();
-		globalData->m_viewPos = glm::vec4(cameraProxy->getPosition(), 0.0f);
-		globalData->m_viewDir = glm::vec4(cameraProxy->getDirection(), 0.0f);
+		Camera* camera = CameraProxy::getInstance();
+		globalData->m_viewPos = glm::vec4(camera->getPosition(), 0.0f);
+		globalData->m_viewDir = glm::vec4(camera->getDirection(), 0.0f);
 
 		globalData->m_directionLightVec = glm::vec4(0.0f);
 		globalData->m_directionLightColor = glm::vec4(0.0f);
 
+#if 0
 		for (auto& light : graphicsWorld->getLightManager()->getLights())
 		{
 			if (light->isA(DirectionalLightComponent::getStaticTypeInfo()))
@@ -87,6 +133,11 @@ namespace engine
 		m_staticMeshConstantBuffer->unmap();
 
 		g_renderDevice->setConstantBufferIndex(0, m_staticMeshConstantBuffer);
+#else
+		g_staticMeshConstantBuffer->unmap();
+		g_renderDevice->setConstantBufferIndex(0, g_staticMeshConstantBuffer.get());
 #endif
+
 	}
+
 }

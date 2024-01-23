@@ -45,6 +45,28 @@ namespace engine
 	class IShaderProgram;
 	class StaticMeshComponent;
 
+	class ConstantBufferProxy
+	{
+	public:
+		ConstantBufferProxy() = default;
+		ConstantBufferProxy(IBufferBase* buffer);
+		ConstantBufferProxy(IBufferBase* buffer, const std::string& name);
+		ConstantBufferProxy(const ConstantBufferProxy& proxy);
+		
+		~ConstantBufferProxy();
+
+		IBufferBase* get();
+		IBufferBase* operator->();
+
+		std::string name();
+
+	private:
+		std::string m_name;
+		IBufferBase* m_buffer;
+	};
+
+	extern ConstantBufferProxy g_staticMeshConstantBuffer;
+
 	class ShaderConstantManager : public Singleton<ShaderConstantManager>
 	{
 	public:
@@ -54,22 +76,37 @@ namespace engine
 		void init();
 		void shutdown();
 
+		template <typename BufferStructureData>
+		ConstantBufferProxy create(const std::string& name);
+	
+		ConstantBufferProxy get(const std::string& name);
+
 		void setStaticMeshGlobalData(StaticMeshComponent* meshComponent, View* view, RenderContext& renderContext, GraphicsWorld* graphicsWorld);
 
-	//	void setPointLightConstantBuffer();
-		
-	//	void setDefaultContants(IShaderProgram* shader);
-	//
-	//	void setGraphicsConstants(IShaderProgram* shader);
-	//	void setEngineConstants(IShaderProgram* shader);
-
-	//	IBufferBase* getPointLightsConstantBuffer() { return m_pointLightsConstantBuffer; }
-
 	private:
-		IBufferBase* m_staticMeshConstantBuffer;
-
-	//	IBufferBase* m_pointLightsConstantBuffer;
+		std::unordered_map<std::string, IBufferBase*> m_constantBuffers;
 	};
+
+	template<typename BufferStructureData>
+	inline ConstantBufferProxy ShaderConstantManager::create(const std::string& name)
+	{
+		// Create constant buffer
+
+		BufferDesc bufferDesc = {};
+		bufferDesc.m_bufferType = BufferType::ConstantBuffer;
+		bufferDesc.m_bufferAccess = BufferAccess::Stream;
+		bufferDesc.m_bufferMemorySize = sizeof(BufferStructureData);
+
+		SubresourceDesc subresourceDesc = {};
+
+		IBufferBase* buffer = g_renderDevice->createBuffer(bufferDesc, subresourceDesc);
+
+		m_constantBuffers.emplace(name, buffer);
+
+		Core::msg("ShaderConstantManager: created constant buffer %s (%i bytes)", name.c_str(), bufferDesc.m_bufferMemorySize);
+
+		return ConstantBufferProxy(buffer);
+	}
 }
 
 #endif // !SHADERCONSTANTMANAGER_H
