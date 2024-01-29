@@ -59,7 +59,7 @@ namespace engine
 		tinyxml2::XMLElement* rootElement = doc.NewElement("Material");
 
 		Material* materialToWrite = TypeManager::getInstance()->createObject<Material>();
-		materialToWrite->m_albedoTextureName = diffuseName;
+		materialToWrite->m_albedoTextureFileName = diffuseName;
 		materialToWrite->m_normalTextureName = normalName;
 		
 		materialToWrite->saveXML(*rootElement);;
@@ -152,9 +152,9 @@ namespace engine
 				filename = albedoTexture->FindAttribute("filename");
 
 			if (filename) {
-				m_albedoTextureName = filename->Value();
+				m_albedoTextureFileName = filename->Value();
 			} else {
-				m_albedoTextureName = "textures/notexture.png";
+				m_albedoTextureFileName = "textures/notexture.png";
 			}
 
 			const tinyxml2::XMLAttribute* clampToEdge = albedoTexture->FindAttribute("ClampToEdge");
@@ -162,7 +162,7 @@ namespace engine
 				m_clampToEdge = clampToEdge->BoolValue();
 			}
 		} else {
-			m_albedoTextureName = "textures/notexture.png";
+			m_albedoTextureFileName = "textures/notexture.png";
 		}
 
 		// Normal texture
@@ -252,7 +252,7 @@ namespace engine
 
 		// Albedo
 		tinyxml2::XMLElement* albedoTexture = element.InsertNewChildElement("AlbedoTexture");
-		albedoTexture->SetAttribute("filename", m_albedoTextureName.c_str());
+		albedoTexture->SetAttribute("filename", m_albedoTextureFileName.c_str());
 		if (m_clampToEdge) {
 			albedoTexture->SetAttribute("ClampToEdge", m_clampToEdge);
 		}
@@ -402,7 +402,13 @@ namespace engine
 		//	m_albedoTexture = contentManager->loadTexture(m_albedoTextureName);
 		//}
 
-		m_albedoTexture = dynamicCastPtr< TextureMap >(g_contentManager->load(m_albedoTextureName, TextureMap::getStaticTypeInfo()));
+		// TODO: Return default texture if TextureMap is not exist
+		if (m_albedoTextureFileName.empty())
+			m_albedoTextureFileName = "textures/system/notex.bmp";
+
+		m_albedoTexture = g_contentManager->loadObject<TextureMap>(m_albedoTextureFileName);
+
+		//m_albedoTexture = dynamicCastPtr< TextureMap >(g_contentManager->load(m_albedoTextureName, TextureMap::getStaticTypeInfo()));
 
 		// REWRITE TO SAMPLER !!!
 

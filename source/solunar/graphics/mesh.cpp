@@ -1,6 +1,7 @@
 #include "graphicspch.h"
 #include "graphics/mesh.h"
 #include "graphics/debugrenderer.h"
+#include "graphics/renderer.h"
 
 namespace engine {
 
@@ -15,11 +16,25 @@ namespace engine {
 
 	MeshComponent::~MeshComponent()
 	{
+		m_model.reset();
 	}
 
 	void MeshComponent::loadXML(tinyxml2::XMLElement& element)
 	{
-		
+		tinyxml2::XMLElement* modelElement = element.FirstChildElement("Model");
+		if (modelElement)
+		{
+			const tinyxml2::XMLAttribute* filenameAttribute = modelElement->FindAttribute("filename");
+			if (filenameAttribute && strlen( filenameAttribute->Value())>0)
+			{
+				std::string filename = filenameAttribute->Value();
+				m_model = g_contentManager->loadObject<ModelBase>(filename);
+			}
+			else
+			{
+				Core::msg("WARNING: MeshComponent at entity(0x%p) has empty filename attribute in Model element!", getEntity());
+			}
+		}
 	}
 
 	void MeshComponent::saveXML(tinyxml2::XMLElement& element)
@@ -30,5 +45,10 @@ namespace engine {
 	{
 		BoundingBox boundingBox = getEntity()->getBoundingBox();
 		g_debugRender.drawBoundingBox(boundingBox, glm::vec3(1.f));
+	}
+
+	std::shared_ptr<ModelBase> MeshComponent::lockModel()
+	{
+		return m_model.lock();
 	}
 }

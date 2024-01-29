@@ -49,6 +49,7 @@ namespace engine
 		const glm::mat4 getTransform() const { return m_transform; }
 
 		std::weak_ptr<Material> getMaterial() { return m_material; }
+		std::shared_ptr<Material> lockMaterial();
 
 	private:
 		std::weak_ptr<Material> m_material;

@@ -40,7 +40,7 @@ private:
 
 	void clearScreen() override;
 
-	void renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, StaticMeshComponent* mesh);
+	void renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh);
 
 private:
 	RendererSingletonStorer m_singletonStorer;

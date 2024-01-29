@@ -98,7 +98,7 @@ namespace engine
 	}
 
 
-	void ShaderConstantManager::setStaticMeshGlobalData(StaticMeshComponent* meshComponent, View* view, RenderContext& renderContext, GraphicsWorld* graphicsWorld)
+	void ShaderConstantManager::setStaticMeshGlobalData(MeshComponent* meshComponent, View* view, RenderContext& renderContext, GraphicsWorld* graphicsWorld)
 	{
 		// OPTICK_EVENT("ShaderConstantManager::setStaticMeshGlobalData");
 

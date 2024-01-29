@@ -33,6 +33,7 @@ public:
 
 	virtual IRasterizerState* createRasterizerState(const RasterizerStateDesc& rasterizerDesc) = 0;
 	virtual void destroyRasterizerState(IRasterizerState* rasterizerState) = 0;
+	virtual void setRasterizerState(IRasterizerState* rasterizerState) = 0;
 
 	virtual ISamplerState* createSamplerState(const SamplerDesc& samplerDesc) = 0;
 	virtual void destroySamplerState(ISamplerState* samplerState) = 0;

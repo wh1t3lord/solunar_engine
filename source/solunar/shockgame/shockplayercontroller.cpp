@@ -73,6 +73,20 @@ void ShockPlayerController::update(float dt)
 
 	// update player movement
 	//updateMovement(dt);
+
+	InputManager* input = InputManager::getInstance();
+	if (input->getKey(KeyboardKeys::KEY_F))
+	{
+		Camera* camera = CameraProxy::getInstance();
+		glm::vec3 rayStart = camera->getPosition() + camera->getDirection();
+		glm::vec3 rayEnd = rayStart + 1000.0f;
+
+		Entity* entity = getWorld()->rayCast(rayStart, rayEnd);
+		if (entity)
+		{
+			Core::msg("ShockPlayerController::update(): looking at entity 0x%p", entity);
+		}
+	}
 }
 
 void ShockPlayerController::updateCamera(float dt)

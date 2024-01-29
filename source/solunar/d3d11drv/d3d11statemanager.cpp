@@ -97,6 +97,12 @@ void D3D11StateManager::destroyRasterizerState(IRasterizerState* rasterizerState
     d3drasterizerState->Release();
 }
 
+void D3D11StateManager::setRasterizerState(IRasterizerState* rasterizerState)
+{
+    ID3D11RasterizerState* d3drasterizerState = (ID3D11RasterizerState*)rasterizerState;
+    g_d3d11Device->getDeviceContext()->RSSetState(d3drasterizerState);
+}
+
 ISamplerState* D3D11StateManager::createSamplerState(const SamplerDesc& samplerDesc)
 {
     // Find already created ISamplerState

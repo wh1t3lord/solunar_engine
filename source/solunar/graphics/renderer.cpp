@@ -220,8 +220,22 @@ namespace engine
 			std::vector<Entity*> drawableEntities = entityManager.getEntitiesWithComponent<MeshComponent>();
 			for (auto entity : drawableEntities)
 			{
+				//MeshComponent* meshComponent = entity->getComponent<MeshComponent>();
+				//meshComponent->render();
+
 				MeshComponent* meshComponent = entity->getComponent<MeshComponent>();
-				meshComponent->render();
+				if (meshComponent)
+				{
+					// setup render context
+					RenderContext& renderCtx = RenderContext::getContext();
+					renderCtx.model = entity->getWorldTranslation();
+					RenderContext::setContext(renderCtx);
+
+					// call render function
+					renderMesh(nullptr, view, meshComponent);
+
+					meshComponent->render();
+				}
 			}
 		}
 #if 0

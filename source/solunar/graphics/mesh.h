@@ -1,6 +1,8 @@
 #ifndef GRAPHICS_MESH_H
 #define GRAPHICS_MESH_H
 
+#include "graphics/model.h"
+
 namespace engine {
 
 	//class MeshResource : public Content
@@ -29,8 +31,10 @@ namespace engine {
 
 		virtual void render();
 
+		std::shared_ptr<ModelBase> lockModel();
+
 	private:
-	
+		std::weak_ptr<ModelBase> m_model;
 	};
 
 }

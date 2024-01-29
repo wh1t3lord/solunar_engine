@@ -120,7 +120,7 @@ namespace engine
 		std::string m_materialName;
 		std::string m_shaderName;
 		
-		std::string m_albedoTextureName;
+		std::string m_albedoTextureFileName;
 		std::string m_normalTextureName;
 		std::string m_specularTextureName;
 

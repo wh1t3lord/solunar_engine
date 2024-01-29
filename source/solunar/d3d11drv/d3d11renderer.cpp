@@ -9,15 +9,17 @@
 
 // Base graphics classes
 #include "graphics/view.h"
+#include "graphics/rendercontext.h"
 
 // Graphics objects
 #include "graphics/image.h"
-// #include "graphics/material.h"
-// #include "graphics/materials/materialinstance.h"
+#include "graphics/mesh.h"
+#include "graphics/material.h"
+#include "graphics/materials/materialinstance.h"
 
 // Graphics managers
-// #include "graphics/ShaderProgramManager.h"
-// #include "graphics/shaderconstantmanager.h"
+#include "graphics/ShaderProgramManager.h"
+#include "graphics/shaderconstantmanager.h"
 
 #include "main/main.h"
 
@@ -194,6 +196,7 @@ void D3D11Renderer::createRasterizerState()
 	rasterizerState.m_fillMode = FillMode::Solid;
 
 	m_rasterizerState = g_stateManager->createRasterizerState(rasterizerState);
+	g_stateManager->setRasterizerState(m_rasterizerState);
 }
 
 void D3D11Renderer::shutdown()
@@ -265,14 +268,14 @@ void D3D11Renderer::bindMaterialForMesh(MeshComponent* mesh, Material* material,
 	Assert(material);
 	Assert(materialInstance);
 
-#if 0
+#if 1
 	// bind material samplers
 	material->bind();
 
 	// Initialize shader
 	IShaderProgram* shaderProgram = nullptr;
 	
-	if (mesh->isA<StaticMeshComponent>())
+	//if (mesh->isA<StaticMeshComponent>())
 		shaderProgram = materialInstance->getStaticMeshShaderProgram();
 
 	Assert2(shaderProgram, "Unknowed mesh component type!");
@@ -296,19 +299,17 @@ void D3D11Renderer::renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshCom
 {
 	// OPTICK_EVENT("D3D11Renderer::renderMesh");
 
-#if 0
-	if (StaticMeshComponent* staticMesh = dynamicCast<StaticMeshComponent>(mesh))
-		renderStaticMesh(graphicsWorld, view, staticMesh);
-#endif
+	//if (StaticMeshComponent* staticMesh = dynamicCast<StaticMeshComponent>(mesh))
+		renderStaticMesh(graphicsWorld, view, mesh);
 }
 
-void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, StaticMeshComponent* mesh)
+void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
 {
 	// OPTICK_EVENT("D3D11Renderer::renderStaticMesh");
 
-#if 0
+	std::shared_ptr<ModelBase> model = mesh->lockModel();
 
-	for (const auto& submesh : mesh->getModel()->getSubmehes())
+	for (const auto& submesh : model->getSubmehes())
 	{
 		// create saved render ctx as previous model.
 		RenderContext savedCtx = RenderContext::getContext();
@@ -329,7 +330,8 @@ void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, S
 
 		//it->getMaterial()->bind();
 
-		bindMaterialForMesh(mesh, submesh->getMaterial().get(), submesh->getMaterial()->getMaterialInstance());
+		std::shared_ptr<Material> material = submesh->lockMaterial();
+		bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
 
 		ShaderConstantManager::getInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
 
@@ -359,7 +361,7 @@ void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, S
 			m_currentViewMode = RendererViewMode::Wireframe;
 
 			// bind material again
-			bindMaterialForMesh(mesh, submesh->getMaterial().get(), submesh->getMaterial()->getMaterialInstance());
+			bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
 
 			// draw with lines
 			g_renderDevice->draw(PM_TriangleList, 0, submesh->getVerticesCount());
@@ -389,8 +391,6 @@ void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, S
 		// return what have been
 		RenderContext::setContext(savedCtx);
 	}
-
-#endif
 }
 
 void D3D11Renderer::renderShadows(View* view)

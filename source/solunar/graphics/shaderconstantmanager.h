@@ -43,7 +43,7 @@ namespace engine
 	};
 
 	class IShaderProgram;
-	class StaticMeshComponent;
+	class MeshComponent;
 
 	class ConstantBufferProxy
 	{
@@ -81,7 +81,7 @@ namespace engine
 	
 		ConstantBufferProxy get(const std::string& name);
 
-		void setStaticMeshGlobalData(StaticMeshComponent* meshComponent, View* view, RenderContext& renderContext, GraphicsWorld* graphicsWorld);
+		void setStaticMeshGlobalData(MeshComponent* meshComponent, View* view, RenderContext& renderContext, GraphicsWorld* graphicsWorld);
 
 	private:
 		std::unordered_map<std::string, IBufferBase*> m_constantBuffers;

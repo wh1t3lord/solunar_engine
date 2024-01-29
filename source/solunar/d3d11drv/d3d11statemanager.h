@@ -63,6 +63,7 @@ public:
 
 	IRasterizerState* createRasterizerState(const RasterizerStateDesc& rasterizerDesc) override;
 	void destroyRasterizerState(IRasterizerState* rasterizerState) override;
+	void setRasterizerState(IRasterizerState* rasterizerState) override;
 
 	ISamplerState* createSamplerState(const SamplerDesc& samplerDesc) override;
 	void destroySamplerState(ISamplerState* samplerState) override;

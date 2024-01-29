@@ -433,6 +433,11 @@ namespace engine
 		//m_material->resetAllStates();
 	}
 
+	std::shared_ptr<Material> SubMesh::lockMaterial()
+	{
+		return m_material.lock();
+	}
+
 	void ModelSubmesh::registerObject()
 	{
 		TypeManager::getInstance()->registerObject<ModelSubmesh>();
