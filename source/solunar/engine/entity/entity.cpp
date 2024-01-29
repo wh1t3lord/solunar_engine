@@ -14,6 +14,8 @@ Entity::Entity() :
 	m_rotation( glm::identity<glm::quat>() ),
 	m_scale(1.0f, 1.0f, 1.0f)
 {
+	m_boundingBox.setIdentity();
+	m_WorldBoundingBox.setIdentity();
 }
 
 Entity::~Entity()
@@ -52,6 +54,17 @@ void Entity::loadXML(tinyxml2::XMLElement& element)
 		}
 		else if (strcmp(entity->Name(), "Scale") == 0) {
 			m_scale = getVector3FromXMLElement(*entity);
+		}
+		else if (strcmp(entity->Name(), "BoundingBox") == 0) {
+			tinyxml2::XMLElement* bboxMin = entity->FirstChildElement("Min");
+			bboxMin->QueryFloatAttribute("x", &m_boundingBox.m_min.x);
+			bboxMin->QueryFloatAttribute("y", &m_boundingBox.m_min.y);
+			bboxMin->QueryFloatAttribute("z", &m_boundingBox.m_min.z);
+			
+			tinyxml2::XMLElement* bboxMax = entity->FirstChildElement("Max");
+			bboxMax->QueryFloatAttribute("x", &m_boundingBox.m_max.x);
+			bboxMax->QueryFloatAttribute("y", &m_boundingBox.m_max.y);
+			bboxMax->QueryFloatAttribute("z", &m_boundingBox.m_max.z);
 		}
 		else if (strcmp(entity->Name(), "Entity") != 0) { // components
 			const TypeInfo* typeInfo = g_typeManager->getTypeInfoByName(entity->Name());
@@ -121,6 +134,20 @@ void Entity::saveXML(tinyxml2::XMLElement& element)
 		scale->SetAttribute("z", m_scale.z);
 	}
 
+	tinyxml2::XMLElement* bbox = element.InsertNewChildElement("BoundingBox");
+	if (bbox)
+	{
+		tinyxml2::XMLElement* bboxMin = bbox->InsertNewChildElement("Min");
+		bboxMin->SetAttribute("x", m_boundingBox.m_min.x);
+		bboxMin->SetAttribute("y", m_boundingBox.m_min.y);
+		bboxMin->SetAttribute("z", m_boundingBox.m_min.z);
+
+		tinyxml2::XMLElement* bboxMax = bbox->InsertNewChildElement("Max");
+		bboxMax->SetAttribute("x", m_boundingBox.m_max.x);
+		bboxMax->SetAttribute("y", m_boundingBox.m_max.y);
+		bboxMax->SetAttribute("z", m_boundingBox.m_max.z);
+	}
+
 	// save components
 	for (auto it : m_components)
 	{
@@ -146,6 +173,16 @@ glm::mat4 Entity::getLocalTranslation()
 	glm::mat4 tranlation = glm::mat4(1.0f);
 	tranlation = tranlation * glm::mat4_cast(m_rotation) * glm::scale(tranlation, m_scale);
 	return tranlation;
+}
+
+BoundingBox Entity::getLocalBoundingBox()
+{
+	return m_boundingBox;
+}
+
+BoundingBox Entity::getBoundingBox()
+{
+	return m_WorldBoundingBox;
 }
 
 void Entity::setRootEntity(Entity* Entity)
@@ -212,6 +249,29 @@ void Entity::updateWorldTransform()
 		m_worldTransform = m_rootEntity->getWorldTranslation() * glm::translate(m_worldTransform, m_position) * rotation * glm::scale(m_worldTransform, m_scale);
 	else
 		m_worldTransform = glm::translate(m_worldTransform, m_position) * rotation * glm::scale(m_worldTransform, m_scale);
+}
+
+void Entity::transformBBox()
+{
+	// transform to center/extents box representation
+	glm::vec3 center = m_boundingBox.m_max + m_boundingBox.m_min * glm::vec3(0.5);
+	glm::vec3 extents = m_boundingBox.m_max - center;
+
+	glm::mat4 m = getWorldTranslation();
+
+	// transform center
+	glm::vec3 t_center = glm::vec3(m * glm::vec4(center, 1.0));
+
+	// transform extents (take maximum)
+	glm::mat3 abs_mat = glm::mat3(abs(glm::vec3(m[0])), abs(glm::vec3(m[1])), abs(glm::vec3(m[2])));
+	glm::vec3 t_extents = abs_mat * extents;
+
+	// transform to min/max box representation
+	glm::vec3 tmin = t_center - t_extents;
+	glm::vec3 tmax = t_center + t_extents;
+
+	m_WorldBoundingBox.m_min = tmin;
+	m_WorldBoundingBox.m_max = tmax;
 }
 
 void Entity::quaternionRotate(const glm::vec3& axis, float angle)

@@ -25,10 +25,36 @@ namespace engine
 static ShockGameInterface s_shockGameInterface;
 IGameInterface* g_gameInterface = (IGameInterface*)&s_shockGameInterface;
 
-ShockGameInterface* engine::getShockGameInterface()
+ShockGameInterface* getShockGameInterface()
 {
 	return &s_shockGameInterface;
 }
+
+class TestRotatorComponent : public LogicComponent
+{
+	ImplementObject(TestRotatorComponent, LogicComponent);
+
+public:
+	TestRotatorComponent() : m_YAxis(0.0f)
+	{}
+
+	~TestRotatorComponent()
+	{}
+
+	static void registerObject()
+	{
+		g_typeManager->registerObject<TestRotatorComponent>();
+	}
+
+	void update(float dt) override
+	{
+		m_YAxis += dt * 200.0f;
+		getEntity()->quaternionRotate(glm::vec3(0.f, 1.f, 0.f), m_YAxis);
+	}
+
+private:
+	float m_YAxis;
+};
 
 void registerGameClasses()
 {
@@ -39,6 +65,8 @@ void registerGameClasses()
 	WeaponPistolComponent::registerObject();
 	WeaponChainComponent::registerObject();
 	LevelManagerComponent::registerObject();
+
+	TestRotatorComponent::registerObject();
 }
 
 void registerShockClasses()

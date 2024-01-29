@@ -70,6 +70,16 @@ namespace engine
 		}
 	}
 
+	void World::update_PreEntityUpdate()
+	{
+		const std::vector<Entity*>& entities = m_entityManager.getEntities();
+		for (auto it : entities)
+		{
+			it->updateWorldTransform();
+			it->transformBBox();
+		}
+	}
+
 	void World::updateLogicWorld()
 	{
 		std::vector<Entity*> logicEntities = m_entityManager.getEntitiesWithComponent<LogicComponent>();

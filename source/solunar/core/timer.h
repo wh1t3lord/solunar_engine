@@ -13,6 +13,9 @@ public:
 	static Timer* getInstance();
 
 public:
+	Timer();
+	~Timer();
+
 	void init();
 	
 	void update();

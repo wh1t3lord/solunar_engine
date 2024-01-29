@@ -1,8 +1,6 @@
 #ifndef GRAPHICS_MESH_H
 #define GRAPHICS_MESH_H
 
-#include "core/math/boundingbox.h"
-
 namespace engine {
 
 	//class MeshResource : public Content
@@ -32,7 +30,7 @@ namespace engine {
 		virtual void render();
 
 	private:
-		BoundingBox m_boundingBox;
+	
 	};
 
 }

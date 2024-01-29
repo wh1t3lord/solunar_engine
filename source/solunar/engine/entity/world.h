@@ -22,6 +22,7 @@ namespace engine
 
 		void postInitializeEntity(Entity* entity);
 
+		void update_PreEntityUpdate();
 		void updateLogicWorld();
 		void updatePhysicsWorld();
 

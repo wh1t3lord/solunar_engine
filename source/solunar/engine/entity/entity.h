@@ -1,6 +1,8 @@
 #ifndef ENGINE_ENTITY_ENTITY_H
 #define ENGINE_ENTITY_ENTITY_H
 
+#include "core/math/boundingbox.h"
+
 namespace engine
 {
 
@@ -37,6 +39,8 @@ public:
 
 	glm::mat4 getWorldTranslation();
 	glm::mat4 getLocalTranslation();
+	BoundingBox getLocalBoundingBox();
+	BoundingBox getBoundingBox();
 
 	Entity* createChild();
 	Entity* createChildEx(const TypeInfo* typeInfo);
@@ -56,6 +60,7 @@ public:
 
 private:
 	void updateWorldTransform();
+	void transformBBox();
 
 private:
 	typedef std::vector<Component*>::iterator ComponentIt;
@@ -71,7 +76,8 @@ private:
 	std::string m_name;
 
 	glm::mat4 m_worldTransform;
-
+	BoundingBox m_boundingBox;
+	BoundingBox m_WorldBoundingBox;
 	glm::quat m_rotation;
 	glm::vec3 m_position;
 	glm::vec3 m_scale;

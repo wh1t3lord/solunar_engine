@@ -10,13 +10,24 @@ Timer* Timer::getInstance()
 }
 
 #ifdef WIN32
+Timer::Timer()
+{
+	m_floatFrequency = 0.0f;
+	m_deltaTime = 0.0f;
+}
+
+Timer::~Timer()
+{
+}
+
+
 void Timer::init()
 {
 	QueryPerformanceFrequency(&m_frequency);
 	m_floatFrequency = (float)m_frequency.QuadPart;
 
 	QueryPerformanceCounter(&m_startTime);
-	m_startTime = m_endTime;
+	m_endTime = m_startTime;
 }
 
 void Timer::update()

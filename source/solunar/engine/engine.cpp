@@ -200,6 +200,7 @@ namespace engine
 		World* world = Engine::ms_world;
 		if (world)
 		{
+			world->update_PreEntityUpdate();
 			world->updatePhysicsWorld();
 			world->updateLogicWorld();
 		}
