@@ -43,7 +43,7 @@ void D3D11RenderTarget::create(D3D11Device* device, const RenderTargetCreationDe
 		renderTargetViewDesc.Texture2D.MipSlice = 0;
 
 		ID3D11RenderTargetView* renderTargetView = nullptr;
-		D3D11_CHECK(device->getD3DDevice()->CreateRenderTargetView(d3dTexture, &renderTargetViewDesc, &renderTargetView));
+		D3D11_CHECK(device->getDevice()->CreateRenderTargetView(d3dTexture, &renderTargetViewDesc, &renderTargetView));
 
 		m_renderTargetViews[i] = renderTargetView;
 
@@ -56,7 +56,7 @@ void D3D11RenderTarget::create(D3D11Device* device, const RenderTargetCreationDe
 		shaderResourceViewDesc.Texture2D.MipLevels = 1;
 		
 		ID3D11ShaderResourceView* shaderResourceView = nullptr;
-		D3D11_CHECK(device->getD3DDevice()->CreateShaderResourceView(d3dTexture, &shaderResourceViewDesc, &shaderResourceView));
+		D3D11_CHECK(device->getDevice()->CreateShaderResourceView(d3dTexture, &shaderResourceViewDesc, &shaderResourceView));
 		
 		m_shaderResourceViews[i] = shaderResourceView;
 	}
@@ -77,7 +77,7 @@ void D3D11RenderTarget::create(D3D11Device* device, const RenderTargetCreationDe
 		depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 		depthStencilViewDesc.Texture2D.MipSlice = 0;
 
-		D3D11_CHECK(device->getD3DDevice()->CreateDepthStencilView(texture2D->getTexture(), &depthStencilViewDesc, &m_depthStencilView));
+		D3D11_CHECK(device->getDevice()->CreateDepthStencilView(texture2D->getTexture(), &depthStencilViewDesc, &m_depthStencilView));
 	}
 }
 

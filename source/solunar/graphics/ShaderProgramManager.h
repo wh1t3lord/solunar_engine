@@ -16,7 +16,11 @@ public:
 
 	std::string getShaderPath();
 
-	virtual	IShaderProgram* createShaderProgram(const char* vsfilename, const char* fsfilename, const char* defines = nullptr) = 0;
+	virtual	IShaderProgram* createShaderProgram(const char* vsfilename,
+		const char* fsfilename,
+		const char* defines = nullptr,
+		InputLayoutDesc* inputLayout = nullptr,
+		int inputLayoutCount = 0) = 0;
 
 	virtual void setShaderProgram(IShaderProgram* program) = 0;
 	virtual void deleteProgram(IShaderProgram* program) = 0;

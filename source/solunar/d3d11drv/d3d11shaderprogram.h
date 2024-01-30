@@ -11,10 +11,10 @@ class D3D11Device;
 class D3D11ShaderProgram : public IShaderProgram
 {
 public:
-	D3D11ShaderProgram(D3D11Device* device, const char* vstext, const char* pstext);
+	D3D11ShaderProgram(D3D11Device* device, const char* vstext, const char* pstext, InputLayoutDesc* inputLayout = nullptr, int inputLayoutCount = 0);
 	~D3D11ShaderProgram();
 
-	void create(D3D11Device* device, const char* vstext, const char* pstext);
+	void create(D3D11Device* device, const char* vstext, const char* pstext, InputLayoutDesc* inputLayout = nullptr, int inputLayoutCount = 0);
 	void destroy();
 
 	void createInputLayout(D3D11Device* device, ID3DBlob* vertexShaderBlob);

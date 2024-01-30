@@ -14,6 +14,10 @@
 
 #include "main/win32_keys.h"
 
+#include "backends/imgui_impl_win32.h"
+
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
 namespace engine
 {
 	View* g_engineView = nullptr;
@@ -95,6 +99,8 @@ namespace engine
 		default:
 			break;
 		}
+
+		ImGui_ImplWin32_WndProcHandler(hWnd, Msg, wParam, lParam);
 
 		return DefWindowProcA(hWnd, Msg, wParam, lParam);
 	}

@@ -27,6 +27,7 @@
 #include "graphics/light.h"
 #include "graphics/ui/rmlsystem.h"
 #include "graphics/postfxmanager.h"
+#include "graphics/imguimanager.h"
 
 #include "engine/camera.h"
 #include "engine/engine.h"
@@ -108,6 +109,8 @@ namespace engine
 	{
 		View* view = CameraProxy::getInstance()->getView();
 
+		ImGuiManager::getInstance()->init();
+
 		// shader manager is inited
 		//initInplaceResources();
 
@@ -129,9 +132,6 @@ namespace engine
 
 		// initialize material factory
 		MaterialInstanceFactory::createInstance();
-
-		//	m_postProcessingRenderer = PostProcessingRenderer::getInstance();
-		//	m_postProcessingRenderer->init(view);
 
 		g_debugRender.initialize();
 
@@ -192,6 +192,8 @@ namespace engine
 		ShaderConstantManager::getInstance()->shutdown();
 
 		RenderContext::shutdown();
+
+		ImGuiManager::getInstance()->shutdown();
 	}
 
 	void Renderer::beginFrame()

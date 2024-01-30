@@ -96,7 +96,7 @@ void D3D11BufferImpl::create(D3D11Device* device, const BufferDesc& bufferDesc, 
 	subresourceData.SysMemPitch = subresourceDesc.m_memoryPitch;
 	subresourceData.SysMemSlicePitch = subresourceDesc.m_memorySlicePitch;
 	
-	D3D11_CHECK(device->getD3DDevice()->CreateBuffer(&d3d11BufferDesc, subresourceDesc.m_memory ? &subresourceData : NULL, &m_buffer));
+	D3D11_CHECK(device->getDevice()->CreateBuffer(&d3d11BufferDesc, subresourceDesc.m_memory ? &subresourceData : NULL, &m_buffer));
 }
 
 void D3D11BufferImpl::destroy()

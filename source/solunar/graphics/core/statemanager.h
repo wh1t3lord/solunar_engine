@@ -24,6 +24,7 @@ namespace engine
 
 struct IRasterizerState;
 struct IBlendState;
+struct IDepthStencilState;
 class ISamplerState;
 
 class IStateManager
@@ -37,6 +38,14 @@ public:
 
 	virtual ISamplerState* createSamplerState(const SamplerDesc& samplerDesc) = 0;
 	virtual void destroySamplerState(ISamplerState* samplerState) = 0;
+
+	virtual IBlendState* createBlendState(const BlendStateDesc& blendStateDesc) = 0;
+	virtual void destroyBlendState(IBlendState* blendState) = 0;
+	virtual void setBlendState(IBlendState* blendState, const float blendFactor[4], uint32_t sampleMask) = 0;
+
+	virtual IDepthStencilState* createDepthStencilState(const DepthStencilDesc& desc) = 0;
+	virtual void destroyDepthStencilState(IDepthStencilState* state) = 0;
+	virtual void setDepthStencilState(IDepthStencilState* state, uint32_t stencilRef) = 0;
 };
 
 extern IStateManager* g_stateManager;

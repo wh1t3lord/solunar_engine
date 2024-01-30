@@ -41,7 +41,7 @@ public:
 	void setVertexBuffer(IBufferBase* buffer, uint32_t stride, uint32_t offset) override;
 
 	//! Set Index buffer.
-	void setIndexBuffer(IBufferBase* buffer) override;
+	void setIndexBuffer(IBufferBase* buffer, bool use16bitsIndices) override;
 
 	//! Set texture 2d.
 	void setTexture2D(int slot, ITexture2D* texture) override;
@@ -58,15 +58,18 @@ public:
 	//! Get current viewport
 	Viewport getViewport() override;
 
+	//! Set scissors
+	void setScissors(float x, float y, float w, float h) override;
+
 	//! Draw non indexed primitives
 	void draw(PrimitiveMode primitiveMode, size_t verticesStart, size_t verticesCount) override;
 
 	//! Draw indexed primitives
 	//! NOTE: Unsigned byte indices support only!
-	void drawIndexed(PrimitiveMode primitiveMode, size_t indexStart, size_t indexCount) override;
+	void drawIndexed(PrimitiveMode primitiveMode, size_t indexStart, size_t indexCount, int baseVertexLocation) override;
 
 public:
-	ID3D11Device* getD3DDevice() { return m_device; }
+	ID3D11Device* getDevice() { return m_device; }
 	ID3D11DeviceContext* getDeviceContext() { return m_deviceContext; }
 
 private:

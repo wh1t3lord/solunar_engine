@@ -29,4 +29,4 @@ target_include_directories(graphics PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../"
 
 target_include_directories(graphics PRIVATE "${CMAKE_SOURCE_DIR}/externals/assimp/include")
 
-target_link_libraries(graphics core)
+target_link_libraries(graphics imgui core)

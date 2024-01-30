@@ -42,7 +42,7 @@ namespace engine {
 		virtual void setVertexBuffer(IBufferBase* buffer, uint32_t stride, uint32_t offset) = 0;
 
 		//! Set Index buffer.
-		virtual void setIndexBuffer(IBufferBase* buffer) = 0;
+		virtual void setIndexBuffer(IBufferBase* buffer, bool use16bitsIndices) = 0;
 
 		//! Set texture 2d.
 		virtual void setTexture2D(int slot, ITexture2D* texture) = 0;
@@ -59,12 +59,14 @@ namespace engine {
 		//! Get current viewport
 		virtual Viewport getViewport() = 0;
 
+		//! Set scissors
+		virtual void setScissors(float x, float y, float w, float h) = 0;
+
 		//! Draw non indexed primitives
 		virtual void draw(PrimitiveMode primitiveMode, size_t verticesStart, size_t verticesCount) = 0;
 
 		//! Draw indexed primitives
-		//! NOTE: Unsigned byte indices support only!
-		virtual void drawIndexed(PrimitiveMode primitiveMode, size_t indexStart, size_t indexCount) = 0;
+		virtual void drawIndexed(PrimitiveMode primitiveMode, size_t indexStart, size_t indexCount, int baseVertexLocation) = 0;
 
 	};
 

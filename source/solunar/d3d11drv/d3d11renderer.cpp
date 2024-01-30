@@ -88,7 +88,7 @@ void D3D11Renderer::createSwapChain()
 	D3D11Device* device = ((D3D11Device*)g_renderDevice);
 
 	IDXGIDevice* dxgiDevice;
-	device->getD3DDevice()->QueryInterface(__uuidof(IDXGIDevice), (void **)&dxgiDevice);
+	device->getDevice()->QueryInterface(__uuidof(IDXGIDevice), (void **)&dxgiDevice);
 
 	IDXGIAdapter* dxgiAdapter;
 	HRESULT hr = dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)&dxgiAdapter);
@@ -114,12 +114,12 @@ void D3D11Renderer::createSwapChain()
 	swapChainDesc.OutputWindow = windowHandle;
 	swapChainDesc.Windowed = TRUE;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-	D3D11_CHECK(dxgiFactory->CreateSwapChain(device->getD3DDevice(), &swapChainDesc, &m_swapChain));
+	D3D11_CHECK(dxgiFactory->CreateSwapChain(device->getDevice(), &swapChainDesc, &m_swapChain));
 
 	ID3D11Texture2D* backBuffer;
 	m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBuffer);
 
-	D3D11_CHECK(device->getD3DDevice()->CreateRenderTargetView(backBuffer, NULL, &m_renderTargetView));
+	D3D11_CHECK(device->getDevice()->CreateRenderTargetView(backBuffer, NULL, &m_renderTargetView));
 	backBuffer->Release();
 	backBuffer = nullptr;
 
@@ -140,7 +140,7 @@ void D3D11Renderer::createSwapChain()
 	depthStencilTextureDesc.Usage = D3D11_USAGE_DEFAULT;
 	depthStencilTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 
-	D3D11_CHECK(device->getD3DDevice()->CreateTexture2D(&depthStencilTextureDesc, NULL, &m_depthStencilTexture));
+	D3D11_CHECK(device->getDevice()->CreateTexture2D(&depthStencilTextureDesc, NULL, &m_depthStencilTexture));
 
 	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 	memset(&depthStencilViewDesc, 0, sizeof(depthStencilViewDesc));
@@ -148,7 +148,7 @@ void D3D11Renderer::createSwapChain()
 	depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	depthStencilViewDesc.Texture2D.MipSlice = 0;
 
-	D3D11_CHECK(device->getD3DDevice()->CreateDepthStencilView(m_depthStencilTexture, &depthStencilViewDesc, &m_depthStencilView));
+	D3D11_CHECK(device->getDevice()->CreateDepthStencilView(m_depthStencilTexture, &depthStencilViewDesc, &m_depthStencilView));
 
 	// Initialize target
 	device->getDeviceContext()->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
@@ -181,7 +181,7 @@ void D3D11Renderer::createSwapChain()
 	depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-	D3D11_CHECK(device->getD3DDevice()->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilState));
+	D3D11_CHECK(device->getDevice()->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilState));
 
 	// Set depth stencil state
 	device->getDeviceContext()->OMSetDepthStencilState(m_depthStencilState, 0);
@@ -427,7 +427,7 @@ void D3D11Renderer::takeScreenshotInternal()
 	textureDesc.Usage = D3D11_USAGE_STAGING;
 
 	ID3D11Texture2D* copyOfScreenTexture = nullptr;
-	D3D11_CHECK(device->getD3DDevice()->CreateTexture2D(&textureDesc, NULL, &copyOfScreenTexture));
+	D3D11_CHECK(device->getDevice()->CreateTexture2D(&textureDesc, NULL, &copyOfScreenTexture));
 
 	device->getDeviceContext()->CopyResource(copyOfScreenTexture, screenTexture);
 

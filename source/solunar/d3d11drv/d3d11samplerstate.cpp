@@ -122,7 +122,7 @@ void D3D11SamplerState::create(D3D11Device* device, const SamplerDesc& samplerDe
 	d3d11SamplerDesc.AddressW = getD3D11AddressMode(samplerDesc.m_wrapRepeat);
 	d3d11SamplerDesc.MaxAnisotropy = samplerDesc.m_anisotropyLevel;
 
-	D3D11_CHECK(device->getD3DDevice()->CreateSamplerState(&d3d11SamplerDesc, &m_samplerState));
+	D3D11_CHECK(device->getDevice()->CreateSamplerState(&d3d11SamplerDesc, &m_samplerState));
 }
 
 void D3D11SamplerState::destroy()

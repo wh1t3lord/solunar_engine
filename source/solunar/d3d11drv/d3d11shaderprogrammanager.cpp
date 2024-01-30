@@ -45,7 +45,7 @@ D3D11ShaderProgramManager::~D3D11ShaderProgramManager()
 	m_cachedPrograms.clear();
 }
 
-IShaderProgram* D3D11ShaderProgramManager::createShaderProgram(const char* vsfilename, const char* fsfilename, const char* defines)
+IShaderProgram* D3D11ShaderProgramManager::createShaderProgram(const char* vsfilename, const char* fsfilename, const char* defines, InputLayoutDesc* inputLayout /*= nullptr*/, int inputLayoutCount /*= 0*/)
 {
 	Assert(this);
 
@@ -66,7 +66,7 @@ IShaderProgram* D3D11ShaderProgramManager::createShaderProgram(const char* vsfil
 
 	// ignore defines :(
 
-	D3D11ShaderProgram* shaderProgram = mem_new<D3D11ShaderProgram>(device, vstext.c_str(), pstext.c_str());
+	D3D11ShaderProgram* shaderProgram = mem_new<D3D11ShaderProgram>(device, vstext.c_str(), pstext.c_str(), inputLayout, inputLayoutCount);
 	m_cachedPrograms.push_back(shaderProgram);
 	return shaderProgram;
 }

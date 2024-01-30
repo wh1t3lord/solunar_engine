@@ -12,6 +12,7 @@
 #include "graphics/graphics.h"
 #include "graphics/graphicsoptions.h"
 #include "graphics/renderer.h"
+#include "graphics/imguimanager.h"
 
 namespace engine {
 
@@ -41,6 +42,38 @@ namespace engine {
 		{
 			g_modelConvert = true;
 			g_modelConvertName = g_commandLine.getOptionParameter("-modelConvert");
+		}
+	}
+
+	static bool g_showEntityList = false;
+
+	void engineDebugOverlay()
+	{
+		if (ImGui::BeginMainMenuBar())
+		{
+			if (ImGui::BeginMenu("Engine"))
+			{
+				if (ImGui::MenuItem("Entity list")) { g_showEntityList = !g_showEntityList; }
+	
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Graphics"))
+			{
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Game"))
+			{
+				ImGui::EndMenu();
+			}
+
+			if (ImGui::BeginMenu("Debug"))
+			{
+				ImGui::EndMenu();
+			}
+
+			ImGui::EndMainMenuBar();
 		}
 	}
 
@@ -156,7 +189,7 @@ namespace engine {
 		// update timer
 		Timer::getInstance()->update();
 
-		//ImguiManager::getInstance()->beginFrame();
+		ImGuiManager::getInstance()->beginFrame();
 
 		// update game specific state
 		//gameState->update();
@@ -173,18 +206,22 @@ namespace engine {
 		g_renderer->beginFrame();
 		
 		g_renderer->renderView(appGetView());
-//
+
 //		if (g_console->isToggled())
 //			g_console->onRender();
-//
+
 //#if 1
 //		DebugOverlay::render();
 //#endif // !MASTER_GOLD_BUILD
-//
+
 //		RmlSystem::getInstance()->render();
-//
-//		ImguiManager::getInstance()->endFrame();
-//
+
+		engineDebugOverlay();
+
+		ImGui::ShowDemoWindow();
+
+		ImGuiManager::getInstance()->endFrame();
+
 		g_renderer->endFrame();
 //
 //		//appPresent();

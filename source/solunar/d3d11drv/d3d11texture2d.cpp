@@ -23,6 +23,15 @@ DXGI_FORMAT getDxgiFormat(ImageFormat format)
 	case ImageFormat::RGBA32:
 		return DXGI_FORMAT_R8G8B8A8_UNORM;
 
+	case ImageFormat::RGBA32F:
+		return DXGI_FORMAT_R32G32B32A32_FLOAT;
+
+	case ImageFormat::RGBA32_UNORM:
+		return DXGI_FORMAT_R8G8B8A8_UNORM;
+
+	case ImageFormat::RG32F:
+		return DXGI_FORMAT_R32G32_FLOAT;
+
 	default:
 		break;
 	}
@@ -81,11 +90,11 @@ void D3D11Texture2D::create(D3D11Device* device, const TextureDesc& textureDesc,
 	subresourceData.SysMemPitch = subresourceDesc.m_memoryPitch;
 	subresourceData.SysMemSlicePitch = subresourceDesc.m_memorySlicePitch;
 
-	D3D11_CHECK(device->getD3DDevice()->CreateTexture2D(&d3d11TextureDesc, subresourceDesc.m_memory ? &subresourceData : NULL, &m_texture));
+	D3D11_CHECK(device->getDevice()->CreateTexture2D(&d3d11TextureDesc, subresourceDesc.m_memory ? &subresourceData : NULL, &m_texture));
 
 	if (d3d11TextureDesc.BindFlags == D3D11_BIND_SHADER_RESOURCE)
 	{
-		D3D11_CHECK(device->getD3DDevice()->CreateShaderResourceView(m_texture, NULL, &m_textureSRV));
+		D3D11_CHECK(device->getDevice()->CreateShaderResourceView(m_texture, NULL, &m_textureSRV));
 	}
 }
 

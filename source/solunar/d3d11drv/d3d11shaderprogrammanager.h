@@ -12,7 +12,11 @@ public:
 	D3D11ShaderProgramManager();
 	~D3D11ShaderProgramManager();
 
-	IShaderProgram* createShaderProgram(const char* vsfilename, const char* fsfilename, const char* defines = nullptr) override;
+	IShaderProgram* createShaderProgram(const char* vsfilename, 
+										const char* fsfilename, 
+										const char* defines = nullptr, 
+										InputLayoutDesc* inputLayout = nullptr, 
+										int inputLayoutCount = 0) override;
 
 	void setShaderProgram(IShaderProgram* program) override;
 	void deleteProgram(IShaderProgram* program) override;

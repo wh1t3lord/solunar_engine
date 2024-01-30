@@ -4,6 +4,8 @@
 namespace engine
 {
 
+extern DXGI_FORMAT getDxgiFormat(ImageFormat format);
+
 enum ShaderType
 {
 	ShaderType_Vertex,
@@ -85,12 +87,16 @@ ID3DBlob* createShaderFromText(const char* text, ShaderType shaderType)
 	return shaderBlob;
 }
 
-D3D11ShaderProgram::D3D11ShaderProgram(D3D11Device* device, const char* vstext, const char* pstext) :
+D3D11ShaderProgram::D3D11ShaderProgram(D3D11Device* device, 
+	const char* vstext, 
+	const char* pstext, 
+	InputLayoutDesc* inputLayout /*= nullptr*/, 
+	int inputLayoutCount /*= 0*/) :
 	m_inputLayout(nullptr),
 	m_vertexShader(nullptr),
 	m_pixelShader(nullptr)
 {
-	create(device, vstext, pstext);
+	create(device, vstext, pstext, inputLayout, inputLayoutCount);
 }
 
 D3D11ShaderProgram::~D3D11ShaderProgram()
@@ -98,18 +104,44 @@ D3D11ShaderProgram::~D3D11ShaderProgram()
 	destroy();
 }
 
-void D3D11ShaderProgram::create(D3D11Device* device, const char* vstext, const char* pstext)
+void D3D11ShaderProgram::create(D3D11Device* device, const char* vstext, const char* pstext, InputLayoutDesc* inputLayout /*= nullptr*/, int inputLayoutCount /*= 0*/)
 {
 	ID3DBlob* vertexShaderBlob = createShaderFromText(vstext, ShaderType_Vertex);
-	device->getD3DDevice()->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), NULL, &m_vertexShader);
+	device->getDevice()->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), NULL, &m_vertexShader);
 
-	createInputLayout(device, vertexShaderBlob);
+	if (inputLayout && inputLayoutCount > 0)
+	{
+		std::vector<D3D11_INPUT_ELEMENT_DESC> inputLayoutDesc;
+
+		for (int i = 0; i < inputLayoutCount; i++)
+		{
+			D3D11_INPUT_ELEMENT_DESC inputElementDesc	= {};
+			inputElementDesc.SemanticName				= inputLayout[i].m_semanticName;
+			inputElementDesc.SemanticIndex				= inputLayout[i].m_semanticIndex;
+			inputElementDesc.Format						= getDxgiFormat(inputLayout[i].m_format);
+			inputElementDesc.InputSlot					= inputLayout[i].m_inputSlot;
+			inputElementDesc.AlignedByteOffset			= inputLayout[i].m_alignedByteOffset;
+			inputElementDesc.InstanceDataStepRate		= inputLayout[i].m_instanceDataStepRate;
+			inputElementDesc.InputSlotClass				= D3D11_INPUT_PER_VERTEX_DATA;
+			inputLayoutDesc.push_back(inputElementDesc);
+		}
+
+		device->getDevice()->CreateInputLayout(&inputLayoutDesc[0],
+			(UINT)inputLayoutDesc.size(),
+			vertexShaderBlob->GetBufferPointer(),
+			vertexShaderBlob->GetBufferSize(),
+			&m_inputLayout);
+	}
+	else
+	{
+		createInputLayout(device, vertexShaderBlob);
+	}
 
 	vertexShaderBlob->Release();
 	vertexShaderBlob = nullptr;
 
 	ID3DBlob* pixelShaderBlob = createShaderFromText(pstext, ShaderType_Pixel);
-	device->getD3DDevice()->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), NULL, &m_pixelShader);
+	device->getDevice()->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), NULL, &m_pixelShader);
 
 	pixelShaderBlob->Release();
 	pixelShaderBlob = nullptr;
@@ -199,7 +231,7 @@ void D3D11ShaderProgram::createInputLayout(D3D11Device* device, ID3DBlob* vertex
 		inputLayoutDesc.push_back(elementDesc);
 	}
 
-	device->getD3DDevice()->CreateInputLayout(&inputLayoutDesc[0], 
+	device->getDevice()->CreateInputLayout(&inputLayoutDesc[0], 
 		(UINT)inputLayoutDesc.size(), 
 		vertexShaderBlob->GetBufferPointer(),
 		vertexShaderBlob->GetBufferSize(), 

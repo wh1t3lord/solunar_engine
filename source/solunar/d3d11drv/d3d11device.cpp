@@ -55,7 +55,7 @@ void D3D11Device::create()
 
 	UINT deviceCreationFlags = 0;
 #ifndef NDEBUG
-	//deviceCreationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+	deviceCreationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
 	HRESULT hr = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, 0, deviceCreationFlags, &needFeatureLevel, 1, D3D11_SDK_VERSION,
@@ -175,12 +175,12 @@ void D3D11Device::setVertexBuffer(IBufferBase* buffer, uint32_t stride, uint32_t
 	m_deviceContext->IASetVertexBuffers(0, 1, &pD3DBuffer, &stride, &offset);
 }
 
-void D3D11Device::setIndexBuffer(IBufferBase* buffer)
+void D3D11Device::setIndexBuffer(IBufferBase* buffer, bool use16bitsIndices)
 {
 	D3D11BufferImpl* bufferImpl = (D3D11BufferImpl*)buffer;
 	ID3D11Buffer* pD3DBuffer = bufferImpl->getBuffer();
 
-	m_deviceContext->IASetIndexBuffer(pD3DBuffer, DXGI_FORMAT_R32_UINT, 0);
+	m_deviceContext->IASetIndexBuffer(pD3DBuffer, use16bitsIndices ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT, 0);
 }
 
 void D3D11Device::setTexture2D(int slot, ITexture2D* texture)
@@ -242,16 +242,22 @@ Viewport D3D11Device::getViewport()
 	return m_viewport;
 }
 
+void D3D11Device::setScissors(float x, float y, float w, float h)
+{
+	D3D11_RECT rect = { static_cast<LONG>(x), static_cast<LONG>(y), static_cast<LONG>(w), static_cast<LONG>(h) };
+	m_deviceContext->RSSetScissorRects(1, &rect);
+}
+
 void D3D11Device::draw(PrimitiveMode primitiveMode, size_t verticesStart, size_t verticesCount)
 {
 	m_deviceContext->IASetPrimitiveTopology(getD3D11PrimitiveTopology(primitiveMode));
 	m_deviceContext->Draw(verticesCount, verticesStart);
 }
 
-void D3D11Device::drawIndexed(PrimitiveMode primitiveMode, size_t indexStart, size_t indexCount)
+void D3D11Device::drawIndexed(PrimitiveMode primitiveMode, size_t indexStart, size_t indexCount, int baseVertexLocation)
 {
 	m_deviceContext->IASetPrimitiveTopology(getD3D11PrimitiveTopology(primitiveMode));
-	m_deviceContext->DrawIndexed(indexCount, indexStart, 0);
+	m_deviceContext->DrawIndexed(indexCount, indexStart, baseVertexLocation);
 }
 
 }

@@ -39,6 +39,72 @@ inline D3D11_CULL_MODE getD3DCullMode(CullMode cullmode)
     return (D3D11_CULL_MODE)0;
 }
 
+inline D3D11_BLEND getD3DBlend(Blend blend)
+{
+    return (D3D11_BLEND)blend;
+
+    switch (blend)
+    {
+    case BLEND_ZERO:
+        return D3D11_BLEND_ZERO;
+    case BLEND_ONE:
+        break;
+    case BLEND_SRC_COLOR:
+        break;
+    case BLEND_INV_SRC_COLOR:
+        break;
+    case BLEND_SRC_ALPHA:
+        break;
+    case BLEND_INV_SRC_ALPHA:
+        break;
+    case BLEND_DEST_ALPHA:
+        break;
+    case BLEND_INV_DEST_ALPHA:
+        break;
+    case BLEND_DEST_COLOR:
+        break;
+    case BLEND_INV_DEST_COLOR:
+        break;
+    case BLEND_SRC_ALPHA_SAT:
+        break;
+    case BLEND_BLEND_FACTOR:
+        break;
+    case BLEND_INV_BLEND_FACTOR:
+        break;
+    case BLEND_SRC1_COLOR:
+        break;
+    case BLEND_INV_SRC1_COLOR:
+        break;
+    case BLEND_SRC1_ALPHA:
+        break;
+    case BLEND_INV_SRC1_ALPHA:
+        break;
+    default:
+        break;
+    }
+}
+
+inline D3D11_BLEND_OP getD3DBlendOp(BlendOp blendop)
+{
+    return (D3D11_BLEND_OP)blendop;
+
+    switch (blendop)
+    {
+    case engine::BLEND_OP_ADD:
+        break;
+    case engine::BLEND_OP_SUBTRACT:
+        break;
+    case engine::BLEND_OP_REV_SUBTRACT:
+        break;
+    case engine::BLEND_OP_MIN:
+        break;
+    case engine::BLEND_OP_MAX:
+        break;
+    default:
+        break;
+    }
+}
+
 D3D11StateManager::D3D11StateManager()
 {
 }
@@ -64,11 +130,11 @@ void D3D11StateManager::shutdown()
 IRasterizerState* D3D11StateManager::createRasterizerState(const RasterizerStateDesc& rasterizerDesc)
 {
     // Find already created IRasterizerState
-	auto it = m_rasterizerStates.find(rasterizerDesc);
-    if (it != m_rasterizerStates.end())
-    {
-        return (*it).second;
-    }
+	//auto it = m_rasterizerStates.find(rasterizerDesc);
+ //   if (it != m_rasterizerStates.end())
+ //   {
+ //       return (*it).second;
+ //   }
 
 	D3D11_RASTERIZER_DESC d3drasterizerDesc = {};
     d3drasterizerDesc.FillMode              = getD3DFillMode(rasterizerDesc.m_fillMode);
@@ -84,7 +150,7 @@ IRasterizerState* D3D11StateManager::createRasterizerState(const RasterizerState
 
     // create d3d object
     IRasterizerState* rasterizerState = nullptr;
-    D3D11_CHECK(g_d3d11Device->getD3DDevice()->CreateRasterizerState(&d3drasterizerDesc, reinterpret_cast<ID3D11RasterizerState**>(&rasterizerState)));
+    D3D11_CHECK(g_d3d11Device->getDevice()->CreateRasterizerState(&d3drasterizerDesc, reinterpret_cast<ID3D11RasterizerState**>(&rasterizerState)));
 
     m_rasterizerStates.emplace(rasterizerDesc, rasterizerState);
 
@@ -124,5 +190,97 @@ void D3D11StateManager::destroySamplerState(ISamplerState* samplerState)
     // ???
     mem_delete(samplerState);
 }
+
+IBlendState* D3D11StateManager::createBlendState(const BlendStateDesc& blendStateDesc)
+{
+    // Find already created IBlendState
+    auto it = m_blendStates.find(blendStateDesc);
+    if (it != m_blendStates.end())
+    {
+        return (*it).second;
+    }
+
+    D3D11_BLEND_DESC blendDesc          = {};
+    blendDesc.AlphaToCoverageEnable     = blendStateDesc.m_alphaToCoverageEnable;
+    blendDesc.IndependentBlendEnable    = blendStateDesc.m_independentBlendEnable;
+    for (int i = 0; i < 8; i++)
+    {
+        blendDesc.RenderTarget[i].BlendEnable            = blendStateDesc.m_renderTarget[i].m_blendEnable;
+        blendDesc.RenderTarget[i].SrcBlend               = getD3DBlend(blendStateDesc.m_renderTarget[i].m_srcBlend);
+        blendDesc.RenderTarget[i].DestBlend              = getD3DBlend(blendStateDesc.m_renderTarget[i].m_destBlend);
+        blendDesc.RenderTarget[i].BlendOp                = getD3DBlendOp(blendStateDesc.m_renderTarget[i].m_blendOp);
+        blendDesc.RenderTarget[i].SrcBlendAlpha          = getD3DBlend(blendStateDesc.m_renderTarget[i].m_srcBlendAlpha);
+        blendDesc.RenderTarget[i].DestBlendAlpha         = getD3DBlend(blendStateDesc.m_renderTarget[i].m_destBlendAlpha);
+        blendDesc.RenderTarget[i].BlendOpAlpha           = getD3DBlendOp(blendStateDesc.m_renderTarget[i].m_blendOpAlpha);
+        blendDesc.RenderTarget[i].RenderTargetWriteMask  = blendStateDesc.m_renderTarget[i].m_renderTargetWriteMask;
+    }
+
+    // create d3d object
+    IBlendState* blendState = nullptr;
+    D3D11_CHECK(g_d3d11Device->getDevice()->CreateBlendState(&blendDesc, reinterpret_cast<ID3D11BlendState**>(&blendState)));
+
+    m_blendStates.emplace(blendStateDesc, blendState);
+
+    return blendState;
+}
+
+void D3D11StateManager::destroyBlendState(IBlendState* blendState)
+{
+    ID3D11BlendState* d3dBlendState = (ID3D11BlendState*)blendState;
+    d3dBlendState->Release();
+}
+
+void D3D11StateManager::setBlendState(IBlendState* blendState, const float blendFactor[4], uint32_t sampleMask)
+{
+    ID3D11BlendState* d3dBlendState = (ID3D11BlendState*)blendState;
+    g_d3d11Device->getDeviceContext()->OMSetBlendState(d3dBlendState, blendFactor, sampleMask);
+}
+
+IDepthStencilState* D3D11StateManager::createDepthStencilState(const DepthStencilDesc& desc)
+{
+    // Find already created IDepthStencilState
+    auto it = m_depthStencilStates.find(desc);
+    if (it != m_depthStencilStates.end())
+    {
+        return (*it).second;
+    }
+
+    D3D11_DEPTH_STENCIL_DESC dsDesc     = {};
+    dsDesc.DepthEnable                  = desc.m_depthEnable;
+    dsDesc.DepthWriteMask               = (D3D11_DEPTH_WRITE_MASK)desc.m_depthWriteMask;
+    dsDesc.DepthFunc                    = (D3D11_COMPARISON_FUNC)desc.m_depthFunc;
+    dsDesc.StencilEnable                = desc.m_stencilEnable;
+    dsDesc.StencilReadMask              = desc.m_stencilReadMask;
+    dsDesc.StencilWriteMask             = desc.m_stencilWriteMask;
+    dsDesc.FrontFace.StencilFailOp      = (D3D11_STENCIL_OP)desc.m_frontFace.m_stencilFailOp;
+    dsDesc.FrontFace.StencilDepthFailOp = (D3D11_STENCIL_OP)desc.m_frontFace.m_stencilDepthFailOp;
+    dsDesc.FrontFace.StencilPassOp      = (D3D11_STENCIL_OP)desc.m_frontFace.m_stencilPassOp;
+    dsDesc.FrontFace.StencilFunc        = (D3D11_COMPARISON_FUNC)desc.m_frontFace.m_stencilFunc;
+    dsDesc.BackFace.StencilFailOp       = (D3D11_STENCIL_OP)desc.m_backFace.m_stencilFailOp;
+    dsDesc.BackFace.StencilDepthFailOp  = (D3D11_STENCIL_OP)desc.m_backFace.m_stencilDepthFailOp;
+    dsDesc.BackFace.StencilPassOp       = (D3D11_STENCIL_OP)desc.m_backFace.m_stencilPassOp;
+    dsDesc.BackFace.StencilFunc         = (D3D11_COMPARISON_FUNC)desc.m_backFace.m_stencilFunc;
+
+    // create d3d object
+    IDepthStencilState* depthStencilState = nullptr;
+    D3D11_CHECK(g_d3d11Device->getDevice()->CreateDepthStencilState(&dsDesc, reinterpret_cast<ID3D11DepthStencilState**>(&depthStencilState)));
+
+    m_depthStencilStates.emplace(desc, depthStencilState);
+
+    return depthStencilState;
+}
+
+void D3D11StateManager::destroyDepthStencilState(IDepthStencilState* state)
+{
+    ID3D11DepthStencilState* d3dDSState = (ID3D11DepthStencilState*)state;
+    d3dDSState->Release();
+}
+
+void D3D11StateManager::setDepthStencilState(IDepthStencilState* state, uint32_t stencilRef)
+{
+    ID3D11DepthStencilState* d3dDSState = (ID3D11DepthStencilState*)state;
+    g_d3d11Device->getDeviceContext()->OMSetDepthStencilState(d3dDSState, stencilRef);
+}
+
 
 }
