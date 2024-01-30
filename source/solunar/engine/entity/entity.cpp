@@ -251,13 +251,11 @@ void Entity::updateWorldTransform()
 		m_worldTransform = glm::translate(m_worldTransform, m_position) * rotation * glm::scale(m_worldTransform, m_scale);
 }
 
-void Entity::transformBBox()
+BoundingBox Entity_TransformBox(const BoundingBox& box, const glm::mat4& m)
 {
 	// transform to center/extents box representation
-	glm::vec3 center = m_boundingBox.m_max + m_boundingBox.m_min * glm::vec3(0.5);
-	glm::vec3 extents = m_boundingBox.m_max - center;
-
-	glm::mat4 m = getWorldTranslation();
+	glm::vec3 center = (box.m_max + box.m_min) * glm::vec3(0.5);
+	glm::vec3 extents = box.m_max - center;
 
 	// transform center
 	glm::vec3 t_center = glm::vec3(m * glm::vec4(center, 1.0));
@@ -270,8 +268,16 @@ void Entity::transformBBox()
 	glm::vec3 tmin = t_center - t_extents;
 	glm::vec3 tmax = t_center + t_extents;
 
-	m_WorldBoundingBox.m_min = tmin;
-	m_WorldBoundingBox.m_max = tmax;
+	BoundingBox rbox;
+	rbox.setIdentity();
+	rbox.m_min = tmin;
+	rbox.m_max = tmax;
+	return rbox;
+}
+
+void Entity::transformBBox()
+{
+	m_WorldBoundingBox = Entity_TransformBox(m_boundingBox, getWorldTranslation());
 }
 
 void Entity::quaternionRotate(const glm::vec3& axis, float angle)
