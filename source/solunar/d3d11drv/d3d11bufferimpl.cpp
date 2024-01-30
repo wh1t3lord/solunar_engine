@@ -67,7 +67,8 @@ D3D11_USAGE getD3D11Usage(const BufferDesc& desc)
 
 D3D11BufferImpl::D3D11BufferImpl(D3D11Device* device, const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc) :
 	m_buffer(nullptr),
-	m_device(nullptr)
+	m_device(nullptr),
+	m_bufferDesc(bufferDesc)
 {
 	create(device, bufferDesc, subresourceDesc);
 }

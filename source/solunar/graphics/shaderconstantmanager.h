@@ -84,6 +84,8 @@ namespace engine
 
 		void setStaticMeshGlobalData(MeshComponent* meshComponent, View* view, RenderContext& renderContext, GraphicsWorld* graphicsWorld);
 
+		void getConstantBuffers(std::unordered_map<std::string, IBufferBase*>& map);
+
 	private:
 		std::unordered_map<std::string, IBufferBase*> m_constantBuffers;
 	};
@@ -108,6 +110,9 @@ namespace engine
 
 		return ConstantBufferProxy(buffer);
 	}
+
+	void graphicsShowConstantBuffers(bool* open);
+
 }
 
 #endif // !SHADERCONSTANTMANAGER_H

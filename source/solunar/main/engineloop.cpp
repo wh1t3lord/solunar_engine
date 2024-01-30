@@ -1,4 +1,5 @@
 #include "pch.h"
+
 #include "main/engineloop.h"
 #include "main/main.h"
 
@@ -15,6 +16,8 @@
 #include "graphics/imguimanager.h"
 
 namespace engine {
+
+	extern void graphicsShowConstantBuffers(bool* open);
 
 	// extern View* g_engineView;
 	
@@ -46,6 +49,9 @@ namespace engine {
 	}
 
 	static bool g_showEntityList = false;
+	static bool g_showCBManager = false;
+	static bool g_forceQuit = false;
+
 
 	void engineDebugOverlay()
 	{
@@ -54,12 +60,15 @@ namespace engine {
 			if (ImGui::BeginMenu("Engine"))
 			{
 				if (ImGui::MenuItem("Entity list")) { g_showEntityList = !g_showEntityList; }
-	
+				if (ImGui::MenuItem("Quit")) { g_forceQuit = true; }
+
 				ImGui::EndMenu();
 			}
 
 			if (ImGui::BeginMenu("Graphics"))
 			{
+				if (ImGui::MenuItem("Show Constant Buffer Tracker")) { g_showCBManager = !g_showCBManager; }
+
 				ImGui::EndMenu();
 			}
 
@@ -75,6 +84,9 @@ namespace engine {
 
 			ImGui::EndMainMenuBar();
 		}
+
+		if (g_showCBManager)
+			graphicsShowConstantBuffers(&g_showCBManager);
 	}
 
 	void EngineLoop::initialize()
@@ -163,6 +175,9 @@ namespace engine {
 
 		if (g_quitAtStart)
 			return true;
+
+		if (g_forceQuit)
+			return false;
 
 		if (g_slowdown)
 			Sleep(100);
