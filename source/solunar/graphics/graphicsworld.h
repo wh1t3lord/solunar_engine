@@ -9,7 +9,7 @@ namespace engine {
 	
 	class GraphicsWorld : public Object
 	{
-		ImplementObject(GraphicsWorld, SerializableObject);
+		ImplementObject(GraphicsWorld, Object);
 	public:
 		static void registerObject();
 		

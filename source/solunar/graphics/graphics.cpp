@@ -6,8 +6,7 @@
 #include "graphics/material.h"
 #include "graphics/mesh.h"
 #include "graphics/model.h"
-
-#include "graphics/mesh.h"
+#include "graphics/light.h"
 
 #include "graphics/renderer.h"
 
@@ -30,6 +29,10 @@ void registerGraphicsObjects()
 
 	// Components
 	g_typeManager->registerObject<MeshComponent>();
+
+	LightComponent::registerObject();
+	PointLightComponent::registerObject();
+	DirectionalLightComponent::registerObject();
 }
 
 void graphicsInit()

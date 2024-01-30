@@ -50,7 +50,8 @@ void Entity::loadXML(tinyxml2::XMLElement& element)
 			m_position = getVector3FromXMLElement(*entity);
 		}
 		else if (strcmp(entity->Name(), "Rotation") == 0) {
-			m_rotation = getVector3FromXMLElement(*entity);
+			glm::vec3 rotation = getVector3FromXMLElement(*entity);
+			setEulerRotation( glm::radians( rotation));
 		}
 		else if (strcmp(entity->Name(), "Scale") == 0) {
 			m_scale = getVector3FromXMLElement(*entity);
@@ -215,9 +216,8 @@ Component* Entity::createComponentByTypeInfo(const TypeInfo* typeinfo)
 {
 	Component* component = (Component*)g_typeManager->createObjectByTypeInfo(typeinfo);
 	m_components.push_back(component);
-
-	component->onEntitySet(this);
 	if (m_world) component->onWorldSet(m_world);
+	component->onEntitySet(this);
 
 	return component;
 }

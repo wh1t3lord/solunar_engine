@@ -12,9 +12,10 @@
 namespace engine
 {
 	World::World() :
-		m_physicsWorld(nullptr)
+		m_physicsWorld(nullptr), m_graphicsWorld(nullptr)
 	{
 		m_physicsWorld = mem_new<PhysicsWorld>();
+		m_graphicsWorld = mem_new<GraphicsWorld>();
 	}
 
 	World::~World()
@@ -22,6 +23,11 @@ namespace engine
 		if (m_physicsWorld)
 		{
 			mem_delete(m_physicsWorld); m_physicsWorld = nullptr;
+		}
+
+		if (m_graphicsWorld)
+		{
+			mem_delete(m_graphicsWorld); m_graphicsWorld = nullptr;
 		}
 	}
 

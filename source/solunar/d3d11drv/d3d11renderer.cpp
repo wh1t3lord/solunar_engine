@@ -299,6 +299,9 @@ void D3D11Renderer::renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshCom
 {
 	// OPTICK_EVENT("D3D11Renderer::renderMesh");
 
+	// setup lights
+	setupLights(graphicsWorld);
+
 	//if (StaticMeshComponent* staticMesh = dynamicCast<StaticMeshComponent>(mesh))
 		renderStaticMesh(graphicsWorld, view, mesh);
 }

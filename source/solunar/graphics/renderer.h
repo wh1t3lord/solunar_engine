@@ -24,6 +24,14 @@ namespace engine
 		Lit
 	};
 
+	enum ConstantBufferBindings
+	{
+		ConstantBufferBindings_Scene,
+		ConstantBufferBindings_Skinning,
+		CBBindings_DirectionalLight,
+		ConstantBufferBindings_PointLights,
+	};
+
 	class Renderer
 	{
 	public:
@@ -46,6 +54,7 @@ namespace engine
 
 		void renderView(View* view);
 		void renderSky(View* view, SkyMeshComponent* skyMesh);
+		void setupLights(GraphicsWorld* graphicsWorld);
 	
 		virtual void bindMaterialForMesh(MeshComponent* mesh, Material* material, MaterialInstance* materialInstance) = 0;
 

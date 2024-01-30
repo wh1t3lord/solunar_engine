@@ -24,6 +24,7 @@
 #include "graphics/ifontmanager.h"
 #include "graphics/fontmanager.h"
 #include "graphics/mesh.h"
+#include "graphics/light.h"
 #include "graphics/ui/rmlsystem.h"
 #include "graphics/postfxmanager.h"
 
@@ -232,7 +233,7 @@ namespace engine
 					RenderContext::setContext(renderCtx);
 
 					// call render function
-					renderMesh(nullptr, view, meshComponent);
+					renderMesh(world->getGraphicsWorld(), view, meshComponent);
 
 					meshComponent->render();
 				}
@@ -329,6 +330,26 @@ namespace engine
 		RenderContext::setContext(renderCtx);
 		skyMesh->render();
 #endif
+	}
+
+	void Renderer::setupLights(GraphicsWorld* graphicsWorld)
+	{
+		LightManager* lightMgr = graphicsWorld->getLightManager();
+		if (DirectionalLightComponent* directionalLight = lightMgr->getDirectionalLight())
+		{
+			DirectionalLightCB* data = (DirectionalLightCB*)g_directionalLightConstantBuffer->map(BufferMapping::WriteOnly);
+			data->m_color = glm::vec4(directionalLight->m_color, 1.0f);
+			
+			Assert(directionalLight->getEntity());
+
+			glm::quat quaternion = directionalLight->getEntity()->getRotation();
+			glm::vec3 euler = glm::eulerAngles(quaternion) * 3.14159f / 180.f;
+			data->m_direction = glm::vec4(euler, 1.0f);
+
+			g_directionalLightConstantBuffer->unmap();
+
+			g_renderDevice->setConstantBufferIndex(CBBindings_DirectionalLight, g_directionalLightConstantBuffer.get());
+		}
 	}
 
 	void Renderer::endFrame()

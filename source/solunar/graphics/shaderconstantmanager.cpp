@@ -12,11 +12,13 @@
 #include "graphics/shaderprogram.h"
 
 #include "graphics/graphicsworld.h"
+#include "graphics/light.h"
 
 namespace engine
 {
 	static ShaderConstantManager s_shaderConstantManager;
 	ConstantBufferProxy g_staticMeshConstantBuffer;
+	ConstantBufferProxy g_directionalLightConstantBuffer;
 
 	ConstantBufferProxy::ConstantBufferProxy(IBufferBase* buffer)
 	{
@@ -73,6 +75,7 @@ namespace engine
 		Core::msg("ShaderConstantManager: initialize constant buffers ...");
 
 		g_staticMeshConstantBuffer = create<StaticMeshGlobalData>("StaticMeshGlobalData");
+		g_directionalLightConstantBuffer = create<DirectionalLightCB>("DirectionalLightCB");
 	}
 
 	void ShaderConstantManager::shutdown()

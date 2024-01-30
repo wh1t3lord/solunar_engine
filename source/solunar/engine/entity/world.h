@@ -2,10 +2,10 @@
 #define ENGINE_ENTITY_WORLD_H
 
 #include "engine/entity/entitymanager.h"
+#include "graphics/graphicsworld.h"
 
 namespace engine
 {
-
 	class PhysicsWorld;
 
 	class World : public SerializableObject
@@ -31,6 +31,7 @@ namespace engine
 
 		EntityManager& getEntityManager() { return m_entityManager; }
 
+		GraphicsWorld* getGraphicsWorld() { return m_graphicsWorld; }
 		PhysicsWorld* getPhysicsWorld() { return m_physicsWorld; }
 
 		// Casting functions
@@ -41,6 +42,7 @@ namespace engine
 	private:
 		EntityManager m_entityManager;
 
+		GraphicsWorld* m_graphicsWorld;
 		PhysicsWorld* m_physicsWorld;
 	};
 
