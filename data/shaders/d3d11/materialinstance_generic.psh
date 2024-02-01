@@ -58,7 +58,7 @@ float4 PSMain(VSOutput input) : SV_Target
 #endif
 
 	float3 N = input.normal;
-	float3 L = -g_DirLight_direction.xyz;
+	float3 L = g_DirLight_direction.xyz;
 	float3 V = g_viewDir.xyz;
 
 	float NdotL = max(0, dot(N, L));

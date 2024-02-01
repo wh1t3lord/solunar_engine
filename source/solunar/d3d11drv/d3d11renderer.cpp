@@ -299,6 +299,10 @@ void D3D11Renderer::renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshCom
 {
 	// OPTICK_EVENT("D3D11Renderer::renderMesh");
 
+	// Set depth stencil state
+	g_d3d11Device->getDeviceContext()->OMSetDepthStencilState(m_depthStencilState, 0);
+	g_stateManager->setRasterizerState(m_rasterizerState);
+
 	// setup lights
 	setupLights(graphicsWorld);
 

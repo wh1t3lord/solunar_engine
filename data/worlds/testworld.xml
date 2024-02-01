@@ -10,7 +10,7 @@
 			<Model filename="models/test.dae"/>
 		</MeshComponent>
 		
-		<TestRotatorComponent/>
+		<!-- <TestRotatorComponent/>-->
 	</Entity>
 	
 	<!-- Test entity with directional light -->

@@ -66,6 +66,8 @@ namespace engine
 
 	void ImGuiRenderer::shutdown()
 	{
+		invalidateDeviceObjects();
+
 		ImGuiIO& io = ImGui::GetIO();
 		ImGuiBackendData* bd = (ImGuiBackendData*)io.BackendRendererUserData;
 
@@ -245,6 +247,9 @@ namespace engine
 
 	void ImGuiRenderer::createDeviceObjects()
 	{
+		if (m_pFontSampler)
+			invalidateDeviceObjects();
+
 		// Create the input layout
 		InputLayoutDesc local_layout[] =
 		{
@@ -308,6 +313,26 @@ namespace engine
 		}
 
 		createFontsTexture();
+	}
+
+	void ImGuiRenderer::invalidateDeviceObjects()
+	{
+		// States are cached and not should be deleted
+		//if (bd->pFontSampler) { bd->pFontSampler->Release(); bd->pFontSampler = nullptr; }
+		//if (bd->pBlendState) { bd->pBlendState->Release(); bd->pBlendState = nullptr; }
+		//if (bd->pDepthStencilState) { bd->pDepthStencilState->Release(); bd->pDepthStencilState = nullptr; }
+		//if (bd->pRasterizerState) { bd->pRasterizerState->Release(); bd->pRasterizerState = nullptr; }
+
+		// Shaders are cached too
+		//if (bd->pPixelShader) { bd->pPixelShader->Release(); bd->pPixelShader = nullptr; }
+		//if (bd->pVertexShader) { bd->pVertexShader->Release(); bd->pVertexShader = nullptr; }
+	
+		//if (bd->pInputLayout) { bd->pInputLayout->Release(); bd->pInputLayout = nullptr; }
+
+		if (m_pFontTexture) { mem_delete(m_pFontTexture); m_pFontTexture = nullptr; ImGui::GetIO().Fonts->SetTexID(0); } // We copied data->pFontTextureView to io.Fonts->TexID so let's clear that as well.
+		if (m_pIB) { mem_delete(m_pIB); m_pIB = nullptr; }
+		if (m_pVB) { mem_delete(m_pVB); m_pVB = nullptr; }
+		if (m_pVertexConstantBuffer) { mem_delete(m_pVertexConstantBuffer); m_pVertexConstantBuffer = nullptr; }
 	}
 
 	void ImGuiRenderer::setupRenderState(ImDrawData* draw_data)

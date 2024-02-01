@@ -14,6 +14,7 @@
 #include "graphics/graphicsoptions.h"
 #include "graphics/renderer.h"
 #include "graphics/imguimanager.h"
+#include "graphics/lightmanager.h"
 
 namespace engine {
 
@@ -50,6 +51,7 @@ namespace engine {
 
 	static bool g_showEntityList = false;
 	static bool g_showCBManager = false;
+	static bool g_showLightEditor = true;
 	static bool g_forceQuit = false;
 
 
@@ -67,7 +69,8 @@ namespace engine {
 
 			if (ImGui::BeginMenu("Graphics"))
 			{
-				if (ImGui::MenuItem("Show Constant Buffer Tracker")) { g_showCBManager = !g_showCBManager; }
+				if (ImGui::MenuItem("Constant Buffer Tracker")) { g_showCBManager = !g_showCBManager; }
+				if (ImGui::MenuItem("Light Editor")) { g_showLightEditor = !g_showLightEditor; }
 
 				ImGui::EndMenu();
 			}
@@ -87,6 +90,9 @@ namespace engine {
 
 		if (g_showCBManager)
 			graphicsShowConstantBuffers(&g_showCBManager);
+	
+		if (g_showLightEditor)
+			graphicsLightEditor(&g_showLightEditor);
 	}
 
 	void EngineLoop::initialize()

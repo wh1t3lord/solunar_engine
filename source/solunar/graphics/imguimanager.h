@@ -28,6 +28,7 @@ namespace engine
 	private:
 		void createFontsTexture();
 		void createDeviceObjects();
+		void invalidateDeviceObjects();
 		void setupRenderState(ImDrawData* draw_data);
 
 	private:

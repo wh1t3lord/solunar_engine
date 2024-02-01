@@ -64,6 +64,8 @@ namespace engine
 		ImplementObject(DirectionalLightComponent, LightComponent);
 	public:
 		static void registerObject();
+
+		glm::vec3 m_direction;
 	};
 }
 

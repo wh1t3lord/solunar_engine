@@ -52,7 +52,7 @@ VSOutput VSMain(VSInput input)
 	output.texcoord = input.texcoord;
 
 	// normal
-	output.normal = input.normal;
+	output.normal = mul( float4(input.normal, 1.0f), g_modelMatrix );
 	
 	return output;
 }

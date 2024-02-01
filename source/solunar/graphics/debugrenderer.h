@@ -25,11 +25,19 @@ public:
 	void initialize();
 	void shutdown();
 
-	void drawDebugPositionOrNormal(const glm::vec3& vec);
+	void drawAxis(const glm::vec3& vec);
 	void drawLine(const glm::vec3& from, const glm::vec3& to, const glm::vec3& color);
 	void drawBoundingBox(const BoundingBox& box, const glm::vec3& color);
+	void drawArc(const glm::vec3& center, const glm::vec3& normal, const glm::vec3& axis, float radiusA, float radiusB, float minAngle, float maxAngle,
+		const glm::vec3& color, bool drawSect, float stepDegrees = float(10.f));
+
+	void drawCone(float radius, float height, int upAxis, const glm::vec3& transform, const glm::vec3& color);
+	
 
 	void renderFrame(View* view);
+
+	void pushModelMatrix(const glm::mat4& model);
+	void popModelMatrix();
 
 private:
 	void beginDraw();
@@ -50,16 +58,14 @@ private:
 
 	std::vector<Line> m_lines;
 
+	glm::mat4 m_modelMatrix;
+
 private:
 	VertexFormat m_lineVertexFormat;
 	
 	IBufferBase* m_verticesBuffer;
 	IBufferBase* m_matrixBuffer;
 	IShaderProgram* m_shaderProgram;
-
-	unsigned int m_vao;
-	unsigned int m_savedVao;
-	uint32_t m_mVPLocation;
 };
 
 extern DebugRender g_debugRender;
