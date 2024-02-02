@@ -8,6 +8,7 @@
 #include "graphics/shaderprogram.h"
 #include "graphics/material.h"
 
+#include "graphics/renderer.h"
 #include "graphics/rendercontext.h"
 
 #include "graphics/core/device.h"
@@ -195,7 +196,10 @@ namespace engine
 		TypeManager::getInstance()->registerObject<ModelBase>();
 	}
 
-	unsigned int kAssimpFlags = aiProcess_Triangulate | aiProcess_GenSmoothNormals | aiProcess_CalcTangentSpace;
+	unsigned int kAssimpFlags = aiProcess_Triangulate | 
+								aiProcess_PreTransformVertices | 
+								aiProcess_GenSmoothNormals | 
+								aiProcess_CalcTangentSpace;
 
 	void ModelBase::load(const std::shared_ptr<DataStream>& dataStream)
 	{
@@ -348,7 +352,13 @@ namespace engine
 			// Load material
 
 			// submesh->m_material = ContentManager::getInstance()->loadMaterial(submesh->m_materialName);
-			submesh->m_material = dynamicCastPtr<Material>(g_contentManager->load(submesh->m_materialName, Material::getStaticTypeInfo()));
+			//submesh->m_material = dynamicCastPtr<Material>(g_contentManager->load(submesh->m_materialName, Material::getStaticTypeInfo()));
+			submesh->m_material = g_contentManager->loadObject<Material>(submesh->m_materialName);
+			if (submesh->m_material.lock() == nullptr)
+			{
+				//Core::msg("ERROR: ModelBase: Missing material \"%s\"", submesh->m_materialName.c_str());
+				submesh->m_material = getDefaultMaterial();
+			}
 		}
 	}
 

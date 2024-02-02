@@ -90,6 +90,7 @@ namespace engine
 	void createRenderer();
 	void destroyRenderer();
 
+	std::weak_ptr<Material> getDefaultMaterial();
 }
 
 #endif // !RENDERER_H

@@ -51,7 +51,7 @@ IShaderProgram* D3D11ShaderProgramManager::createShaderProgram(const char* vsfil
 
 	D3D11Device* device = (D3D11Device*)g_renderDevice;
 
-	Core::msg("[d3d11drv]: compile shader program from files %s, %s", vsfilename, fsfilename);
+	Core::msg("D3D11ShaderProgramManager: compile shader program from files %s, %s", vsfilename, fsfilename);
 
 	std::string vspath = m_shaderPath;
 	vspath += "/";
@@ -74,14 +74,14 @@ IShaderProgram* D3D11ShaderProgramManager::createShaderProgram(const char* vsfil
 void D3D11ShaderProgramManager::setShaderProgram(IShaderProgram* program)
 {
 	D3D11Device* device = (D3D11Device*)g_renderDevice;
-	D3D11ShaderProgram* nativeProgram = (D3D11ShaderProgram*)program;
+	D3D11ShaderProgram* d3dProgram = (D3D11ShaderProgram*)program;
 
 	// #TODO: REFACTOR
-	if (nativeProgram)
+	if (d3dProgram)
 	{
-		device->getDeviceContext()->IASetInputLayout(nativeProgram->getInputLayout());
-		device->getDeviceContext()->VSSetShader(nativeProgram->getVertexShader(), NULL, 0);
-		device->getDeviceContext()->PSSetShader(nativeProgram->getPixelShader(), NULL, 0);
+		device->getDeviceContext()->IASetInputLayout(d3dProgram->getInputLayout());
+		device->getDeviceContext()->VSSetShader(d3dProgram->getVertexShader(), NULL, 0);
+		device->getDeviceContext()->PSSetShader(d3dProgram->getPixelShader(), NULL, 0);
 	}
 	else
 	{

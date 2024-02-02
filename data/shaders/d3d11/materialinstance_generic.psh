@@ -39,29 +39,23 @@ cbuffer DirectionalLightCB : register(b2)
 Texture2D g_albedoTexture;
 SamplerState g_albedoSampler;
 
+//#define UNLIT
+
 float4 PSMain(VSOutput input) : SV_Target
 {
 	float3 ambientColor = float3(0.2f, 0.2f, 0.2f);
-
 	float3 albedoColor = g_albedoTexture.Sample(g_albedoSampler, input.texcoord).rgb;
-
-//#define UNLIT
-//#define TEST
 
 #ifdef UNLIT
 	return float4(albedoColor, 1.0f);
 #endif
 
-#ifdef TEST
-	float3 testColor= albedoColor*g_DirLight_color.rgb;
-	return float4(testColor, 1.0f);
-#endif
-
 	float3 N = input.normal;
-	float3 L = g_DirLight_direction.xyz;
+	float3 L = -g_DirLight_direction.xyz;
 	float3 V = g_viewDir.xyz;
-
 	float NdotL = max(0, dot(N, L));
+
+	
 
 	float3 finalColor = albedoColor * (ambientColor + NdotL * g_DirLight_color.rgb);
 

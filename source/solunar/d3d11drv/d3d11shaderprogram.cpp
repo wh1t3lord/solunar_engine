@@ -1,6 +1,8 @@
 #include "d3d11drv_pch.h"
 #include "d3d11drv/d3d11shaderprogram.h"
 
+#define CREATE_INPUT_LAYOUT_FROM_REFLECT
+
 namespace engine
 {
 
@@ -72,7 +74,7 @@ ID3DBlob* createShaderFromText(const char* text, ShaderType shaderType)
 			errorText += " ";
 		}
 
-		Core::msg("[d3d11drv]: %s", errorText.c_str());
+		Core::msg("createShaderFromText: %s", errorText.c_str());
 
 		std::terminate();
 		//DebugBreak();
@@ -132,10 +134,14 @@ void D3D11ShaderProgram::create(D3D11Device* device, const char* vstext, const c
 			vertexShaderBlob->GetBufferSize(),
 			&m_inputLayout);
 	}
+#ifdef CREATE_INPUT_LAYOUT_FROM_REFLECT
 	else
 	{
 		createInputLayout(device, vertexShaderBlob);
 	}
+#else
+	Assert2(inputLayout, "Failed to create shader input layout");
+#endif // CREATE_INPUT_LAYOUT_FROM_REFLECT
 
 	vertexShaderBlob->Release();
 	vertexShaderBlob = nullptr;

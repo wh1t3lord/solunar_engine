@@ -15,6 +15,9 @@ namespace engine
 class ContentManager : public Singleton<ContentManager>
 {
 public:
+	ContentManager();
+	~ContentManager();
+
 	void init();
 	void shutdown();
 

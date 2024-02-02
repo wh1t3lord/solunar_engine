@@ -41,6 +41,7 @@ namespace engine
 
 	static std::weak_ptr<TextureMap> g_defaultTexture;
 	static std::weak_ptr<TextureMap> g_notFoundTexture;
+	static std::weak_ptr<Material> g_defaultMaterial;
 
 	Renderer::Renderer()
 	{
@@ -68,9 +69,11 @@ namespace engine
 		}
 #endif
 
+		g_defaultMaterial = g_contentManager->loadObject<Material>("materials/default_material.xml");
+
 		// load textures
-		g_defaultTexture = g_contentManager->loadObject<TextureMap>("textures/default.png");
-		g_notFoundTexture = g_contentManager->loadObject<TextureMap>("textures/notexture.png");
+		//g_defaultTexture = g_contentManager->loadObject<TextureMap>("textures/default.png");
+		//g_notFoundTexture = g_contentManager->loadObject<TextureMap>("textures/notexture.png");
 	}
 
 	void Renderer::initFramebuffer(View* view)
@@ -112,7 +115,7 @@ namespace engine
 		ImGuiManager::getInstance()->init();
 
 		// shader manager is inited
-		//initInplaceResources();
+		initInplaceResources();
 
 		// initialize default framebuffer
 		//initFramebuffer(view);
@@ -355,7 +358,7 @@ namespace engine
 			V[0] = 2 * (o.x * o.z - o.w * o.y);
 			V[1] = 2 * (o.y * o.z + o.w * o.x);
 			V[2] = 1 - 2 * (o.x * o.x + o.y * o.y);
-			data->m_direction = glm::vec4(V, 1.0f);
+			data->m_direction = glm::vec4(-V, 1.0f);
 
 			g_debugRender.drawLine(directionalLight->getEntity()->getPosition(), 
 				directionalLight->getEntity()->getPosition() + V, glm::vec3(1.0f, 1.0f, 0.0f));
@@ -387,6 +390,11 @@ namespace engine
 	void Renderer::toggleShowOctree()
 	{
 		m_showOctree = !m_showOctree;
+	}
+
+	std::weak_ptr<Material> getDefaultMaterial()
+	{
+		return g_defaultMaterial;
 	}
 
 }

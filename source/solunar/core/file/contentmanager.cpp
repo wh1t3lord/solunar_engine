@@ -12,23 +12,31 @@ namespace engine
 
 ContentManager* g_contentManager = nullptr;
 
+ContentManager::ContentManager()
+{
+}
+
+ContentManager::~ContentManager()
+{
+}
+
 void ContentManager::init()
 {
 }
 
 void ContentManager::shutdown()
 {
-	//for (auto& it : m_content)
-	//{
-	//	if (it.second)
-	//	{
-	//		spdlog::info("[content]: releasing {}", it.first);
-	//		it.second.reset();
-	//		it.second = nullptr;
-	//	}
-	//}
+	for (auto& it : m_content)
+	{
+		if (it.second)
+		{
+			Core::msg("ContentManager: releasing %s", it.first.c_str());
+			it.second.reset();
+			it.second = nullptr;
+		}
+	}
 
-	//m_content.clear();
+	m_content.clear();
 }
 
 void ContentManager::mountDevice(ContentDevice* contentDevice, const std::string& name)
@@ -38,7 +46,7 @@ void ContentManager::mountDevice(ContentDevice* contentDevice, const std::string
 
 	m_devices[name] = contentDevice;
 
-	Core::msg("[content]: mounted device %s", name.c_str());
+	Core::msg("ContentManager: mounted device %s", name.c_str());
 }
 
 void ContentManager::unountDevice(const std::string& name)
@@ -82,14 +90,20 @@ std::weak_ptr<SerializableObject> ContentManager::load(const std::string& filena
 	// we will guess content is not loaded for now
 	if (objectInstance == m_content.end())
 	{
-		Core::msg("[content]: loading %s %s", pTypeInfo->getClassName(), filename.c_str());
-
 		DataStreamPtr stream = contentDevice->openStream(filename);
+		if (!stream)
+		{
+			Core::msg("ContentManager: failed to load %s from file \"%s\"", pTypeInfo->getClassName(),
+				filename.c_str());
+
+			return std::weak_ptr<SerializableObject>();
+		}
 
 		SerializableObject* objectInstance = (SerializableObject*)TypeManager::getInstance()->createObjectByTypeInfo(pTypeInfo);
 
 		std::shared_ptr<SerializableObject> object = std::shared_ptr<SerializableObject>(objectInstance, objectDeleter);
 		object->load(stream);
+		Core::msg("ContentManager: loaded %s %s", pTypeInfo->getClassName(), filename.c_str());
 		m_content.emplace(filename, object);
 	}
 

@@ -36,6 +36,7 @@ namespace engine
 		DataStreamFactory::createInstance();
 
 		g_contentManager = mem_new<ContentManager>();
+		g_contentManager->init();
 
 		// register core types
 		registerCoreTypes();

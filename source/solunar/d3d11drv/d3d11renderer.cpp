@@ -1,3 +1,4 @@
+#include "renderer.h"
 #include "d3d11drv_pch.h"
 #include "d3d11drv/d3d11renderer.h"
 #include "d3d11drv/d3d11device.h"

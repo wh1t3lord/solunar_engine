@@ -4,6 +4,7 @@
 #include "main/main.h"
 
 #include "core/timer.h"
+#include "core/file/contentmanager.h"
 
 #include "engine/engine.h"
 #include "engine/inputmanager.h"
@@ -163,6 +164,10 @@ namespace engine {
 		//AudioManager::destroyInstance();
 
 		//ImguiManager::getInstance()->shutdown();
+
+		// release content manager (because some objects allocated by renderer, and after
+		//							renderer destroying, render device is unavaliable)
+		g_contentManager->shutdown();
 
 		graphicsShutdown();
 

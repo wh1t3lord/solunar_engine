@@ -32,6 +32,9 @@ DataStreamPtr ContentDevice::openStream(const std::string& filename)
 	path += "/";
 	path += filename;
 
+	if (!g_fileSystem->exist(path.c_str()))
+		return DataStreamPtr(nullptr);
+
 	// create object
 	return std::make_shared<FileStream>(path);
 }

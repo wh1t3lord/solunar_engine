@@ -1,5 +1,9 @@
 // Material Instance shader - Generic material
 //
+
+// C++ defines:
+//	SKINNED
+
 struct VSInput
 {
 	float3 position		: POSITION;

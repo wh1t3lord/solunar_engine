@@ -183,4 +183,33 @@ namespace engine {
 	{
 		m_rigidBody->setCollisionFlags(m_rigidBody->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	}
+
+
+	/////////////////////////////////////////////////////////////////
+
+
+	RBPlayerComponent::RBPlayerComponent()
+	{
+	}
+
+	RBPlayerComponent::~RBPlayerComponent()
+	{
+	}
+
+	void RBPlayerComponent::registerObject()
+	{
+		g_typeManager->registerObject<RBPlayerComponent>();
+	}
+
+	void RBPlayerComponent::onEntitySet(Entity* entity)
+	{
+	}
+
+	void RBPlayerComponent::onWorldSet(World* world)
+	{
+	}
+
+	void RBPlayerComponent::onEntityRemove()
+	{
+	}
 }

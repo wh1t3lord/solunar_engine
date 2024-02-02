@@ -59,7 +59,22 @@ namespace engine {
 		bool m_isKinematic;
 		bool m_inWorld;
 	};
-	
+
+	//! Hack due support btCharacterController in the physics system.
+	class RBPlayerComponent : public RigidBodyComponent
+	{
+		ImplementObject(RBPlayerComponent, RigidBodyComponent);
+	public:
+		RBPlayerComponent();
+		~RBPlayerComponent();
+
+		static void registerObject();
+
+		void onEntitySet(Entity* entity) override;
+		void onWorldSet(World* world) override;
+
+		void onEntityRemove() override;
+	};
 }
 
 #endif // !RIGIDBODYCOMPONENT_H
