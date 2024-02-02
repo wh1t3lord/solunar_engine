@@ -48,7 +48,7 @@ namespace engine
 
 	void Image::createFromFile(const std::string& filename)
 	{
-		stbi_set_flip_vertically_on_load(true);
+		stbi_set_flip_vertically_on_load(false);
 
 		FileHandle file = g_fileSystem->open(filename.c_str());
 		g_fileSystem->seek(file, Seek_End, 0);
@@ -69,6 +69,8 @@ namespace engine
 
 	void Image::createFromMemoryStream(const std::shared_ptr<DataStream>& stream)
 	{
+		stbi_set_flip_vertically_on_load(true);
+
 		stream->seek(Seek_End, 0);
 		size_t fileSize = stream->tell();
 		stream->seek(Seek_Begin, 0);

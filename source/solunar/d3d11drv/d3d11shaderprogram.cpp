@@ -48,7 +48,7 @@ ID3DBlob* createShaderFromText(const char* text, ShaderType shaderType)
 	const char* entryPoint = (shaderType == ShaderType_Vertex) ? "VSMain" : "PSMain";
 	const char* shaderTarget = (shaderType == ShaderType_Vertex) ? "vs_5_0" : "ps_5_0";
 
-	HRESULT hr = D3DCompile(text, strlen(text), "UNKNOWED", NULL, NULL, entryPoint, shaderTarget, 0, 0, &shaderBlob, &errorTextBlob);
+	HRESULT hr = D3DCompile(text, strlen(text), "UNKNOWED", NULL, NULL, entryPoint, shaderTarget, D3DCOMPILE_DEBUG, 0, &shaderBlob, &errorTextBlob);
 	if (FAILED(hr))
 	{
 		std::string errorText = "Failed to compile shader!";
