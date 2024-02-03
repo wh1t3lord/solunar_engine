@@ -78,11 +78,13 @@ namespace engine
 
 	void Renderer::initFramebuffer(View* view)
 	{
+#if 0
 		TextureDesc colorTextureDesc;
 		memset(&colorTextureDesc, 0, sizeof(colorTextureDesc));
 		colorTextureDesc.m_width = view->m_width;
 		colorTextureDesc.m_height = view->m_height;
 		colorTextureDesc.m_format = ImageFormat::RGBA16F;
+		colorTextureDesc.m_renderTargetUsage = true;
 
 		SubresourceDesc colorTextureSubresourceDesc;
 		memset(&colorTextureSubresourceDesc, 0, sizeof(colorTextureSubresourceDesc));
@@ -94,6 +96,7 @@ namespace engine
 		depthTextureDesc.m_width = view->m_width;
 		depthTextureDesc.m_height = view->m_height;
 		depthTextureDesc.m_format = ImageFormat::DEPTH24;
+		depthTextureDesc.m_renderTargetUsage = true;
 
 		SubresourceDesc depthTextureSubresourceDesc;
 		memset(&depthTextureSubresourceDesc, 0, sizeof(depthTextureSubresourceDesc));
@@ -106,19 +109,20 @@ namespace engine
 		renderTargetDesc.m_textures2D[0] = m_screenColorTexture;
 		renderTargetDesc.m_textures2DCount = 1;
 		m_screenRenderTarget = g_renderDevice->createRenderTarget(renderTargetDesc);
+#endif
 	}
 
 	void Renderer::init()
 	{
 		View* view = CameraProxy::getInstance()->getView();
 
-		ImGuiManager::getInstance()->init();
+		// initialize default framebuffer
+		initFramebuffer(view);
 
 		// shader manager is inited
 		initInplaceResources();
 
-		// initialize default framebuffer
-		//initFramebuffer(view);
+		ImGuiManager::getInstance()->init();
 
 		// set as lit
 		setRenderMode(RendererViewMode::Lit);

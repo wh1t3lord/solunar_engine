@@ -7,6 +7,7 @@ namespace engine {
 	
 	class PhysicsManager;
 	class PhysicsWorld;
+	class ShapeComponent;
 
 	//! Rigid body component
 	class RigidBodyComponent : public Component
@@ -18,10 +19,10 @@ namespace engine {
 		
 		static void registerObject();
 		
-		void onEntitySet(Entity* entity) override;
-		void onWorldSet(World* world) override;
+		virtual void onEntitySet(Entity* entity) override;
+		virtual void onWorldSet(World* world) override;
 
-		void onEntityRemove() override;
+		virtual void onEntityRemove() override;
 		
 		void loadXML(tinyxml2::XMLElement& element) override;
 		void saveXML(tinyxml2::XMLElement& element) override;
@@ -42,6 +43,9 @@ namespace engine {
 		void disableCollide();
 		void enableCollide();
 
+		void attachShape(ShapeComponent* shape);
+		void dettachShape(ShapeComponent* shape);
+
 	private:
 		void createBody();
 		void destroyBody();
@@ -61,12 +65,12 @@ namespace engine {
 	};
 
 	//! Hack due support btCharacterController in the physics system.
-	class RBPlayerComponent : public RigidBodyComponent
+	class RigidBodyProxyComponent : public RigidBodyComponent
 	{
-		ImplementObject(RBPlayerComponent, RigidBodyComponent);
+		ImplementObject(RigidBodyProxyComponent, RigidBodyComponent);
 	public:
-		RBPlayerComponent();
-		~RBPlayerComponent();
+		RigidBodyProxyComponent();
+		~RigidBodyProxyComponent();
 
 		static void registerObject();
 

@@ -1,9 +1,8 @@
-#include "shockgame/shockgamepch.h"
+#include "shockgamepch.h"
 
 #include "shockgame/shockgame.h"
 #include "shockgame/shockeventlistener.h"
 #include "shockgame/shocksignalmanager.h"
-
 #include "shockgame/shockplayercontroller.h"
 
 // Base game includes
@@ -16,6 +15,8 @@
 #include "game/gamelogic/weapons/weaponautocomponent.h"
 #include "game/gamelogic/weapons/weaponpistolcomponent.h"
 #include "game/gamelogic/world/levelmanager.h"
+
+#include "graphics/imguimanager.h"
 
 namespace engine
 {
@@ -107,6 +108,38 @@ void ShockGameInterface::shutdown()
 	ShockSignalManager::destroyInstance();
 
 	// g_eventManager.removeEventListener(&g_shockEventListener);
+}
+
+void shockGamePlayerDebug(bool* open)
+{
+	if (ImGui::Begin("Shock Player Debug", open))
+	{
+		World* world = Engine::ms_world;
+		if (world)
+		{
+			std::vector<Entity*> players = world->getEntityManager().getEntitiesWithComponent<ShockPlayerController>();
+			if (!players.empty())
+			{
+				Entity* player = players[0];
+				ShockPlayerController* playerController = player->getComponent<ShockPlayerController>();
+				if (playerController)
+				{
+					ImGui::Checkbox("Fly cam", &playerController->m_flyCam);
+				}
+			}
+			else
+			{
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Player with ShockPlayerController doesn't exist!");
+			}
+		}
+		else
+		{
+			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "World is not loaded!");
+		}
+	}
+
+	ImGui::End();
+
 }
 
 }

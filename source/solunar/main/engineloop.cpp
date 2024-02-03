@@ -17,6 +17,8 @@
 #include "graphics/imguimanager.h"
 #include "graphics/lightmanager.h"
 
+#include "shockgame/shockgame.h"
+
 namespace engine {
 
 	extern void graphicsShowConstantBuffers(bool* open);
@@ -54,7 +56,7 @@ namespace engine {
 	static bool g_showCBManager = false;
 	static bool g_showLightEditor = true;
 	static bool g_forceQuit = false;
-
+	static bool g_showShockPlayerDebug = false;
 
 	void engineDebugOverlay()
 	{
@@ -78,6 +80,8 @@ namespace engine {
 
 			if (ImGui::BeginMenu("Game"))
 			{
+				if (ImGui::MenuItem("Shock Player Debug")) { g_showShockPlayerDebug = !g_showShockPlayerDebug; }
+
 				ImGui::EndMenu();
 			}
 
@@ -94,6 +98,9 @@ namespace engine {
 	
 		if (g_showLightEditor)
 			graphicsLightEditor(&g_showLightEditor);
+
+		if (g_showShockPlayerDebug)
+			shockGamePlayerDebug(&g_showShockPlayerDebug);
 	}
 
 	void EngineLoop::initialize()

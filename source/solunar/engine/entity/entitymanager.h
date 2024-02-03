@@ -12,6 +12,8 @@ public:
 	EntityManager();
 	~EntityManager();
 
+	void deleteEntities();
+
 	Entity* createEntity();
 	Entity* createEntityEx(const TypeInfo* typeInfo);
 

@@ -1,6 +1,8 @@
 #ifndef SHOCKPLAYERCONTROLLER_H
 #define SHOCKPLAYERCONTROLLER_H
 
+#include "engine/physics/shapescomponent.h"
+#include "engine/physics/rigidbodycomponent.h"
 #include "game/gamelogic/player/playercontrollercomponent.h"
 
 namespace engine
@@ -37,6 +39,13 @@ private:
 private:
 	ShockPlayerStats m_playerStats;
 	CameraFirstPersonComponent* m_camera;
+
+	RigidBodyComponent* m_rigidBody;
+	BoxShapeComponent* m_shape;
+
+
+public:
+	bool m_flyCam;
 };
 
 }

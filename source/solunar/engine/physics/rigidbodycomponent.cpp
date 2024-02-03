@@ -1,6 +1,7 @@
 #include "enginepch.h"
 #include "engine/physics/rigidbodycomponent.h"
 #include "engine/physics/physicsworld.h"
+#include "engine/physics/shapescomponent.h"
 
 #include "engine/entity/world.h"
 
@@ -184,32 +185,43 @@ namespace engine {
 		m_rigidBody->setCollisionFlags(m_rigidBody->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	}
 
+	void RigidBodyComponent::attachShape(ShapeComponent* shape)
+	{
+		shape->initializeShape();
+	}
+
+	void RigidBodyComponent::dettachShape(ShapeComponent* shape)
+	{
+	}
 
 	/////////////////////////////////////////////////////////////////
 
 
-	RBPlayerComponent::RBPlayerComponent()
+	RigidBodyProxyComponent::RigidBodyProxyComponent()
 	{
 	}
 
-	RBPlayerComponent::~RBPlayerComponent()
+	RigidBodyProxyComponent::~RigidBodyProxyComponent()
 	{
 	}
 
-	void RBPlayerComponent::registerObject()
+	void RigidBodyProxyComponent::registerObject()
 	{
-		g_typeManager->registerObject<RBPlayerComponent>();
+		g_typeManager->registerObject<RigidBodyProxyComponent>();
 	}
 
-	void RBPlayerComponent::onEntitySet(Entity* entity)
+	void RigidBodyProxyComponent::onEntitySet(Entity* entity)
 	{
+		Component::onEntitySet(entity);
 	}
 
-	void RBPlayerComponent::onWorldSet(World* world)
+	void RigidBodyProxyComponent::onWorldSet(World* world)
 	{
+		Component::onWorldSet(world);
 	}
 
-	void RBPlayerComponent::onEntityRemove()
+	void RigidBodyProxyComponent::onEntityRemove()
 	{
+		Component::onEntityRemove();
 	}
 }

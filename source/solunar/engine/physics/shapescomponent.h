@@ -1,8 +1,8 @@
 #ifndef SHAPESCOMPONENT_H
 #define SHAPESCOMPONENT_H
 
-#include "physics/bullet_private.h"
-#include "physics/rigidbodycomponent.h"
+#include "engine/physics/bullet_private.h"
+#include "engine/physics/rigidbodycomponent.h"
 
 namespace engine {
 
@@ -83,6 +83,8 @@ namespace engine {
 
 		void loadXML(tinyxml2::XMLElement& element) override;
 		void saveXML(tinyxml2::XMLElement& element) override;
+
+		void createShape(const glm::vec3& size);
 
 	private:
 		void createShapeInternal() override;

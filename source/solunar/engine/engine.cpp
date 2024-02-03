@@ -35,6 +35,7 @@ namespace engine
 		CapsuleShapeComponent::registerObject();
 		TriangleMeshShapeComponent::registerObject();
 		RigidBodyComponent::registerObject();
+		RigidBodyProxyComponent::registerObject();
 
 		/*Node::registerObject();
 		CameraNode::registerObject();

@@ -11,15 +11,23 @@ EntityManager::EntityManager()
 
 EntityManager::~EntityManager()
 {
-	for (auto entity : m_entities)
-	{
-		if (entity)
-		{
-			mem_delete(entity);
-		}
-	}
+	deleteEntities();
+}
 
-	m_entities.clear();
+void EntityManager::deleteEntities()
+{
+	if (!m_entities.empty())
+	{
+		for (auto entity : m_entities)
+		{
+			if (entity)
+			{
+				mem_delete(entity);
+			}
+		}
+
+		m_entities.clear();
+	}
 }
 
 Entity* EntityManager::createEntity()

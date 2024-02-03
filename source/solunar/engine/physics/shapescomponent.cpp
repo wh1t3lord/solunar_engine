@@ -14,7 +14,11 @@ namespace engine {
 	}
 
 	ShapeComponent::ShapeComponent() :
-		m_shape(nullptr)
+		m_shape(nullptr),
+		m_physicsWorld(nullptr),
+		m_rigidBody(nullptr),
+		m_scale(glm::vec3(1.0f)),
+		m_rotation( glm::identity<glm::quat>())
 	{
 		m_localPosition = glm::vec3(0.0f);
 	}
@@ -33,11 +37,20 @@ namespace engine {
 	{
 		if (getEntity())
 		{
+			// HACK: I don't know how it's brokes but... hack...
+#if 1
+			if (RigidBodyComponent* rigidBody = getEntity()->getComponent<RigidBodyComponent>())
+			{
+				Assert2(rigidBody->getCompoundShape(), "RigidBody is not initialized!");
+				rigidBody->getCompoundShape()->removeChildShape(m_shape);
+			}
+#else
 			if (m_rigidBody)
 			{
 				Assert2(m_rigidBody->getCompoundShape(), "RigidBody is not initialized!");
 				m_rigidBody->getCompoundShape()->removeChildShape(m_shape);
 			}
+#endif
 		}
 
 		// destroy shape
@@ -135,6 +148,12 @@ namespace engine {
 		{
 			saveVector3ToXMLElement(*sizeElement, m_size);
 		}
+	}
+
+	void BoxShapeComponent::createShape(const glm::vec3& size)
+	{
+		m_size = size;
+		createShapeInternal();
 	}
 
 	void BoxShapeComponent::createShapeInternal()

@@ -20,6 +20,9 @@ namespace engine
 
 	World::~World()
 	{
+		// Delete all entities before physics world destruction
+		m_entityManager.deleteEntities();
+
 		if (m_physicsWorld)
 		{
 			mem_delete(m_physicsWorld); m_physicsWorld = nullptr;

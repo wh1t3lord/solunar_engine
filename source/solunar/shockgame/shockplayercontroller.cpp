@@ -7,7 +7,8 @@ namespace engine
 {
 
 ShockPlayerController::ShockPlayerController() :
-	m_camera(nullptr)
+	m_camera(nullptr),
+	m_flyCam(true)
 {
 }
 
@@ -51,6 +52,13 @@ void ShockPlayerController::initializeCamera()
 
 	m_camera = getEntity()->createComponent<CameraFirstPersonComponent>();
 
+	m_rigidBody = getEntity()->createComponent<RigidBodyComponent>();
+
+	m_shape = getEntity()->createComponent<BoxShapeComponent>();
+	m_shape->createShape(glm::vec3(0.2f, 0.8f, 0.2f));
+
+	m_rigidBody->attachShape(m_shape);
+
 	activateCamera();
 }
 
@@ -72,7 +80,7 @@ void ShockPlayerController::update(float dt)
 	updateCamera(dt);
 
 	// update player movement
-	//updateMovement(dt);
+	updateMovement(dt);
 
 	InputManager* input = InputManager::getInstance();
 	if (input->getKey(KeyboardKeys::KEY_F))

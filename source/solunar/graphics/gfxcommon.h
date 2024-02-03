@@ -63,13 +63,6 @@ namespace engine
 		Count
 	};
 
-	struct BufferCreationDesc
-	{
-		void* m_data;
-		size_t m_dataSize;
-		BufferAccess m_access;
-	};
-
 	enum class BufferType : uint16_t
 	{
 		VertexBuffer,
@@ -167,6 +160,7 @@ namespace engine
 		uint32_t m_height = 1;
 		uint32_t m_mipmapLevel = 0;
 		ImageFormat m_format;
+		bool m_renderTargetUsage;
 	};
 
 	struct SurfaceDesc
