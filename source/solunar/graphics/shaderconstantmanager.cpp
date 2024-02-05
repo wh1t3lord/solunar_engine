@@ -119,28 +119,8 @@ namespace engine
 		globalData->m_viewPos = glm::vec4(camera->getPosition(), 0.0f);
 		globalData->m_viewDir = glm::vec4(camera->getDirection(), 0.0f);
 
-		globalData->m_directionLightVec = glm::vec4(0.0f);
-		globalData->m_directionLightColor = glm::vec4(0.0f);
-
-#if 0
-		for (auto& light : graphicsWorld->getLightManager()->getLights())
-		{
-			if (light->isA(DirectionalLightComponent::getStaticTypeInfo()))
-			{
-				DirectionalLightComponent* directionalLight = dynamicCast<DirectionalLightComponent>(light);
-				globalData->m_directionLightVec = glm::vec4(directionalLight->getDirection(), 0.0f);
-				globalData->m_directionLightColor = glm::vec4(directionalLight->getColor(), 0.0f);
-			}
-		}
-
-		m_staticMeshConstantBuffer->unmap();
-
-		g_renderDevice->setConstantBufferIndex(0, m_staticMeshConstantBuffer);
-#else
 		g_staticMeshConstantBuffer->unmap();
 		g_renderDevice->setConstantBufferIndex(0, g_staticMeshConstantBuffer.get());
-#endif
-
 	}
 
 	void ShaderConstantManager::getConstantBuffers(std::unordered_map<std::string, IBufferBase*>& map)

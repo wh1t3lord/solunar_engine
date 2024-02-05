@@ -31,15 +31,6 @@ namespace engine
 
 		glm::vec4 m_viewPos;
 		glm::vec4 m_viewDir;
-
-		glm::vec4 m_directionLightVec;
-		glm::vec4 m_directionLightColor;
-
-		//int32_t m_lightsCount;
-
-		//PointLightDesc m_pointLight;
-
-		//PointLightDesc m_pointLights[MAX_POINT_LIGHTS];
 	};
 
 	class IShaderProgram;

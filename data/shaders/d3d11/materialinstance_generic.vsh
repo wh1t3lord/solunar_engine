@@ -36,9 +36,6 @@ cbuffer GlobalData : register(b0)
 
 	float4 g_viewPos;
 	float4 g_viewDir;
-
-	float4 g_directionLightVec;
-	float4 g_directionLightColor;
 };
 
 VSOutput VSMain(VSInput input)

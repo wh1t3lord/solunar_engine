@@ -153,22 +153,25 @@ namespace engine {
 
 	void RigidBodyComponent::destroyBody()
 	{
-		if (!m_physicsWorld)
+		if (m_physicsWorld)
+		{
+			btDynamicsWorld* physicsWorld = m_physicsWorld->getWorld();
+			physicsWorld->removeRigidBody(m_rigidBody);
+		}
+		else
 		{
 			Core::msg("RigidBodyComponent::destroyBody: Can't remove body. Physics world is already destroyed.");
 			Core::msg("Entity=0x%p", getEntity());
-			return;
 		}
-
+		
 		// remove user pointer from this component
 		m_rigidBody->setUserPointer(nullptr);
 
-		btDynamicsWorld* physicsWorld = m_physicsWorld->getWorld();
-		physicsWorld->removeRigidBody(m_rigidBody);
-
 		mem_delete(m_rigidBody);
+		m_rigidBody = nullptr;
 
 		mem_delete(m_compoundShape);
+		m_compoundShape = nullptr;
 	}
 
 	void RigidBodyComponent::updateBodyProperties()
@@ -192,6 +195,12 @@ namespace engine {
 
 	void RigidBodyComponent::dettachShape(ShapeComponent* shape)
 	{
+		m_compoundShape->removeChildShape(shape->getSdkShape());
+	}
+
+	void RigidBodyComponent::applyImpulse(const glm::vec3& impulse)
+	{
+		m_rigidBody->applyCentralImpulse(glmVectorToBt(impulse));
 	}
 
 	/////////////////////////////////////////////////////////////////
@@ -223,5 +232,14 @@ namespace engine {
 	void RigidBodyProxyComponent::onEntityRemove()
 	{
 		Component::onEntityRemove();
+	}
+
+	void RigidBodyProxyComponent::createPlayerController()
+	{
+		btTransform startTransform; startTransform.setIdentity();
+		startTransform.setOrigin(glmVectorToBt(getEntity()->getPosition()));
+
+		m_ghostObject = mem_new<btPairCachingGhostObject>();
+		m_ghostObject->setWorldTransform(startTransform);
 	}
 }

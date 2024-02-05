@@ -46,6 +46,8 @@ namespace engine {
 		void attachShape(ShapeComponent* shape);
 		void dettachShape(ShapeComponent* shape);
 
+		void applyImpulse(const glm::vec3& impulse);
+
 	private:
 		void createBody();
 		void destroyBody();
@@ -78,6 +80,12 @@ namespace engine {
 		void onWorldSet(World* world) override;
 
 		void onEntityRemove() override;
+
+		void createPlayerController();
+
+	private:
+		btKinematicCharacterController* m_characterController;
+		btPairCachingGhostObject* m_ghostObject;
 	};
 }
 
