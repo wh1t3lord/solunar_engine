@@ -21,7 +21,7 @@ namespace engine
 		const size_t getClassAlign() const { return  m_classAlign; }
 
 		const bool isA(const TypeInfo* typeInfo) const;
-		const bool isAFast(const TypeInfo* typeInfo) const;
+		const bool isExactly(const TypeInfo* typeInfo) const;
 
 		template <typename T>
 		const bool isA() const
@@ -61,9 +61,14 @@ namespace engine
 		virtual ~Object();
 
 		template <typename T>
-		bool isAFast()
+		bool isExactly()
 		{
 			return (getTypeInfo()->getStringHash() == T::getStaticTypeInfo()->getStringHash());
+		}
+
+		bool isExactly(const TypeInfo* classTypeInfo)
+		{
+			return (getTypeInfo()->getStringHash() == classTypeInfo->getStringHash());
 		}
 
 		template <typename T>

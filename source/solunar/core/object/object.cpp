@@ -37,7 +37,7 @@ namespace engine
 		return false;
 	}
 
-	const bool TypeInfo::isAFast(const TypeInfo* typeInfo) const
+	const bool TypeInfo::isExactly(const TypeInfo* typeInfo) const
 	{
 		Assert(typeInfo);
 		return (getStringHash() == typeInfo->getStringHash());

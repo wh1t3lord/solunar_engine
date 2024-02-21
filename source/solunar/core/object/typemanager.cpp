@@ -8,22 +8,19 @@
 namespace engine
 {
 
-namespace
+static TypeManager s_typeManager;
+
+Object* createObjectPrivate(const TypeInfo* typeInfo)
 {
-	static TypeManager s_typeManager;
+	IAllocator* pAllocator = MemoryManager::getDefaultAllocator();
+	Object* pObject = (Object*)pAllocator->allocate(typeInfo->getClassSize(), typeInfo->getClassAlign());
 
-	Object* createObjectPrivate(const TypeInfo* typeInfo)
-	{
-		IAllocator* pAllocator = MemoryManager::getDefaultAllocator();
-		Object* pObject = (Object*)pAllocator->allocate(typeInfo->getClassSize(), typeInfo->getClassAlign());
+	StaticConstructor_t objectConstructor = typeInfo->getStaticConstructor();
+	Assert3(objectConstructor, "Failed to create object without static constructor", typeInfo->getClassName());
 
-		StaticConstructor_t objectConstructor = typeInfo->getStaticConstructor();
-		Assert3(objectConstructor, "Failed to create object without static constructor", typeInfo->getClassName());
+	objectConstructor(pObject);
 
-		objectConstructor(pObject);
-
-		return pObject;
-	}
+	return pObject;
 }
 
 TypeManager* TypeManager::getInstance()
@@ -68,7 +65,7 @@ Object* TypeManager::createObjectByTypeInfo(const TypeInfo* typeInfo)
 {
 	for (auto it : m_registeredTypes)
 	{
-		if (it->isAFast(typeInfo))
+		if (it->isExactly(typeInfo))
 			return createObjectPrivate(it);
 	}
 
