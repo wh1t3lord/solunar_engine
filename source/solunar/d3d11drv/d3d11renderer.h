@@ -39,6 +39,7 @@ private:
 	void takeScreenshotInternal();
 
 	void clearScreen() override;
+	void setSwapChainRenderTarget() override;
 
 	void renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh);
 

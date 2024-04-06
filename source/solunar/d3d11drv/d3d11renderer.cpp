@@ -488,4 +488,11 @@ void D3D11Renderer::clearScreen()
 	}
 }
 
+void D3D11Renderer::setSwapChainRenderTarget()
+{
+	// Initialize target
+	g_d3d11Device->getDeviceContext()->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
+
+}
+
 }

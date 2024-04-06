@@ -78,7 +78,6 @@ namespace engine
 
 	void Renderer::initFramebuffer(View* view)
 	{
-#if 0
 		TextureDesc colorTextureDesc;
 		memset(&colorTextureDesc, 0, sizeof(colorTextureDesc));
 		colorTextureDesc.m_width = view->m_width;
@@ -109,7 +108,6 @@ namespace engine
 		renderTargetDesc.m_textures2D[0] = m_screenColorTexture;
 		renderTargetDesc.m_textures2DCount = 1;
 		m_screenRenderTarget = g_renderDevice->createRenderTarget(renderTargetDesc);
-#endif
 	}
 
 	void Renderer::init()
@@ -148,7 +146,7 @@ namespace engine
 
 		//initFramebuffer(CameraProxy::getInstance()->getView());
 
-		//g_postFxManager.init(CameraProxy::getInstance()->getView());
+		g_postFxManager.init(CameraProxy::getInstance()->getView());
 
 		ShadowsRenderer::getInstance()->init();
 	}
@@ -159,7 +157,7 @@ namespace engine
 
 		ShadowsRenderer::getInstance()->shutdown();
 
-		//g_postFxManager.shutdown();
+		g_postFxManager.shutdown();
 
 		g_debugRender.shutdown();
 
@@ -216,7 +214,7 @@ namespace engine
 
 		//renderShadows(view);
 	
-		//g_renderDevice->setRenderTarget(m_screenRenderTarget);
+		g_renderDevice->setRenderTarget(m_screenRenderTarget);
 		clearScreen();
 
 		// get camera
@@ -297,7 +295,7 @@ namespace engine
 
 #endif
 
-		g_debugRender.renderFrame(view);
+
 	}
 
 	void Renderer::renderView(View* view)
@@ -328,7 +326,13 @@ namespace engine
 		//////////////////
 		// post processing
 		//////////////////
-		//g_postFxManager.hdrPass(m_screenColorTexture);
+		g_postFxManager.hdrPass(m_screenColorTexture);
+
+		// reset to swap chain
+		setSwapChainRenderTarget();
+
+		// draw debug renderer
+		g_debugRender.renderFrame(view);
 	}
 
 	void Renderer::renderSky(View* view, SkyMeshComponent* skyMesh)

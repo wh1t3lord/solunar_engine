@@ -10,11 +10,22 @@
 #include "graphics/ShaderProgramManager.h"
 #include "graphics/shaderprogram.h"
 
+#include "graphics/shaderconstantmanager.h"
+
 #include "graphics/screenquad.h"
 
+#include "graphics/renderer.h"
 
 namespace engine
 {
+
+struct HDRConstants
+{
+	glm::vec4 weight[3];
+	glm::vec4 texOffset;
+};
+
+ConstantBufferProxy g_hdrconstants;
 
 // global instance
 PostFxManager g_postFxManager;
@@ -44,6 +55,7 @@ void PostFxManager::initHDR(View* view)
 	hdrTextureDesc.m_width = view->m_width;
 	hdrTextureDesc.m_height = view->m_height;
 	hdrTextureDesc.m_format = ImageFormat::RGBA16F;
+	hdrTextureDesc.m_renderTargetUsage = true;
 
 	SubresourceDesc hdrTextureSubresourceDesc;
 	memset(&hdrTextureSubresourceDesc, 0, sizeof(hdrTextureSubresourceDesc));
@@ -55,7 +67,7 @@ void PostFxManager::initHDR(View* view)
 	rtCreationDesc.m_textures2DCount = 1;
 	m_hdrRenderTarget = g_renderDevice->createRenderTarget(rtCreationDesc);
 
-	m_hdrPassProgram = g_shaderManager->createShaderProgram("hdr_main", "shaders/quad.vsh", "shaders/hdr_main.fsh");
+	m_hdrPassProgram = g_shaderManager->createShaderProgram("quad.vsh", "hdr_main.psh");
 }
 
 void PostFxManager::initBlur(View* view)
@@ -78,6 +90,7 @@ void PostFxManager::initBlur(View* view)
 	m_hdrPingPongTextureDesc.m_width = view->m_width / 2;
 	m_hdrPingPongTextureDesc.m_height = view->m_height / 2;
 	m_hdrPingPongTextureDesc.m_format = ImageFormat::RGBA16F;
+	m_hdrPingPongTextureDesc.m_renderTargetUsage = true;
 
 	// size of one texel of screen texture
 	m_texOffset = glm::vec2(1.0f) / glm::vec2(m_hdrPingPongTextureDesc.m_width, m_hdrPingPongTextureDesc.m_height);
@@ -108,17 +121,17 @@ void PostFxManager::initBlur(View* view)
 	hdrPinPongSamplerDesc.m_anisotropyLevel = 1.0f;
 	m_hdrPinPongSampler = g_renderDevice->createSamplerState(hdrPinPongSamplerDesc);
 
-	m_blurPassProgram = g_shaderManager->createShaderProgram("hdr_blur", "shaders/quad.vsh", "shaders/hdr_blur.fsh");
-	//m_blurWeightsLoc = m_blurPassProgram->getUniformLocation("weight");
+	m_blurPassProgram = g_shaderManager->createShaderProgram("quad.vsh", "hdr_blur.psh");
 
-	m_hdrCombineProgram = g_shaderManager->createShaderProgram("hdr_combine", "shaders/quad.vsh", "shaders/hdr_combine.fsh");
+	m_hdrCombineProgram = g_shaderManager->createShaderProgram("quad.vsh", "hdr_combine.psh");
+
+	g_hdrconstants = ShaderConstantManager::getInstance()->create<HDRConstants>("HDRConstants");
 }
 
 void PostFxManager::shutdown()
 {
 	if (m_hdrPinPongSampler)
 	{
-
 		mem_delete(m_hdrPinPongSampler);
 		m_hdrPinPongSampler = nullptr;
 	}
@@ -187,11 +200,19 @@ void PostFxManager::blurPass(ITexture2D* screenTexture)
 		//glClear(GL_COLOR_BUFFER_BIT);
 
 		g_shaderManager->setShaderProgram(m_blurPassProgram);
+
 		//m_blurPassProgram->setTextureSampler(0, "u_texture");
 		//m_blurPassProgram->setInteger("u_horizontal", horizontal);
 		//glUniform4fv(m_blurWeightsLoc, 3, (float*)m_blurWeights.data());
 		//m_blurPassProgram->setVector2("texOffset", m_texOffset);
 
+		// #TODO: REMOVE THIS SHIT
+		HDRConstants* pHDRConstants = (HDRConstants*)g_hdrconstants->map(BufferMapping::WriteOnly);
+		memcpy(pHDRConstants->weight, m_blurWeights.data(), m_blurWeights.size() * sizeof(glm::vec4));
+		pHDRConstants->texOffset = glm::vec4(m_texOffset, 0.0f, 0.0f);
+		g_hdrconstants->unmap();
+
+		g_renderDevice->setConstantBufferIndex(0, g_hdrconstants.get());
 		g_renderDevice->setSampler(0, m_hdrPinPongSampler);
 		g_renderDevice->setTexture2D(0, first_iteration ? m_hdrTempTex : m_hdrPinPingTextures[!horizontal]);
 
@@ -207,7 +228,7 @@ void PostFxManager::blurPass(ITexture2D* screenTexture)
 
 void PostFxManager::combinePass(ITexture2D* screenTexture)
 {
-	g_renderDevice->setRenderTarget(0);
+	g_renderer->setSwapChainRenderTarget();
 
 	// clear color
 	//graphicsDevice->clear(ClearRenderTarget | ClearDepth);

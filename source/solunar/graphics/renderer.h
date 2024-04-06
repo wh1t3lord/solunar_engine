@@ -65,6 +65,8 @@ namespace engine
 		
 		virtual void clearScreen() = 0;
 	 
+		virtual void setSwapChainRenderTarget() = 0;
+
 		// Too simple but i dont regret
 		void setRenderMode(RendererViewMode mode) { m_currentViewMode = mode; }
 		RendererViewMode getRenderMode() { return m_currentViewMode; }

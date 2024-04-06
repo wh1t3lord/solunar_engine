@@ -137,7 +137,12 @@ void D3D11Device::setRenderTarget(IRenderTarget* rt)
 	}
 	else
 	{
-
+		for (int i = 0; i < 8; i++)
+		{
+			// #TODO: Hack with depth stencil installation
+			m_deviceContext->OMSetRenderTargets(0, nullptr, nullptr);
+			m_deviceContext->PSGetShaderResources(i, 0, nullptr);
+		}
 	}
 
 	//if (rt)

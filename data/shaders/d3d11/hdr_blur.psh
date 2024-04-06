@@ -1,23 +1,23 @@
-#version 330 core
+Texture2D g_texture 	: register(t0);
+//SamplerState g_sampler 	: register(s0);
+SamplerState g_sampler { AddressU = Clamp; AddressV = Wrap; };
 
-out vec4 fragColor;
-in vec2 v_texcoord;
-
-uniform sampler2D u_texture;
-
-layout (std140) uniform HDRConstants
+cbuffer HDRConstants : register(b0)
 {
-    vec4 weight[3];
-	vec4 texOffset;
+    float4 weight[3];
+	float4 texOffset;
 };
 
-void main()
+float4 PSMain(float4 position : SV_POSITION, float2 texcoord : TEXCOORD) : SV_Target
 {
+	float4 fragColor = float4(0.f, 0.f, 0.f, 0.f);
+	
     // sampled texture
-    vec4 color = texture(u_texture, v_texcoord);
+    //float4 color = texture(u_texture, v_texcoord);
+    float4 color = g_texture.Sample(g_sampler, texcoord);
     
     // how much current fragment is affect on frame
-    vec4 result = color * weight[0];
+    float4 result = color * weight[0];
 
     bool u_horizontal = texOffset.w >= 10.0f;
 
@@ -27,18 +27,29 @@ void main()
     {
         for (int i = 0; i < sampleCount; ++i)
         {
+			float2 positiveTexcoord = texcoord + float2(texOffset.x * i, 0.0);
+			float2 negativeTexcoord = texcoord - float2(texOffset.x * i, 0.0);
+			
+			#if 0
             result += texture(u_texture, v_texcoord + vec2(texOffset.x * i, 0.0)) * weight[i];
             result += texture(u_texture, v_texcoord - vec2(texOffset.x * i, 0.0)) * weight[i];
+			#endif
         }
     }
     else
     {
         for (int i = 0; i < sampleCount; ++i)
         {
+			float2 positiveTexcoord = texcoord + float2(texOffset.x * i, 0.0);
+			float2 negativeTexcoord = texcoord - float2(texOffset.x * i, 0.0);
+			
+			#if 0
             result += texture(u_texture, v_texcoord + vec2(0.0, texOffset.y * i)) * weight[i];
             result += texture(u_texture, v_texcoord - vec2(0.0, texOffset.y * i)) * weight[i];
+			#endif
         }
     }
     
-    fragColor = result * 0.5;
+    fragColor *= result * 0.5;
+	return fragColor;
 }
