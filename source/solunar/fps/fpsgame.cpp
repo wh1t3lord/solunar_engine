@@ -62,7 +62,7 @@ FPSGameInterface::~FPSGameInterface()
 
 void FPSGameInterface::initialize()
 {
-	Core::msg("Initializing fps game");
+	Core::msg("FPSGameInterface: Initializing FPS game");
 
 	// register game objects
 	registerGameClasses();
@@ -82,7 +82,7 @@ void FPSGameInterface::shutdown()
 	// Destroy signal manager
 	//FPSSignalManager::destroyInstance(); # same as line 77
 	
-	Core::msg("Shutting down fps game");
+	Core::msg("FPSGameInterface: Shutting down FPS game");
 	
 	// g_eventManager.removeEventListener(&g_shockEventListener);
 }

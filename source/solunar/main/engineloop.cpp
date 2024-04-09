@@ -126,7 +126,12 @@ namespace engine {
 		//Game::init();
 
 		// Game interface init
-		g_gameInterface->initialize();
+		if (g_gameInterface)
+		{
+			g_gameInterface->initialize();
+			Core::msg("IGameInterface: game interface initialized");
+		}
+
 
 		//if (g_commandLine.hasOption("-saveClassIds"))
 		//	saveClassIds();
