@@ -17,7 +17,7 @@
 #include "graphics/imguimanager.h"
 #include "graphics/lightmanager.h"
 
-#include "shockgame/shockgame.h"
+//#include "shockgame/shockgame.h"
 
 namespace engine {
 
@@ -99,8 +99,8 @@ namespace engine {
 		if (g_showLightEditor)
 			graphicsLightEditor(&g_showLightEditor);
 
-		if (g_showShockPlayerDebug)
-			shockGamePlayerDebug(&g_showShockPlayerDebug);
+		//if (g_showShockPlayerDebug)
+			//sshockGamePlayerDebug(&g_showShockPlayerDebug);
 	}
 
 	void EngineLoop::initialize()

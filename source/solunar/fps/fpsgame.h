@@ -1,22 +1,22 @@
-#ifndef SHOCKGAME_H
-#define SHOCKGAME_H
+#ifndef FPSGAME_H
+#define FPSGAME_H
 
 #include "engine/gameinterface.h"
 
 namespace engine
 {
 
-class ShockGameInterface : public IGameInterface
+class FPSGameInterface : public IGameInterface
 {
 public:
-	ShockGameInterface();
-	~ShockGameInterface();
+	FPSGameInterface();
+	~FPSGameInterface();
 
 	void initialize() override;
 	void shutdown() override;
 };
 
-ShockGameInterface* getShockGameInterface();
+FPSGameInterface* getShockGameInterface();
 
 void shockGamePlayerDebug(bool* open);
 

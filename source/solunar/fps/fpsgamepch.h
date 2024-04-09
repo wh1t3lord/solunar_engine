@@ -1,5 +1,5 @@
-#ifndef SHOCKGAMEPCH_H
-#define SHOCKGAMEPCH_H
+#ifndef FPSGAMEPCH_H
+#define FPSGAMEPCH_H
 
 // include engine pch
 #include "engine/enginepch.h"
@@ -25,4 +25,4 @@
 // graphics
 #include "graphics/gfxcommon.h"
 
-#endif // !SHOCKGAMEPCH_H
+#endif // !FPSGAMEPCH_H
