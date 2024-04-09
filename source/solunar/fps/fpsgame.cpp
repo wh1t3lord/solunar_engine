@@ -20,7 +20,7 @@ namespace engine
 // implemetation for IGameInterface
 
 static FPSGameInterface s_fpsGameInterface;
-IGameInterface* g_gameInterface = (IGameInterface*)&s_fpsGameInterface;
+__declspec(dllexport) IGameInterface* g_gameInterface = (IGameInterface*)&s_fpsGameInterface; 
 
 FPSGameInterface* getFPSGameInterface()
 {

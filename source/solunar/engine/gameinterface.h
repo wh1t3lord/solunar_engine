@@ -13,7 +13,7 @@ public:
 	virtual void shutdown() = 0;
 };
 
-extern IGameInterface* g_gameInterface;
+extern "C" __declspec(dllimport)IGameInterface * g_gameInterface;
 
 }
 
