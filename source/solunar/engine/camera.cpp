@@ -9,8 +9,8 @@ namespace engine
 
 	void Camera::update()
 	{
-		//m_view->m_view = getViewMatrix();
-		//m_view->updateInternalValues();
+		m_view->m_view = getViewMatrix();
+		m_view->updateInternalValues();
 
 		//m_frustum.update(m_view->m_projection * m_view->m_view);
 	}
@@ -28,8 +28,8 @@ namespace engine
 
 	void Camera::updateInternal()
 	{
-		//m_view->m_view = getViewMatrix();
-		//m_view->updateInternalValues();
+		m_view->m_view = getViewMatrix();
+		m_view->updateInternalValues();
 
 		//m_frustum.update(m_view->m_projection * m_view->m_view);
 	}

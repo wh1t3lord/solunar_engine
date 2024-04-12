@@ -26,9 +26,9 @@ namespace engine
 		// #TODO: CURSOR
 		//if (GetForegroundWindow() == (HWND)appGetWindow())
 		//{
-		//	POINT pt = {};
-		//	GetCursorPos(&pt);
-		//	cursorPosAction(static_cast<float>(pt.x), static_cast<float>(pt.y));
+			POINT pt = {};
+			GetCursorPos(&pt);
+			cursorPosAction(static_cast<float>(pt.x), static_cast<float>(pt.y));
 		//}
 	}
 
