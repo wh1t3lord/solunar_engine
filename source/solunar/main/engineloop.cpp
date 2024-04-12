@@ -107,12 +107,12 @@ namespace engine {
 	{
 		initEngineCommandLine();
 
+		// initialize engine
+		Engine::init();
+
 		// create engine view
 		createEngineView();
 
-		// initialize engine
-		Engine::init();
-		
 		GraphicsFacade::init(appGetWindow());
 		
 		// initialize audio manager

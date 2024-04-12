@@ -5,7 +5,7 @@
 
 namespace engine
 {
-	CameraProxy CameraProxy::ms_cameraProxy;
+	CameraProxy* g_cameraProxy = nullptr;
 
 	void Camera::update()
 	{

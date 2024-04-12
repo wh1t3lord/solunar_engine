@@ -43,9 +43,6 @@ namespace engine
 	class ENGINE_API CameraProxy :  public Singleton<CameraProxy>,
 									public Camera
 	{
-	private:
-		static CameraProxy ms_cameraProxy;
-
 	public:
 		void updateProxy();
 
@@ -55,6 +52,8 @@ namespace engine
 	private:
 		CameraComponent* m_cameraComponent;
 	};
+
+	extern CameraProxy* g_cameraProxy;
 }
 
 #endif // !CAMERA_H

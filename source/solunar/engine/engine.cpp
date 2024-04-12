@@ -1,12 +1,12 @@
 #include "enginepch.h"
 #include "core/file/contentmanager.h"
 #include "engine/engine.h"
+#include "engine/camera.h"
 #include "engine/entity/entity.h"
 #include "engine/entity/component.h"
 #include "engine/entity/world.h"
 #include "engine/entity/cameracomponent.h"
 #include "engine/entity/logiccomponent.h"
-
 #include "engine/physics/shapescomponent.h"
 #include "engine/physics/rigidbodycomponent.h"
 #include "engine/physics/trianglemeshshape.h"
@@ -107,6 +107,8 @@ namespace engine
 
 		registerEngineObjects();
 
+		g_cameraProxy = mem_new<CameraProxy>();
+		
 		// Start logic thread
 //		g_logicThread.start();
 
@@ -140,7 +142,8 @@ namespace engine
 
 		//ScriptManager::getInstance()->shutdown();
 
-		//destroyComponentCacheSystem();
+		mem_delete(g_cameraProxy);
+		g_cameraProxy = nullptr;
 	}
 
 	void Engine::loadWorld(const std::string& filename)
