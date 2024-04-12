@@ -35,5 +35,5 @@ if (USE_SHARED_LIBS)
 	# TODO: Move D3D11Drv to DLL
 	target_link_libraries(graphics d3d11drv)
 	
-	target_compile_definitions(graphics PUBLIC ENGINE_DLL PRIVATE GRAPHICS_COMPILE)
+	#target_compile_definitions(graphics PUBLIC ENGINE_DLL PRIVATE GRAPHICS_COMPILE)
 endif()

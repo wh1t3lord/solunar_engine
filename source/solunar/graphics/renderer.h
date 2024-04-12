@@ -1,6 +1,9 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include "graphics/graphicsapi.h"
+#include "graphics/imguimanager.h"
+
 namespace engine
 {
 	class View;
@@ -46,6 +49,11 @@ namespace engine
 		virtual void beginFrame() = 0;
 		virtual void endFrame() = 0;
 		virtual void renderView(View* view) = 0;
+	};
+
+	struct RendererSingletonStorer
+	{
+		ImGuiManager m_ImGuiManager;
 	};
 
 	class Renderer : public IRenderer
@@ -99,6 +107,9 @@ namespace engine
 
 		bool m_meshPolysWireframe;
 		bool m_showOctree;
+
+	private:
+		RendererSingletonStorer m_rendererSingletonStorer;
 	};
 
 	extern Renderer* g_renderer;

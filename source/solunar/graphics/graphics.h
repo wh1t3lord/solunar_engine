@@ -5,8 +5,8 @@
 
 namespace engine
 {
-	GRAPHICS_API void graphicsInit(void* window);
-	GRAPHICS_API void graphicsShutdown();
+	void graphicsInit(void* window);
+	void graphicsShutdown();
 }
 
 #endif // !GRAPHICS_GRAPHICS_H

@@ -14,4 +14,4 @@ target_include_directories(d3d11drv PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../"
 								    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 
 #target_link_libraries(d3d11drv engine core graphics)
-target_link_libraries(d3d11drv core)
+target_link_libraries(d3d11drv core imgui)

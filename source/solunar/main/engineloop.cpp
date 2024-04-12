@@ -173,7 +173,7 @@ namespace engine {
 		//							renderer destroying, render device is unavaliable)
 		g_contentManager->shutdown();
 
-		graphicsShutdown();
+		GraphicsFacade::shutdown();
 
 		GraphicsFacade::saveSettings("engine.ini");
 

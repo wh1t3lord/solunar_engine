@@ -9,7 +9,7 @@
 namespace engine
 {
 
-struct RendererSingletonStorer
+struct D3D11RendererSingletonStorer
 {
 	// ShaderConstantManager m_constantManager;
 };
@@ -43,7 +43,7 @@ private:
 	void renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh);
 
 private:
-	RendererSingletonStorer m_singletonStorer;
+	D3D11RendererSingletonStorer m_d3d11SingletonStorer;
 
 	ID3D11RenderTargetView* m_renderTargetView;
 	ID3D11Texture2D* m_depthStencilTexture;

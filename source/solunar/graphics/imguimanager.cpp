@@ -29,8 +29,6 @@ namespace engine
 
 	};
 
-	ImGuiManager ImGuiManager::ms_instance;
-
 	ImGuiRenderer::ImGuiRenderer() :
 		m_pVB(nullptr),
 		m_pIB(nullptr),

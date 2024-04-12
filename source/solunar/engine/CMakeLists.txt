@@ -44,7 +44,7 @@ target_link_libraries(engine PUBLIC bullet core imgui)
 
 if (USE_SHARED_LIBS)
 	target_link_libraries(engine PRIVATE graphics)
-	target_compile_definitions(engine PUBLIC ENGINE_DLL PRIVATE ENGINE_COMPILE PRIVATE GRAPHICS_COMPILE)
+	target_compile_definitions(engine PUBLIC ENGINE_DLL PRIVATE ENGINE_COMPILE)
 endif()
 
 if (CMAKE_SIZEOF_VOID_P EQUAL 4)

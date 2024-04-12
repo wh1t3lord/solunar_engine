@@ -8,7 +8,7 @@ namespace engine {
 	
 	class DrawableComponent;
 	
-	class GRAPHICS_API GraphicsWorld : public Object
+	class GraphicsWorld : public Object
 	{
 		ImplementObject(GraphicsWorld, Object);
 	public:

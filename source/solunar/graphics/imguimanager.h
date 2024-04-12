@@ -13,7 +13,7 @@ namespace engine
 	class IDepthStencilState;
 	class IBlendState;
 
-	class GRAPHICS_API ImGuiRenderer
+	class ImGuiRenderer
 	{
 	public:
 		ImGuiRenderer();
@@ -57,10 +57,9 @@ namespace engine
 		virtual void endFrame() = 0;
 	};
 
-	class GRAPHICS_API ImGuiManager : public Singleton<ImGuiManager>,
-									  public IImGuiManager
+	class ImGuiManager : public Singleton<ImGuiManager>,
+						 public IImGuiManager
 	{
-		static ImGuiManager ms_instance;
 	public:
 		void init(void* window);
 		void shutdown();
