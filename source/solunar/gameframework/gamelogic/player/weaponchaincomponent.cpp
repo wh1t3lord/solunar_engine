@@ -1,5 +1,5 @@
 #include "gamepch.h"
-#include "game/gamelogic/player/weaponchaincomponent.h"
+#include "gameframework/gamelogic/player/weaponchaincomponent.h"
 
 namespace engine
 {

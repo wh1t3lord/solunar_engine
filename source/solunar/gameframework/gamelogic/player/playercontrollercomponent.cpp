@@ -1,5 +1,5 @@
 #include "gamepch.h"
-#include "game/gamelogic/player/playercontrollercomponent.h"
+#include "gameframework/gamelogic/player/playercontrollercomponent.h"
 
 namespace engine {
 	

@@ -2,15 +2,15 @@
 #include "fpsgame.h"
 
 // Base game includes
-#include "game/gamelogic/camera/cameramanager.h"
-#include "game/gamelogic/mainmenu/mainmenuworldcomponent.h"
-#include "game/gamelogic/player/playercontrollercomponent.h"
-#include "game/gamelogic/player/weaponchaincomponent.h"
-#include "game/gamelogic/saveload/saveloadmanager.h"
-#include "game/gamelogic/weapons/weaponcomponent.h"
-#include "game/gamelogic/weapons/weaponautocomponent.h"
-#include "game/gamelogic/weapons/weaponpistolcomponent.h"
-#include "game/gamelogic/world/levelmanager.h"
+#include "gameframework/gamelogic/camera/cameramanager.h"
+#include "gameframework/gamelogic/mainmenu/mainmenuworldcomponent.h"
+#include "gameframework/gamelogic/player/playercontrollercomponent.h"
+#include "gameframework/gamelogic/player/weaponchaincomponent.h"
+#include "gameframework/gamelogic/saveload/saveloadmanager.h"
+#include "gameframework/gamelogic/weapons/weaponcomponent.h"
+#include "gameframework/gamelogic/weapons/weaponautocomponent.h"
+#include "gameframework/gamelogic/weapons/weaponpistolcomponent.h"
+#include "gameframework/gamelogic/world/levelmanager.h"
 
 #include "graphics/imguimanager.h"
 
@@ -62,6 +62,7 @@ FPSGameInterface::~FPSGameInterface()
 
 void FPSGameInterface::initialize()
 {
+	Logger::init();
 	Core::msg("FPSGameInterface: Initializing FPS game");
 
 	// register game objects

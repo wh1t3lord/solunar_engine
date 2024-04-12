@@ -1,7 +1,7 @@
 #ifndef WEAPONAUTOCOMPONENT_H
 #define WEAPONAUTOCOMPONENT_H
 
-#include "game/gamelogic/weapons/weaponcomponent.h"
+#include "gameframework/gamelogic/weapons/weaponcomponent.h"
 
 namespace engine
 {
