@@ -103,6 +103,23 @@ namespace engine {
 		//	shockGamePlayerDebug(&g_showShockPlayerDebug);
 	}
 
+	HANDLE g_gameLibHandle = INVALID_HANDLE_VALUE;
+
+	void loadGameDll()
+	{
+		const char* gamename = "shockgame";
+		
+		char buffer[260];
+#ifdef _DEBUG
+		snprintf(buffer, sizeof(buffer), "solunar_%s_dll_d", gamename);
+#else
+		snprintf(buffer, sizeof(buffer), "solunar_%s_dll_rwdi", gamename);
+#endif // _DEBUG
+
+		g_gameLibHandle = LoadLibraryA(buffer);
+		Assert2(g_gameLibHandle, "Failed to load gamelib");
+	}
+
 	void EngineLoop::initialize()
 	{
 		initEngineCommandLine();
@@ -120,7 +137,7 @@ namespace engine {
 		//pAudioManager->init();
 
 		// game init
-		//Game::init();
+		loadGameDll();
 
 		// Game interface init
 		g_gameInterface->initialize();

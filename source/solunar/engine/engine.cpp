@@ -18,6 +18,9 @@
 
 namespace engine
 {
+	// #TODO: REMOVE
+	ENGINE_API IGameInterface* g_gameInterface = nullptr;
+
 	void registerEngineObjects()
 	{
 		// TODO: Rewrite to Class::registerObject()

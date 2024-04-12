@@ -1,5 +1,5 @@
 #include "shockgamepch.h"
-
+#include "engine/gameinterface.h"
 #include "shockgame/shockgame.h"
 #include "shockgame/shockeventlistener.h"
 #include "shockgame/shocksignalmanager.h"
@@ -22,14 +22,7 @@ namespace engine
 {
 
 // implemetation for IGameInterface
-
 static ShockGameInterface s_shockGameInterface;
-IGameInterface* g_gameInterface = (IGameInterface*)&s_shockGameInterface;
-
-ShockGameInterface* getShockGameInterface()
-{
-	return &s_shockGameInterface;
-}
 
 class TestRotatorComponent : public LogicComponent
 {
@@ -143,3 +136,32 @@ void shockGamePlayerDebug(bool* open)
 }
 
 }
+
+#ifdef WIN32
+
+using namespace engine;
+
+__declspec(dllexport) void dummy_export()
+{
+
+}
+
+BOOL APIENTRY DllMain(HANDLE hModule,
+	DWORD  ul_reason_for_call,
+	LPVOID lpReserved
+)
+{
+	switch (ul_reason_for_call)
+	{
+	case DLL_PROCESS_ATTACH:
+		// #TODO: !!!
+		::g_gameInterface = &s_shockGameInterface;
+		break;
+	case DLL_THREAD_ATTACH:
+	case DLL_THREAD_DETACH:
+	case DLL_PROCESS_DETACH:
+		break;
+	}
+	return TRUE;
+}
+#endif // WIN32
