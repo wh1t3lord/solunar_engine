@@ -41,7 +41,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${GAME_GAMELOGIC_MAINMENU_SR
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${GAME_GAMELOGIC_WORLD_SRC})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${GAME_GAMELOGIC_WEAOPONS_SRC})
 
-add_library(game STATIC
+add_library(gameframework STATIC
 	${GAME_SRC}
 	${GAME_GAMELOGIC_SAVELOAD_SRC}
 	${GAME_GAMELOGIC_CAMERA_SRC}
@@ -50,8 +50,8 @@ add_library(game STATIC
 	${GAME_GAMELOGIC_WORLD_SRC}
 	${GAME_GAMELOGIC_WEAOPONS_SRC})
 	
-target_precompile_headers(game PRIVATE "gamepch.h")
-target_include_directories(game PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../"
+target_precompile_headers(gameframework PRIVATE "gamepch.h")
+target_include_directories(gameframework PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../"
 								PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 								
-target_link_libraries(game engine graphics)
+target_link_libraries(gameframework engine graphics)
