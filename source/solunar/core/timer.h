@@ -7,7 +7,7 @@ namespace engine
 {
 
 #ifdef WIN32
-class Timer
+class CORE_API Timer
 {
 public:
 	static Timer* getInstance();

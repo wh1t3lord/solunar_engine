@@ -20,6 +20,8 @@
 #include "core/object/serializableobject.h"
 #include "core/object/typemanager.h"
 
+#include "engine/engineapi.h"
+
 #include "engine/entity/entity.h"
 #include "engine/entity/component.h"
 

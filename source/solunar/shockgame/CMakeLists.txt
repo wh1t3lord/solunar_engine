@@ -13,4 +13,4 @@ target_precompile_headers(shockgame PRIVATE "shockgamepch.h")
 target_include_directories(shockgame PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../"
 								PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 								
-target_link_libraries(shockgame engine graphics game)
+target_link_libraries(shockgame engine game)

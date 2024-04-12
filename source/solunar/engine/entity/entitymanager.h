@@ -6,7 +6,7 @@ namespace engine
 
 class Entity;
 
-class EntityManager
+class ENGINE_API EntityManager
 {
 public:
 	EntityManager();

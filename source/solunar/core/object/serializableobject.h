@@ -9,7 +9,7 @@
 
 namespace engine
 {
-	class SerializableObject : public Object
+	class CORE_API SerializableObject : public Object
 	{
 	public:
 		ImplementObject(SerializableObject, Object);
@@ -25,8 +25,8 @@ namespace engine
 		virtual void saveXML(tinyxml2::XMLElement& element);
 	};
 
-	glm::vec3 getVector3FromXMLElement(tinyxml2::XMLElement& element);
-	void saveVector3ToXMLElement(tinyxml2::XMLElement& element, const glm::vec3& v);
+	CORE_API glm::vec3 getVector3FromXMLElement(tinyxml2::XMLElement& element);
+	CORE_API void saveVector3ToXMLElement(tinyxml2::XMLElement& element, const glm::vec3& v);
 }
 
 #endif

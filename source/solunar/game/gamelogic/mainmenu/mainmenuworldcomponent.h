@@ -5,7 +5,7 @@
 
 namespace engine {
 	
-	class MainMenuWorldComponent : public LogicComponent
+	class GAME_API MainMenuWorldComponent : public LogicComponent
 	{
 		ImplementObject(MainMenuWorldComponent, LogicComponent);
 	public:

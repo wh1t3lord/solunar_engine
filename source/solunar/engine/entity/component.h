@@ -8,7 +8,7 @@ class Entity;
 class World;
 
 // Base class for entity component
-class Component : public SerializableObject
+class ENGINE_API Component : public SerializableObject
 {
 	friend class Entity;
 	friend class World;

@@ -2,5 +2,5 @@
 
 namespace engine
 {
-	FileSystem* g_fileSystem = nullptr;
+	CORE_API FileSystem* g_fileSystem = nullptr;
 }

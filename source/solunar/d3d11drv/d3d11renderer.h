@@ -20,7 +20,7 @@ public:
 	D3D11Renderer();
 	~D3D11Renderer();
 
-	void init() override;
+	void init(void* window) override;
 	void shutdown() override;
 
 	void endFrame() override;
@@ -33,7 +33,7 @@ public:
 	void takeScreenshot() override;
 
 private:
-	void createSwapChain();
+	void createSwapChain(void* window);
 	void createRasterizerState();
 
 	void takeScreenshotInternal();

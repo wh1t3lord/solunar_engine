@@ -11,7 +11,7 @@ namespace engine
 class TypeInfo;
 class ITypedObject;
 
-class TypeManager
+class CORE_API TypeManager
 {
 public:
 	static TypeManager* getInstance();

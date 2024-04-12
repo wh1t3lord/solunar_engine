@@ -93,30 +93,27 @@ namespace engine {
 			ImGui::EndMainMenuBar();
 		}
 
-		if (g_showCBManager)
-			graphicsShowConstantBuffers(&g_showCBManager);
+		//if (g_showCBManager)
+		//	graphicsShowConstantBuffers(&g_showCBManager);
 	
-		if (g_showLightEditor)
-			graphicsLightEditor(&g_showLightEditor);
+		//if (g_showLightEditor)
+		//	graphicsLightEditor(&g_showLightEditor);
 
-		if (g_showShockPlayerDebug)
-			shockGamePlayerDebug(&g_showShockPlayerDebug);
+		//if (g_showShockPlayerDebug)
+		//	shockGamePlayerDebug(&g_showShockPlayerDebug);
 	}
 
 	void EngineLoop::initialize()
 	{
 		initEngineCommandLine();
 
-		//appInit2();
-
 		// create engine view
 		createEngineView();
-		//appInitInput();
 
 		// initialize engine
 		Engine::init();
 		
-		graphicsInit();
+		GraphicsFacade::init(appGetWindow());
 		
 		// initialize audio manager
 		//AudioManager* pAudioManager = AudioManager::createInstance();
@@ -178,7 +175,7 @@ namespace engine {
 
 		graphicsShutdown();
 
-		g_graphicsOptions.saveSettings("engine.ini");
+		GraphicsFacade::saveSettings("engine.ini");
 
 		Engine::shutdown();
 
@@ -206,23 +203,10 @@ namespace engine {
 		// update delta cursor pos and others input stuff
 		input->update();
 
-//		glfwPollEvents();
-//
-//		if (gameState->getGameState() == GameState::GAME_STATE_RUNNING &&
-//			!input->getKey(KeyboardKeys::KEY_LEFT_ALT))
-//		{
-//			appToggleShowMousePointer(false);
-//			//appSetCursorPos(0, 0);
-//		}
-//		else
-//		{
-//			appToggleShowMousePointer(true);
-//		}
-
 		// update timer
 		Timer::getInstance()->update();
 
-		ImGuiManager::getInstance()->beginFrame();
+		GraphicsFacade::getImGuiManager()->beginFrame();
 
 		// update game specific state
 		//gameState->update();
@@ -236,30 +220,18 @@ namespace engine {
 		// sound
 		//AudioManager::getInstance()->update();
 
-		g_renderer->beginFrame();
+		GraphicsFacade::getRenderer()->beginFrame();
 		
-		g_renderer->renderView(appGetView());
-
-//		if (g_console->isToggled())
-//			g_console->onRender();
-
-//#if 1
-//		DebugOverlay::render();
-//#endif // !MASTER_GOLD_BUILD
-
-//		RmlSystem::getInstance()->render();
+		GraphicsFacade::getRenderer()->renderView(appGetView());
 
 		engineDebugOverlay();
 
 		ImGui::ShowDemoWindow();
 
-		ImGuiManager::getInstance()->endFrame();
+		GraphicsFacade::getImGuiManager()->endFrame();
 
-		g_renderer->endFrame();
-//
-//		//appPresent();
-//
-//		Sleep(1);
+		GraphicsFacade::getRenderer()->endFrame();
+
 		return true;
 	}
 

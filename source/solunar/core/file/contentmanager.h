@@ -12,7 +12,7 @@
 namespace engine
 {
 
-class ContentManager : public Singleton<ContentManager>
+class CORE_API ContentManager : public Singleton<ContentManager>
 {
 public:
 	ContentManager();
@@ -50,7 +50,7 @@ private:
 
 };
 
-extern ContentManager* g_contentManager;
+extern CORE_API ContentManager* g_contentManager;
 
 template<typename T>
 inline std::weak_ptr<T> ContentManager::loadObject(const std::string& filename)

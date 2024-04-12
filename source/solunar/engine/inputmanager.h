@@ -130,7 +130,7 @@ namespace engine
 		KEY_MENU = 348
 	};
 
-	class InputManager : public Singleton<InputManager>
+	class ENGINE_API InputManager : public Singleton<InputManager>
 	{
 	private:
 		static InputManager ms_inputManager;

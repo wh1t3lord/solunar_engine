@@ -1,13 +1,14 @@
 #ifndef GRAPHICSWORLD_H
 #define GRAPHICSWORLD_H
 
+#include "graphics/graphicsapi.h"
 #include "graphics/lightmanager.h"
 
 namespace engine {
 	
 	class DrawableComponent;
 	
-	class GraphicsWorld : public Object
+	class GRAPHICS_API GraphicsWorld : public Object
 	{
 		ImplementObject(GraphicsWorld, Object);
 	public:

@@ -1,7 +1,7 @@
 #ifndef SHADERCONSTANTMANAGER_H
 #define SHADERCONSTANTMANAGER_H
 
-#include "graphics/view.h"
+#include "engine/view.h"
 #include "graphics/rendercontext.h"
 //#include "graphics/light.h"
 //#include "graphics/staticmeshcomponent.h"

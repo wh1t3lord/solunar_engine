@@ -7,7 +7,7 @@
 
 namespace engine
 {
-	class DataStream
+	class CORE_API DataStream
 	{
 	public:
 		DataStream();

@@ -1,11 +1,9 @@
 #include "gamepch.h"
 #include "game/gamelogic/saveload/saveloadmanager.h"
 
-
-
 namespace engine {
 	
-SaveLoadManager g_saveLoadManager;
+GAME_API SaveLoadManager g_saveLoadManager;
 	
 void SaveLoadManager::autosave()
 {

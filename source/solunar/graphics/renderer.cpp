@@ -2,7 +2,7 @@
 #include "graphics/renderer.h"
 #include "graphics/screenquad.h"
 #include "graphics/gfxcommon.h"
-#include "graphics/view.h"
+#include "engine/view.h"
 #include "graphics/core/texture.h"
 #include "graphics/core/device.h"
 #include "graphics/core/rendertarget.h"
@@ -112,7 +112,7 @@ namespace engine
 #endif
 	}
 
-	void Renderer::init()
+	void Renderer::init(void* window)
 	{
 		View* view = CameraProxy::getInstance()->getView();
 
@@ -122,7 +122,7 @@ namespace engine
 		// shader manager is inited
 		initInplaceResources();
 
-		ImGuiManager::getInstance()->init();
+		ImGuiManager::getInstance()->init(window);
 
 		// set as lit
 		setRenderMode(RendererViewMode::Lit);

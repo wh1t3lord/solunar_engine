@@ -6,7 +6,7 @@
 namespace engine
 {
 
-class WeaponPistolComponent : public WeaponAutoComponent
+class GAME_API WeaponPistolComponent : public WeaponAutoComponent
 {
     ImplementObject(WeaponPistolComponent, WeaponAutoComponent);
 public:

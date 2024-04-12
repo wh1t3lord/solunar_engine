@@ -9,10 +9,10 @@ namespace engine
 
 	void Camera::update()
 	{
-		m_view->m_view = getViewMatrix();
-		m_view->updateInternalValues();
+		//m_view->m_view = getViewMatrix();
+		//m_view->updateInternalValues();
 
-		m_frustum.update(m_view->m_projection * m_view->m_view);
+		//m_frustum.update(m_view->m_projection * m_view->m_view);
 	}
 
 	glm::vec3 Camera::getScreenRay(float x, float y)
@@ -28,10 +28,10 @@ namespace engine
 
 	void Camera::updateInternal()
 	{
-		m_view->m_view = getViewMatrix();
-		m_view->updateInternalValues();
+		//m_view->m_view = getViewMatrix();
+		//m_view->updateInternalValues();
 
-		m_frustum.update(m_view->m_projection * m_view->m_view);
+		//m_frustum.update(m_view->m_projection * m_view->m_view);
 	}
 
 	glm::mat4 Camera::getViewMatrix()

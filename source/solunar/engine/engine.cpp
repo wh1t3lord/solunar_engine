@@ -11,6 +11,11 @@
 #include "engine/physics/rigidbodycomponent.h"
 #include "engine/physics/trianglemeshshape.h"
 
+#include "graphics/graphics.h"
+#include "graphics/graphicsoptions.h"
+#include "graphics/imguimanager.h"
+#include "graphics/renderer.h"
+
 namespace engine
 {
 	void registerEngineObjects()
@@ -261,4 +266,55 @@ namespace engine
 			break;
 		}
 	}
+
+	void GraphicsFacade::init(void* window)
+	{
+		graphicsInit(window);
+	}
+
+	void GraphicsFacade::shutdown()
+	{
+		graphicsShutdown();
+	}
+
+	bool GraphicsFacade::loadSettings(const std::string& filename)
+	{
+		return g_graphicsOptions.loadSettings(filename);
+	}
+
+	void GraphicsFacade::saveSettings(const std::string& filename)
+	{
+		g_graphicsOptions.saveSettings(filename);
+	}
+
+	void GraphicsFacade::applyDefaultOptions()
+	{
+		g_graphicsOptions.applyDefaultOptions();
+	}
+
+	int GraphicsFacade::getWidth()
+	{
+		return g_graphicsOptions.m_width;
+	}
+
+	int GraphicsFacade::getHeight()
+	{
+		return g_graphicsOptions.m_height;
+	}
+
+	bool GraphicsFacade::getFullscreen()
+	{
+		return g_graphicsOptions.m_fullscreen;
+	}
+
+	IImGuiManager* GraphicsFacade::getImGuiManager()
+	{
+		return (IImGuiManager*)ImGuiManager::getInstance();
+	}
+
+	IRenderer* GraphicsFacade::getRenderer()
+	{
+		return g_renderer;
+	}
+
 }

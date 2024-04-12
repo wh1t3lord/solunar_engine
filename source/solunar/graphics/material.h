@@ -1,6 +1,7 @@
 #ifndef MATERIAL_H
 #define MATERIAL_H
 
+#include "graphics/graphicsapi.h"
 #include "graphics/shaderprogram.h"
 #include "graphics/ShaderProgramManager.h"
 #include "graphics/texturemap.h"

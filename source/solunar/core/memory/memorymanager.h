@@ -9,7 +9,7 @@
 namespace engine
 {
 
-class MemoryManager
+class CORE_API MemoryManager
 {
 public:
 	static void initialize();

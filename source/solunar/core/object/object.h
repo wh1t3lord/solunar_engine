@@ -7,7 +7,7 @@ namespace engine
 {
 	typedef void (*StaticConstructor_t)(void* ptr);
 
-	class TypeInfo
+	class CORE_API TypeInfo
 	{
 	public:
 		TypeInfo(const char* name, StaticConstructor_t staticConstructor, size_t classSize, size_t classAlign, const TypeInfo* baseInfo);
@@ -53,7 +53,7 @@ namespace engine
 		static const TypeInfo* getStaticTypeInfo() { static const TypeInfo s_typeInfo(#typeName, typeName::staticConstructor, sizeof(typeName), alignof(typeName), baseTypeName::getStaticTypeInfo()); return &s_typeInfo; } \
 		virtual const TypeInfo* getTypeInfo() { return getStaticTypeInfo();  }
 	
-	class Object
+	class CORE_API Object
 	{
 		ImplementRootObject(Object);
 	public:
@@ -133,7 +133,7 @@ namespace engine
 		return std::weak_ptr<T>();
 	}
 
-	void objectDeleter(Object* p);
+	CORE_API void objectDeleter(Object* p);
 }
 
 #endif // !OBJECT_H

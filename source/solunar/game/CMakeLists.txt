@@ -41,17 +41,37 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${GAME_GAMELOGIC_MAINMENU_SR
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${GAME_GAMELOGIC_WORLD_SRC})
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${GAME_GAMELOGIC_WEAOPONS_SRC})
 
-add_library(game STATIC
-	${GAME_SRC}
-	${GAME_GAMELOGIC_SAVELOAD_SRC}
-	${GAME_GAMELOGIC_CAMERA_SRC}
-	${GAME_GAMELOGIC_PLAYER_SRC}
-	${GAME_GAMELOGIC_MAINMENU_SRC}
-	${GAME_GAMELOGIC_WORLD_SRC}
-	${GAME_GAMELOGIC_WEAOPONS_SRC})
-	
+if (USE_SHARED_LIBS)
+	add_library(game SHARED
+		${GAME_SRC}
+		${GAME_GAMELOGIC_SAVELOAD_SRC}
+		${GAME_GAMELOGIC_CAMERA_SRC}
+		${GAME_GAMELOGIC_PLAYER_SRC}
+		${GAME_GAMELOGIC_MAINMENU_SRC}
+		${GAME_GAMELOGIC_WORLD_SRC}
+		${GAME_GAMELOGIC_WEAOPONS_SRC})
+else()
+	add_library(game STATIC
+		${GAME_SRC}
+		${GAME_GAMELOGIC_SAVELOAD_SRC}
+		${GAME_GAMELOGIC_CAMERA_SRC}
+		${GAME_GAMELOGIC_PLAYER_SRC}
+		${GAME_GAMELOGIC_MAINMENU_SRC}
+		${GAME_GAMELOGIC_WORLD_SRC}
+		${GAME_GAMELOGIC_WEAOPONS_SRC})
+endif()
+
+if (USE_SHARED_LIBS)
+	set_target_name_ex(game "solunar_gamelib_dll")
+	set_engine_out_dir(game "${CMAKE_SOURCE_DIR}/bin")
+endif()
+
 target_precompile_headers(game PRIVATE "gamepch.h")
 target_include_directories(game PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../"
 								PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 								
-target_link_libraries(game engine graphics)
+target_link_libraries(game engine)
+
+if (USE_SHARED_LIBS)
+	target_compile_definitions(game PUBLIC GAME_DLL PRIVATE GAME_COMPILE)
+endif()

@@ -7,7 +7,7 @@ namespace engine
 {
 	class RigidBodyComponent;
 
-	class PhysicsWorld
+	class ENGINE_API PhysicsWorld
 	{
 	public:
 		PhysicsWorld();

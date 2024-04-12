@@ -7,7 +7,7 @@
 namespace engine {
 
 
-class Frustum  
+class CORE_API Frustum  
 {
 public:
     enum FrustumSide

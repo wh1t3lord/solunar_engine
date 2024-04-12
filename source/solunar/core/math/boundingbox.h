@@ -1,6 +1,8 @@
 #ifndef BOUNDINGBOX_H
 #define BOUNDINGBOX_H
 
+#include "core/platform/core_platform.h"
+
 namespace engine {
 	
 enum class IntersectionType
@@ -8,7 +10,7 @@ enum class IntersectionType
 	
 };
 
-class BoundingBox
+class CORE_API BoundingBox
 {
 public:
 	glm::vec3 m_min;

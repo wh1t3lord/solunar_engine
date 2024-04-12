@@ -20,7 +20,7 @@ namespace engine {
 	class RigidBodyComponent;
 
 	//! Interface class for any type of rigid body shapes.
-	class ShapeComponent : public Component
+	class ENGINE_API ShapeComponent : public Component
 	{
 		ImplementObject(ShapeComponent, Component);
 	public:
@@ -71,7 +71,7 @@ namespace engine {
 
 	};
 
-	class BoxShapeComponent : public ShapeComponent
+	class ENGINE_API BoxShapeComponent : public ShapeComponent
 	{
 		ImplementObject(BoxShapeComponent, ShapeComponent);
 	public:
@@ -93,7 +93,7 @@ namespace engine {
 		glm::vec3 m_size;
 	};
 
-	class SphereShapeComponent : public ShapeComponent
+	class ENGINE_API SphereShapeComponent : public ShapeComponent
 	{
 		ImplementObject(SphereShapeComponent, ShapeComponent);
 	public:
@@ -114,7 +114,7 @@ namespace engine {
 
 	};
 
-	class CylinderShapeComponent : public ShapeComponent
+	class ENGINE_API CylinderShapeComponent : public ShapeComponent
 	{
 		ImplementObject(CylinderShapeComponent, ShapeComponent);
 	public:
@@ -135,7 +135,7 @@ namespace engine {
 
 	};
 
-	class CapsuleShapeComponent : public ShapeComponent
+	class ENGINE_API CapsuleShapeComponent : public ShapeComponent
 	{
 		ImplementObject(CapsuleShapeComponent, ShapeComponent);
 	public:

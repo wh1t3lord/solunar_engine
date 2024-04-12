@@ -9,7 +9,7 @@
 #include "core/file/filesystem.h"
 
 // Base graphics classes
-#include "graphics/view.h"
+#include "engine/view.h"
 #include "graphics/rendercontext.h"
 
 // Graphics objects
@@ -59,7 +59,7 @@ D3D11Renderer::~D3D11Renderer()
 	m_takeScreenshot = false;
 }
 
-void D3D11Renderer::init()
+void D3D11Renderer::init(void* window)
 {
 	Core::msg("D3D11Renderer: Creating rendering device");
 
@@ -68,7 +68,7 @@ void D3D11Renderer::init()
 	((D3D11Device*)g_renderDevice)->create();
 
 	// initalize swap chain
-	createSwapChain();
+	createSwapChain(window);
 
 	// initialize device state manager
 	g_stateManager = mem_new<D3D11StateManager>();
@@ -81,10 +81,10 @@ void D3D11Renderer::init()
 	g_shaderManager->init("shaders/d3d11");
 
 	// initialize base renderer
-	Renderer::init();
+	Renderer::init(window);
 }
 
-void D3D11Renderer::createSwapChain()
+void D3D11Renderer::createSwapChain(void* window)
 {
 	D3D11Device* device = ((D3D11Device*)g_renderDevice);
 
@@ -97,7 +97,7 @@ void D3D11Renderer::createSwapChain()
 	IDXGIFactory* dxgiFactory;
 	dxgiAdapter->GetParent(__uuidof(IDXGIFactory), (void**)&dxgiFactory);
 
-	HWND windowHandle = (HWND)appGetWindow();
+	HWND windowHandle = (HWND)window;
 
 	RECT rc = {};
 	GetClientRect(windowHandle, &rc);

@@ -362,7 +362,7 @@ namespace engine
 
 
 
-	void ImGuiManager::init()
+	void ImGuiManager::init(void* window)
 	{
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -373,7 +373,7 @@ namespace engine
 
 		// Initialize backend
 #ifdef _WIN32
-		ImGui_ImplWin32_Init(appGetWindow());
+		ImGui_ImplWin32_Init(window);
 #endif // _WIN32
 
 		m_ImGuiRenderer.init();

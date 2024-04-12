@@ -3,7 +3,7 @@
 
 namespace engine {
 	
-	class PlayerControllerComponent : public LogicComponent
+	class GAME_API PlayerControllerComponent : public LogicComponent
 	{
 		ImplementObject(PlayerControllerComponent, LogicComponent);
 	public:

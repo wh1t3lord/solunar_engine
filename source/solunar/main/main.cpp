@@ -7,10 +7,12 @@
 #include "core/file/contentdevice.h"
 #include "core/file/contentmanager.h"
 
+#include "engine/engine.h"
+#include "engine/view.h"
 #include "engine/camera.h"
 
+#include "graphics/graphics.h"
 #include "graphics/graphicsoptions.h"
-#include "graphics/view.h"
 
 #include "main/win32_keys.h"
 
@@ -108,15 +110,15 @@ namespace engine
 	void createEngineView()
 	{
 		std::string optionsFilename = "engine.ini";
-		if (!g_graphicsOptions.loadSettings(optionsFilename))
+		if (!GraphicsFacade::loadSettings(optionsFilename))
 		{
-			g_graphicsOptions.applyDefaultOptions();
-			g_graphicsOptions.saveSettings(optionsFilename);
+			GraphicsFacade::applyDefaultOptions();
+			GraphicsFacade::saveSettings(optionsFilename);
 		}
 
 		// create window
-		int width = g_graphicsOptions.m_width, height = g_graphicsOptions.m_height;
-		bool fullscreen = g_graphicsOptions.m_fullscreen;
+		int width = GraphicsFacade::getWidth(), height = GraphicsFacade::getHeight();
+		bool fullscreen = GraphicsFacade::getFullscreen();
 		const char* title = "Very big game title";
 
 		WNDCLASSA wc = {};
@@ -189,15 +191,6 @@ namespace engine
 		engineLoop.initialize();
 
 		mainLoop(&engineLoop);
-#if 0
-		/*while (!glfwWindowShouldClose(g_engineWindow))
-		{
-			OPTICK_FRAME("Main Thread");
-
-			if (engineLoop.update())
-				break;
-		}*/
-#endif
 
 		Core::msg("Quiting from engine loop ...");
 

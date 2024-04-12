@@ -21,6 +21,8 @@
 // C Includes
 #include <stdlib.h>
 
+#include "core/platform/core_platform.h"
+
 #define MAX_KEYNAME	  128
 #define MAX_VALUENAME 128
 #define MAX_VALUEDATA 2048
@@ -30,7 +32,7 @@ using namespace std;
 namespace engine
 {
 
-class CIniFile
+class CORE_API CIniFile
 {
 private:
 	bool caseInsensitive;

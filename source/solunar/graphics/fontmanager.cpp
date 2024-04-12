@@ -14,7 +14,7 @@
 #include "graphics/vertexformat.h"
 
 // renderer
-#include "graphics/view.h"
+#include "engine/view.h"
 #include "graphics/renderer.h"
 
 // Shader system

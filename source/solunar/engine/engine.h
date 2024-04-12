@@ -1,12 +1,14 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
+#include "engine/engineapi.h"
+
 namespace engine
 {
 	class World;
 	class IGameInterface;
 
-	class Engine
+	class ENGINE_API Engine
 	{
 	public:
 		static World* ms_world;
@@ -34,7 +36,7 @@ namespace engine
 		Count
 	};
 
-	class EngineStateManager : public Singleton<EngineStateManager>
+	class ENGINE_API EngineStateManager : public Singleton<EngineStateManager>
 	{
 	public:
 		EngineStateManager();
@@ -48,6 +50,24 @@ namespace engine
 		std::string m_worldName;
 		EngineState m_currentState;
 		EngineState m_nextState;
+	};
+
+	class IImGuiManager;
+	class IRenderer;
+
+	class ENGINE_API GraphicsFacade
+	{
+	public:
+		static void init(void* window);
+		static void shutdown();
+		static bool loadSettings(const std::string& filename);
+		static void saveSettings(const std::string& filename);
+		static void applyDefaultOptions();
+		static int getWidth();
+		static int getHeight();
+		static bool getFullscreen();
+		static IImGuiManager* getImGuiManager();
+		static IRenderer* getRenderer();
 	};
 }
 

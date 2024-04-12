@@ -8,7 +8,7 @@ namespace engine
 {
 	class PhysicsWorld;
 
-	class World : public SerializableObject
+	class ENGINE_API World : public SerializableObject
 	{
 	public:
 		ImplementObject(World, SerializableObject);

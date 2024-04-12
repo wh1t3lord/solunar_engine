@@ -6,7 +6,7 @@
 namespace engine
 {
 
-class CameraComponent : public Component
+class ENGINE_API CameraComponent : public Component
 {
 	ImplementObject(CameraComponent, Component);
 public:
@@ -22,7 +22,7 @@ protected:
 
 
 // Yaw pitch roll camera
-class CameraYawPitchRollComponent : public CameraComponent
+class ENGINE_API CameraYawPitchRollComponent : public CameraComponent
 {
 	ImplementObject(CameraYawPitchRollComponent, CameraComponent);
 public:
@@ -42,7 +42,7 @@ protected:
 };
 
 // First person camera
-class CameraFirstPersonComponent : public CameraYawPitchRollComponent
+class ENGINE_API CameraFirstPersonComponent : public CameraYawPitchRollComponent
 {
 	ImplementObject(CameraFirstPersonComponent, CameraYawPitchRollComponent);
 public:

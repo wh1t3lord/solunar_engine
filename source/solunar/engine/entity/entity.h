@@ -9,7 +9,7 @@ namespace engine
 class World;
 class Component;
 
-class Entity : public SerializableObject
+class ENGINE_API Entity : public SerializableObject
 {
 	friend class World;
 public:

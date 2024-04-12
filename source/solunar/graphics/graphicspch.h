@@ -14,6 +14,7 @@
 #include "engine/enginepch.h"
 
 // graphics stuff
+#include "graphics/graphicsapi.h"
 #include "graphics/gfxcommon.h"
 
 //# TODO: Make this more beautiful

@@ -5,7 +5,7 @@
 
 namespace engine
 {
-	GraphicsOptions g_graphicsOptions;
+	GRAPHICS_API GraphicsOptions g_graphicsOptions;
 
 	bool GraphicsOptions::loadSettings(const std::string& filename)
 	{

@@ -3,7 +3,7 @@
 
 namespace engine
 {
-	class GraphicsOptions
+	class GRAPHICS_API GraphicsOptions
 	{
 	public:
 		bool loadSettings(const std::string& filename);
@@ -27,7 +27,7 @@ namespace engine
 		int m_vsync;
 	};
 
-	extern GraphicsOptions g_graphicsOptions;
+	extern GRAPHICS_API GraphicsOptions g_graphicsOptions;
 }
 
 #endif // !GRAPHICSSETTINGS_H

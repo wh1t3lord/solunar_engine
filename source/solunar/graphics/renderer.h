@@ -32,7 +32,23 @@ namespace engine
 		ConstantBufferBindings_PointLights,
 	};
 
-	class Renderer
+	// #TODO: Make more beautiful!!!
+	
+	//! Render interface
+	class IRenderer
+	{
+	public:
+		virtual ~IRenderer() = default;
+
+		virtual void init(void* window) = 0;
+		virtual void shutdown() = 0;
+
+		virtual void beginFrame() = 0;
+		virtual void endFrame() = 0;
+		virtual void renderView(View* view) = 0;
+	};
+
+	class Renderer : public IRenderer
 	{
 	public:
 		Renderer();
@@ -40,7 +56,7 @@ namespace engine
 		void initFramebuffer(View* view);
 		void initInplaceResources();
 
-		virtual void init();
+		virtual void init(void* window);
 		virtual void shutdown();
 
 	//	void initForView(View* view);

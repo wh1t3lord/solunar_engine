@@ -1,6 +1,8 @@
 #ifndef DEBUG_H
 #define DEBUG_H
 
+#include "core/platform/core_platform.h"
+
 //#define MASTER_GOLD
 
 #define DEBUG_INFO __FILE__, __LINE__, __FUNCTION__
@@ -13,7 +15,7 @@
 namespace engine
 {
 
-class Debug
+class CORE_API Debug
 {
 public:
 	static void initialize();

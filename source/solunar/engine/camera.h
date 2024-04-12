@@ -1,12 +1,12 @@
 #ifndef CAMERA_H
 #define CAMERA_H
 
-#include "graphics/view.h"
+#include "engine/view.h"
 #include "graphics/camerafrustum.h"
 
 namespace engine
 {
-	class Camera
+	class ENGINE_API Camera
 	{
 	public:
 		void  setView(View* view) { m_view = view; m_view->updateInternalValues(); }
@@ -40,8 +40,8 @@ namespace engine
 
 	class CameraComponent;
 
-	class CameraProxy : public Singleton<CameraProxy>,
-						public Camera
+	class ENGINE_API CameraProxy :  public Singleton<CameraProxy>,
+									public Camera
 	{
 	private:
 		static CameraProxy ms_cameraProxy;

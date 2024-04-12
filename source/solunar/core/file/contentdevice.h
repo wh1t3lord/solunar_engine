@@ -9,7 +9,7 @@
 namespace engine
 {
 
-class ContentDevice
+class CORE_API ContentDevice
 {
 public:
 	ContentDevice(const std::string& path);

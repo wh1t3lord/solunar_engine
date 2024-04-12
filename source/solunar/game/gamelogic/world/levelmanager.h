@@ -4,7 +4,7 @@
 namespace engine
 {
 	
-class LevelManagerComponent : public Component
+class GAME_API LevelManagerComponent : public Component
 {
 	ImplementObject(LevelManagerComponent, Component);
 public:

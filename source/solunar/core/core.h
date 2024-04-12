@@ -5,7 +5,7 @@
 
 namespace engine
 {
-	class Core
+	class CORE_API Core
 	{
 	public:
 		static void init();

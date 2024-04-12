@@ -25,4 +25,7 @@
 // graphics
 #include "graphics/gfxcommon.h"
 
+// game
+#include "game/gameapi.h"
+
 #endif // !SHOCKGAMEPCH_H

@@ -1,6 +1,8 @@
 #ifndef CORE_FILESYSTEM_H
 #define CORE_FILESYSTEM_H
 
+#include "core/platform/core_platform.h"
+
 namespace engine
 {
 
@@ -14,7 +16,7 @@ enum SeekWay
 typedef void* FileHandle;
 
 //! Abstract class for file system.
-class FileSystem
+class CORE_API FileSystem
 {
 public:
 	virtual ~FileSystem() {}
@@ -38,7 +40,7 @@ public:
 	virtual size_t write(FileHandle handle, const void* data, size_t size) = 0;
 };
 
-extern FileSystem* g_fileSystem;
+extern CORE_API FileSystem* g_fileSystem;
 
 }
 

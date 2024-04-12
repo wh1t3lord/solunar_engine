@@ -23,4 +23,6 @@
 // graphics
 #include "graphics/gfxcommon.h"
 
+#include "game/gameapi.h"
+
 #endif // !GAMEPCH_H

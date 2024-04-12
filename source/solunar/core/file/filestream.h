@@ -8,7 +8,7 @@
 
 namespace engine
 {
-	class FileStream : public DataStream
+	class CORE_API FileStream : public DataStream
 	{
 	public:
 		FileStream(const std::string& filename);

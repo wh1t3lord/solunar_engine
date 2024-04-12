@@ -1,8 +1,7 @@
 #include "graphicspch.h"
 #include "graphics/postfxmanager.h"
 
-#include "graphics/view.h"
-
+#include "engine/view.h"
 #include "graphics/core/device.h"
 #include "graphics/core/texture.h"
 #include "graphics/core/rendertarget.h"

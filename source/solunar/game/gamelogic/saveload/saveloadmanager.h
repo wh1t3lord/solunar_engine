@@ -26,7 +26,7 @@ struct SaveFileWorldInformation
 	char worldName[SAVEFILE_MAX_WORLD_NAME_LENGTH];
 };
 
-class SaveLoadManager
+class GAME_API SaveLoadManager
 {
 public:
 	void autosave();
@@ -36,7 +36,7 @@ private:
 	void saveActiveWorld(FileHandle file);
 };
 
-extern SaveLoadManager g_saveLoadManager;
+extern GAME_API SaveLoadManager g_saveLoadManager;
 	
 }
 

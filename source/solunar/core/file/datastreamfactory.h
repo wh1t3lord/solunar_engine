@@ -7,7 +7,7 @@
 namespace engine
 {
 
-class DataStreamFactory : public Singleton<DataStreamFactory>
+class CORE_API DataStreamFactory : public Singleton<DataStreamFactory>
 {
 public:
 	static void createInstance();

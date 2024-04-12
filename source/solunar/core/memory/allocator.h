@@ -1,10 +1,12 @@
 #ifndef CORE_ALLOCATOR_H
 #define CORE_ALLOCATOR_H
 
+#include "core/platform/core_platform.h"
+
 namespace engine
 {
 
-class IAllocator
+class CORE_API IAllocator
 {
 public:
 	virtual ~IAllocator() {}

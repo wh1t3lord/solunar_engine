@@ -7,7 +7,7 @@ namespace engine
 {
 
 // Компонент цепи оружия
-class WeaponChainComponent : public Component
+class GAME_API WeaponChainComponent : public Component
 {
 	ImplementObject(WeaponChainComponent, Component);
 public:

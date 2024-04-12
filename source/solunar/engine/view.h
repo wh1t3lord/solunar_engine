@@ -3,7 +3,7 @@
 
 namespace engine
 {
-	class View
+	class ENGINE_API View
 	{
 	public:
 		glm::mat4 m_projection, m_view;

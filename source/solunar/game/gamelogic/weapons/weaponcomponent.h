@@ -12,7 +12,7 @@ namespace engine {
 		MP5
 	};
 	
-	class WeaponComponent : public LogicComponent
+	class GAME_API WeaponComponent : public LogicComponent
 	{
 		ImplementObject(WeaponComponent, LogicComponent);
 	public:

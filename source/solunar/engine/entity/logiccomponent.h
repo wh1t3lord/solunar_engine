@@ -6,7 +6,7 @@
 namespace engine
 {
 	// Logic component for node (run update function once at game frame)
-	class LogicComponent : public Component
+	class ENGINE_API LogicComponent : public Component
 	{
 	public:
 		ImplementObject(LogicComponent, Component);

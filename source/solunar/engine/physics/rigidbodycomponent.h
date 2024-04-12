@@ -10,7 +10,7 @@ namespace engine {
 	class ShapeComponent;
 
 	//! Rigid body component
-	class RigidBodyComponent : public Component
+	class ENGINE_API RigidBodyComponent : public Component
 	{
 		ImplementObject(RigidBodyComponent, Component);
 	public:
@@ -67,7 +67,7 @@ namespace engine {
 	};
 
 	//! Hack due support btCharacterController in the physics system.
-	class RigidBodyProxyComponent : public RigidBodyComponent
+	class ENGINE_API RigidBodyProxyComponent : public RigidBodyComponent
 	{
 		ImplementObject(RigidBodyProxyComponent, RigidBodyComponent);
 	public:

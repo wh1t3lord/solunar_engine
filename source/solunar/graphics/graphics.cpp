@@ -35,14 +35,14 @@ void registerGraphicsObjects()
 	DirectionalLightComponent::registerObject();
 }
 
-void graphicsInit()
+void graphicsInit(void* window)
 {
 	Core::msg("Initializing graphics");
 
 	registerGraphicsObjects();
 
 	createRenderer();
-	g_renderer->init();
+	g_renderer->init(window);
 }
 
 void graphicsShutdown()

@@ -10,7 +10,7 @@ typedef unsigned ThreadId;
 // ???
 #endif // _WIN32
 
-class Thread
+class CORE_API Thread
 {
 public:
 	Thread();
@@ -31,7 +31,7 @@ private:
 	bool m_isRunning;
 };
 
-void setCurrentThreadName(const char* name);
+CORE_API void setCurrentThreadName(const char* name);
 
 } 
 

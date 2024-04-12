@@ -10,7 +10,7 @@
 namespace engine
 {
 
-ContentManager* g_contentManager = nullptr;
+CORE_API ContentManager* g_contentManager = nullptr;
 
 ContentManager::ContentManager()
 {

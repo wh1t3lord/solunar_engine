@@ -4,7 +4,7 @@
 #include "graphics/rendercontext.h"
 #include "graphics/shaderprogram.h"
 #include "graphics/ShaderProgramManager.h"
-#include "graphics/view.h"
+#include "engine/view.h"
 
 #include <glm/gtx/rotate_vector.hpp>
 
