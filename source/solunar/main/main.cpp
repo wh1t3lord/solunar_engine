@@ -134,6 +134,9 @@ namespace engine
 		ShowWindow(g_engineWindow, SW_SHOW);
 		UpdateWindow(g_engineWindow);
 
+		//HMODULE gameDLL = LoadLibrary("fpsgame.dll");
+
+
 		g_engineView = mem_new<View>();
 		g_engineView->m_width = width;
 		g_engineView->m_height = height;

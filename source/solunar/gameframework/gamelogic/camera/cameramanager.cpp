@@ -1,5 +1,5 @@
 #include "gamepch.h"
-#include "game/gamelogic/camera/cameramanager.h"
+#include "gameframework/gamelogic/camera/cameramanager.h"
 
 namespace engine {
 	

@@ -1,5 +1,5 @@
 #include "gamepch.h"
-#include "game/gamelogic/mainmenu/mainmenuworldcomponent.h"
+#include "gameframework/gamelogic/mainmenu/mainmenuworldcomponent.h"
 
 #include "engine/entity/world.h"
 

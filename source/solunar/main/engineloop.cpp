@@ -17,7 +17,7 @@
 #include "graphics/imguimanager.h"
 #include "graphics/lightmanager.h"
 
-#include "shockgame/shockgame.h"
+//#include "shockgame/shockgame.h"
 
 namespace engine {
 
@@ -140,7 +140,12 @@ namespace engine {
 		loadGameDll();
 
 		// Game interface init
-		g_gameInterface->initialize();
+		if (g_gameInterface)
+		{
+			g_gameInterface->initialize();
+			Core::msg("IGameInterface: game interface initialized");
+		}
+
 
 		//if (g_commandLine.hasOption("-saveClassIds"))
 		//	saveClassIds();
