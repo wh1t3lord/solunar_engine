@@ -107,7 +107,7 @@ namespace engine {
 
 	void loadGameDll()
 	{
-		const char* gamename = "shockgame";
+		const char* gamename = "fpsgame";
 		
 		char buffer[260];
 #ifdef _DEBUG

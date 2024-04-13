@@ -20,7 +20,6 @@ namespace engine
 // implemetation for IGameInterface
 
 static FPSGameInterface s_fpsGameInterface;
-__declspec(dllexport) IGameInterface* g_gameInterface = (IGameInterface*)&s_fpsGameInterface; 
 
 FPSGameInterface* getFPSGameInterface()
 {
@@ -62,7 +61,6 @@ FPSGameInterface::~FPSGameInterface()
 
 void FPSGameInterface::initialize()
 {
-	Logger::init();
 	Core::msg("FPSGameInterface: Initializing FPS game");
 
 	// register game objects
@@ -89,3 +87,32 @@ void FPSGameInterface::shutdown()
 }
 
 }
+
+#ifdef WIN32
+
+using namespace engine;
+
+__declspec(dllexport) void dummy_export()
+{
+
+}
+
+BOOL APIENTRY DllMain(HANDLE hModule,
+	DWORD  ul_reason_for_call,
+	LPVOID lpReserved
+)
+{
+	switch (ul_reason_for_call)
+	{
+	case DLL_PROCESS_ATTACH:
+		// #TODO: !!!
+		::g_gameInterface = &s_fpsGameInterface;
+		break;
+	case DLL_THREAD_ATTACH:
+	case DLL_THREAD_DETACH:
+	case DLL_PROCESS_DETACH:
+		break;
+	}
+	return TRUE;
+}
+#endif // WIN32

@@ -26,7 +26,7 @@
 #include "graphics/gfxcommon.h"
 
 // game
-#include "game/gameapi.h"
+#include "gameframework/gameapi.h"
 
 #endif // !FPSGAMEPCH_H
 
