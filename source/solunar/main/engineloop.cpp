@@ -143,7 +143,7 @@ namespace engine {
 		if (g_gameInterface)
 		{
 			g_gameInterface->initialize();
-			Core::msg("IGameInterface: game interface initialized");
+			Core::msg("EngineLoop: game interface initialize complete");
 		}
 
 

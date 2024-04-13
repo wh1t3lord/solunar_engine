@@ -45,7 +45,7 @@ void registerGameClasses()
 void registerFPSClasses()
 {
 	// Custom register goes here 
-	Core::msg("Registring FPS classes");
+	MSG("Regsitring fps classes");
 	//ShockSignal::registerObject();
 	 
 	
@@ -61,7 +61,7 @@ FPSGameInterface::~FPSGameInterface()
 
 void FPSGameInterface::initialize()
 {
-	Core::msg("FPSGameInterface: Initializing FPS game");
+	MSG("Initializing FPS game");
 
 	// register game objects
 	registerGameClasses();
@@ -81,7 +81,7 @@ void FPSGameInterface::shutdown()
 	// Destroy signal manager
 	//FPSSignalManager::destroyInstance(); # same as line 77
 	
-	Core::msg("FPSGameInterface: Shutting down FPS game");
+	MSG("Shutting down game interface");
 	
 	// g_eventManager.removeEventListener(&g_shockEventListener);
 }

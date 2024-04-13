@@ -3,6 +3,8 @@
 
 #include "engine/gameinterface.h"
 
+#define MSG(s) Core::msg("%s: %s", __FUNCTION__, s)
+
 namespace engine
 {
 
