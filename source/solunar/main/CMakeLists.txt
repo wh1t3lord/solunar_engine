@@ -6,6 +6,9 @@ file(GLOB MAIN_SRC
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${MAIN_SRC})
 
 add_executable(main WIN32 ${MAIN_SRC})
+set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT main)
+set_property(TARGET main PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}" )
+set_property(TARGET main PROPERTY VS_DEBUGGER_COMMAND_ARGUMENTS "-world testworld")
 
 if (USE_SHARED_LIBS)
 	set_target_name_ex(main "solunar_main_dll")
@@ -25,3 +28,4 @@ if (CMAKE_SIZEOF_VOID_P EQUAL 4)
 else()
 	target_link_directories(main PRIVATE "${CMAKE_SOURCE_DIR}/externals/assimp/libs/x64")
 endif()
+
