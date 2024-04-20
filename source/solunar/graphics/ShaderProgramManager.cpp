@@ -5,9 +5,9 @@
 namespace engine
 {
 
-ShaderProgramManager* g_shaderManager = nullptr;
+IShaderProgramManager* g_shaderManager = nullptr;
 
-void ShaderProgramManager::init(const char* shaderPath)
+void IShaderProgramManager::init(const char* shaderPath)
 {
 	Assert2(this, "Please initialize shader manager for exactly graphics driver API.");
 	Assert2(shaderPath, "Please specify shader path for exactly graphics driver API.");
@@ -15,7 +15,7 @@ void ShaderProgramManager::init(const char* shaderPath)
 	m_shaderPath = shaderPath;
 }
 
-void ShaderProgramManager::shutdown()
+void IShaderProgramManager::shutdown()
 {
 	//for (auto it = m_programs.begin(); it != m_programs.end(); ++it) {
 	//	if (*it) {
@@ -26,7 +26,7 @@ void ShaderProgramManager::shutdown()
 	//m_programs.clear();
 }
 
-std::string ShaderProgramManager::getShaderPath()
+std::string IShaderProgramManager::getShaderPath()
 {
 	return m_shaderPath;
 }

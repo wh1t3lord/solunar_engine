@@ -81,6 +81,8 @@ private:
 
 #define g_d3d11Device ((D3D11Device*)g_renderDevice)
 
+IRenderDevice* createRenderDevice();
+
 }
 
 #endif

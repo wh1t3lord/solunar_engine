@@ -4,11 +4,11 @@
 namespace engine
 {
 	
-class ShaderProgramManager;
+class IShaderProgramManager;
 
 class IShaderProgram
 {
-	friend class ShaderProgramManager;
+	friend class IShaderProgramManager;
 public:
 	virtual ~IShaderProgram();
 

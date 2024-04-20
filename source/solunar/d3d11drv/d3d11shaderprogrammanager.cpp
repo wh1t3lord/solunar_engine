@@ -96,3 +96,15 @@ void D3D11ShaderProgramManager::deleteProgram(IShaderProgram* program)
 }
 
 }
+
+using namespace engine;
+
+IShaderProgramManager* createShaderProgramManager()
+{
+	Logger::logPrint("d3d11drv: Creating shader manager ...");
+
+	IShaderProgramManager* shaderManager = mem_new<D3D11ShaderProgramManager>();
+	shaderManager->init("d3d11");
+
+	return shaderManager;
+}

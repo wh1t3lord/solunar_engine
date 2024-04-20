@@ -1,8 +1,6 @@
 #ifndef GRAPHICSWORLD_H
 #define GRAPHICSWORLD_H
 
-#include "graphics/lightmanager.h"
-
 namespace engine {
 	
 	class DrawableComponent;
@@ -22,8 +20,6 @@ namespace engine {
 		void addDrawable(DrawableComponent* drawable);
 		void removeDrawable(DrawableComponent* drawable);
 
-		LightManager* getLightManager() { return &m_lightManager; }
-
 		const std::vector<DrawableComponent*>& getDrawables() { return m_drawables; }
 
 		void updateDrawables();
@@ -31,7 +27,6 @@ namespace engine {
 	private:
 		std::vector<DrawableComponent*> m_drawables;
 
-		LightManager m_lightManager;
 	};
 	
 }

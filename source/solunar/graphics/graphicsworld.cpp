@@ -1,6 +1,5 @@
 #include "graphicspch.h"
 #include "graphics/graphicsworld.h"
-#include "graphics/mesh.h"
 #include "engine/camera.h"
 
 namespace engine {

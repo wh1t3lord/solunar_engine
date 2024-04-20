@@ -3,13 +3,12 @@
 
 #include "graphics/view.h"
 #include "graphics/rendercontext.h"
-//#include "graphics/light.h"
-//#include "graphics/staticmeshcomponent.h"
-#include "graphics/rendercontext.h"
-#include "graphics/graphicsworld.h"
 
 namespace engine
 {
+	class IShaderProgram;
+	class MeshComponent;
+
 	enum class ShaderConstantType
 	{
 		Int,
@@ -33,9 +32,6 @@ namespace engine
 		glm::vec4 m_viewDir;
 	};
 
-	class IShaderProgram;
-	class MeshComponent;
-
 	class ConstantBufferProxy
 	{
 	public:
@@ -53,33 +49,34 @@ namespace engine
 
 	private:
 		std::string m_name;
-		IBufferBase* m_buffer;
+		IBufferBase* m_buffer = nullptr;
 	};
 
-	extern ConstantBufferProxy g_staticMeshConstantBuffer;
-	extern ConstantBufferProxy g_directionalLightConstantBuffer;
-
+	// \brief Shader Constant Manager, manage the constant buffers.
 	class ShaderConstantManager : public Singleton<ShaderConstantManager>
 	{
 	public:
 		ShaderConstantManager();
 		~ShaderConstantManager();
 
+		// Initialize constant manager
 		void init();
+
+		// Shutdown constant manager
 		void shutdown();
 
+		// Create tagged constant buffer
 		template <typename BufferStructureData>
 		ConstantBufferProxy create(const std::string& name);
 	
+		// Get tagged constant buffer
 		ConstantBufferProxy get(const std::string& name);
-
-		void setStaticMeshGlobalData(MeshComponent* meshComponent, View* view, RenderContext& renderContext, GraphicsWorld* graphicsWorld);
-
-		void getConstantBuffers(std::unordered_map<std::string, IBufferBase*>& map);
 
 	private:
 		std::unordered_map<std::string, IBufferBase*> m_constantBuffers;
 	};
+
+	extern ConstantBufferProxy g_staticMeshConstantBuffer;
 
 	template<typename BufferStructureData>
 	inline ConstantBufferProxy ShaderConstantManager::create(const std::string& name)
@@ -94,16 +91,9 @@ namespace engine
 		SubresourceDesc subresourceDesc = {};
 
 		IBufferBase* buffer = g_renderDevice->createBuffer(bufferDesc, subresourceDesc);
-
 		m_constantBuffers.emplace(name, buffer);
-
-		Core::msg("ShaderConstantManager: created constant buffer %s (%i bytes)", name.c_str(), bufferDesc.m_bufferMemorySize);
-
 		return ConstantBufferProxy(buffer);
 	}
-
-	void graphicsShowConstantBuffers(bool* open);
-
 }
 
 #endif // !SHADERCONSTANTMANAGER_H

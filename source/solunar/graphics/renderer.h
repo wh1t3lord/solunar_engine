@@ -1,96 +1,54 @@
-#ifndef RENDERER_H
-#define RENDERER_H
+#ifndef GRAPHICS_RENDERER_H
+#define GRAPHICS_RENDERER_H
 
 namespace engine
 {
-	class View;
-	class GraphicsDevice;
-	class PostProcessingRendererOld;
-	class SkyMeshComponent;
-	class StaticMeshComponent;
-	class ITexture2D;
-	class IRenderTarget;
-	class IShaderProgram;
-	class World;
-	class MeshComponent;
-	class Material;
-	class MaterialInstance;
-	class GraphicsWorld;
 
-	enum class RendererViewMode
-	{
-		Wireframe,
-		Unlit,
-		Lit
-	};
+class IRenderDevice;
+class IViewSurface;
 
-	enum ConstantBufferBindings
-	{
-		ConstantBufferBindings_Scene,
-		ConstantBufferBindings_Skinning,
-		CBBindings_DirectionalLight,
-		ConstantBufferBindings_PointLights,
-	};
+// \brief Base interface for any renderer visual.
+class IRenderVisual
+{
+public:
+	virtual ~IRenderVisual() {}
 
-	class Renderer
-	{
-	public:
-		Renderer();
-		virtual ~Renderer();
-		void initFramebuffer(View* view);
-		void initInplaceResources();
+	// Render function
+	virtual void render(const glm::mat4& matrix) = 0;
+};
 
-		virtual void init();
-		virtual void shutdown();
+// \brief Renderer class.
+class Renderer
+{
+public:
+	Renderer();
+	~Renderer();
 
-	//	void initForView(View* view);
-	
-		View* getView() { return m_view; }
+	// Initialize renderer
+	void init();
 
-		virtual void beginFrame();
-		virtual void endFrame();
+	// Shutdown renderer
+	void shutdown();
 
-		void renderWorld(View* view);
+	// Start begin of rendering frame.
+	void beginFrame();
 
-		void renderView(View* view);
-		void renderSky(View* view, SkyMeshComponent* skyMesh);
-		void setupLights(GraphicsWorld* graphicsWorld);
-	
-		virtual void bindMaterialForMesh(MeshComponent* mesh, Material* material, MaterialInstance* materialInstance) = 0;
+	// End of rendering frame.
+	void endFrame();
 
-		virtual void renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh) = 0;
-		virtual void renderShadows(View* view) = 0;
+	// Render the view surface. (frameSyncNum will be ignored at offscreen surfaces.)
+	void renderView(IViewSurface* view, int frameSyncNum);
 
-		virtual void takeScreenshot() = 0;
-		
-		virtual void clearScreen() = 0;
-	 
-		// Too simple but i dont regret
-		void setRenderMode(RendererViewMode mode) { m_currentViewMode = mode; }
-		RendererViewMode getRenderMode() { return m_currentViewMode; }
+	// Create view surface from window.
+	IViewSurface* createViewSurface(void* handle);
 
-		void toggleShowingWireframe();
-		void toggleShowOctree();
+	// Get render device.
+	IRenderDevice* getRenderDevice();
 
-	protected:
-		ITexture2D* m_screenColorTexture;
-		ITexture2D* m_screenDepthTexture;
-		IRenderTarget* m_screenRenderTarget;
-		
-		View* m_view;
+};
 
-		RendererViewMode m_currentViewMode;
+extern Renderer* g_renderer;
 
-		bool m_meshPolysWireframe;
-		bool m_showOctree;
-	};
-
-	extern Renderer* g_renderer;
-
-	void createRenderer();
-	void destroyRenderer();
-
-	std::weak_ptr<Material> getDefaultMaterial();
 }
 
-#endif // !RENDERER_H
+#endif // !GRAPHICS_RENDERER_H

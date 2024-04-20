@@ -6,10 +6,10 @@ namespace engine
 	
 class IShaderProgram;
 
-class ShaderProgramManager
+class IShaderProgramManager
 {
 public:
-	virtual ~ShaderProgramManager() {}
+	virtual ~IShaderProgramManager() {}
 
 	void init(const char* shaderPath);
 	void shutdown();
@@ -30,7 +30,7 @@ protected:
 	std::string m_shaderPath;
 };
 
-extern ShaderProgramManager* g_shaderManager;
+extern IShaderProgramManager* g_shaderManager;
 	
 }
 

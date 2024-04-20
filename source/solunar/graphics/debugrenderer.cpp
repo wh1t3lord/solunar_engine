@@ -1,7 +1,6 @@
 #include "graphicspch.h"
 #include "graphics/core/device.h"
 #include "graphics/debugrenderer.h"
-#include "graphics/rendercontext.h"
 #include "graphics/shaderprogram.h"
 #include "graphics/ShaderProgramManager.h"
 #include "graphics/view.h"
@@ -59,9 +58,7 @@ void DebugRender::initialize()
 
 	// create shader
 	m_shaderProgram = g_shaderManager->createShaderProgram("debug_draw.vsh", "debug_draw.psh");
-	
-	m_lineVertexFormat.addPosition(); // position
-	m_lineVertexFormat.addPosition(); // color
+
 }
 
 void DebugRender::shutdown()
@@ -252,7 +249,7 @@ void DebugRender::drawLinesInternal(View* view)
 		return;
 
 	g_renderDevice->setVertexBuffer(m_verticesBuffer, sizeof(LineVertex), 0);
-	g_renderDevice->setVertexFormat(&m_lineVertexFormat);
+	//g_renderDevice->setVertexFormat(&m_lineVertexFormat);
 	
 	//m_verticesBuffer->updateSubresource(m_lines.data(), m_lines.size() * sizeof(Line));
 

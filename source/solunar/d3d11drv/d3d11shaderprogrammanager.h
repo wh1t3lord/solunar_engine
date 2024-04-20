@@ -6,7 +6,7 @@
 namespace engine
 {
 
-class D3D11ShaderProgramManager : public ShaderProgramManager
+class D3D11ShaderProgramManager : public IShaderProgramManager
 {
 public:
 	D3D11ShaderProgramManager();

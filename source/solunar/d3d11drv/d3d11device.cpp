@@ -261,3 +261,14 @@ void D3D11Device::drawIndexed(PrimitiveMode primitiveMode, size_t indexStart, si
 }
 
 }
+
+using namespace engine;
+
+IRenderDevice* createRenderDevice()
+{
+	Logger::logPrint("d3d11drv: creating d3d11 device ...");
+
+	D3D11Device* device = mem_new<D3D11Device>();
+	device->create();
+	return device;
+}

@@ -16,10 +16,4 @@
 // graphics stuff
 #include "graphics/gfxcommon.h"
 
-//# TODO: Make this more beautiful
-#ifdef WIN32
-#	include <d3d11.h>
-#endif // WIN32
-
-
 #endif // !GRAPHICSPCH_H

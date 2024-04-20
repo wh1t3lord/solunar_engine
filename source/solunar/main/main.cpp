@@ -11,6 +11,8 @@
 
 #include "graphics/graphicsoptions.h"
 #include "graphics/view.h"
+#include "graphics/viewsurface.h"
+#include "graphics/renderer.h"
 
 #include "main/win32_keys.h"
 
@@ -20,7 +22,7 @@ extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg
 
 namespace engine
 {
-	View* g_engineView = nullptr;
+	IViewSurface* g_engineView = nullptr;
 	HWND g_engineWindow = nullptr;
 	ContentDevice* g_gameContentDevice = nullptr;
 
@@ -117,7 +119,7 @@ namespace engine
 		// create window
 		int width = g_graphicsOptions.m_width, height = g_graphicsOptions.m_height;
 		bool fullscreen = g_graphicsOptions.m_fullscreen;
-		const char* title = "Very big game title";
+		const char* title = "Solunar Engine";
 
 		WNDCLASSA wc = {};
 		wc.lpszClassName = "EngineWindowClass";
@@ -132,15 +134,9 @@ namespace engine
 		ShowWindow(g_engineWindow, SW_SHOW);
 		UpdateWindow(g_engineWindow);
 
-		g_engineView = mem_new<View>();
-		g_engineView->m_width = width;
-		g_engineView->m_height = height;
-		g_engineView->m_fov = 75.0f;
-		g_engineView->m_znear = 0.1f;
-		g_engineView->m_zfar = 10000.0f;
-		g_engineView->updateInternalValues();
+		Assert(g_renderer);
 
-		CameraProxy::getInstance()->setView(g_engineView);
+		g_engineView = g_renderer->createViewSurface(g_engineWindow);
 	}
 
 	void appPresent()
@@ -153,7 +149,7 @@ namespace engine
 		return g_engineWindow;
 	}
 
-	View* appGetView()
+	IViewSurface* appGetViewSurface()
 	{
 		return g_engineView;
 	}
@@ -189,15 +185,6 @@ namespace engine
 		engineLoop.initialize();
 
 		mainLoop(&engineLoop);
-#if 0
-		/*while (!glfwWindowShouldClose(g_engineWindow))
-		{
-			OPTICK_FRAME("Main Thread");
-
-			if (engineLoop.update())
-				break;
-		}*/
-#endif
 
 		Core::msg("Quiting from engine loop ...");
 

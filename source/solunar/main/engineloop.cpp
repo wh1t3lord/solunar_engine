@@ -14,8 +14,7 @@
 #include "graphics/graphics.h"
 #include "graphics/graphicsoptions.h"
 #include "graphics/renderer.h"
-#include "graphics/imguimanager.h"
-#include "graphics/lightmanager.h"
+#include "graphics/viewsurface.h"
 
 #include "shockgame/shockgame.h"
 
@@ -58,78 +57,25 @@ namespace engine {
 	static bool g_forceQuit = false;
 	static bool g_showShockPlayerDebug = false;
 
-	void engineDebugOverlay()
-	{
-		if (ImGui::BeginMainMenuBar())
-		{
-			if (ImGui::BeginMenu("Engine"))
-			{
-				if (ImGui::MenuItem("Entity list")) { g_showEntityList = !g_showEntityList; }
-				if (ImGui::MenuItem("Quit")) { g_forceQuit = true; }
-
-				ImGui::EndMenu();
-			}
-
-			if (ImGui::BeginMenu("Graphics"))
-			{
-				if (ImGui::MenuItem("Constant Buffer Tracker")) { g_showCBManager = !g_showCBManager; }
-				if (ImGui::MenuItem("Light Editor")) { g_showLightEditor = !g_showLightEditor; }
-
-				ImGui::EndMenu();
-			}
-
-			if (ImGui::BeginMenu("Game"))
-			{
-				if (ImGui::MenuItem("Shock Player Debug")) { g_showShockPlayerDebug = !g_showShockPlayerDebug; }
-
-				ImGui::EndMenu();
-			}
-
-			if (ImGui::BeginMenu("Debug"))
-			{
-				ImGui::EndMenu();
-			}
-
-			ImGui::EndMainMenuBar();
-		}
-
-		if (g_showCBManager)
-			graphicsShowConstantBuffers(&g_showCBManager);
-	
-		if (g_showLightEditor)
-			graphicsLightEditor(&g_showLightEditor);
-
-		if (g_showShockPlayerDebug)
-			shockGamePlayerDebug(&g_showShockPlayerDebug);
-	}
-
 	void EngineLoop::initialize()
 	{
 		initEngineCommandLine();
 
-		//appInit2();
-
-		// create engine view
-		createEngineView();
-		//appInitInput();
-
 		// initialize engine
 		Engine::init();
 		
+		// Initialize graphics
 		graphicsInit();
+
+		// create engine view
+		createEngineView();
 		
 		// initialize audio manager
 		//AudioManager* pAudioManager = AudioManager::createInstance();
 		//pAudioManager->init();
 
-		// game init
-		//Game::init();
-
 		// Game interface init
 		g_gameInterface->initialize();
-
-		//if (g_commandLine.hasOption("-saveClassIds"))
-		//	saveClassIds();
 
 		//if (g_modelConvert)
 		//{
@@ -144,33 +90,14 @@ namespace engine {
 			snprintf(stringBuffer, sizeof(stringBuffer), "worlds/%s.xml", worldFileName);
 			EngineStateManager::getInstance()->loadWorld(stringBuffer);
 		}
-
-		//if (g_commandLine.hasOption("-world"))
-		//{
-		//	// #TODO: Refactor this
-		//	GameState* gameState = GameState::getInstance();
-		//	gameState->setGameState(GameState::GAME_STATE_RUNNING);
-		//	loadLevel();
-		//}
-		//else
-		//{
-		//	// #TODO: Refactor this
-		//	GameState* gameState = GameState::getInstance();
-		//	gameState->setGameState(GameState::GAME_STATE_RUNNING);
-		//	loadLevel("entry");
-		//}
 	}
 
 	void EngineLoop::shutdown()
 	{
 		g_gameInterface->shutdown();
 
-		//Game::shutdown();
-
 		//AudioManager::getInstance()->shutdown();
 		//AudioManager::destroyInstance();
-
-		//ImguiManager::getInstance()->shutdown();
 
 		// release content manager (because some objects allocated by renderer, and after
 		//							renderer destroying, render device is unavaliable)
@@ -181,8 +108,6 @@ namespace engine {
 		g_graphicsOptions.saveSettings("engine.ini");
 
 		Engine::shutdown();
-
-		//appShutdown2();
 	}
 
 	bool EngineLoop::update()
@@ -206,26 +131,8 @@ namespace engine {
 		// update delta cursor pos and others input stuff
 		input->update();
 
-//		glfwPollEvents();
-//
-//		if (gameState->getGameState() == GameState::GAME_STATE_RUNNING &&
-//			!input->getKey(KeyboardKeys::KEY_LEFT_ALT))
-//		{
-//			appToggleShowMousePointer(false);
-//			//appSetCursorPos(0, 0);
-//		}
-//		else
-//		{
-//			appToggleShowMousePointer(true);
-//		}
-
 		// update timer
 		Timer::getInstance()->update();
-
-		ImGuiManager::getInstance()->beginFrame();
-
-		// update game specific state
-		//gameState->update();
 		
 		// update camera
 		CameraProxy::getInstance()->updateProxy();
@@ -236,30 +143,18 @@ namespace engine {
 		// sound
 		//AudioManager::getInstance()->update();
 
+		// begin render frame
 		g_renderer->beginFrame();
 		
-		g_renderer->renderView(appGetView());
+		// get vsync value
+		int frameSyncNum = g_graphicsOptions.m_vsync;
 
-//		if (g_console->isToggled())
-//			g_console->onRender();
+		// show display
+		g_renderer->renderView(appGetViewSurface(), frameSyncNum);
 
-//#if 1
-//		DebugOverlay::render();
-//#endif // !MASTER_GOLD_BUILD
-
-//		RmlSystem::getInstance()->render();
-
-		engineDebugOverlay();
-
-		ImGui::ShowDemoWindow();
-
-		ImGuiManager::getInstance()->endFrame();
-
+		// end render frame
 		g_renderer->endFrame();
-//
-//		//appPresent();
-//
-//		Sleep(1);
+
 		return true;
 	}
 

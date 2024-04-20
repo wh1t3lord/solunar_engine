@@ -2,12 +2,12 @@
 #define MAIN_H
 
 namespace engine {
-	class View;
+	class IViewSurface;
 
 	void appInit(int argc, char** argv);
 	void appShutdown();
 	void* appGetWindow();
-	View* appGetView();
+	IViewSurface* appGetViewSurface();
 	void appPresent();
 
 	void createEngineView();
