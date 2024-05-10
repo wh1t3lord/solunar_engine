@@ -1,3 +1,5 @@
+#ifdef _WINDOWS
+
 #include "core/platform/core_platform.h"
 #include "core/file/filesystem_win32.h"
 
@@ -95,3 +97,5 @@ size_t FileSystem_Win32::write(FileHandle handle, const void* data, size_t size)
 }
 
 }
+
+#endif // _WINDOWS

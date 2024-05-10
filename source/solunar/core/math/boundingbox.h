@@ -3,11 +3,6 @@
 
 namespace engine {
 	
-enum class IntersectionType
-{
-	
-};
-
 class BoundingBox
 {
 public:
@@ -18,15 +13,15 @@ public:
 	void setIdentity();
 
     //! Returns a bool whether the given point is inside the bounding volume.
-    bool Contains(const glm::vec3& pPoint) const
+    bool contains(const glm::vec3& pPoint) const
     {
         return m_min.x <= pPoint.x && m_min.y <= pPoint.y && m_min.z <= pPoint.z &&
             m_max.x >= pPoint.x && m_max.y >= pPoint.y && m_max.z >= pPoint.z;
     }
 
-    bool Contains(const BoundingBox& pBox) const
+    bool contains(const BoundingBox& pBox) const
     {
-        return Contains(pBox.m_min) && Contains(pBox.m_max);
+        return contains(pBox.m_min) && contains(pBox.m_max);
     }
 
     glm::vec3 getCenter() const
@@ -46,7 +41,6 @@ public:
         else if (pElem == 1)
             return m_max;
 
-       // ASSERT(0);
         return glm::vec3(0.f);
     }
 
@@ -57,7 +51,6 @@ public:
         else if (pElem == 1)
             return m_max;
 
-       // ASSERT(0);
         return glm::vec3(0.f);
     }
 };
