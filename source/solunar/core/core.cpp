@@ -56,14 +56,11 @@ namespace engine
 		std::terminate();
 #endif // !MASTER_GOLD_BUILD
 
-
-//#if defined(DEBUG) || defined(_DEBUG)
-		
-//#else
-//		exit(1);
-//#endif
-
+#ifdef _WINDOWS
 		ExitProcess(1);
+#else
+		exit(1);
+#endif
 	}
 
 	void Core::warning(const char* msg, ...)

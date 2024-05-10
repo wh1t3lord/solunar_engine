@@ -3,13 +3,13 @@
 namespace engine
 {
 
+#ifdef WIN32
 Timer* Timer::getInstance()
 {
 	static Timer timer;
 	return &timer;
 }
 
-#ifdef WIN32
 Timer::Timer()
 {
 	m_floatFrequency = 0.0f;
