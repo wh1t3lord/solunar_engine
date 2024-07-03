@@ -7,6 +7,7 @@
 #include "graphics/core/device.h"
 #include "graphics/core/rendertarget.h"
 #include "graphics/rendercontext.h"
+#include "graphics/core/statemanager.h"
 
 // shaders
 #include "graphics/ShaderProgramManager.h"
@@ -43,6 +44,9 @@ namespace engine
 	static std::weak_ptr<TextureMap> g_notFoundTexture;
 	static std::weak_ptr<Material> g_defaultMaterial;
 
+	ISamplerState* g_defaultSampler = nullptr;
+	IDepthStencilState* g_depthStencilState_NoWrite = nullptr;
+
 	Renderer::Renderer()
 	{
 		m_meshPolysWireframe	= false;
@@ -68,6 +72,23 @@ namespace engine
 			Core::error("Game files is corrupted or incomplete.\nFor devs: wrong working directory???");
 		}
 #endif
+
+		SamplerDesc samplerDesc = {};
+		samplerDesc.m_wrapS = TextureWrap::Repeat;
+		samplerDesc.m_wrapT = TextureWrap::Repeat;
+		samplerDesc.m_minFilter = TextureFilter::Nearest;
+		samplerDesc.m_magFilter = TextureFilter::Nearest;
+		g_defaultSampler = g_renderDevice->createSamplerState(samplerDesc);
+
+		DepthStencilDesc desc = {};
+		desc.m_depthEnable = false;
+		desc.m_depthWriteMask = DEPTH_WRITE_MASK_ALL;
+		desc.m_depthFunc = COMPARISON_ALWAYS;
+		desc.m_stencilEnable = false;
+		desc.m_frontFace.m_stencilFailOp = desc.m_frontFace.m_stencilDepthFailOp = desc.m_frontFace.m_stencilPassOp = STENCIL_OP_KEEP;
+		desc.m_frontFace.m_stencilFunc = COMPARISON_ALWAYS;
+		desc.m_backFace = desc.m_frontFace;
+		g_depthStencilState_NoWrite = g_stateManager->createDepthStencilState(desc);
 
 		g_defaultMaterial = g_contentManager->loadObject<Material>("materials/default_material.xml");
 
@@ -181,6 +202,16 @@ namespace engine
 			m_screenColorTexture = nullptr;
 		}
 
+		//D3D11: DeviceChild reference counter underflow.Release should not be called on objects with zero reference count.
+		//Exception thrown at 0x00007FFE0F6EAB89 (KernelBase.dll) in solunar_main_d.exe : 0x0000087D (parameters : 0x0000000000000000, 0x000000F2E33CD930, 0x000000F2E33CD950).
+		//Unhandled exception at 0x00007FFE0F6EAB89 (KernelBase.dll) in solunar_main_d.exe : 0x0000087D (parameters : 0x0000000000000000, 0x000000F2E33CD930, 0x000000F2E33CD950).
+
+		//g_stateManager->destroyDepthStencilState(g_depthStencilState_NoWrite);
+		//g_depthStencilState_NoWrite = nullptr;
+
+		mem_delete(g_defaultSampler);
+		g_defaultSampler = nullptr;
+
 		//m_postProcessingRenderer->shutdown();
 		//m_postProcessingRenderer = nullptr;
 
@@ -215,7 +246,7 @@ namespace engine
 		//renderShadows(view);
 	
 		g_renderDevice->setRenderTarget(m_screenRenderTarget);
-		clearScreen();
+		clearRenderTarget(m_screenRenderTarget);
 
 		// get camera
 		Camera* camera = CameraProxy::getInstance();
@@ -323,13 +354,16 @@ namespace engine
 
 		renderWorld(view);
 
-		//////////////////
 		// post processing
-		//////////////////
-		g_postFxManager.hdrPass(m_screenColorTexture);
+		//g_postFxManager.hdrPass(m_screenColorTexture);
 
 		// reset to swap chain
 		setSwapChainRenderTarget();
+
+		g_stateManager->setDepthStencilState(g_depthStencilState_NoWrite, 0);
+
+		// draw
+		ScreenQuad::render( m_screenColorTexture );
 
 		// draw debug renderer
 		g_debugRender.renderFrame(view);

@@ -64,6 +64,7 @@ namespace engine
 		virtual void takeScreenshot() = 0;
 		
 		virtual void clearScreen() = 0;
+		virtual void clearRenderTarget( IRenderTarget* renderTarget ) = 0;
 	 
 		virtual void setSwapChainRenderTarget() = 0;
 
@@ -93,6 +94,10 @@ namespace engine
 	void destroyRenderer();
 
 	std::weak_ptr<Material> getDefaultMaterial();
+
+	class ISamplerState;
+	extern ISamplerState* g_defaultSampler;
+
 }
 
 #endif // !RENDERER_H

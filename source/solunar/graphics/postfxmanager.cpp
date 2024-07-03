@@ -154,28 +154,19 @@ void PostFxManager::shutdown()
 
 void PostFxManager::hdrPass(ITexture2D* screenTexture)
 {
-	////////////////////////
 	// lets go
-	////////////////////////
 
 	// setup device state
 	g_renderDevice->setRenderTarget(m_hdrRenderTarget);
 
-	/////////////////
 	// run first pass
-	/////////////////
 	g_renderDevice->setTexture2D(0, screenTexture);
-	//m_hdrPassProgram->setTextureSampler(0, "u_texture");
 	ScreenQuad::renderWithoutTextureBinding(m_hdrPassProgram);
 
-	//////////////////
 	// run second pass
-	//////////////////
 	blurPass(screenTexture);
 
-	///////////////
 	// combine pass
-	///////////////
 	combinePass(screenTexture);
 }
 

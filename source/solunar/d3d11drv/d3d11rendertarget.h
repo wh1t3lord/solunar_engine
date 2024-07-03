@@ -9,8 +9,11 @@
 namespace engine
 {
 
+class D3D11Renderer;
+
 class D3D11RenderTarget : public IRenderTarget
 {
+	friend class D3D11Renderer;
 public:
 	D3D11RenderTarget(D3D11Device* device, const RenderTargetCreationDesc& renderTargetDesc);
 	~D3D11RenderTarget();
@@ -21,6 +24,8 @@ public:
 	void bind(D3D11Device* device);
 
 private:
+
+
 	std::array<ID3D11RenderTargetView*, kMaxRenderTargetTextures> m_renderTargetViews;
 	std::array<ID3D11ShaderResourceView*, kMaxRenderTargetTextures> m_shaderResourceViews;
 

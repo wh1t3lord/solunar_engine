@@ -218,7 +218,7 @@ void D3D11Texture2D::create(D3D11Device* device, const TextureDesc& textureDesc,
 
 	D3D11_CHECK(device->getDevice()->CreateTexture2D(&d3dTextureDesc, subresourceDesc.m_memory ? &subresourceData : NULL, &m_texture));
 
-	if (d3dTextureDesc.BindFlags == D3D11_BIND_SHADER_RESOURCE)
+	if ((d3dTextureDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE ) != 0)  
 	{
 		D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 		memset(&shaderResourceViewDesc, 0, sizeof(shaderResourceViewDesc));
