@@ -44,6 +44,10 @@ namespace engine
 		void loadEmptyWorld();
 	
 		void update();
+
+	private:
+		void onStateSwitch();
+
 	private:
 		std::string m_worldName;
 		EngineState m_currentState;

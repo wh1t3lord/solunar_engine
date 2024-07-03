@@ -134,8 +134,8 @@ namespace engine
 		ScreenQuad::init();
 
 		// initialize font manager
-		//g_fontManager = mem_new<FontManager>();
-		//g_fontManager->initialize();
+		g_fontManager = mem_new<FontManager>();
+		g_fontManager->initialize();
 
 		// initialize material factory
 		MaterialInstanceFactory::createInstance();
@@ -189,8 +189,8 @@ namespace engine
 		MaterialInstanceFactory::destroyInstance();
 
 		// shutdown font manager
-		//g_fontManager->shutdown();
-		//mem_delete(g_fontManager);
+		g_fontManager->shutdown();
+		mem_delete(g_fontManager);
 
 		ScreenQuad::shutdown();
 
@@ -298,6 +298,8 @@ namespace engine
 #endif
 
 		g_debugRender.renderFrame(view);
+
+		g_fontManager->drawSystemFont("Test 123 ABC abc", 100, 100);
 	}
 
 	void Renderer::renderView(View* view)

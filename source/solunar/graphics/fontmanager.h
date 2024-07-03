@@ -32,6 +32,7 @@ private:
 	// Shared font data
 	ISamplerState* m_fontTextureSamplerState;
 	IBufferBase* m_fontVertexBuffer;
+	IBufferBase* m_fontConstantBuffer;
 	IShaderProgram* m_defaultShaderProgram;
 
 };

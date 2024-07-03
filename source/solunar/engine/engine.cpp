@@ -146,7 +146,7 @@ namespace engine
 			ms_world = nullptr;
 		}
 
-		Core::msg("Engine::loadWorld() Loading %s", filename.c_str());
+		Core::msg("Engine: Loading world %s", filename.c_str());
 
 		std::shared_ptr<DataStream> stream = g_contentManager->openStream(filename);
 
@@ -163,7 +163,7 @@ namespace engine
 		
 		if (error != tinyxml2::XML_SUCCESS)
 		{
-			Core::error("Engine::loadWorld() Failed to parse world %s.", filename.c_str());
+			Core::error("Engine::loadWorld: Failed to parse world %s.", filename.c_str());
 		}
 		
 		tinyxml2::XMLElement* worldElement = doc.FirstChildElement("World");;
@@ -184,7 +184,7 @@ namespace engine
 			ms_world = nullptr;
 		}
 
-		Core::msg("Engine::loadEmptyWorld() Creating ...");
+		Core::msg("Engine: Creating empty world");
 
 		World* world = g_typeManager->createObject<World>();
 		ms_world = world;
@@ -242,7 +242,24 @@ namespace engine
 
 	void EngineStateManager::update()
 	{
+		if (m_currentState == m_nextState)
+			return;
+
 		m_currentState = m_nextState;
+		onStateSwitch();
+	}
+
+	void EngineStateManager::onStateSwitch()
+	{
+		static const char* s_stateNames[(int)EngineState::Count] =
+		{
+			"None",
+			"Running",
+			"LoadWorld"
+		};
+
+		Core::msg("Engine: Switching to state %s", s_stateNames[(int)m_nextState]);
+
 		switch (m_currentState)
 		{
 		case EngineState::Running:
@@ -256,7 +273,7 @@ namespace engine
 			m_nextState = EngineState::Running;
 
 			break;
-		
+
 		default:
 			break;
 		}

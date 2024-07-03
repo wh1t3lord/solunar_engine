@@ -21,32 +21,30 @@
 #include "graphics/shaderprogram.h"
 #include "graphics/ShaderProgramManager.h"
 
+#include "engine/camera.h"
+
 #include <utility>
 
 namespace engine
 {
 
+struct FontVertex
+{
+	glm::vec2 position;
+	glm::vec2 texcoord;
+};
+
+// Limited to 256 characters per one sentence
+const int kMaxFontVBSize = sizeof(FontVertex) * 256;
+
 IFontManager* g_fontManager = nullptr;
 
-// https://stackoverflow.com/questions/58905321/pointer-to-texture-data-flip-data-vertically
-void FlipYTexture(const unsigned int width, const unsigned int height, uint8_t* data) {
-	const unsigned int rowsSwapCount = height / 2;
-	const unsigned int maxRowIndex = height - 1;
-
-	for (unsigned int i = 0; i < rowsSwapCount; ++i) {
-		for (unsigned int j = 0; j < width; ++j) {
-			const unsigned int currentDataIndex = width * i + j;
-			const unsigned int swapDataIndex = width * (maxRowIndex - i) + j;
-			std::swap(data[currentDataIndex], data[swapDataIndex]);
-		}
-	}
-}
 void FontManager::initialize()
 {
 	Assert2(g_renderDevice, "Please initialize font manager after core graphics initialization");
 
 	// load system font
-	DataStreamPtr systemFontStream = g_contentManager->openStream("textures/ui/arial.ttf");
+	DataStreamPtr systemFontStream = g_contentManager->openStream("textures/ui/system.ttf");
 	systemFontStream->seek(Seek_End, 0);
 	long systemFontFileLength = systemFontStream->tell();
 	systemFontStream->seek(Seek_Begin, 0);
@@ -57,11 +55,8 @@ void FontManager::initialize()
 	uint8_t* tmpBitmap = new uint8_t[512 * 512]; //res of the bitmap
 	stbtt_BakeFontBitmap(ttfBuffer, 0, 32.0f, tmpBitmap, 512, 512, 32, 96, m_systemFontChars);
 
-#if 1
 	// flip buffer
 	//Flip(tmpBitmap, 512 * 512, 512, 512);
-
-	FlipYTexture(512, 512, tmpBitmap);
 
 	TextureDesc systemFontTextureDesc;
 	memset(&systemFontTextureDesc, 0, sizeof(systemFontTextureDesc));
@@ -75,26 +70,7 @@ void FontManager::initialize()
 	memset(&systemFontSubresourceDesc, 0, sizeof(systemFontSubresourceDesc));
 	systemFontSubresourceDesc.m_memory = tmpBitmap;
 	systemFontSubresourceDesc.m_memoryPitch = 512;
-#else
-	unsigned char whiteTextureData[2][2] =
-	{
-		255, 255,
-		255, 255
-	};
 
-	TextureDesc systemFontTextureDesc;
-	memset(&systemFontTextureDesc, 0, sizeof(systemFontTextureDesc));
-	systemFontTextureDesc.m_textureType = TextureType::Texture2D;
-	systemFontTextureDesc.m_width = 2;
-	systemFontTextureDesc.m_height = 2;
-	systemFontTextureDesc.m_mipmapLevel = 0;
-	systemFontTextureDesc.m_format = ImageFormat::R32;
-
-	SubresourceDesc systemFontSubresourceDesc;
-	memset(&systemFontSubresourceDesc, 0, sizeof(systemFontSubresourceDesc));
-	systemFontSubresourceDesc.m_memory = whiteTextureData;
-
-#endif
 	m_systemFontTexture = g_renderDevice->createTexture2D(systemFontTextureDesc, systemFontSubresourceDesc);
 
 	delete[] tmpBitmap;
@@ -102,15 +78,6 @@ void FontManager::initialize()
 
 	initPrivate();
 }
-
-struct FontVertex
-{
-	glm::vec2 position;
-	glm::vec2 texcoord;
-};
-
-// Limited to 256 characters per one sentence
-const int kMaxFontVBSize = sizeof(FontVertex) * 256;
 
 void FontManager::initPrivate()
 {
@@ -141,12 +108,30 @@ void FontManager::initPrivate()
 	//       And we will fill buffer at every time when we need to draw some sentence.
 	m_fontVertexBuffer = g_renderDevice->createBuffer(charBufferDesc, charSubresourceDesc);
 
+	// create constant buffer
+	BufferDesc constantBufferDesc;
+	memset(&constantBufferDesc, 0, sizeof(constantBufferDesc));
+	constantBufferDesc.m_bufferType = BufferType::ConstantBuffer;
+	constantBufferDesc.m_bufferAccess = BufferAccess::Stream;
+	constantBufferDesc.m_bufferMemorySize = sizeof(glm::mat4);
+
+	SubresourceDesc constantSubresorceDesc;
+	memset(&constantSubresorceDesc, 0, sizeof(constantSubresorceDesc));
+
+	m_fontConstantBuffer = g_renderDevice->createBuffer(constantBufferDesc, constantSubresorceDesc);
+
 	// Create 2d font shader
-	m_defaultShaderProgram = g_shaderManager->createShaderProgram("2d_font.vsh", "2d_font.psh", "#define INVTRANSPARENT\n");
+	m_defaultShaderProgram = g_shaderManager->createShaderProgram("2d_font.vsh", "2d_font.psh");
 }
 
 void FontManager::shutdown()
 {
+	if (m_fontConstantBuffer)
+	{
+		mem_delete(m_fontConstantBuffer);
+		m_fontConstantBuffer = nullptr;
+	}
+
 	if (m_fontVertexBuffer)
 	{
 		mem_delete(m_fontVertexBuffer);
@@ -180,14 +165,22 @@ void FontManager::drawSystemFont(const char* text, int x, int y)
 	g_shaderManager->setShaderProgram(m_defaultShaderProgram);
 
 
-	//// build orthogonal matrix
+	// build orthogonal matrix
 
-	//// get current view
-	//View* view = renderer->getView();
+	// get current view
+	//View* view = g_renderer->getView();
+	View* view = CameraProxy::getInstance()->getView();
 
-	//// calculate ortho matrix based on current view
-	//glm::mat4 orthoMatrix = glm::identity<glm::mat4>();
-	//orthoMatrix = glm::ortho(0, view->m_width, view->m_height, 0, -1, 1);
+	// calculate ortho matrix based on current view
+	glm::mat4 proj = glm::orthoLH(0.0f, (float)view->m_width, 0.0f, (float)view->m_height, 0.1f, 100.0f);
+
+	// update constant buffer
+	void* constantBufferData = m_fontConstantBuffer->map(BufferMapping::WriteOnly);
+	memcpy(constantBufferData, &proj[0], sizeof(proj));
+	m_fontConstantBuffer->unmap();
+
+	// setup it to shader
+	g_renderDevice->setConstantBufferIndex(0, m_fontConstantBuffer);
 
 	//// setup it to shader
 	//m_defaultShaderProgram->setMatrix4(m_uOtrhoMatrixLocation, orthoMatrix);
@@ -207,7 +200,7 @@ void FontManager::drawSystemFont(const char* text, int x, int y)
 			float fY = (float)y;
 
 			stbtt_aligned_quad q;
-			stbtt_GetBakedQuad(m_systemFontChars, 512, 512, text[i] - 32, &fX, &fY, &q, 0);
+			stbtt_GetBakedQuad(m_systemFontChars, 512, 512, text[i] - 32, &fX, &fY, &q, 1);
 
 #if 1
 			fontVertices[numVertices + 0].position = glm::vec2(q.x0 + offset, q.y0); fontVertices[numVertices + 0].texcoord = glm::vec2(q.s0,  q.t0);
@@ -276,6 +269,7 @@ void FontManager::drawSystemFont(const char* text, int x, int y)
 
 	// draw 
 	//glDrawArrays(GL_TRIANGLES, 0, numVertices);
+	g_renderDevice->draw(PM_TriangleList, 0, numVertices);
 
 	// reset what we binded
 
@@ -284,8 +278,8 @@ void FontManager::drawSystemFont(const char* text, int x, int y)
 	//glDepthMask(GL_TRUE);
 	//glEnable(GL_DEPTH_TEST);
 
-	g_renderDevice->setTexture2D(0, nullptr);
-	g_renderDevice->setSampler(0, nullptr);
+	//g_renderDevice->setTexture2D(0, nullptr);
+	//g_renderDevice->setSampler(0, nullptr);
 }
 
 }
