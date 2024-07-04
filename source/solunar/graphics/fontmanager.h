@@ -18,6 +18,7 @@ struct FontVertex
 {
 	glm::vec2 position;
 	glm::vec2 texcoord;
+	glm::vec4 color;
 };
 
 // Limited to 1024 characters per one sentence
@@ -33,7 +34,7 @@ public:
 	void initialize() override;
 	void shutdown() override;
 
-	void drawSystemFont(const char* text, int x, int y) override;
+	void drawSystemFont(const char* text, int x, int y, const glm::vec4& color) override;
 
 	void flushPrimitives() override;
 
@@ -46,6 +47,7 @@ private:
 		std::string m_string;
 		float m_x;
 		float m_y;
+		glm::vec4 m_color;
 	};
 
 	std::vector<SystemStringDrawInfo> m_systemDrawStrings;

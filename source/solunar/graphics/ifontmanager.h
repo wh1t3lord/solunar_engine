@@ -10,7 +10,7 @@ public:
 	virtual void initialize() = 0;
 	virtual void shutdown() = 0;
 
-	virtual void drawSystemFont(const char* text, int x, int y) = 0;
+	virtual void drawSystemFont(const char* text, int x, int y, const glm::vec4& color) = 0;
 
 	virtual void flushPrimitives() = 0;
 };

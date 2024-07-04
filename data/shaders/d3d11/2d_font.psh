@@ -4,7 +4,7 @@ struct VSOutput
 {
 	float4 position : SV_POSITION;
 	float2 texcoord : TEXCOORD;
-	//float4 color : COLOR;
+	float4 color : COLOR;
 };
 
 Texture2D g_texture;
@@ -13,5 +13,5 @@ SamplerState g_sampler;
 float4 PSMain(VSOutput input) : SV_Target
 {
 	float a = g_texture.Sample(g_sampler, input.texcoord).r;
-	return float4(1.0f, 1.0f, 1.0f, a);
+	return input.color * float4(1.0f, 1.0f, 1.0f, a);
 }

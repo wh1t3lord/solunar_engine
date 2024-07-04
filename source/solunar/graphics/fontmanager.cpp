@@ -132,6 +132,7 @@ void FontManager::initPrivate()
 	{
 		{ "POSITION", 0, ImageFormat::RG32F,   0, (UINT)offsetof(FontVertex, position), INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, ImageFormat::RG32F,   0, (UINT)offsetof(FontVertex, texcoord),  INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, ImageFormat::RGBA32F,   0, (UINT)offsetof(FontVertex, color),  INPUT_PER_VERTEX_DATA, 0 },
 	};
 
 	m_shaderProgram = g_shaderManager->createShaderProgram("2d_font.vsh", "2d_font.psh", nullptr,
@@ -180,6 +181,9 @@ void FontManager::flushPrimitives()
 	// setup it to shader
 	g_renderDevice->setConstantBufferIndex(0, m_constantBuffer);
 
+	// enable rasterizer state
+	g_stateManager->setRasterizerState(m_rasterizerState);
+
 	for (auto& it : m_systemDrawStrings)
 	{
 		// map our text buffer
@@ -187,7 +191,6 @@ void FontManager::flushPrimitives()
 
 		uint32_t numVertices = 0;
 		size_t stringLength = it.m_string.length();
-		size_t offset = 0;
 
 		for (int i = 0; i < stringLength; i++)
 		{
@@ -201,9 +204,12 @@ void FontManager::flushPrimitives()
 			fontVertices[numVertices + 4].position = glm::vec2(q.x0, (float)view->m_height - q.y0); fontVertices[numVertices + 4].texcoord = glm::vec2(q.s0, q.t0);
 			fontVertices[numVertices + 5].position = glm::vec2(q.x1, (float)view->m_height - q.y1); fontVertices[numVertices + 5].texcoord = glm::vec2(q.s1, q.t1);
 
-
-			offset += 20;
-
+			fontVertices[numVertices + 0].color = it.m_color;
+			fontVertices[numVertices + 1].color = it.m_color;
+			fontVertices[numVertices + 2].color = it.m_color;
+			fontVertices[numVertices + 3].color = it.m_color;
+			fontVertices[numVertices + 4].color = it.m_color;
+			fontVertices[numVertices + 5].color = it.m_color;
 			numVertices += 6;
 		}
 
@@ -212,15 +218,6 @@ void FontManager::flushPrimitives()
 
 		// bind vertex buffer
 		g_renderDevice->setVertexBuffer(m_vertexBuffer, sizeof(FontVertex), 0);
-
-		// vertex format
-		VertexFormat vf;
-		vf.addTexcoord();
-		vf.addTexcoord();
-		g_renderDevice->setVertexFormat(&vf);
-
-		// enable rasterizer state
-		g_stateManager->setRasterizerState(m_rasterizerState);
 
 		// draw 
 		g_renderDevice->draw(PM_TriangleList, 0, numVertices);
@@ -256,12 +253,13 @@ void FontManager::shutdown()
 	}
 }
 
-void FontManager::drawSystemFont(const char* text, int x, int y)
+void FontManager::drawSystemFont(const char* text, int x, int y, const glm::vec4& color)
 {
 	SystemStringDrawInfo drawInfo = {};
 	drawInfo.m_string = text;
 	drawInfo.m_x = (float)x;
 	drawInfo.m_y = (float)y;
+	drawInfo.m_color = color;
 	m_systemDrawStrings.push_back(drawInfo);
 }
 
