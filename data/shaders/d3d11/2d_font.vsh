@@ -2,8 +2,8 @@
 
 struct VSInput
 {
-	float2 texcoord : TEXCOORD;
 	float2 position : POSITION;
+	float2 texcoord : TEXCOORD;
 	//float4 color : COLOR;
 };
 
@@ -22,7 +22,7 @@ cbuffer GlobalData : register(b0)
 VSOutput VSMain(VSInput input)
 {
 	VSOutput output = (VSOutput)0;
-	output.position = mul(g_modelViewProjection, float4(input.position, 0.0f, 1.0f));
+	output.position = mul(float4(input.position, 0.0f, 1.0f), g_modelViewProjection);
 	output.texcoord = input.texcoord;
 	return output;
 }

@@ -12,10 +12,24 @@ class ITexture2D;
 class IBufferBase;
 class IShaderProgram;
 class ISamplerState;
+class IRasterizerState;
+
+struct FontVertex
+{
+	glm::vec2 position;
+	glm::vec2 texcoord;
+};
+
+// Limited to 1024 characters per one sentence
+const int kMaxFontVBSize = sizeof(FontVertex)	* 1024;
+const int kMaxFontIBSize = sizeof(uint32_t)		* 1024;
 
 class FontManager : public IFontManager
 {
 public:
+	FontManager();
+	~FontManager();
+	
 	void initialize() override;
 	void shutdown() override;
 
@@ -25,16 +39,26 @@ private:
 	void initPrivate();
 
 private:
+	struct SystemStringDrawInfo
+	{
+		std::string m_string;
+		float x;
+		float y;
+	};
+
+	std::vector<SystemStringDrawInfo> m_systemDrawStrings;
+
 	// System font
 	stbtt_bakedchar m_systemFontChars[96];
 	ITexture2D* m_systemFontTexture;
 	
 	// Shared font data
-	ISamplerState* m_fontTextureSamplerState;
-	IBufferBase* m_fontVertexBuffer;
-	IBufferBase* m_fontConstantBuffer;
-	IShaderProgram* m_defaultShaderProgram;
-
+	ISamplerState* m_textureSampler;
+	IBufferBase* m_vertexBuffer;
+	IBufferBase* m_indexBuffer;
+	IBufferBase* m_constantBuffer;
+	IShaderProgram* m_shaderProgram;
+	IRasterizerState* m_rasterizerState;
 };
 
 }

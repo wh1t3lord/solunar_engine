@@ -15,7 +15,6 @@ public:
 
 extern IFontManager* g_fontManager;
 
-
 }
 
 #endif

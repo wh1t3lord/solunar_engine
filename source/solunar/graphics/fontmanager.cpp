@@ -6,10 +6,10 @@
 #include "core/file/filesystem.h"
 #include "core/file/contentdevice.h"
 
-
 #include "graphics/core/device.h"
 #include "graphics/core/texture.h"
 #include "graphics/core/buffer.h"
+#include "graphics/core/statemanager.h"
 
 #include "graphics/vertexformat.h"
 
@@ -28,16 +28,23 @@
 namespace engine
 {
 
-struct FontVertex
-{
-	glm::vec2 position;
-	glm::vec2 texcoord;
-};
-
-// Limited to 256 characters per one sentence
-const int kMaxFontVBSize = sizeof(FontVertex) * 256;
-
 IFontManager* g_fontManager = nullptr;
+
+FontManager::FontManager()
+{
+	memset(m_systemFontChars, 0, sizeof(m_systemFontChars));
+	m_systemFontTexture = nullptr;
+	m_textureSampler = nullptr;
+	m_vertexBuffer = nullptr;
+	m_indexBuffer = nullptr;
+	m_constantBuffer = nullptr;
+	m_shaderProgram = nullptr;
+	m_rasterizerState = nullptr;
+}
+
+FontManager::~FontManager()
+{
+}
 
 void FontManager::initialize()
 {
@@ -91,7 +98,7 @@ void FontManager::initPrivate()
 	fontTextureSamplerDesc.m_wrapT = TextureWrap::ClampToEdge;
 	fontTextureSamplerDesc.m_anisotropyLevel = 1.0f;
 
-	m_fontTextureSamplerState = g_renderDevice->createSamplerState(fontTextureSamplerDesc);
+	m_textureSampler = g_renderDevice->createSamplerState(fontTextureSamplerDesc);
 
 	// create characters buffer
 
@@ -106,7 +113,7 @@ void FontManager::initPrivate()
 
 	// NOTE: We create dynamic vertex buffer without any data.
 	//       And we will fill buffer at every time when we need to draw some sentence.
-	m_fontVertexBuffer = g_renderDevice->createBuffer(charBufferDesc, charSubresourceDesc);
+	m_vertexBuffer = g_renderDevice->createBuffer(charBufferDesc, charSubresourceDesc);
 
 	// create constant buffer
 	BufferDesc constantBufferDesc;
@@ -118,30 +125,45 @@ void FontManager::initPrivate()
 	SubresourceDesc constantSubresorceDesc;
 	memset(&constantSubresorceDesc, 0, sizeof(constantSubresorceDesc));
 
-	m_fontConstantBuffer = g_renderDevice->createBuffer(constantBufferDesc, constantSubresorceDesc);
+	m_constantBuffer = g_renderDevice->createBuffer(constantBufferDesc, constantSubresorceDesc);
 
 	// Create 2d font shader
-	m_defaultShaderProgram = g_shaderManager->createShaderProgram("2d_font.vsh", "2d_font.psh");
+	InputLayoutDesc layout[] =
+	{
+		{ "POSITION", 0, ImageFormat::RG32F,   0, (UINT)offsetof(FontVertex, position), INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, ImageFormat::RG32F,   0, (UINT)offsetof(FontVertex, texcoord),  INPUT_PER_VERTEX_DATA, 0 },
+	};
+
+	m_shaderProgram = g_shaderManager->createShaderProgram("2d_font.vsh", "2d_font.psh", nullptr,
+		layout, sizeof(layout) / sizeof(layout[0]));
+
+	RasterizerStateDesc rasterizerState;
+	memset(&rasterizerState, 0, sizeof(rasterizerState));
+	rasterizerState.m_cullMode = CullMode::Back;
+	rasterizerState.m_frontCCW = false;
+	rasterizerState.m_fillMode = FillMode::Solid;
+
+	m_rasterizerState = g_stateManager->createRasterizerState(rasterizerState);
 }
 
 void FontManager::shutdown()
 {
-	if (m_fontConstantBuffer)
+	if (m_constantBuffer)
 	{
-		mem_delete(m_fontConstantBuffer);
-		m_fontConstantBuffer = nullptr;
+		mem_delete(m_constantBuffer);
+		m_constantBuffer = nullptr;
 	}
 
-	if (m_fontVertexBuffer)
+	if (m_vertexBuffer)
 	{
-		mem_delete(m_fontVertexBuffer);
-		m_fontVertexBuffer = nullptr;
+		mem_delete(m_vertexBuffer);
+		m_vertexBuffer = nullptr;
 	}
 
-	if (m_fontTextureSamplerState)
+	if (m_textureSampler)
 	{
-		mem_delete(m_fontTextureSamplerState);
-		m_fontTextureSamplerState = nullptr;
+		mem_delete(m_textureSampler);
+		m_textureSampler = nullptr;
 	}
 
 	if (m_systemFontTexture)
@@ -155,38 +177,36 @@ void FontManager::drawSystemFont(const char* text, int x, int y)
 {
 	Assert2(g_renderer, "Called before renderer initialization.");
 	Assert(m_systemFontTexture);
-	Assert(m_fontVertexBuffer);
+	Assert(m_vertexBuffer);
 
 	// bind texture and their sampler
-	g_renderDevice->setSampler(0, m_fontTextureSamplerState);
+	g_renderDevice->setSampler(0, m_textureSampler);
 	g_renderDevice->setTexture2D(0, m_systemFontTexture);
 
 	// setup shader and others stuff
-	g_shaderManager->setShaderProgram(m_defaultShaderProgram);
-
+	g_shaderManager->setShaderProgram(m_shaderProgram);
 
 	// build orthogonal matrix
 
 	// get current view
-	//View* view = g_renderer->getView();
 	View* view = CameraProxy::getInstance()->getView();
 
 	// calculate ortho matrix based on current view
-	glm::mat4 proj = glm::orthoLH(0.0f, (float)view->m_width, 0.0f, (float)view->m_height, 0.1f, 100.0f);
+	glm::mat4 proj = glm::ortho(0.0f, (float)view->m_width, 0.0f, (float)view->m_height, 0.1f, 100.0f);
 
 	// update constant buffer
-	void* constantBufferData = m_fontConstantBuffer->map(BufferMapping::WriteOnly);
+	void* constantBufferData = m_constantBuffer->map(BufferMapping::WriteOnly);
 	memcpy(constantBufferData, &proj[0], sizeof(proj));
-	m_fontConstantBuffer->unmap();
+	m_constantBuffer->unmap();
 
 	// setup it to shader
-	g_renderDevice->setConstantBufferIndex(0, m_fontConstantBuffer);
+	g_renderDevice->setConstantBufferIndex(0, m_constantBuffer);
 
 	//// setup it to shader
 	//m_defaultShaderProgram->setMatrix4(m_uOtrhoMatrixLocation, orthoMatrix);
 
 	// map our text buffer
-	FontVertex* fontVertices = (FontVertex*)m_fontVertexBuffer->map(BufferMapping::WriteOnly);
+	FontVertex* fontVertices = (FontVertex*)m_vertexBuffer->map(BufferMapping::WriteOnly);
 
 	uint32_t numVertices = 0;
 	size_t stringLength = strlen(text);
@@ -203,12 +223,12 @@ void FontManager::drawSystemFont(const char* text, int x, int y)
 			stbtt_GetBakedQuad(m_systemFontChars, 512, 512, text[i] - 32, &fX, &fY, &q, 1);
 
 #if 1
-			fontVertices[numVertices + 0].position = glm::vec2(q.x0 + offset, q.y0); fontVertices[numVertices + 0].texcoord = glm::vec2(q.s0,  q.t0);
-			fontVertices[numVertices + 1].position = glm::vec2(q.x1 + offset, q.y0); fontVertices[numVertices + 1].texcoord = glm::vec2(q.s1,  q.t0);
-			fontVertices[numVertices + 2].position = glm::vec2(q.x1 + offset, q.y1); fontVertices[numVertices + 2].texcoord = glm::vec2(q.s1,  q.t1);
-			fontVertices[numVertices + 3].position = glm::vec2(q.x0 + offset, q.y1); fontVertices[numVertices + 3].texcoord = glm::vec2(q.s0,  q.t1);
-			fontVertices[numVertices + 4].position = glm::vec2(q.x0 + offset, q.y0); fontVertices[numVertices + 4].texcoord = glm::vec2(q.s0,  q.t0);
-			fontVertices[numVertices + 5].position = glm::vec2(q.x1 + offset, q.y1); fontVertices[numVertices + 5].texcoord = glm::vec2(q.s1,  q.t1);
+			fontVertices[numVertices + 0].position = glm::vec2(q.x0 + offset, (float)view->m_height - q.y0); fontVertices[numVertices + 0].texcoord = glm::vec2(q.s0, q.t0);
+			fontVertices[numVertices + 1].position = glm::vec2(q.x1 + offset, (float)view->m_height - q.y0); fontVertices[numVertices + 1].texcoord = glm::vec2(q.s1, q.t0);
+			fontVertices[numVertices + 2].position = glm::vec2(q.x1 + offset, (float)view->m_height - q.y1); fontVertices[numVertices + 2].texcoord = glm::vec2(q.s1, q.t1);
+			fontVertices[numVertices + 3].position = glm::vec2(q.x0 + offset, (float)view->m_height - q.y1); fontVertices[numVertices + 3].texcoord = glm::vec2(q.s0, q.t1);
+			fontVertices[numVertices + 4].position = glm::vec2(q.x0 + offset, (float)view->m_height - q.y0); fontVertices[numVertices + 4].texcoord = glm::vec2(q.s0, q.t0);
+			fontVertices[numVertices + 5].position = glm::vec2(q.x1 + offset, (float)view->m_height - q.y1); fontVertices[numVertices + 5].texcoord = glm::vec2(q.s1, q.t1);
 #else
 			fontVertices[numVertices + 0].position = glm::vec2(q.x0 + offset, -q.y1); fontVertices[numVertices + 0].texcoord = glm::vec2(q.s0, q.t0);
 			fontVertices[numVertices + 1].position = glm::vec2(q.x1 + offset, -q.y1); fontVertices[numVertices + 1].texcoord = glm::vec2(q.s1, q.t0);
@@ -248,10 +268,10 @@ void FontManager::drawSystemFont(const char* text, int x, int y)
 
 
 	// unmap
-	m_fontVertexBuffer->unmap();
+	m_vertexBuffer->unmap();
 
 	// bind vertex buffer
-	g_renderDevice->setVertexBuffer(m_fontVertexBuffer, sizeof(FontVertex), 0);
+	g_renderDevice->setVertexBuffer(m_vertexBuffer, sizeof(FontVertex), 0);
 
 	// vertex format
 	VertexFormat vf;
@@ -266,6 +286,8 @@ void FontManager::drawSystemFont(const char* text, int x, int y)
 	// enable blending
 	//glEnable(GL_BLEND);
 	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	g_stateManager->setRasterizerState(m_rasterizerState);
 
 	// draw 
 	//glDrawArrays(GL_TRIANGLES, 0, numVertices);
