@@ -40,7 +40,7 @@ STDMETHODIMP D3D11Include::Close(LPCVOID pData)
 	return E_NOTIMPL;
 }
 
-ID3DBlob* createShaderFromText(const char* text, ShaderType shaderType)
+ID3DBlob* createShaderFromText(const char* text, ShaderType shaderType, const char* defines = nullptr)
 {
 	ID3DBlob* shaderBlob = nullptr;
 	ID3DBlob* errorTextBlob = nullptr;
@@ -48,7 +48,33 @@ ID3DBlob* createShaderFromText(const char* text, ShaderType shaderType)
 	const char* entryPoint = (shaderType == ShaderType_Vertex) ? "VSMain" : "PSMain";
 	const char* shaderTarget = (shaderType == ShaderType_Vertex) ? "vs_5_0" : "ps_5_0";
 
-	HRESULT hr = D3DCompile(text, strlen(text), "UNKNOWED", NULL, NULL, entryPoint, shaderTarget, D3DCOMPILE_DEBUG, 0, &shaderBlob, &errorTextBlob);
+	std::vector<std::string> shderMacroStrings;
+	if (defines && strlen(defines) > 0)
+	{
+		std::string definesStr = defines;
+		size_t iterator = definesStr.find_first_of('\n');
+		std::string exactDefineStr = definesStr.substr(0, iterator);
+		shderMacroStrings.push_back(exactDefineStr);
+
+		/*std::string definesStr = defines;
+
+		size_t iterator = definesStr.find_first_of('\n');
+		while (iterator != std::string::npos) {
+			std::string exactDefineStr = definesStr.substr(0, iterator);
+			Core::msg("createShaderFromText: %s", exactDefineStr.c_str());
+			shderMacroStrings.push_back(exactDefineStr);
+			iterator = definesStr.find_first_of('\n', iterator);
+		}*/
+	}
+
+	std::vector<D3D_SHADER_MACRO> shaderMacro;
+	for (auto& it : shderMacroStrings)
+		shaderMacro.push_back(D3D_SHADER_MACRO{ it.c_str(), NULL });
+
+	shaderMacro.push_back(D3D_SHADER_MACRO{ NULL, NULL });
+
+	HRESULT hr = D3DCompile(text, strlen(text), "UNKNOWED", defines ? shaderMacro.data() : NULL,
+		NULL, entryPoint, shaderTarget, D3DCOMPILE_DEBUG, 0, &shaderBlob, &errorTextBlob);
 	if (FAILED(hr))
 	{
 		std::string errorText = "Failed to compile shader!";
@@ -91,14 +117,15 @@ ID3DBlob* createShaderFromText(const char* text, ShaderType shaderType)
 
 D3D11ShaderProgram::D3D11ShaderProgram(D3D11Device* device, 
 	const char* vstext, 
-	const char* pstext, 
+	const char* pstext,
+	const char* defines /*= nullptr*/,
 	InputLayoutDesc* inputLayout /*= nullptr*/, 
 	int inputLayoutCount /*= 0*/) :
 	m_inputLayout(nullptr),
 	m_vertexShader(nullptr),
 	m_pixelShader(nullptr)
 {
-	create(device, vstext, pstext, inputLayout, inputLayoutCount);
+	create(device, vstext, pstext, defines, inputLayout, inputLayoutCount);
 }
 
 D3D11ShaderProgram::~D3D11ShaderProgram()
@@ -106,7 +133,7 @@ D3D11ShaderProgram::~D3D11ShaderProgram()
 	destroy();
 }
 
-void D3D11ShaderProgram::create(D3D11Device* device, const char* vstext, const char* pstext, InputLayoutDesc* inputLayout /*= nullptr*/, int inputLayoutCount /*= 0*/)
+void D3D11ShaderProgram::create(D3D11Device* device, const char* vstext, const char* pstext, const char* defines /*= nullptr*/, InputLayoutDesc* inputLayout /*= nullptr*/, int inputLayoutCount /*= 0*/)
 {
 	ID3DBlob* vertexShaderBlob = createShaderFromText(vstext, ShaderType_Vertex);
 	device->getDevice()->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), NULL, &m_vertexShader);
@@ -146,7 +173,7 @@ void D3D11ShaderProgram::create(D3D11Device* device, const char* vstext, const c
 	vertexShaderBlob->Release();
 	vertexShaderBlob = nullptr;
 
-	ID3DBlob* pixelShaderBlob = createShaderFromText(pstext, ShaderType_Pixel);
+	ID3DBlob* pixelShaderBlob = createShaderFromText(pstext, ShaderType_Pixel, defines);
 	device->getDevice()->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), NULL, &m_pixelShader);
 
 	pixelShaderBlob->Release();

@@ -36,8 +36,6 @@ cbuffer DirectionalLightCB : register(b2)
 Texture2D g_albedoTexture;
 SamplerState g_albedoSampler;
 
-//#define UNLIT
-
 float4 PSMain(VSOutput input) : SV_Target
 {
 	float3 ambientColor = float3(0.2f, 0.2f, 0.2f);
@@ -52,9 +50,6 @@ float4 PSMain(VSOutput input) : SV_Target
 	float3 V = g_viewDir.xyz;
 	float NdotL = max(0, dot(N, L));
 
-	
-
 	float3 finalColor = albedoColor * (ambientColor + NdotL * g_DirLight_color.rgb);
-
 	return float4(finalColor, 1.0f);
 }

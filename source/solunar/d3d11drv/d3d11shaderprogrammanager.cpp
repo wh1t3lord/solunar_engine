@@ -64,9 +64,7 @@ IShaderProgram* D3D11ShaderProgramManager::createShaderProgram(const char* vsfil
 	std::string vstext = loadShaderText(vspath);
 	std::string pstext = loadShaderText(pspath);
 
-	// ignore defines :(
-
-	D3D11ShaderProgram* shaderProgram = mem_new<D3D11ShaderProgram>(device, vstext.c_str(), pstext.c_str(), inputLayout, inputLayoutCount);
+	D3D11ShaderProgram* shaderProgram = mem_new<D3D11ShaderProgram>(device, vstext.c_str(), pstext.c_str(), defines, inputLayout, inputLayoutCount);
 	m_cachedPrograms.push_back(shaderProgram);
 	return shaderProgram;
 }

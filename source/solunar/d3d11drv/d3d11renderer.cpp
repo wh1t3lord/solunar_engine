@@ -17,6 +17,7 @@
 #include "graphics/mesh.h"
 #include "graphics/material.h"
 #include "graphics/materials/materialinstance.h"
+#include "graphics/materials/materialinstance_generic.h"
 
 // Graphics managers
 #include "graphics/ShaderProgramManager.h"
@@ -270,6 +271,28 @@ void D3D11Renderer::bindMaterialForMesh(MeshComponent* mesh, Material* material,
 	Assert(materialInstance);
 
 #if 1
+	// bind material samplers
+	material->bind();
+
+	// Initialize shader
+	
+	MaterialInstance_Generic* materialInstanceGeneric = dynamic_cast<MaterialInstance_Generic*>(materialInstance);
+	Assert2(materialInstanceGeneric, "Only MaterialInstance_Generic supported!");
+
+	uint32_t pixelVariation = 0;
+	if (material->m_selfillum)
+		pixelVariation |= PixelVariation_Unlit;
+	else
+		pixelVariation |= PixelVariation_Lit;
+
+	IShaderProgram* shaderProgram = materialInstanceGeneric->getShaderProgram_StaticVertexFactory_Variation(pixelVariation);
+	Assert2(shaderProgram, "Unknowed mesh component type!");
+
+	// bind material instance shader and material uniforms
+	g_shaderManager->setShaderProgram(shaderProgram);
+#endif
+
+#if 0
 	// bind material samplers
 	material->bind();
 

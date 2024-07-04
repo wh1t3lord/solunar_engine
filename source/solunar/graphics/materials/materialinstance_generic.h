@@ -18,6 +18,8 @@ public:
 	IShaderProgram* getSkinnedShaderProgram() override { return m_skinnedMeshShader; }
 	IShaderProgram* getParticleShaderProgram() override { return m_particleShader; }
 
+	IShaderProgram* getShaderProgram_StaticVertexFactory_Variation(uint32_t pixelVariation);
+
 private:
 	IShaderProgram* m_staticMeshShader;
 	IShaderProgram* m_skinnedMeshShader;

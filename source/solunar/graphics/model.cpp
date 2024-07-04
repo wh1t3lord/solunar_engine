@@ -128,7 +128,7 @@ namespace engine
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
 		char buffer[256];
-		sprintf(buffer, "materials/%s.xml", material->GetName().C_Str());
+		sprintf(buffer, "data/materials/%s.xml", material->GetName().C_Str());
 
 		std::string bufferString = buffer;
 		osConvertStandartPath(bufferString);

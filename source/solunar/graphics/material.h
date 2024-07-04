@@ -105,10 +105,8 @@ namespace engine
 
 		MaterialInstance* getMaterialInstance() { return m_materialInstance; }
 
+		// #TODO: VERY BAD, LIKE GETTERS
 	public:
-		bool m_isFirstPersonWeapon;
-
-	private:
 		MaterialInstance* m_materialInstance;
 
 		ISamplerState* m_albedoSampler;
@@ -134,6 +132,7 @@ namespace engine
 		bool m_skipmips;
 		bool m_selfillum;
 		bool m_clampToEdge;
+		bool m_isFirstPersonWeapon;
 
 		IRasterizerState* m_rasterizerDesc;
 	};

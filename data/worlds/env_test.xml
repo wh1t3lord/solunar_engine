@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<World>
+	<!-- Test entity with mesh -->
+	<Entity>
+		<Position x="0" y="0" z="0"/>
+		<Rotation x="0" y="90" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		
+		<MeshComponent>
+			<Model filename="models/l01_street.dae"/>
+		</MeshComponent>
+	</Entity>
+	
+	<!-- Test entity with skysphere -->
+	<Entity>
+		<Position x="0" y="0" z="0"/>
+		<Rotation x="0" y="90" z="0"/>
+		<Scale x="1000" y="1000" z="1000"/>
+		<MeshComponent>
+			<Model filename="models/test_sky.dae"/>
+		</MeshComponent>
+	</Entity>
+	
+	<!-- Test entity with directional light -->
+	<Entity>
+		<Position x="0" y="0" z="0"/>
+		<Rotation x="-90" y="0" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		
+		<DirectionalLightComponent>
+			<Color r="1.0" g="1.0" b="1.0"/>
+		</DirectionalLightComponent>
+	</Entity>
+	
+	<!-- Player -->
+	<Entity>
+		<Position x="0" y="0" z="0"/>
+		<Rotation x="0" y="0" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		
+		<ShockPlayerController/>
+	</Entity>
+</World>

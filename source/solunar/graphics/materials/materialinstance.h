@@ -8,6 +8,12 @@ enum VertexFactory
 {
 };
 
+enum PixelVariations
+{
+	PixelVariation_Unlit = 1 << 0,
+	PixelVariation_Lit = 1 << 1,
+};
+
 class IShaderProgram;
 
 class MaterialInstance
@@ -15,10 +21,10 @@ class MaterialInstance
 public:
 	virtual ~MaterialInstance();
 
+	// #TODO: Old deprecated API
 	virtual IShaderProgram* getStaticMeshShaderProgram() = 0;
 	virtual IShaderProgram* getSkinnedShaderProgram() = 0;
 	virtual IShaderProgram* getParticleShaderProgram() = 0;
-
 };
 
 }
