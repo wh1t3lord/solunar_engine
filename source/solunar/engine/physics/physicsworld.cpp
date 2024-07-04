@@ -87,7 +87,7 @@ namespace engine
 			m_world->stepSimulation(delta);
 		}
 
-		m_debugDraw = true;
+		//m_debugDraw = true;
 		if (m_debugDraw)
 		{
 			int debugDrawMode = 0;

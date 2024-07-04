@@ -43,8 +43,8 @@ namespace engine {
 
 	void MeshComponent::render()
 	{
-		BoundingBox boundingBox = getEntity()->getBoundingBox();
-		g_debugRender.drawBoundingBox(boundingBox, glm::vec3(1.f));
+		//BoundingBox boundingBox = getEntity()->getBoundingBox();
+		//g_debugRender.drawBoundingBox(boundingBox, glm::vec3(1.f));
 	}
 
 	std::shared_ptr<ModelBase> MeshComponent::lockModel()
