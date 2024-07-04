@@ -35,6 +35,8 @@ public:
 
 	void drawSystemFont(const char* text, int x, int y) override;
 
+	void flushPrimitives() override;
+
 private:
 	void initPrivate();
 
@@ -42,8 +44,8 @@ private:
 	struct SystemStringDrawInfo
 	{
 		std::string m_string;
-		float x;
-		float y;
+		float m_x;
+		float m_y;
 	};
 
 	std::vector<SystemStringDrawInfo> m_systemDrawStrings;
@@ -59,6 +61,7 @@ private:
 	IBufferBase* m_constantBuffer;
 	IShaderProgram* m_shaderProgram;
 	IRasterizerState* m_rasterizerState;
+
 };
 
 }

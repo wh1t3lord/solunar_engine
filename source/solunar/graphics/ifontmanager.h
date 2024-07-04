@@ -11,6 +11,8 @@ public:
 	virtual void shutdown() = 0;
 
 	virtual void drawSystemFont(const char* text, int x, int y) = 0;
+
+	virtual void flushPrimitives() = 0;
 };
 
 extern IFontManager* g_fontManager;

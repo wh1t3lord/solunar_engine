@@ -137,6 +137,8 @@ void FontManager::initPrivate()
 	m_shaderProgram = g_shaderManager->createShaderProgram("2d_font.vsh", "2d_font.psh", nullptr,
 		layout, sizeof(layout) / sizeof(layout[0]));
 
+	// create rasterizer state
+
 	RasterizerStateDesc rasterizerState;
 	memset(&rasterizerState, 0, sizeof(rasterizerState));
 	rasterizerState.m_cullMode = CullMode::Back;
@@ -144,6 +146,87 @@ void FontManager::initPrivate()
 	rasterizerState.m_fillMode = FillMode::Solid;
 
 	m_rasterizerState = g_stateManager->createRasterizerState(rasterizerState);
+}
+
+void FontManager::flushPrimitives()
+{
+	if (m_systemDrawStrings.empty())
+		return;
+
+	Assert2(g_renderer, "Called before renderer initialization.");
+	Assert(m_systemFontTexture);
+	Assert(m_vertexBuffer);
+
+	// bind texture and their sampler
+	g_renderDevice->setSampler(0, m_textureSampler);
+	g_renderDevice->setTexture2D(0, m_systemFontTexture);
+
+	// setup shader and others stuff
+	g_shaderManager->setShaderProgram(m_shaderProgram);
+
+	// build orthogonal matrix
+
+	// get current view
+	View* view = CameraProxy::getInstance()->getView();
+
+	// calculate ortho matrix based on current view
+	glm::mat4 proj = glm::ortho(0.0f, (float)view->m_width, 0.0f, (float)view->m_height, 0.1f, 100.0f);
+
+	// update constant buffer
+	void* constantBufferData = m_constantBuffer->map(BufferMapping::WriteOnly);
+	memcpy(constantBufferData, &proj[0], sizeof(proj));
+	m_constantBuffer->unmap();
+
+	// setup it to shader
+	g_renderDevice->setConstantBufferIndex(0, m_constantBuffer);
+
+	for (auto& it : m_systemDrawStrings)
+	{
+		// map our text buffer
+		FontVertex* fontVertices = (FontVertex*)m_vertexBuffer->map(BufferMapping::WriteOnly);
+
+		uint32_t numVertices = 0;
+		size_t stringLength = it.m_string.length();
+		size_t offset = 0;
+
+		for (int i = 0; i < stringLength; i++)
+		{
+			stbtt_aligned_quad q;
+			stbtt_GetBakedQuad(m_systemFontChars, 512, 512, it.m_string[i] - 32, &it.m_x, &it.m_y, &q, 1);
+
+			fontVertices[numVertices + 0].position = glm::vec2(q.x0, (float)view->m_height - q.y0); fontVertices[numVertices + 0].texcoord = glm::vec2(q.s0, q.t0);
+			fontVertices[numVertices + 1].position = glm::vec2(q.x1, (float)view->m_height - q.y0); fontVertices[numVertices + 1].texcoord = glm::vec2(q.s1, q.t0);
+			fontVertices[numVertices + 2].position = glm::vec2(q.x1, (float)view->m_height - q.y1); fontVertices[numVertices + 2].texcoord = glm::vec2(q.s1, q.t1);
+			fontVertices[numVertices + 3].position = glm::vec2(q.x0, (float)view->m_height - q.y1); fontVertices[numVertices + 3].texcoord = glm::vec2(q.s0, q.t1);
+			fontVertices[numVertices + 4].position = glm::vec2(q.x0, (float)view->m_height - q.y0); fontVertices[numVertices + 4].texcoord = glm::vec2(q.s0, q.t0);
+			fontVertices[numVertices + 5].position = glm::vec2(q.x1, (float)view->m_height - q.y1); fontVertices[numVertices + 5].texcoord = glm::vec2(q.s1, q.t1);
+
+
+			offset += 20;
+
+			numVertices += 6;
+		}
+
+		// unmap
+		m_vertexBuffer->unmap();
+
+		// bind vertex buffer
+		g_renderDevice->setVertexBuffer(m_vertexBuffer, sizeof(FontVertex), 0);
+
+		// vertex format
+		VertexFormat vf;
+		vf.addTexcoord();
+		vf.addTexcoord();
+		g_renderDevice->setVertexFormat(&vf);
+
+		// enable rasterizer state
+		g_stateManager->setRasterizerState(m_rasterizerState);
+
+		// draw 
+		g_renderDevice->draw(PM_TriangleList, 0, numVertices);
+	}
+
+	m_systemDrawStrings.clear();
 }
 
 void FontManager::shutdown()
@@ -175,133 +258,11 @@ void FontManager::shutdown()
 
 void FontManager::drawSystemFont(const char* text, int x, int y)
 {
-	Assert2(g_renderer, "Called before renderer initialization.");
-	Assert(m_systemFontTexture);
-	Assert(m_vertexBuffer);
-
-	// bind texture and their sampler
-	g_renderDevice->setSampler(0, m_textureSampler);
-	g_renderDevice->setTexture2D(0, m_systemFontTexture);
-
-	// setup shader and others stuff
-	g_shaderManager->setShaderProgram(m_shaderProgram);
-
-	// build orthogonal matrix
-
-	// get current view
-	View* view = CameraProxy::getInstance()->getView();
-
-	// calculate ortho matrix based on current view
-	glm::mat4 proj = glm::ortho(0.0f, (float)view->m_width, 0.0f, (float)view->m_height, 0.1f, 100.0f);
-
-	// update constant buffer
-	void* constantBufferData = m_constantBuffer->map(BufferMapping::WriteOnly);
-	memcpy(constantBufferData, &proj[0], sizeof(proj));
-	m_constantBuffer->unmap();
-
-	// setup it to shader
-	g_renderDevice->setConstantBufferIndex(0, m_constantBuffer);
-
-	//// setup it to shader
-	//m_defaultShaderProgram->setMatrix4(m_uOtrhoMatrixLocation, orthoMatrix);
-
-	// map our text buffer
-	FontVertex* fontVertices = (FontVertex*)m_vertexBuffer->map(BufferMapping::WriteOnly);
-
-	uint32_t numVertices = 0;
-	size_t stringLength = strlen(text);
-	size_t offset = 0;
-
-	for (int i = 0; i < stringLength; i++)
-	{
-		//if (text[i] >= 32 && text[i] < 128) {
-			
-			float fX = (float)x;
-			float fY = (float)y;
-
-			stbtt_aligned_quad q;
-			stbtt_GetBakedQuad(m_systemFontChars, 512, 512, text[i] - 32, &fX, &fY, &q, 1);
-
-#if 1
-			fontVertices[numVertices + 0].position = glm::vec2(q.x0 + offset, (float)view->m_height - q.y0); fontVertices[numVertices + 0].texcoord = glm::vec2(q.s0, q.t0);
-			fontVertices[numVertices + 1].position = glm::vec2(q.x1 + offset, (float)view->m_height - q.y0); fontVertices[numVertices + 1].texcoord = glm::vec2(q.s1, q.t0);
-			fontVertices[numVertices + 2].position = glm::vec2(q.x1 + offset, (float)view->m_height - q.y1); fontVertices[numVertices + 2].texcoord = glm::vec2(q.s1, q.t1);
-			fontVertices[numVertices + 3].position = glm::vec2(q.x0 + offset, (float)view->m_height - q.y1); fontVertices[numVertices + 3].texcoord = glm::vec2(q.s0, q.t1);
-			fontVertices[numVertices + 4].position = glm::vec2(q.x0 + offset, (float)view->m_height - q.y0); fontVertices[numVertices + 4].texcoord = glm::vec2(q.s0, q.t0);
-			fontVertices[numVertices + 5].position = glm::vec2(q.x1 + offset, (float)view->m_height - q.y1); fontVertices[numVertices + 5].texcoord = glm::vec2(q.s1, q.t1);
-#else
-			fontVertices[numVertices + 0].position = glm::vec2(q.x0 + offset, -q.y1); fontVertices[numVertices + 0].texcoord = glm::vec2(q.s0, q.t0);
-			fontVertices[numVertices + 1].position = glm::vec2(q.x1 + offset, -q.y1); fontVertices[numVertices + 1].texcoord = glm::vec2(q.s1, q.t0);
-			fontVertices[numVertices + 2].position = glm::vec2(q.x1 + offset, -q.y0); fontVertices[numVertices + 2].texcoord = glm::vec2(q.s1, q.t1);
-			fontVertices[numVertices + 3].position = glm::vec2(q.x0 + offset, -q.y0); fontVertices[numVertices + 3].texcoord = glm::vec2(q.s0, q.t1);
-			fontVertices[numVertices + 4].position = glm::vec2(q.x0 + offset, -q.y1); fontVertices[numVertices + 4].texcoord = glm::vec2(q.s0, q.t0);
-			fontVertices[numVertices + 5].position = glm::vec2(q.x1 + offset, -q.y0); fontVertices[numVertices + 5].texcoord = glm::vec2(q.s1, q.t1);
-#endif
-
-			offset += 20;
-
-			numVertices += 6;
-	/*	}*/
-	}
-
-	/*while (*text) {
-		if (*text >= 32 && *text < 128) {
-			stbtt_aligned_quad q;
-
-			float fX = (float)x;
-			float fY = (float)y;
-
-			stbtt_GetBakedQuad(m_systemFontChars, 512, 512, *text - 32, &fX, &fY, &q, 1);
-
-			fontVertices[0].position = glm::vec2(q.x0, q.y0); fontVertices[0].texcoord = glm::vec2(q.s0, q.t0);
-			fontVertices[1].position = glm::vec2(q.x1, q.y0); fontVertices[1].texcoord = glm::vec2(q.s1, q.t0);
-			fontVertices[2].position = glm::vec2(q.x1, q.y1); fontVertices[2].texcoord = glm::vec2(q.s1, q.t1);
-			fontVertices[3].position = glm::vec2(q.x0, q.y1); fontVertices[3].texcoord = glm::vec2(q.s0, q.t1);
-			fontVertices[4].position = glm::vec2(q.x0, q.y0); fontVertices[4].texcoord = glm::vec2(q.s0, q.t0);
-			fontVertices[5].position = glm::vec2(q.x1, q.y1); fontVertices[5].texcoord = glm::vec2(q.s1, q.t1);
-
-			fontVertices += 6;
-			numVertices += 6;
-		}
-		++text;
-	}*/
-
-
-	// unmap
-	m_vertexBuffer->unmap();
-
-	// bind vertex buffer
-	g_renderDevice->setVertexBuffer(m_vertexBuffer, sizeof(FontVertex), 0);
-
-	// vertex format
-	VertexFormat vf;
-	vf.addTexcoord();
-	vf.addTexcoord();
-	g_renderDevice->setVertexFormat(&vf);
-
-	// disable depth testing
-	//glDisable(GL_DEPTH_TEST);
-	//glDepthMask(GL_FALSE);
-
-	// enable blending
-	//glEnable(GL_BLEND);
-	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-
-	g_stateManager->setRasterizerState(m_rasterizerState);
-
-	// draw 
-	//glDrawArrays(GL_TRIANGLES, 0, numVertices);
-	g_renderDevice->draw(PM_TriangleList, 0, numVertices);
-
-	// reset what we binded
-
-	//glDisable(GL_BLEND);
-
-	//glDepthMask(GL_TRUE);
-	//glEnable(GL_DEPTH_TEST);
-
-	//g_renderDevice->setTexture2D(0, nullptr);
-	//g_renderDevice->setSampler(0, nullptr);
+	SystemStringDrawInfo drawInfo = {};
+	drawInfo.m_string = text;
+	drawInfo.m_x = (float)x;
+	drawInfo.m_y = (float)y;
+	m_systemDrawStrings.push_back(drawInfo);
 }
 
 }
