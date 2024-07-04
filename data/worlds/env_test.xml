@@ -17,7 +17,7 @@
 		<Rotation x="0" y="90" z="0"/>
 		<Scale x="1000" y="1000" z="1000"/>
 		<MeshComponent>
-			<Model filename="models/test_sky.dae"/>
+			<Model filename="models/test_sky_half.dae"/>
 		</MeshComponent>
 	</Entity>
 	
@@ -28,7 +28,8 @@
 		<Scale x="1" y="1" z="1"/>
 		
 		<DirectionalLightComponent>
-			<Color r="1.0" g="1.0" b="1.0"/>
+			<AmbientColor r="0.501" g="0.443" b="0.337"/>
+			<Color r="0.678" g="0.596" b="0.427"/>
 		</DirectionalLightComponent>
 	</Entity>
 	

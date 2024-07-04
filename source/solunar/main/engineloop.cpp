@@ -236,6 +236,9 @@ namespace engine {
 		// sound
 		//AudioManager::getInstance()->update();
 
+		// install current view
+		g_renderer->setView(CameraProxy::getInstance()->getView());
+
 		g_renderer->beginFrame();
 		
 		g_renderer->renderView(appGetView());
@@ -256,6 +259,10 @@ namespace engine {
 		ImGuiManager::getInstance()->endFrame();
 
 		g_renderer->endFrame();
+
+		if (InputManager::getInstance()->getKeyWithReset(KeyboardKeys::KEY_F12))
+			g_renderer->takeScreenshot();
+
 //
 //		//appPresent();
 //

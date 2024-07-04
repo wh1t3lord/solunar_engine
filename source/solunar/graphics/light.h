@@ -11,6 +11,7 @@ namespace engine
 	struct DirectionalLightCB
 	{
 		glm::vec4 m_direction;
+		glm::vec4 m_ambientColor;
 		glm::vec4 m_color;
 	};
 

@@ -45,6 +45,7 @@ namespace engine
 
 	//	void initForView(View* view);
 	
+		void setView(View* view) { m_view = view; }
 		View* getView() { return m_view; }
 
 		virtual void beginFrame();

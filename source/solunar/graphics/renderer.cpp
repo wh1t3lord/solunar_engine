@@ -349,8 +349,9 @@ namespace engine
 		if (DirectionalLightComponent* directionalLight = lightMgr->getDirectionalLight())
 		{
 			DirectionalLightCB* data = (DirectionalLightCB*)g_directionalLightConstantBuffer->map(BufferMapping::WriteOnly);
+			data->m_ambientColor = glm::vec4(directionalLight->m_ambientColor, 1.0f);
 			data->m_color = glm::vec4(directionalLight->m_color, 1.0f);
-			
+
 			Assert(directionalLight->getEntity());
 
 			// convert to euler and reorder direction of the light
