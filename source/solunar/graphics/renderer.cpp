@@ -299,7 +299,6 @@ namespace engine
 
 		g_debugRender.renderFrame(view);
 
-		g_fontManager->drawSystemFont("Test 123 ABC abc", 100, 100, glm::vec4(1.0f));
 		g_fontManager->flushPrimitives();
 	}
 

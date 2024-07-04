@@ -3,6 +3,8 @@
 
 #include "engine/inputmanager.h"
 
+#include "graphics/ifontmanager.h"
+
 namespace engine
 {
 
@@ -10,6 +12,9 @@ ShockPlayerController::ShockPlayerController() :
 	m_camera(nullptr),
 	m_flyCam(true)
 {
+	memset(&m_playerStats, 0, sizeof(m_playerStats));
+	m_playerStats.m_health = 100.0f;
+	m_playerStats.m_endurance = 25.0f;
 }
 
 ShockPlayerController::~ShockPlayerController()
@@ -75,6 +80,17 @@ void ShockPlayerController::update(float dt)
 	// 	initializeComponents();
 	// 	//ASSERT2(m_rigidBody, "Node don't have rigid body component.");
 	// }
+
+	View* view = CameraProxy::getInstance()->getView();
+	
+	char healthText[64];
+	snprintf(healthText, sizeof(healthText), "Health: %.0f", m_playerStats.m_health);
+	
+	char enduranceText[64];
+	snprintf(enduranceText, sizeof(enduranceText), "Endurance: %.0f", m_playerStats.m_endurance);
+
+	g_fontManager->drawSystemFont(healthText, 25, view->m_height - 50, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
+	g_fontManager->drawSystemFont(enduranceText, 25, view->m_height - 25, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
 
 	// update camera look
 	updateCamera(dt);
