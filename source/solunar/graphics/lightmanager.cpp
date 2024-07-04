@@ -64,8 +64,11 @@ namespace engine
 				
 				ImGui::DragFloat3("Euler Rotation", &directionalLight->m_direction[0], 1.0f, -360.f, 360.f);
 #endif
+				static glm::vec4 color = glm::vec4(1.0f);
+				ImGui::DragFloat4("Color (R, G, B, A)", &color[0], 0.1f, 0.f, 1.f);
+				directionalLight->m_color = color;
+
 				g_debugRender.pushModelMatrix(entity->getWorldTranslation());
-				//g_debugRender.drawArc(glm::vec3(0.0f), glm::vec3(0.0f, 1.0f, 0.0f), )
 				g_debugRender.drawAxis(glm::vec3(0.0f));
 				g_debugRender.popModelMatrix();
 
