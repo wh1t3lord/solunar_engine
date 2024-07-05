@@ -8,6 +8,13 @@ namespace engine
 {
 	class PhysicsWorld;
 
+	struct RayCastResult
+	{
+		Entity* m_entity;
+		glm::vec3 m_hitPosition;
+		glm::vec3 m_hitNormal;
+	};
+
 	class World : public SerializableObject
 	{
 	public:
@@ -36,7 +43,7 @@ namespace engine
 
 		// Casting functions
 
-		Entity* rayCast(const glm::vec3& rayStart, const glm::vec3& rayEnd);
+		bool rayCast(RayCastResult& rayResult, const glm::vec3& rayStart, const glm::vec3& rayEnd);
 		std::vector<Entity*> boxCast(const glm::vec3& boxPos, const glm::vec3& boxSize);
 
 	private:

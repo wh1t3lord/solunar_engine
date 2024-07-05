@@ -105,9 +105,10 @@ void ShockPlayerController::update(float dt)
 		glm::vec3 rayStart = camera->getPosition() + camera->getDirection();
 		glm::vec3 rayEnd = rayStart + 1000.0f;
 
-		Entity* entity = getWorld()->rayCast(rayStart, rayEnd);
-		if (entity)
+		RayCastResult rq = {};
+		if (getWorld()->rayCast(rq, rayStart, rayEnd))
 		{
+			Entity* entity = rq.m_entity;
 			Core::msg("ShockPlayerController::update(): looking at entity 0x%p", entity);
 		}
 	}

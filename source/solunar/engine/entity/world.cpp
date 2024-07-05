@@ -131,7 +131,7 @@ namespace engine
 		return entity;
 	}
 
-	Entity* World::rayCast(const glm::vec3& rayStart, const glm::vec3& rayEnd)
+	bool World::rayCast(RayCastResult& rayResult, const glm::vec3& rayStart, const glm::vec3& rayEnd)
 	{
 		Assert2(m_physicsWorld, "Physics world is not initialized for ray casting");
 
@@ -142,12 +142,18 @@ namespace engine
 			// Query entity
 			
 			RigidBodyComponent* rigidbody = reinterpret_cast<RigidBodyComponent*>(rayCallback.m_collisionObject->getUserPointer());
+			Assert2(rigidbody, "Critital skill issue, rigid body component is nullptr!");
+
 			Entity* entity = rigidbody->getEntity();
 			Assert2(entity, "Critital skill issue, rigid body component assigned to nullptr entity!");
-			return entity;
+			
+			rayResult.m_entity = entity;
+			rayResult.m_hitPosition = btVectorToGlm(rayCallback.m_hitPointWorld);
+			rayResult.m_hitPosition = btVectorToGlm(rayCallback.m_hitNormalWorld);
+			return true;
 		}
 
-		return nullptr;
+		return false;
 	}
 
 	std::vector<Entity*> World::boxCast(const glm::vec3& boxPos, const glm::vec3& boxSize)
