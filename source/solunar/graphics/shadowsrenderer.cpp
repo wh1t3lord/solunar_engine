@@ -23,16 +23,14 @@ namespace engine
 		memset(&m_originalViewport, 0, sizeof(m_originalViewport));
 	}
 
-	int g_shadowMapSize = 512;
+	const int kShadowMapSize = 512;
 
 	void ShadowsRenderer::init()
 	{
-		return;
-
 		TextureDesc textureDesc;
 		memset(&textureDesc, 0, sizeof(textureDesc));
 		textureDesc.m_textureType = TextureType::Texture2D;
-		textureDesc.m_width = textureDesc.m_height = g_shadowMapSize;
+		textureDesc.m_width = textureDesc.m_height = kShadowMapSize;
 		textureDesc.m_mipmapLevel = 1;
 		textureDesc.m_format = ImageFormat::R32;
 

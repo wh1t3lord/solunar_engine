@@ -176,9 +176,9 @@ namespace engine
 		case Win32Keys::Tab:			return KeyboardKeys::KEY_TAB;
 		case Win32Keys::Clear:			return KeyboardKeys::KEY_WORLD_1;
 		case Win32Keys::Enter:			return KeyboardKeys::KEY_ENTER;
-		case Win32Keys::Shift:			return KeyboardKeys::KEY_UNKNOWN;//KEY_LEFT_SHIFT;		// TODO
-		case Win32Keys::Control:		return KeyboardKeys::KEY_UNKNOWN;//KEY_LEFT_CONTROL;	// TODO
-		case Win32Keys::Alt:			return KeyboardKeys::KEY_UNKNOWN;//KEY_LEFT_ALT;		// TODO
+		case Win32Keys::Shift:			return KeyboardKeys::KEY_LEFT_SHIFT;		// TODO
+		case Win32Keys::Control:		return KeyboardKeys::KEY_LEFT_CONTROL;		// TODO
+		case Win32Keys::Alt:			return KeyboardKeys::KEY_LEFT_ALT;			// TODO
 		case Win32Keys::Pause:			return KeyboardKeys::KEY_PAUSE;
 		case Win32Keys::CapsLock:		return KeyboardKeys::KEY_CAPS_LOCK;
 		case Win32Keys::Escape:			return KeyboardKeys::KEY_ESCAPE;

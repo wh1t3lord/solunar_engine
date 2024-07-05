@@ -24,9 +24,8 @@ namespace engine
 		void beginRender();
 		void endRender();
 
-		ITexture2D* getShadowMapTexture() { return m_shadowMap; }
-
-		IShaderProgram* getShadowMapShader() { return m_shadowShader; }
+		ITexture2D* getTexture() { return m_shadowMap; }
+		IShaderProgram* getShader() { return m_shadowShader; }
 
 	private:
 		ITexture2D* m_shadowMap;

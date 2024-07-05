@@ -130,6 +130,9 @@ void ShockPlayerController::updateCamera(float dt)
 	 glm::vec3 cameraDirection = CameraProxy::getInstance()->getDirection();
 	 glm::vec3 pos = getEntity()->getPosition();
 	 float camSpeed = 8.0f * dt;
+
+	 if (input->getKey(KeyboardKeys::KEY_LEFT_SHIFT))
+		 camSpeed = 18.0f * dt;
 	 
 	 if (input->getKey(KeyboardKeys::KEY_W))
 	 	pos += camSpeed * cameraDirection;

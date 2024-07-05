@@ -7,6 +7,8 @@
 // NOTE: Please note this macro should be up to date with C++ code: graphics\light.h
 #define MAX_POINT_LIGHTS 32
 
+//#define ENABLE_PHONG
+
 struct VSOutput
 {
 	float4 position		: SV_Position;
@@ -61,6 +63,9 @@ SamplerState g_albedoSampler;
 
 float4 PSMain(VSOutput input) : SV_Target
 {
+	const float3 kSpecColor = float3(1.0f, 1.0f, 1.0f);
+	const float kSpecPower = 30.0f;
+
 	float3 ambientColor = g_DirLight_ambientColor.xyz;
 	float3 albedoColor = g_albedoTexture.Sample(g_albedoSampler, input.texcoord).rgb;
 
@@ -68,6 +73,24 @@ float4 PSMain(VSOutput input) : SV_Target
 	return float4(albedoColor, 1.0f);
 #endif
 
+#ifdef ENABLE_PHONG
+	float3 N = input.normal;
+	float3 L = -g_DirLight_direction.xyz;
+	float3 V = g_viewDir.xyz;
+	
+	float3 V2 = normalize(V);
+	float3 N2 = normalize(N);
+	float3 R = reflect(-V2,  N2);
+	
+	float NdotL = max(0, dot(N, L));
+	float NdotR = max(0, dot(L, R));
+
+	float3 diffuseColor = ambientColor + NdotL * g_DirLight_color.rgb;
+	float3 specularColor = kSpecColor * pow(NdotR, kSpecPower); 
+
+	float3 finalColor = albedoColor * (diffuseColor + specularColor);
+	return float4(finalColor, 1.0f);
+#else
 	float3 N = input.normal;
 	float3 L = -g_DirLight_direction.xyz;
 	float3 V = g_viewDir.xyz;
@@ -75,4 +98,5 @@ float4 PSMain(VSOutput input) : SV_Target
 
 	float3 finalColor = albedoColor * (ambientColor + NdotL * g_DirLight_color.rgb);
 	return float4(finalColor, 1.0f);
+#endif
 }
