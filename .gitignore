@@ -7,3 +7,4 @@ output
 engine.ini
 engine_output.txt
 imgui.ini
+imgui_log.txt

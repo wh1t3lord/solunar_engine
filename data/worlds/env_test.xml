@@ -7,7 +7,7 @@
 		<Scale x="1" y="1" z="1"/>
 		
 		<MeshComponent>
-			<Model filename="models/l01_street.dae"/>
+			<Model filename="models/env_test_geom.dae"/>
 		</MeshComponent>
 	</Entity>
 	
