@@ -32,12 +32,11 @@ namespace engine
 		m_channels = 0;
 		m_miplevel = 0;
 		m_flip = false;
-		ImageFormat m_format = (ImageFormat)0;
+		m_format = (ImageFormat)0;
 	}
 
 	Image::~Image()
 	{
-
 	}
 
 	void Image::free()

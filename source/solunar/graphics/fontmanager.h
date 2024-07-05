@@ -13,6 +13,7 @@ class IBufferBase;
 class IShaderProgram;
 class ISamplerState;
 class IRasterizerState;
+class IDepthStencilState;
 
 struct FontVertex
 {
@@ -63,6 +64,7 @@ private:
 	IBufferBase* m_constantBuffer;
 	IShaderProgram* m_shaderProgram;
 	IRasterizerState* m_rasterizerState;
+	IDepthStencilState* m_depthStencilState;
 
 };
 

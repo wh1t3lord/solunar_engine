@@ -40,6 +40,7 @@ FontManager::FontManager()
 	m_constantBuffer = nullptr;
 	m_shaderProgram = nullptr;
 	m_rasterizerState = nullptr;
+	m_depthStencilState = nullptr;
 }
 
 FontManager::~FontManager()
@@ -147,6 +148,17 @@ void FontManager::initPrivate()
 	rasterizerState.m_fillMode = FillMode::Solid;
 
 	m_rasterizerState = g_stateManager->createRasterizerState(rasterizerState);
+
+	// create depth stencil test
+	DepthStencilDesc desc = {};
+	desc.m_depthEnable = false;
+	desc.m_depthWriteMask = DEPTH_WRITE_MASK_ALL;
+	desc.m_depthFunc = COMPARISON_ALWAYS;
+	desc.m_stencilEnable = false;
+	desc.m_frontFace.m_stencilFailOp = desc.m_frontFace.m_stencilDepthFailOp = desc.m_frontFace.m_stencilPassOp = STENCIL_OP_KEEP;
+	desc.m_frontFace.m_stencilFunc = COMPARISON_ALWAYS;
+	desc.m_backFace = desc.m_frontFace;
+	m_depthStencilState = g_stateManager->createDepthStencilState(desc);
 }
 
 void FontManager::flushPrimitives()
@@ -183,6 +195,9 @@ void FontManager::flushPrimitives()
 
 	// enable rasterizer state
 	g_stateManager->setRasterizerState(m_rasterizerState);
+
+	// disable depth test
+	g_stateManager->setDepthStencilState(m_depthStencilState, 0);
 
 	for (auto& it : m_systemDrawStrings)
 	{
