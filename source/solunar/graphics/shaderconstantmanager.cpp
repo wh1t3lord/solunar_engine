@@ -16,9 +16,10 @@
 
 namespace engine
 {
-	static ShaderConstantManager s_shaderConstantManager;
 	ConstantBufferProxy g_staticMeshConstantBuffer;
 	ConstantBufferProxy g_directionalLightConstantBuffer;
+	ConstantBufferProxy g_pointLightConstantBuffer;
+	ConstantBufferProxy g_lightDataConstantBuffer;
 
 	ConstantBufferProxy::ConstantBufferProxy(IBufferBase* buffer)
 	{
@@ -62,6 +63,10 @@ namespace engine
 		return m_name;
 	}
 
+	// ShaderConstantManager implementation
+
+	static ShaderConstantManager s_shaderConstantManager;
+
 	ShaderConstantManager::ShaderConstantManager()
 	{
 	}
@@ -76,6 +81,8 @@ namespace engine
 
 		g_staticMeshConstantBuffer = create<StaticMeshGlobalData>("StaticMeshGlobalData");
 		g_directionalLightConstantBuffer = create<DirectionalLightCB>("DirectionalLightCB");
+		g_pointLightConstantBuffer = create<PointLightCB>("PointLightCB");
+		g_lightDataConstantBuffer = create<LightGlobalDataCB>("LightGlobalDataCB");
 	}
 
 	void ShaderConstantManager::shutdown()

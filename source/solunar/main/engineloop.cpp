@@ -252,9 +252,7 @@ namespace engine {
 
 //		RmlSystem::getInstance()->render();
 
-		engineDebugOverlay();
-
-		ImGui::ShowDemoWindow();
+		//engineDebugOverlay();
 
 		ImGuiManager::getInstance()->endFrame();
 

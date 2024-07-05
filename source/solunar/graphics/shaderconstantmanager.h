@@ -58,6 +58,8 @@ namespace engine
 
 	extern ConstantBufferProxy g_staticMeshConstantBuffer;
 	extern ConstantBufferProxy g_directionalLightConstantBuffer;
+	extern ConstantBufferProxy g_pointLightConstantBuffer;
+	extern ConstantBufferProxy g_lightDataConstantBuffer;
 
 	class ShaderConstantManager : public Singleton<ShaderConstantManager>
 	{

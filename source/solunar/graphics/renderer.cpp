@@ -343,39 +343,62 @@ namespace engine
 #endif
 	}
 
-	void Renderer::setupLights(GraphicsWorld* graphicsWorld)
+	void setupLightData()
 	{
-		LightManager* lightMgr = graphicsWorld->getLightManager();
-		if (DirectionalLightComponent* directionalLight = lightMgr->getDirectionalLight())
-		{
-			DirectionalLightCB* data = (DirectionalLightCB*)g_directionalLightConstantBuffer->map(BufferMapping::WriteOnly);
-			data->m_ambientColor = glm::vec4(directionalLight->m_ambientColor, 1.0f);
-			data->m_color = glm::vec4(directionalLight->m_color, 1.0f);
+		LightGlobalDataCB* globalData = (LightGlobalDataCB*)g_lightDataConstantBuffer->map(BufferMapping::WriteOnly);
+		globalData->m_pointLightCount = 0;
+		globalData->m_spotLightCount = 0;
 
-			Assert(directionalLight->getEntity());
+		g_lightDataConstantBuffer->unmap();
 
-			// convert to euler and reorder direction of the light
+		g_renderDevice->setConstantBufferIndex(ConstantBufferBinding_LightData, g_lightDataConstantBuffer.get());
+	}
+
+	void setupDirectionalLight(DirectionalLightComponent* directionalLight)
+	{
+		if (!directionalLight)
+			return;
+
+		DirectionalLightCB* data = (DirectionalLightCB*)g_directionalLightConstantBuffer->map(BufferMapping::WriteOnly);
+		data->m_ambientColor = glm::vec4(directionalLight->m_ambientColor, 1.0f);
+		data->m_color = glm::vec4(directionalLight->m_color, 1.0f);
+
+		Assert(directionalLight->getEntity());
+
+		// convert to euler and reorder direction of the light
 #if 0
-			glm::quat quaternion = directionalLight->getEntity()->getRotation();
-			glm::vec3 euler = glm::eulerAngles(quaternion) * 3.14159f / 180.f;
-			data->m_direction = glm::vec4(euler.y, euler.x, euler.z, 1.0f);
+		glm::quat quaternion = directionalLight->getEntity()->getRotation();
+		glm::vec3 euler = glm::eulerAngles(quaternion) * 3.14159f / 180.f;
+		data->m_direction = glm::vec4(euler.y, euler.x, euler.z, 1.0f);
 #else
-			glm::quat o = directionalLight->getEntity()->getRotation();
-			glm::vec3 V;
-			V[0] = 2 * (o.x * o.z - o.w * o.y);
-			V[1] = 2 * (o.y * o.z + o.w * o.x);
-			V[2] = 1 - 2 * (o.x * o.x + o.y * o.y);
-			data->m_direction = glm::vec4(-V, 1.0f);
+		glm::quat o = directionalLight->getEntity()->getRotation();
+		glm::vec3 V;
+		V[0] = 2 * (o.x * o.z - o.w * o.y);
+		V[1] = 2 * (o.y * o.z + o.w * o.x);
+		V[2] = 1 - 2 * (o.x * o.x + o.y * o.y);
+		data->m_direction = glm::vec4(-V, 1.0f);
 
-			g_debugRender.drawLine(directionalLight->getEntity()->getPosition(), 
-				directionalLight->getEntity()->getPosition() + V, glm::vec3(1.0f, 1.0f, 0.0f));
+		g_debugRender.drawLine(directionalLight->getEntity()->getPosition(),
+			directionalLight->getEntity()->getPosition() + V, glm::vec3(1.0f, 1.0f, 0.0f));
 #endif
 		//	data->m_direction = glm::vec4(glm::radians(directionalLight->m_direction), 1.0f);
 
-			g_directionalLightConstantBuffer->unmap();
+		g_directionalLightConstantBuffer->unmap();
 
-			g_renderDevice->setConstantBufferIndex(CBBindings_DirectionalLight, g_directionalLightConstantBuffer.get());
-		}
+		g_renderDevice->setConstantBufferIndex(CBBindings_DirectionalLight, g_directionalLightConstantBuffer.get());
+	}
+
+
+
+	void Renderer::setupLights(GraphicsWorld* graphicsWorld)
+	{
+		LightManager* lightMgr = graphicsWorld->getLightManager();
+		if (!lightMgr)
+			return;
+
+		setupLightData();
+
+		setupDirectionalLight(lightMgr->getDirectionalLight());
 	}
 
 	void Renderer::endFrame()

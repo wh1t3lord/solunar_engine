@@ -15,7 +15,7 @@ namespace engine
 		glm::vec4 m_color;
 	};
 
-	struct PointLightCB
+	struct PointLightData
 	{
 		glm::vec4 position;
 
@@ -24,6 +24,20 @@ namespace engine
 		glm::vec4 specular;
 
 		glm::vec4 lightData;
+	};
+
+	struct PointLightCB
+	{
+		PointLightData pointLights[MAX_POINT_LIGHTS];
+	};
+
+	struct LightGlobalDataCB
+	{
+		uint32_t m_pointLightCount;
+		uint32_t m_spotLightCount;
+
+		uint32_t m_padding0;
+		uint32_t m_padding1;
 	};
 
 	class LightComponent : public Component
