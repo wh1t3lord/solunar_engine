@@ -236,6 +236,8 @@ namespace engine
 	{
 		//OPTICK_EVENT("Renderer::beginFrame");
 
+		setSwapChainRenderTarget();
+
 		clearScreen();
 	}
 
@@ -245,8 +247,8 @@ namespace engine
 
 		//renderShadows(view);
 	
-		g_renderDevice->setRenderTarget(m_screenRenderTarget);
-		clearRenderTarget(m_screenRenderTarget);
+		//g_renderDevice->setRenderTarget(m_screenRenderTarget);
+		//clearRenderTarget(m_screenRenderTarget);
 
 		// get camera
 		Camera* camera = CameraProxy::getInstance();
@@ -360,15 +362,15 @@ namespace engine
 		//g_postFxManager.hdrPass(m_screenColorTexture);
 
 		// reset to swap chain
-		setSwapChainRenderTarget();
+	//	setSwapChainRenderTarget();
 
-		g_stateManager->setDepthStencilState(g_depthStencilState_NoWrite, 0);
+	//	g_stateManager->setDepthStencilState(g_depthStencilState_NoWrite, 0);
 
 		// draw
-		ScreenQuad::render( m_screenColorTexture );
+	//	ScreenQuad::render( m_screenColorTexture );
 
 		// draw debug renderer
-		g_debugRender.renderFrame(view);
+	//	g_debugRender.renderFrame(view);
 	}
 
 	void Renderer::renderSky(View* view, SkyMeshComponent* skyMesh)
