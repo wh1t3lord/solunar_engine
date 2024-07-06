@@ -13,43 +13,78 @@
 
 namespace engine
 {
+
+	//void registerEngineObjects()
+	//{
+	//	// TODO: Rewrite to Class::registerObject()
+
+	//	TypeManager::getInstance()->registerObject<Entity>();
+	//	TypeManager::getInstance()->registerObject<Component>();
+	//	TypeManager::getInstance()->registerObject<World>();
+
+	//	TypeManager::getInstance()->registerObject<CameraComponent>();
+	//	TypeManager::getInstance()->registerObject<CameraYawPitchRollComponent>();
+	//	TypeManager::getInstance()->registerObject<CameraFirstPersonComponent>();
+
+	//	TypeManager::getInstance()->registerObject<LogicComponent>();
+
+	//	// Physics
+	//	ShapeComponent::registerObject();
+	//	BoxShapeComponent::registerObject();
+	//	SphereShapeComponent::registerObject();
+	//	CylinderShapeComponent::registerObject();
+	//	CapsuleShapeComponent::registerObject();
+	//	TriangleMeshShapeComponent::registerObject();
+	//	RigidBodyComponent::registerObject();
+	//	RigidBodyProxyComponent::registerObject();
+
+	//	/*Node::registerObject();
+	//	CameraNode::registerObject();
+
+	//	Component::registerObject();
+	//	TransformComponent::registerObject();
+	//	LogicComponent::registerObject();
+
+
+	//	WorldComponent::registerObject();
+	//	WorldEnvironmentComponent::registerObject();
+
+	//	World::registerObject();
+	//	LoadingRoomManager::registerObject();*/
+	//}
+
+	// There is more nice looking object registration
 	void registerEngineObjects()
 	{
-		// TODO: Rewrite to Class::registerObject()
+		const TypeInfo* engineClasses[] = 
+		{
+			// base types
+			Entity::getStaticTypeInfo(),
+			Component::getStaticTypeInfo(),
+			World::getStaticTypeInfo(),
 
-		TypeManager::getInstance()->registerObject<Entity>();
-		TypeManager::getInstance()->registerObject<Component>();
-		TypeManager::getInstance()->registerObject<World>();
+			// camera
+			CameraComponent::getStaticTypeInfo(),
+			CameraYawPitchRollComponent::getStaticTypeInfo(),
+			CameraFirstPersonComponent::getStaticTypeInfo(),
 
-		TypeManager::getInstance()->registerObject<CameraComponent>();
-		TypeManager::getInstance()->registerObject<CameraYawPitchRollComponent>();
-		TypeManager::getInstance()->registerObject<CameraFirstPersonComponent>();
+			// logic
+			LogicComponent::getStaticTypeInfo(),
 
-		TypeManager::getInstance()->registerObject<LogicComponent>();
+			// physics
+			ShapeComponent::getStaticTypeInfo(),
+			BoxShapeComponent::getStaticTypeInfo(),
+			SphereShapeComponent::getStaticTypeInfo(),
+			CylinderShapeComponent::getStaticTypeInfo(),
+			CapsuleShapeComponent::getStaticTypeInfo(),
+			TriangleMeshShapeComponent::getStaticTypeInfo(),
+			RigidBodyComponent::getStaticTypeInfo(),
+			RigidBodyProxyComponent::getStaticTypeInfo()
+		};
 
-		// Physics
-		ShapeComponent::registerObject();
-		BoxShapeComponent::registerObject();
-		SphereShapeComponent::registerObject();
-		CylinderShapeComponent::registerObject();
-		CapsuleShapeComponent::registerObject();
-		TriangleMeshShapeComponent::registerObject();
-		RigidBodyComponent::registerObject();
-		RigidBodyProxyComponent::registerObject();
-
-		/*Node::registerObject();
-		CameraNode::registerObject();
-
-		Component::registerObject();
-		TransformComponent::registerObject();
-		LogicComponent::registerObject();
-
-
-		WorldComponent::registerObject();
-		WorldEnvironmentComponent::registerObject();
-
-		World::registerObject();
-		LoadingRoomManager::registerObject();*/
+		// register types
+		for (int i = 0; i < sizeof(engineClasses) / sizeof(engineClasses[0]); i++)
+			TypeManager::getInstance()->registerType(engineClasses[i]);
 	}
 
 	bool g_harakiriLogicThread = false;
