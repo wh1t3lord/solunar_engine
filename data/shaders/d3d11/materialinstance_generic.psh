@@ -7,7 +7,7 @@
 // NOTE: Please note this macro should be up to date with C++ code: graphics\light.h
 #define MAX_POINT_LIGHTS 32
 
-//#define ENABLE_PHONG
+#define ENABLE_PHONG
 
 struct VSOutput
 {
@@ -63,8 +63,8 @@ SamplerState g_albedoSampler;
 
 float4 PSMain(VSOutput input) : SV_Target
 {
-	const float3 kSpecColor = float3(1.0f, 1.0f, 1.0f);
-	const float kSpecPower = 30.0f;
+	const float3 kSpecColor = float3(2.0f, 2.0f, 2.0f);
+	const float kSpecPower = 256.0f;
 
 	float3 ambientColor = g_DirLight_ambientColor.xyz;
 	float3 albedoColor = g_albedoTexture.Sample(g_albedoSampler, input.texcoord).rgb;
@@ -76,17 +76,14 @@ float4 PSMain(VSOutput input) : SV_Target
 #ifdef ENABLE_PHONG
 	float3 N = input.normal;
 	float3 L = -g_DirLight_direction.xyz;
-	float3 V = g_viewDir.xyz;
-	
-	float3 V2 = normalize(V);
-	float3 N2 = normalize(N);
-	float3 R = reflect(-V2,  N2);
-	
-	float NdotL = max(0, dot(N, L));
-	float NdotR = max(0, dot(L, R));
+	float3 V = normalize(g_viewPos.xyz - input.worldPos);
+	float3 H = normalize(L + V);
+
+	float NdotL = max(0.0f, dot(N, L));
+	float NdotH = max(0.0f, dot(N, H));
 
 	float3 diffuseColor = ambientColor + NdotL * g_DirLight_color.rgb;
-	float3 specularColor = kSpecColor * pow(NdotR, kSpecPower); 
+	float3 specularColor  = pow(NdotH, kSpecPower) * kSpecColor;
 
 	float3 finalColor = albedoColor * (diffuseColor + specularColor);
 	return float4(finalColor, 1.0f);
