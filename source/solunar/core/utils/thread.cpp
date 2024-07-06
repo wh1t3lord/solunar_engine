@@ -66,6 +66,9 @@ static unsigned threadProc(void* data)
 	return 0;
 }
 
+#pragma warning( push )
+#pragma warning( disable : 4312 )
+
 bool Thread::start()
 {
 	m_threadId = _beginthreadex(NULL, 0, (_beginthreadex_proc_type)threadProc, this, 0, 0);
@@ -75,6 +78,8 @@ bool Thread::start()
 
 	return true;
 }
+
+#pragma warning( pop )
 
 #endif
 

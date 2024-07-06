@@ -4,10 +4,10 @@ struct VS_OUTPUT
 	float2 m_texcoord : TEXCOORD;
 };
 
-VS_OUTPUT VSMain(float4 position : POSITION, float2 texcoord : TEXCOORD)
+VS_OUTPUT VSMain(float3 position : POSITION, float2 texcoord : TEXCOORD)
 {
 	VS_OUTPUT output = (VS_OUTPUT)0;
-	output.m_position = position;
+	output.m_position = float4(position, 1.0f);
 	output.m_texcoord = texcoord;
 	return output;
 }

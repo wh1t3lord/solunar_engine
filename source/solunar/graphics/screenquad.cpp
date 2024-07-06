@@ -4,6 +4,7 @@
 #include "graphics/vertexformat.h"
 #include "graphics/shaderprogram.h"
 #include "graphics/ShaderProgramManager.h"
+#include "graphics/renderer.h"
 
 namespace engine
 {
@@ -13,14 +14,17 @@ namespace engine
 	
 	struct QuadVertex
 	{
-		glm::vec2 position;
+		glm::vec3 position;
 		glm::vec2 texcoord;
 	};
 
 	void ScreenQuad::init()
 	{
+
+		// OpenGL Buffer
+#if 1
 		float quadVertices[] = {
-			// positions   // texCoords
+			// positions         // texCoords
 			-1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
 			-1.0f, -1.0f, 0.0f,  0.0f, 0.0f,
 			 1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
@@ -29,6 +33,18 @@ namespace engine
 			 1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
 			 1.0f,  1.0f, 0.0f,  1.0f, 1.0f
 		};
+#else
+		// DirectX Buffer
+		float quadVertices[] = {
+			// positions			  // texCoords
+			-1.0f,  1.0f, 0.0f,       0.0f, 0.0f,
+			 1.0f,  1.0f, 0.0f,       1.0f, 0.0f,
+			 1.0f, -1.0f, 0.0f,       1.0f, 1.0f,
+			-1.0f,  1.0f, 0.0f,       0.0f, 0.0f,
+			 1.0f, -1.0f, 0.0f,       1.0f, 1.0f,
+			-1.0f, -1.0f, 0.0f,       0.0f, 1.0f
+		};
+#endif
 
 		BufferDesc bufferDesc;
 		memset(&bufferDesc, 0, sizeof(bufferDesc));
@@ -66,6 +82,7 @@ namespace engine
 		g_renderDevice->setVertexBuffer(ms_vertexBuffer, sizeof(QuadVertex), 0);
 		g_renderDevice->setVertexFormat(&s_screenQuadVertexFormat);
 		g_renderDevice->setTexture2D(0, texture);
+		g_renderDevice->setSampler(0, g_defaultSampler);
 
 		g_shaderManager->setShaderProgram(ms_screenQuadShader);
 		g_renderDevice->draw(PM_TriangleList, 0, 6);

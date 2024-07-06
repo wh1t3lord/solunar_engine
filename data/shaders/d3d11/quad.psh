@@ -9,5 +9,7 @@ SamplerState g_sampler;
 
 float4 PSMain(VS_OUTPUT input) : SV_Target
 {
-	return g_texture.Sample(g_sampler, input.m_texcoord);
+	float2 texcoord = input.m_texcoord;
+	texcoord.y = -texcoord.y;
+	return g_texture.Sample(g_sampler, texcoord);
 }

@@ -4,6 +4,7 @@
 #include "d3d11drv/d3d11device.h"
 #include "d3d11drv/d3d11shaderprogrammanager.h"
 #include "d3d11drv/d3d11statemanager.h"
+#include "d3d11drv/d3d11rendertarget.h"
 
 // filesystem
 #include "core/file/filesystem.h"
@@ -509,6 +510,34 @@ void D3D11Renderer::clearScreen()
 		((D3D11Device*)g_renderDevice)->getDeviceContext()->ClearRenderTargetView(m_renderTargetView, color);
 		((D3D11Device*)g_renderDevice)->getDeviceContext()->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 	}
+}
+
+void D3D11Renderer::clearRenderTarget(IRenderTarget* renderTarget)
+{
+	D3D11RenderTarget* d3dRenderTarget = (D3D11RenderTarget*)renderTarget;
+	if (d3dRenderTarget)
+	{
+		for (auto it : d3dRenderTarget->m_renderTargetViews)
+		{
+			if (it)
+			{
+				static float color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+				g_d3d11Device->getDeviceContext()->ClearRenderTargetView(it, color);
+			}
+		}
+
+		if (d3dRenderTarget->m_depthStencilView)
+		{
+			g_d3d11Device->getDeviceContext()->ClearDepthStencilView(d3dRenderTarget->m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+		}
+	}
+}
+
+void D3D11Renderer::setSwapChainRenderTarget()
+{
+	// Initialize target
+	g_d3d11Device->getDeviceContext()->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
+
 }
 
 }

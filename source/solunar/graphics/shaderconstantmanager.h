@@ -53,7 +53,7 @@ namespace engine
 
 	private:
 		std::string m_name;
-		IBufferBase* m_buffer;
+		IBufferBase* m_buffer = nullptr;
 	};
 
 	extern ConstantBufferProxy g_staticMeshConstantBuffer;

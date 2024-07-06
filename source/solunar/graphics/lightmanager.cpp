@@ -44,7 +44,8 @@ namespace engine
 	{
 		if (ImGui::Begin("Light Editor", open))
 		{
-			DirectionalLightComponent* directionalLight = LightManager::getInstance()->getDirectionalLight();
+			DirectionalLightComponent* directionalLight = nullptr;
+			if (LightManager::getInstance()) directionalLight = LightManager::getInstance()->getDirectionalLight();
 			if (directionalLight)
 			{
 				Entity* entity = directionalLight->getEntity();

@@ -37,7 +37,7 @@ private:
 
 }
 
-#ifndef MASTER_GOLD
+#ifndef FINAL_BUILD
 #define Assert(EXPR) \
 	if ( !(EXPR) ) \
 		engine::Debug::assertionFailed(#EXPR, DEBUG_INFO, "assertion failed")

@@ -66,7 +66,10 @@ namespace engine
 		virtual void takeScreenshot() = 0;
 		
 		virtual void clearScreen() = 0;
+		virtual void clearRenderTarget( IRenderTarget* renderTarget ) = 0;
 	 
+		virtual void setSwapChainRenderTarget() = 0;
+
 		// Too simple but i dont regret
 		void setRenderMode(RendererViewMode mode) { m_currentViewMode = mode; }
 		RendererViewMode getRenderMode() { return m_currentViewMode; }
@@ -93,6 +96,10 @@ namespace engine
 	void destroyRenderer();
 
 	std::weak_ptr<Material> getDefaultMaterial();
+
+	class ISamplerState;
+	extern ISamplerState* g_defaultSampler;
+
 }
 
 #endif // !RENDERER_H

@@ -1,33 +1,34 @@
-#version 330 core
+// HDR Combine pass 
+Texture2D g_hdrTexture		: register(t0);
+Texture2D g_bloomTexture	: register(t1);
 
-out vec4 fragColor;
-in vec2 v_texcoord;
+SamplerState g_sampler { AddressU = Clamp; AddressV = Wrap; };
 
-uniform sampler2D u_hdrTexture;
-uniform sampler2D u_bloomTexture;
+//uniform float exposure = 0.75f;
+float exposure = 0.125f;
+float bloomScale = 0.1f;
 
-//uniform float exposure = 0.75;
-uniform float exposure = 0.125;
-uniform float bloomScale = 0.1;
-
-vec3 toneMapping(vec3 v)
+float3 toneMapping(float3 v)
 {
     return v / (1.0 + v);
 }
 
-void main()
+float4 PSMain(float4 position : SV_POSITION, float2 texcoord : TEXCOORD) : SV_Target
 {
+	float4 fragColor = float4(0.f, 0.f, 0.f, 0.f);
+	
     // hdr buffer texture
-    vec3 color = texture(u_hdrTexture, v_texcoord).rgb;
+    float3 color = g_hdrTexture.Sample(g_sampler, texcoord).rgb;
     
     // bloom buffer texture
-    vec3 bloomColor = texture(u_bloomTexture, v_texcoord).rgb * bloomScale;
+    float3 bloomColor = g_bloomTexture.Sample(g_sampler, texcoord).rgb * bloomScale;
 	color += bloomColor;
 	
 	color *= exposure;
 	color = toneMapping(color);
  	
     // apply gamma correction
-    float gamma = 2.2;
-    fragColor.rgb = pow(color, vec3(1.0 / gamma));
+    float gamma = 2.2f;
+    fragColor.rgb = pow(color, float3(1.0f / gamma, 1.0f / gamma, 1.0f / gamma));
+	return fragColor;
 }

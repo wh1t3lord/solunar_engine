@@ -1,7 +1,7 @@
 Texture2D g_texture 	: register(t0);
 SamplerState g_sampler 	: register(s0);
 
-float4 PSMain(float2 texcoord : TEXCOORD1) : SV_Target
+float4 PSMain(float4 position : SV_POSITION, float2 texcoord : TEXCOORD) : SV_Target
 {
 	float4 fragColor = float4(0.f, 0.f, 0.f, 0.f);
 #if 1
