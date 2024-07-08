@@ -48,6 +48,8 @@ namespace engine {
 
 		void applyImpulse(const glm::vec3& impulse);
 
+		void setLinearVelocity(const glm::vec3& velocity);
+
 	private:
 		void createBody();
 		void destroyBody();

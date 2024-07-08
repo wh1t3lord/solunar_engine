@@ -116,11 +116,11 @@ void D3D11SamplerState::create(D3D11Device* device, const SamplerDesc& samplerDe
 
 	D3D11_SAMPLER_DESC d3d11SamplerDesc;
 	memset(&d3d11SamplerDesc, 0, sizeof(d3d11SamplerDesc));
-	d3d11SamplerDesc.Filter = getD3D11Filter(samplerDesc);
-	d3d11SamplerDesc.AddressU = getD3D11AddressMode(samplerDesc.m_wrapS);
-	d3d11SamplerDesc.AddressV = getD3D11AddressMode(samplerDesc.m_wrapT);
-	d3d11SamplerDesc.AddressW = getD3D11AddressMode(samplerDesc.m_wrapRepeat);
-	d3d11SamplerDesc.MaxAnisotropy = samplerDesc.m_anisotropyLevel;
+	d3d11SamplerDesc.Filter			= getD3D11Filter(samplerDesc);
+	d3d11SamplerDesc.AddressU		= getD3D11AddressMode(samplerDesc.m_wrapS);
+	d3d11SamplerDesc.AddressV		= getD3D11AddressMode(samplerDesc.m_wrapT);
+	d3d11SamplerDesc.AddressW		= getD3D11AddressMode(samplerDesc.m_wrapRepeat);
+	d3d11SamplerDesc.MaxAnisotropy	= samplerDesc.m_anisotropyLevel;
 
 	D3D11_CHECK(device->getDevice()->CreateSamplerState(&d3d11SamplerDesc, &m_samplerState));
 }

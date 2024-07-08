@@ -5,8 +5,7 @@
 
 namespace engine
 {
-
-	class GrFramebuffer;
+	class IRenderTarget;
 	class IRenderTarget;
 	class ITexture2D;
 	class IShaderProgram;
@@ -22,15 +21,16 @@ namespace engine
 		void shutdown();
 
 		void beginRender();
+		void renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh);
 		void endRender();
 
-		ITexture2D* getTexture() { return m_shadowMap; }
-		IShaderProgram* getShader() { return m_shadowShader; }
+		ITexture2D*			getTexture()				{ return m_shadowMap; }
+		IShaderProgram*		getShader_StaticMesh()		{ return m_shadowShader_StaticMesh; }
 
 	private:
 		ITexture2D* m_shadowMap;
-		GrFramebuffer* m_shadowFbo;
-		IShaderProgram* m_shadowShader;
+		IRenderTarget* m_shadowFbo;
+		IShaderProgram* m_shadowShader_StaticMesh;
 
 		Viewport m_originalViewport;
 	};

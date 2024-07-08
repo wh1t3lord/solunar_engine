@@ -53,6 +53,9 @@ namespace engine
 		static const TypeInfo* getStaticTypeInfo() { static const TypeInfo s_typeInfo(#typeName, typeName::staticConstructor, sizeof(typeName), alignof(typeName), baseTypeName::getStaticTypeInfo()); return &s_typeInfo; } \
 		virtual const TypeInfo* getTypeInfo() { return getStaticTypeInfo();  }
 	
+#define ObjectGetTypeInfo(typeName) \
+	typeName::getStaticTypeInfo()
+
 	class Object
 	{
 		ImplementRootObject(Object);

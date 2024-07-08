@@ -17,6 +17,8 @@ public:
 
 	DataStreamPtr openStream(const std::string& filename);
 
+	const std::string& getPath() { return m_path; }
+
 private:
 	std::string m_path;
 };

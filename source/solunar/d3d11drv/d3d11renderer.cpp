@@ -153,6 +153,9 @@ void D3D11Renderer::createSwapChain()
 
 	D3D11_CHECK(device->getDevice()->CreateDepthStencilView(m_depthStencilTexture, &depthStencilViewDesc, &m_depthStencilView));
 
+	// Create proxy render target for swap chain
+	m_swapChainRenderTarget = mem_new<D3D11RenderTarget>(m_renderTargetView, m_depthStencilView);
+
 	// Initialize target
 	device->getDeviceContext()->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
 
@@ -213,6 +216,12 @@ void D3D11Renderer::shutdown()
 	}
 
 	g_d3d11StateManager->shutdown();
+
+	if (m_swapChainRenderTarget)
+	{
+		mem_delete(m_swapChainRenderTarget);
+		m_swapChainRenderTarget = nullptr;
+	}
 
 	if (m_depthStencilState)
 	{
@@ -332,7 +341,7 @@ void D3D11Renderer::renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshCom
 	setupLights(graphicsWorld);
 
 	//if (StaticMeshComponent* staticMesh = dynamicCast<StaticMeshComponent>(mesh))
-		renderStaticMesh(graphicsWorld, view, mesh);
+	renderStaticMesh(graphicsWorld, view, mesh);
 }
 
 void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
@@ -351,6 +360,9 @@ void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 
 		// and overwrite model matrix
 		localCtx.model = savedCtx.model * submesh->getTransform();
+
+		// transpose matrices for D3D11
+		//localCtx.model = glm::transpose(localCtx.model);
 
 		// set our local render ctx
 		RenderContext::setContext(localCtx);

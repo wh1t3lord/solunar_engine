@@ -10,6 +10,7 @@
 #include "engine/inputmanager.h"
 #include "engine/gameinterface.h"
 #include "engine/camera.h"
+#include "engine/entity/world.h"
 
 #include "graphics/graphics.h"
 #include "graphics/graphicsoptions.h"
@@ -64,6 +65,7 @@ namespace engine {
 		{
 			if (ImGui::BeginMenu("Engine"))
 			{
+				if (ImGui::MenuItem("Toggle Physics Debug Draw")) { if (Engine::ms_world) Engine::ms_world->togglePhysicsDebugDraw(); }
 				if (ImGui::MenuItem("Entity list")) { g_showEntityList = !g_showEntityList; }
 				if (ImGui::MenuItem("Quit")) { g_forceQuit = true; }
 
@@ -206,26 +208,11 @@ namespace engine {
 		// update delta cursor pos and others input stuff
 		input->update();
 
-//		glfwPollEvents();
-//
-//		if (gameState->getGameState() == GameState::GAME_STATE_RUNNING &&
-//			!input->getKey(KeyboardKeys::KEY_LEFT_ALT))
-//		{
-//			appToggleShowMousePointer(false);
-//			//appSetCursorPos(0, 0);
-//		}
-//		else
-//		{
-//			appToggleShowMousePointer(true);
-//		}
-
 		// update timer
 		Timer::getInstance()->update();
 
+		// Begin ImGui frame
 		ImGuiManager::getInstance()->beginFrame();
-
-		// update game specific state
-		//gameState->update();
 		
 		// update camera
 		CameraProxy::getInstance()->updateProxy();
@@ -239,32 +226,25 @@ namespace engine {
 		// install current view
 		g_renderer->setView(CameraProxy::getInstance()->getView());
 
+		// Begin renderer frame
 		g_renderer->beginFrame();
 		
+		// Render view
 		g_renderer->renderView(appGetView());
 
-//		if (g_console->isToggled())
-//			g_console->onRender();
-
-//#if 1
-//		DebugOverlay::render();
-//#endif // !MASTER_GOLD_BUILD
-
-//		RmlSystem::getInstance()->render();
-
+		// Draw the engine debug overlay
 		//engineDebugOverlay();
 
+		// End and render ImGui
 		ImGuiManager::getInstance()->endFrame();
 
+		// End renderer frame
 		g_renderer->endFrame();
 
-		if (InputManager::getInstance()->getKeyWithReset(KeyboardKeys::KEY_F12))
+		// Take screenshot
+		if (input->getKeyWithReset(KeyboardKeys::KEY_F12))
 			g_renderer->takeScreenshot();
 
-//
-//		//appPresent();
-//
-//		Sleep(1);
 		return true;
 	}
 

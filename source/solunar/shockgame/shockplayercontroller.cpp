@@ -32,7 +32,7 @@ void ShockPlayerController::onEntitySet(Entity* entity)
 
 	initializeCamera();
 	initializeComponents();
-}
+}	
 
 void ShockPlayerController::onEntityRemove()
 {

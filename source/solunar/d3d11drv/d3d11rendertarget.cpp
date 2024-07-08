@@ -7,6 +7,33 @@ namespace engine
 
 extern DXGI_FORMAT getDxgiFormat(ImageFormat format);
 
+D3D11RenderTarget::D3D11RenderTarget(ID3D11RenderTargetView* renderTargetView, ID3D11DepthStencilView* depthStencilView)
+{
+	memset(m_renderTargetViews.data(), 0, m_renderTargetViews.size() * sizeof(ID3D11RenderTargetView));
+	memset(m_shaderResourceViews.data(), 0, m_shaderResourceViews.size() * sizeof(ID3D11ShaderResourceView));
+
+	// clear the render target desc
+	memset(&m_renderTargetDesc, 0, sizeof(m_renderTargetDesc));
+
+	if (renderTargetView)
+	{
+		// add reference for properly releasing in desctuctor
+		renderTargetView->AddRef();
+		
+		// assign
+		m_renderTargetViews[m_renderTargetDesc.m_textures2DCount++] = renderTargetView;
+	}
+
+	if (depthStencilView)
+	{
+		// add reference for properly releasing in desctuctor
+		depthStencilView->AddRef();
+
+		// assign
+		m_depthStencilView = depthStencilView;
+	}
+}
+
 D3D11RenderTarget::D3D11RenderTarget(D3D11Device* device, const RenderTargetCreationDesc& renderTargetDesc) :
 	m_renderTargetDesc(renderTargetDesc),
 	m_depthStencilView(nullptr)

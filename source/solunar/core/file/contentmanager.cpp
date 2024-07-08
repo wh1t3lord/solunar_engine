@@ -46,7 +46,7 @@ void ContentManager::mountDevice(ContentDevice* contentDevice, const std::string
 
 	m_devices[name] = contentDevice;
 
-	Core::msg("ContentManager: mounted device %s", name.c_str());
+	Core::msg("ContentManager: mounted device %s (%s/)", name.c_str(), contentDevice->getPath().c_str());
 }
 
 void ContentManager::unountDevice(const std::string& name)

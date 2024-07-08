@@ -5,13 +5,13 @@
 
 namespace engine
 {
-	class IBufferBase;
+	struct IBufferBase;
 	class IShaderProgram;
 	class ITexture2D;
 	class ISamplerState;
-	class IRasterizerState;
-	class IDepthStencilState;
-	class IBlendState;
+	struct IRasterizerState;
+	struct IDepthStencilState;
+	struct IBlendState;
 
 	class ImGuiRenderer
 	{

@@ -15,6 +15,7 @@ class D3D11RenderTarget : public IRenderTarget
 {
 	friend class D3D11Renderer;
 public:
+	D3D11RenderTarget(ID3D11RenderTargetView* renderTargetView, ID3D11DepthStencilView* depthStencilView); // #NOTE: this is helper constructor
 	D3D11RenderTarget(D3D11Device* device, const RenderTargetCreationDesc& renderTargetDesc);
 	~D3D11RenderTarget();
 

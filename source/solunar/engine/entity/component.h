@@ -30,11 +30,15 @@ public:
 	Entity* getEntity() { return m_entity; }
 	World* getWorld() { return m_world; }
 
+	void setSerializable(bool value);
+	bool isSerializable() { return m_isSerializable; }
+
 private:
 	Entity* m_entity;
 	World* m_world;
 
 	bool m_isActive;
+	bool m_isSerializable;
 };
 
 }

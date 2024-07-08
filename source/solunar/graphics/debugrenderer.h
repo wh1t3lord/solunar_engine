@@ -8,7 +8,7 @@ namespace engine {
 	
 class IShaderProgram;
 class View;
-class IBufferBase;
+struct IBufferBase;
 
 struct LineVertex
 {

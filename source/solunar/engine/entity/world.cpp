@@ -131,6 +131,11 @@ namespace engine
 		return entity;
 	}
 
+	void World::togglePhysicsDebugDraw()
+	{
+		m_physicsWorld->toggleDebugDraw();
+	}
+
 	bool World::rayCast(RayCastResult& rayResult, const glm::vec3& rayStart, const glm::vec3& rayEnd)
 	{
 		Assert2(m_physicsWorld, "Physics world is not initialized for ray casting");

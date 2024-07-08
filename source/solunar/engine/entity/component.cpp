@@ -7,7 +7,8 @@ namespace engine
 Component::Component() :
 	m_entity(nullptr),
 	m_world(nullptr),
-	m_isActive(true)
+	m_isActive(true),
+	m_isSerializable(true)
 {
 }
 
@@ -40,6 +41,11 @@ void Component::onWorldSet(World* world)
 void Component::onEntityRemove()
 {
 	m_entity = nullptr;
+}
+
+void Component::setSerializable(bool value)
+{
+	m_isSerializable = value;
 }
 
 }

@@ -152,9 +152,12 @@ void Entity::saveXML(tinyxml2::XMLElement& element)
 	// save components
 	for (auto it : m_components)
 	{
-		const TypeInfo* typeInfo = it->getTypeInfo();
-		tinyxml2::XMLElement* compElem = element.InsertNewChildElement(typeInfo->m_name);
-		it->saveXML(*compElem);
+		if (it->isSerializable())
+		{
+			const TypeInfo* typeInfo = it->getTypeInfo();
+			tinyxml2::XMLElement* compElem = element.InsertNewChildElement(typeInfo->m_name);
+			it->saveXML(*compElem);
+		}
 	}
 }
 

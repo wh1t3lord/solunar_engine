@@ -9,11 +9,11 @@ namespace engine
 {
 
 class ITexture2D;
-class IBufferBase;
+struct IBufferBase;
 class IShaderProgram;
 class ISamplerState;
-class IRasterizerState;
-class IDepthStencilState;
+struct IRasterizerState;
+struct IDepthStencilState;
 
 struct FontVertex
 {

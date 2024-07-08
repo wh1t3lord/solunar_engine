@@ -77,11 +77,15 @@ namespace engine
 		void toggleShowingWireframe();
 		void toggleShowOctree();
 
+		IRenderTarget* getSwapChainRenderTarget() { return m_swapChainRenderTarget; }
+
 	protected:
 		ITexture2D* m_screenColorTexture;
 		ITexture2D* m_screenDepthTexture;
 		IRenderTarget* m_screenRenderTarget;
 		
+		IRenderTarget* m_swapChainRenderTarget;
+
 		View* m_view;
 
 		RendererViewMode m_currentViewMode;

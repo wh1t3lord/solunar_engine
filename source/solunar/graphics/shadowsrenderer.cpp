@@ -1,11 +1,19 @@
 #include "graphicspch.h"
 
-#include "graphics/shadowsrenderer.h"
+// Graphics Core Objects
 #include "graphics/core/texture.h"
 #include "graphics/core/device.h"
 #include "graphics/core/rendertarget.h"
+
+// Graphics classes
+#include "graphics/renderer.h"
+#include "graphics/shadowsrenderer.h"
 #include "graphics/shaderprogram.h"
 #include "graphics/ShaderProgramManager.h"
+#include "graphics/graphicsworld.h"
+#include "graphics/mesh.h"
+#include "graphics/light.h"
+#include "graphics/lightmanager.h"
 
 namespace engine
 {
@@ -13,17 +21,17 @@ namespace engine
 
 	ShadowsRenderer::ShadowsRenderer()
 	{
-		m_shadowShader = nullptr;
+		m_shadowShader_StaticMesh = nullptr;
 		memset(&m_originalViewport, 0, sizeof(m_originalViewport));
 	}
 
 	ShadowsRenderer::~ShadowsRenderer()
 	{
-		m_shadowShader = nullptr;
+		m_shadowShader_StaticMesh = nullptr;
 		memset(&m_originalViewport, 0, sizeof(m_originalViewport));
 	}
 
-	const int kShadowMapSize = 512;
+	const int kShadowMapSize = 1024;
 
 	void ShadowsRenderer::init()
 	{
@@ -32,75 +40,82 @@ namespace engine
 		textureDesc.m_textureType = TextureType::Texture2D;
 		textureDesc.m_width = textureDesc.m_height = kShadowMapSize;
 		textureDesc.m_mipmapLevel = 1;
-		textureDesc.m_format = ImageFormat::R32;
+		textureDesc.m_format = ImageFormat::DEPTH32F;
+		textureDesc.m_renderTargetUsage = true;
 
 		SubresourceDesc subresourceDesc;
 		memset(&subresourceDesc, 0, sizeof(subresourceDesc));
 
+		// Create shadow map texture
+		m_shadowMap = g_renderDevice->createTexture2D(textureDesc, subresourceDesc);
 
-	/*	GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0 };
-		glDrawBuffers(1, DrawBuffers);
+		RenderTargetCreationDesc renderTargetDesc;
+		memset(&renderTargetDesc, 0, sizeof(renderTargetDesc));
+		renderTargetDesc.m_depthTexture2D = m_shadowMap;
 
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-			Core::error("ShadowsRenderer::init: Framebuffer is not complete.");
-		}*/
+		// Create render target view
+		m_shadowFbo = g_renderDevice->createRenderTarget(renderTargetDesc);
 
-		g_renderDevice->setRenderTarget(0);
-
-		/*TextureCreationDesc shadowMapDesc;
-		memset(&shadowMapDesc, 0, sizeof(shadowMapDesc));
-		shadowMapDesc.m_width = shadowMapDesc.m_height = shadowMapSize;
-		shadowMapDesc.m_format = ImageFormat::R32F;
-		m_shadowMapTexture = GraphicsDevice::instance()->createTexture2D(shadowMapDesc);
-
-		m_renderTarget = GraphicsDevice::instance()->createFramebuffer(shadowMapSize, shadowMapSize);
-		GraphicsDevice::instance()->setFramebuffer(m_renderTarget);
-
-		m_renderTarget->setColorTexture(0, m_shadowMapTexture);
-
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
-			Core::error("ShadowsRenderer::init: framebuffer error");
-
-		GraphicsDevice::instance()->setFramebuffer(0);
-
-		m_shadowShader = g_shaderManager->createShaderProgram("shadowmap_nonskinned",
-			"shaders/shadowmap.vsh",
-			"shaders/shadowmap.fsh");*/
+		// Create shader for static mesh
+		m_shadowShader_StaticMesh = g_shaderManager->createShaderProgram("shadowmap.hlsl", "shadowmap.hlsl");
 	}
 
 	void ShadowsRenderer::shutdown()
 	{
+		if (m_shadowMap)
+		{
+			mem_delete(m_shadowMap);
+			m_shadowMap = nullptr;
+		}
 
-		/*GraphicsDevice::instance()->deleteFramebuffer(m_renderTarget);
-		GraphicsDevice::instance()->deleteTexture2D(m_shadowMapTexture);*/
+		if (m_shadowFbo)
+		{
+			mem_delete(m_shadowFbo);
+			m_shadowFbo = nullptr;
+		}
 	}
 
 	void ShadowsRenderer::beginRender()
 	{
-		/*GraphicsDevice* graphicsDevice = GraphicsDevice::instance();*/
+		m_originalViewport = g_renderDevice->getViewport();
 
-		//m_originalViewport = graphicsDevice->getViewport();
+		// set framebuffer
+		g_renderDevice->setRenderTarget(m_shadowFbo);
 
-		//// set framebuffer
-		//graphicsDevice->setFramebuffer(m_renderTarget);
+		// install shadowmap viewport
+		Viewport vp;
+		vp.m_x = 0;
+		vp.m_y = 0;
+		vp.m_width = vp.m_height = kShadowMapSize;
+		g_renderDevice->setViewport(&vp);
+	}
 
-		//// install shadowmap viewport
-		//Viewport vp;
-		//vp.m_x = 0;
-		//vp.m_y = 0;
-		//vp.m_width = vp.m_height = shadowMapSize;
-		//graphicsDevice->setViewport(&vp);
+	void ShadowsRenderer::renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
+	{
+		LightManager* lightManager = graphicsWorld->getLightManager();
+		Assert(lightManager); // uninitialized light manager, critical error
+
+		// Get directional light
+		DirectionalLightComponent* directionalLight = lightManager->getDirectionalLight();
+		if (!directionalLight)
+			return;
+
+		// Get directional light entity
+		Entity* directionalLightEntity = directionalLight->getEntity();
+		if (!directionalLightEntity)
+			return;
+
+		// calculate view matrix for light
+		//glm::mat4 lightViewMatrix = glm::lookAt(  )
 	}
 
 	void ShadowsRenderer::endRender()
 	{
-		//GraphicsDevice* graphicsDevice = GraphicsDevice::instance();
+		// set framebuffer
+		g_renderDevice->setRenderTarget(g_renderer->getSwapChainRenderTarget());
 
-		//// set framebuffer
-		//graphicsDevice->setFramebuffer(0);
-
-		//// restore viewport
-		//graphicsDevice->setViewport(&m_originalViewport);
+		// restore viewport
+		g_renderDevice->setViewport(&m_originalViewport);
 	}
 
 }

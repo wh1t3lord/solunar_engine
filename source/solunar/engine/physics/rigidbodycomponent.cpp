@@ -203,6 +203,11 @@ namespace engine {
 		m_rigidBody->applyCentralImpulse(glmVectorToBt(impulse));
 	}
 
+	void RigidBodyComponent::setLinearVelocity(const glm::vec3& velocity)
+	{
+		m_rigidBody->setLinearVelocity(glmVectorToBt(velocity));
+	}
+
 	/////////////////////////////////////////////////////////////////
 
 

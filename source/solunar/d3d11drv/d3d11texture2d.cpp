@@ -16,6 +16,7 @@ DXGI_FORMAT getDxgiFormat(ImageFormat format)
 		return DXGI_FORMAT_R24G8_TYPELESS;
 
 	case ImageFormat::DEPTH32:
+	case ImageFormat::DEPTH32F:
 		return DXGI_FORMAT_D32_FLOAT;
 
 	case ImageFormat::R32:

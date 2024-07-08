@@ -102,7 +102,7 @@ ID3DBlob* createShaderFromText(const char* text, ShaderType shaderType, const ch
 
 		Core::msg("createShaderFromText: %s", errorText.c_str());
 
-		std::terminate();
+		//std::terminate();
 		//DebugBreak();
 	}
 

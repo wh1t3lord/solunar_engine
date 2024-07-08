@@ -41,6 +41,8 @@ namespace engine
 		GraphicsWorld* getGraphicsWorld() { return m_graphicsWorld; }
 		PhysicsWorld* getPhysicsWorld() { return m_physicsWorld; }
 
+		void togglePhysicsDebugDraw();
+
 		// Casting functions
 
 		bool rayCast(RayCastResult& rayResult, const glm::vec3& rayStart, const glm::vec3& rayEnd);

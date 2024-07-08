@@ -1,6 +1,7 @@
 #include "graphicspch.h"
 
 #define STB_TRUETYPE_IMPLEMENTATION
+#define STBTT_RASTERIZER_VERSION 1
 #include "graphics/fontmanager.h"
 
 #include "core/file/filesystem.h"
@@ -61,10 +62,7 @@ void FontManager::initialize()
 	systemFontStream->read(ttfBuffer, systemFontFileLength);
 
 	uint8_t* tmpBitmap = new uint8_t[512 * 512]; //res of the bitmap
-	stbtt_BakeFontBitmap(ttfBuffer, 0, 32.0f, tmpBitmap, 512, 512, 32, 96, m_systemFontChars);
-
-	// flip buffer
-	//Flip(tmpBitmap, 512 * 512, 512, 512);
+	stbtt_BakeFontBitmap(ttfBuffer, 0, 16.0f, tmpBitmap, 512, 512, 32, 96, m_systemFontChars);
 
 	TextureDesc systemFontTextureDesc;
 	memset(&systemFontTextureDesc, 0, sizeof(systemFontTextureDesc));
@@ -93,8 +91,8 @@ void FontManager::initPrivate()
 
 	SamplerDesc fontTextureSamplerDesc;
 	memset(&fontTextureSamplerDesc, 0, sizeof(fontTextureSamplerDesc));
-	fontTextureSamplerDesc.m_minFilter = TextureFilter::Linear;
-	fontTextureSamplerDesc.m_magFilter = TextureFilter::Linear;
+	fontTextureSamplerDesc.m_minFilter = TextureFilter::Nearest;
+	fontTextureSamplerDesc.m_magFilter = TextureFilter::Nearest;
 	fontTextureSamplerDesc.m_wrapS = TextureWrap::ClampToEdge;
 	fontTextureSamplerDesc.m_wrapT = TextureWrap::ClampToEdge;
 	fontTextureSamplerDesc.m_anisotropyLevel = 1.0f;

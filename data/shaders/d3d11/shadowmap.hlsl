@@ -1,16 +1,21 @@
-// Material Instance shader - Generic material
+// Shadow mapping shader
 //
 
 // C++ defines:
+//	BILLBOARD
 //	SKINNED
 
 struct VSInput
 {
 	float3 position		: POSITION;
+#ifndef BILLBOARD
 	float3 normal		: NORMAL;
+#endif
 	float2 texcoord		: TEXCOORD;
+#ifndef BILLBOARD
 	float3 tangent		: TANGENT;
 	float3 bitangent	: BINORMAL;
+#endif
 #ifdef SKINNED
 	float4 weights		: BLENDWEIGHT;
 	uint boneIds		: BLENDINDICES;
@@ -20,11 +25,7 @@ struct VSInput
 struct VSOutput
 {
 	float4 position		: SV_Position;
-	float3 worldPos		: TEXCOORD0;
-	float3 normal		: NORMAL;
-	float2 texcoord		: TEXCOORD1;
-	float3 tangent		: TANGENT;
-	float3 bitangent	: BINORMAL;
+	float4 depthPosition: SV_Depth;
 };
 
 cbuffer GlobalData : register(b0)
@@ -42,19 +43,8 @@ VSOutput VSMain(VSInput input)
 {
 	VSOutput output = (VSOutput)0;
 
-	// World position
-	output.worldPos = mul(input.position, g_modelMatrix);
-
 	// Position
-	//output.position = mul(float4(output.worldPos, 1.0f), g_viewMatrix);
-	//output.position = mul(output.position, g_projectionMatrix);
-	output.position = mul(float4(input.position, 1.0f), g_modelViewProjection);
-
-	// texcoord
-	output.texcoord = input.texcoord;
-
-	// normal
-	output.normal = mul(float4(input.normal, 1.0f), g_modelMatrix);
-	
+	output.position = mul(float4(output.worldPos, 1.0f), g_viewMatrix);
+	output.position = mul(output.position, g_projectionMatrix);	
 	return output;
 }

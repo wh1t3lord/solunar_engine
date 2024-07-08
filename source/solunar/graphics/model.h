@@ -22,7 +22,7 @@ namespace engine
 
 	class ModelBase;
 	class Material;
-	class IBufferBase;
+	struct IBufferBase;
 
 	IBufferBase* createVBFromModel(VertexFormat* meshVF, int countOfVertexDecls, const std::string& filename, int* verticesCount);
 

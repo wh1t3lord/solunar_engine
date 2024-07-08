@@ -169,7 +169,7 @@ namespace engine
 
 		g_postFxManager.init(CameraProxy::getInstance()->getView());
 
-		ShadowsRenderer::getInstance()->init();
+//		ShadowsRenderer::getInstance()->init();
 	}
 
 	void Renderer::shutdown()
@@ -259,11 +259,35 @@ namespace engine
 			EntityManager& entityManager = world->getEntityManager();
 
 			std::vector<Entity*> drawableEntities = entityManager.getEntitiesWithComponent<MeshComponent>();
+			
+#if 0
+			// shadow map pass
+			ShadowsRenderer::getInstance()->beginRender();
+
+			// color pass
 			for (auto entity : drawableEntities)
 			{
-				//MeshComponent* meshComponent = entity->getComponent<MeshComponent>();
-				//meshComponent->render();
+				MeshComponent* meshComponent = entity->getComponent<MeshComponent>();
+				if (meshComponent)
+				{
+					// setup render context
+					RenderContext& renderCtx = RenderContext::getContext();
+					renderCtx.model = entity->getWorldTranslation();
+					RenderContext::setContext(renderCtx);
 
+					// call render function
+					//renderMesh(world->getGraphicsWorld(), view, meshComponent);
+					ShadowsRenderer::getInstance()->renderMesh(world->getGraphicsWorld(), view, meshComponent);
+
+					meshComponent->render();
+				}
+			}
+
+			ShadowsRenderer::getInstance()->endRender();
+#endif
+			// color pass
+			for (auto entity : drawableEntities)
+			{
 				MeshComponent* meshComponent = entity->getComponent<MeshComponent>();
 				if (meshComponent)
 				{
