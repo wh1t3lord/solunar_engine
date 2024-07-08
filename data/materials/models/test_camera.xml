@@ -5,6 +5,6 @@
     <SpecularTexture filename=""/>
     <RenderState>
         <DepthWrite value="true"/>
-        <SelfIllumination value="true"/>
+        <SelfIllumination value="false"/>
     </RenderState>
 </Material>
