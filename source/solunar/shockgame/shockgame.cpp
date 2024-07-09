@@ -164,6 +164,16 @@ void ShockProjectileComponent::update(float dt)
 	glm::vec3 position = getEntity()->getPosition();
 	position = glm::lerp(position, m_direction, kSpeed * dt);
 	getEntity()->setPosition(position);
+
+	// find player
+	std::vector<Entity*> players = getWorld()->getEntityManager().getEntitiesWithComponent<ShockPlayerController>();
+	Entity* player = players[0];
+
+	if (getEntity()->getBoundingBox().contains(player->getPosition())) // we shot!
+	{
+		ShockPlayerController* playerController = player->getComponent<ShockPlayerController>();
+		playerController->doHit(25.0f);
+	}
 }
 
 class ShockProjectilePool : public Singleton<ShockProjectilePool>

@@ -28,16 +28,6 @@
 			<AIType value="ShockAIType_Camera"/>
 		</ShockAIComponent>
 	</Entity>
-
-	<!-- Test entity with skysphere -->
-	<Entity>
-		<Position x="0" y="0" z="0"/>
-		<Rotation x="0" y="90" z="0"/>
-		<Scale x="1000" y="1000" z="1000"/>
-		<MeshComponent>
-			<Model filename="models/test_sky_half.dae"/>
-		</MeshComponent>
-	</Entity>
 	
 	<!-- Test entity with directional light -->
 	<Entity>

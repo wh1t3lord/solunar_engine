@@ -29,20 +29,21 @@ public:
 
 	void update(float dt) override;
 
+	void doHit(float amount);
+
 private:
 	void activateCamera();
 	void initializeCamera();
 	void initializeComponents();
 	void updateCamera(float dt);
 	void updateMovement(float dt);
+	void debugUpdate(float dt);
 
 private:
 	ShockPlayerStats m_playerStats;
 	CameraFirstPersonComponent* m_camera;
 
-	RigidBodyComponent* m_rigidBody;
-	BoxShapeComponent* m_shape;
-
+	RigidBodyProxyComponent* m_rigidBody;
 
 public:
 	bool m_flyCam;

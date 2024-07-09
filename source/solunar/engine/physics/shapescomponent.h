@@ -145,6 +145,8 @@ namespace engine {
 		CapsuleShapeComponent();
 		~CapsuleShapeComponent();
 
+		void createCapsule(float _fRadius, float _fHeight);
+
 		void loadXML(tinyxml2::XMLElement& element) override;
 		void saveXML(tinyxml2::XMLElement& element) override;
 

@@ -92,6 +92,9 @@ namespace engine {
 
 	void RigidBodyComponent::updateBodyTranslationDirty()
 	{
+		if (!m_rigidBody)
+			return;
+
 		btTransform trans;
 		trans.setIdentity();
 
@@ -210,8 +213,11 @@ namespace engine {
 
 	/////////////////////////////////////////////////////////////////
 
-
-	RigidBodyProxyComponent::RigidBodyProxyComponent()
+	RigidBodyProxyComponent::RigidBodyProxyComponent() :
+		m_characterController(nullptr),
+		m_ghostObject(nullptr),
+		m_ghostCallback(nullptr),
+		m_capsuleShape(nullptr)
 	{
 	}
 
@@ -231,7 +237,7 @@ namespace engine {
 
 	void RigidBodyProxyComponent::onWorldSet(World* world)
 	{
-		Component::onWorldSet(world);
+		RigidBodyComponent::onWorldSet(world);
 	}
 
 	void RigidBodyProxyComponent::onEntityRemove()
@@ -244,7 +250,48 @@ namespace engine {
 		btTransform startTransform; startTransform.setIdentity();
 		startTransform.setOrigin(glmVectorToBt(getEntity()->getPosition()));
 
+		float fRadius = 0.3f;
+		float fHeight = 0.4f;
+		m_capsuleShape = mem_new<btCapsuleShape>(fRadius, fHeight);
+
 		m_ghostObject = mem_new<btPairCachingGhostObject>();
 		m_ghostObject->setWorldTransform(startTransform);
+
+		m_ghostCallback = mem_new<btGhostPairCallback>();
+		getPhysicsWorld()->getWorld()->getPairCache()->setInternalGhostPairCallback(m_ghostCallback);
+
+		m_ghostObject->setCollisionShape(m_capsuleShape);
+
+		m_characterController = mem_new<btKinematicCharacterController>(
+			m_ghostObject, 
+			m_capsuleShape, 
+			0.25f, 
+			btVector3(0.0f, 1.0f, 0.0f));
+		
+		getPhysicsWorld()->getWorld()->addCollisionObject(
+			m_ghostObject//,
+			//getCollisionParameter(eFilterGroup),
+			//getCollisionParameter(eFilterMask)
+		);
+
+		getPhysicsWorld()->getWorld()->addAction(m_characterController);
+	}
+
+	void RigidBodyProxyComponent::update(float dt)
+	{
+		m_characterController->updateAction(getPhysicsWorld()->getWorld(), dt);
+	}
+
+	void RigidBodyProxyComponent::setDirection(const glm::vec3& direction)
+	{
+		m_characterController->setWalkDirection(glmVectorToBt(direction));
+	}
+
+	void RigidBodyProxyComponent::setPositionForce(const glm::vec3& position)
+	{
+		btTransform trans;
+		trans.setIdentity();
+		trans.setOrigin(glmVectorToBt(position));
+		m_ghostObject->setWorldTransform(trans);
 	}
 }

@@ -179,12 +179,12 @@ glm::mat4 Entity::getLocalTranslation()
 	return tranlation;
 }
 
-BoundingBox Entity::getLocalBoundingBox()
+const BoundingBox& Entity::getLocalBoundingBox()
 {
 	return m_boundingBox;
 }
 
-BoundingBox Entity::getBoundingBox()
+const BoundingBox& Entity::getBoundingBox()
 {
 	return m_WorldBoundingBox;
 }

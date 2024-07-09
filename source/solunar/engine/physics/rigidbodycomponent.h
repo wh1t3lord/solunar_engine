@@ -36,6 +36,7 @@ namespace engine {
 
 		btRigidBody* getSDKBody() { return m_rigidBody; }
 		btCompoundShape* getCompoundShape() { return m_compoundShape; }
+		PhysicsWorld* getPhysicsWorld() { return m_physicsWorld; }
 
 		//void getWorldTransform(btTransform& worldTrans) const override;
 		//void setWorldTransform(const btTransform& worldTrans) override;
@@ -84,10 +85,18 @@ namespace engine {
 		void onEntityRemove() override;
 
 		void createPlayerController();
+		void update(float dt);
+		void setDirection(const glm::vec3& direction);
+		void setPositionForce(const glm::vec3& position);
+
+		btKinematicCharacterController* getCharacterController() { return m_characterController; }
+		btGhostObject* getGhostObject() { return m_ghostObject; }
 
 	private:
 		btKinematicCharacterController* m_characterController;
 		btPairCachingGhostObject* m_ghostObject;
+		btGhostPairCallback* m_ghostCallback;
+		btConvexShape* m_capsuleShape;
 	};
 }
 

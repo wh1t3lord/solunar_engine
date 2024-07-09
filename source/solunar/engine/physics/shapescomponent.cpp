@@ -272,6 +272,13 @@ namespace engine {
 
 	}
 
+	void CapsuleShapeComponent::createCapsule(float _fRadius, float _fHeight)
+	{
+		m_fRadius = _fRadius;
+		m_fHeight = _fHeight;
+		createShapeInternal();
+	}
+
 	void CapsuleShapeComponent::loadXML(tinyxml2::XMLElement& element)
 	{
 		ShapeComponent::loadXML(element);

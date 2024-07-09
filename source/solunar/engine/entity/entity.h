@@ -39,8 +39,8 @@ public:
 
 	glm::mat4 getWorldTranslation();
 	glm::mat4 getLocalTranslation();
-	BoundingBox getLocalBoundingBox();
-	BoundingBox getBoundingBox();
+	const BoundingBox& getLocalBoundingBox();
+	const BoundingBox& getBoundingBox();
 
 	Entity* createChild();
 	Entity* createChildEx(const TypeInfo* typeInfo);
