@@ -1,6 +1,8 @@
 #ifndef GRAPHICS_GL_GLPOSTPROCESSING_H
 #define GRAPHICS_GL_GLPOSTPROCESSING_H
 
+#include "graphics/shaderconstantmanager.h"
+
 namespace engine
 {
 
@@ -45,6 +47,8 @@ private:
 	IShaderProgram* m_hdrPassProgram;
 	IShaderProgram* m_blurPassProgram;
 	IShaderProgram* m_hdrCombineProgram;
+
+	ConstantBufferProxy m_hdrconstants;
 };
 
 extern PostFxManager g_postFxManager;

@@ -1,7 +1,7 @@
 #include "d3d11drv_pch.h"
 #include "d3d11drv/d3d11shaderprogram.h"
 
-#define CREATE_INPUT_LAYOUT_FROM_REFLECT
+//#define CREATE_INPUT_LAYOUT_FROM_REFLECT
 
 namespace engine
 {

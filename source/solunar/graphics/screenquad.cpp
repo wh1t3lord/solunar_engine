@@ -10,12 +10,10 @@ namespace engine
 {
 	IBufferBase* ScreenQuad::ms_vertexBuffer;
 	IShaderProgram* ScreenQuad::ms_screenQuadShader;
-	static VertexFormat s_screenQuadVertexFormat;
-	
-	struct QuadVertex
+	InputLayoutDesc ScreenQuad::ms_inputLayout[2]=
 	{
-		glm::vec3 position;
-		glm::vec2 texcoord;
+		{ "POSITION", 0, ImageFormat::RGBA32F,   0, (UINT)offsetof(QuadVertex, position), INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, ImageFormat::RG32F,   0, (UINT)offsetof(QuadVertex, texcoord),  INPUT_PER_VERTEX_DATA, 0 }
 	};
 
 	void ScreenQuad::init()
@@ -58,10 +56,12 @@ namespace engine
 
 		ms_vertexBuffer = g_renderDevice->createBuffer(bufferDesc, subresourceDesc);
 
-		ms_screenQuadShader = g_shaderManager->createShaderProgram("quad.vsh", "quad.psh");
-
-		s_screenQuadVertexFormat.addPosition();
-		s_screenQuadVertexFormat.addTexcoord();
+		ms_screenQuadShader = g_shaderManager->createShaderProgram(
+			"quad.vsh", 
+			"quad.psh", 
+			nullptr,
+			ms_inputLayout,
+			sizeof(ms_inputLayout) / sizeof(ms_inputLayout[0]));
 	}
 
 	void ScreenQuad::shutdown()
@@ -80,7 +80,6 @@ namespace engine
 		//glDisable(GL_DEPTH_TEST);
 
 		g_renderDevice->setVertexBuffer(ms_vertexBuffer, sizeof(QuadVertex), 0);
-		g_renderDevice->setVertexFormat(&s_screenQuadVertexFormat);
 		g_renderDevice->setTexture2D(0, texture);
 		g_renderDevice->setSampler(0, g_defaultSampler);
 
@@ -96,7 +95,6 @@ namespace engine
 		//glDisable(GL_DEPTH_TEST);
 
 		g_renderDevice->setVertexBuffer(ms_vertexBuffer, sizeof(QuadVertex), 0);
-		g_renderDevice->setVertexFormat(&s_screenQuadVertexFormat);
 		g_renderDevice->setTexture2D(0, texture);
 
 		g_shaderManager->setShaderProgram(shader);
@@ -110,7 +108,6 @@ namespace engine
 		/*glDisable(GL_DEPTH_TEST);*/
 
 		g_renderDevice->setVertexBuffer(ms_vertexBuffer, sizeof(QuadVertex), 0);
-		g_renderDevice->setVertexFormat(&s_screenQuadVertexFormat);
 		g_renderDevice->setTexture2D(0, texture);
 
 		g_renderDevice->draw(PM_TriangleList, 0, 6);
@@ -123,7 +120,6 @@ namespace engine
 		//glDisable(GL_DEPTH_TEST);
 
 		g_renderDevice->setVertexBuffer(ms_vertexBuffer, sizeof(QuadVertex), 0);
-		g_renderDevice->setVertexFormat(&s_screenQuadVertexFormat);
 		
 		g_shaderManager->setShaderProgram(shader);
 

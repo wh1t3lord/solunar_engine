@@ -57,8 +57,20 @@ void DebugRender::initialize()
 
 	m_matrixBuffer = g_renderDevice->createBuffer(matrixBufferDesc, matrixSubresourceDesc);
 
+	// create input layout
+	InputLayoutDesc layoutDesc[] =
+	{
+		{ "POSITION", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(LineVertex, position), INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(LineVertex, color), INPUT_PER_VERTEX_DATA, 0 }
+	};
+
 	// create shader
-	m_shaderProgram = g_shaderManager->createShaderProgram("debug_draw.vsh", "debug_draw.psh");
+	m_shaderProgram = g_shaderManager->createShaderProgram(
+		"debug_draw.vsh", 
+		"debug_draw.psh",
+		nullptr,
+		layoutDesc,
+		sizeof(layoutDesc) / sizeof(layoutDesc[0]));
 	
 	m_lineVertexFormat.addPosition(); // position
 	m_lineVertexFormat.addPosition(); // color

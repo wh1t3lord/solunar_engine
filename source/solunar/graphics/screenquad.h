@@ -3,12 +3,20 @@
 
 namespace engine
 {
-	class GrVertexBuffer;
 	class ITexture2D;
 	class IShaderProgram;
 
+	struct QuadVertex
+	{
+		glm::vec3 position;
+		glm::vec2 texcoord;
+	};
+
 	class ScreenQuad
 	{
+	public:
+		static InputLayoutDesc ms_inputLayout[2];
+
 	private:
 		static IBufferBase* ms_vertexBuffer;
 		static IShaderProgram* ms_screenQuadShader;

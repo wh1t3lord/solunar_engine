@@ -1,6 +1,7 @@
 #include "graphicspch.h"
 #include "graphics/materials/materialinstance_generic.h"
 #include "graphics/ShaderProgramManager.h"
+#include "graphics/model.h"
 
 namespace engine
 {
@@ -50,11 +51,22 @@ IShaderProgram* MaterialInstance_Generic::getShaderProgram_StaticVertexFactory_V
 	Core::msg("Graphics: Generation variation '%s' for MaterialInstance_Generic", shaderName.c_str());
 
 	std::string defines = getPixelVariationDefine(pixelVariation);
-	
+
+	InputLayoutDesc inputLayout[] =
+	{
+		{ "POSITION", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(Vertex, m_position), INPUT_PER_VERTEX_DATA, 0 },
+		{ "NORMAL", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(Vertex, m_normal),  INPUT_PER_VERTEX_DATA, 0 },
+		{ "TEXCOORD", 0, ImageFormat::RG32F, 0, (UINT)offsetof(Vertex, m_texcoord0),  INPUT_PER_VERTEX_DATA, 0 },
+		{ "TANGENT", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(Vertex, m_tangent),  INPUT_PER_VERTEX_DATA, 0 },
+		{ "BINORMAL", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(Vertex, m_bitangent),  INPUT_PER_VERTEX_DATA, 0 }
+	};
+
 	IShaderProgram* shaderProgram = g_shaderManager->createShaderProgram(
 		"materialinstance_generic.vsh",
 		"materialinstance_generic.psh",
-		defines.c_str());
+		defines.c_str(),
+		inputLayout,
+		sizeof(inputLayout) / sizeof(inputLayout[0]));
 
 	g_materialInstancePixelVariations.emplace(shaderName, shaderProgram);
 
