@@ -35,7 +35,7 @@ public:
 	void initialize() override;
 	void shutdown() override;
 
-	void drawSystemFont(const char* text, int x, int y, const glm::vec4& color) override;
+	void drawSystemFont(const char* text, float x, float y, const glm::vec4& color) override;
 
 	void flushPrimitives() override;
 

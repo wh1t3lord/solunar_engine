@@ -266,12 +266,12 @@ void FontManager::shutdown()
 	}
 }
 
-void FontManager::drawSystemFont(const char* text, int x, int y, const glm::vec4& color)
+void FontManager::drawSystemFont(const char* text, float x, float y, const glm::vec4& color)
 {
 	SystemStringDrawInfo drawInfo = {};
 	drawInfo.m_string = text;
-	drawInfo.m_x = (float)x;
-	drawInfo.m_y = (float)y;
+	drawInfo.m_x = x;
+	drawInfo.m_y = y;
 	drawInfo.m_color = color;
 	m_systemDrawStrings.push_back(drawInfo);
 }
