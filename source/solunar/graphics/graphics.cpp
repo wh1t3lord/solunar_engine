@@ -6,6 +6,7 @@
 #include "graphics/material.h"
 #include "graphics/mesh.h"
 #include "graphics/model.h"
+#include "graphics/animatedmodel.h"
 #include "graphics/light.h"
 
 #include "graphics/renderer.h"
@@ -24,11 +25,13 @@ void registerGraphicsObjects()
 	g_typeManager->registerObject<LayeredMaskedMaterial>();
 	g_typeManager->registerObject<NullMaterial>();
 	g_typeManager->registerObject<ModelBase>();
+	g_typeManager->registerObject<AnimatedModel>();
 	g_typeManager->registerObject<Model>();
 	g_typeManager->registerObject<ModelSubmesh>();
 
 	// Components
 	g_typeManager->registerObject<MeshComponent>();
+	g_typeManager->registerObject<AnimatedMeshComponent>();
 
 	LightComponent::registerObject();
 	PointLightComponent::registerObject();

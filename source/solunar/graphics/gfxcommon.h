@@ -161,6 +161,7 @@ namespace engine
 		uint32_t m_mipmapLevel = 0;
 		ImageFormat m_format;
 		bool m_renderTargetUsage;
+		bool m_isStreamTexture = false;
 	};
 
 	struct SurfaceDesc

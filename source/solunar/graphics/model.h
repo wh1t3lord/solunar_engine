@@ -83,8 +83,8 @@ namespace engine
 
 		virtual void renderObjects();
 
-		void createHw() override;
-		void releaseHw() override;
+		virtual void createHw() override;
+		virtual void releaseHw() override;
 
 		void saveBinary(const std::string& filename);
 
@@ -182,6 +182,10 @@ namespace engine
 		std::vector<std::shared_ptr<ModelSubmesh>> m_submeshes;
 
 	};
+
+	std::string getDirectoryPath(const std::string& filepath);
+	void osConvertPath(std::string& path);
+	void osConvertStandartPath(std::string& path);
 }
 
 #endif // !MODEL_H

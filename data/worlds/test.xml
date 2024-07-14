@@ -17,6 +17,7 @@
 	</Entity>
 	
 	<!-- Camera AI test -->
+	<!--
 	<Entity>
 		<Position x="0" y="3" z="0"/>
 		<Rotation x="0" y="0" z="0"/>
@@ -28,11 +29,22 @@
 			<AIType value="ShockAIType_Camera"/>
 		</ShockAIComponent>
 	</Entity>
+	-->
+	
+	<!-- Test animated model -->
+	<Entity>
+		<Position x="0" y="1" z="0"/>
+		<Rotation x="0" y="0" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		<AnimatedMeshComponent>
+			<Model filename="models/anim_test.dae"/>
+		</AnimatedMeshComponent>
+	</Entity>
 	
 	<!-- Test entity with directional light -->
 	<Entity>
 		<Position x="0" y="0" z="0"/>
-		<Rotation x="-90" y="0" z="0"/>
+		<Rotation x="0" y="20" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		
 		<DirectionalLightComponent>

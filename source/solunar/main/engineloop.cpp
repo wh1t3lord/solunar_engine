@@ -55,7 +55,7 @@ namespace engine {
 
 	static bool g_showEntityList = false;
 	static bool g_showCBManager = false;
-	static bool g_showLightEditor = true;
+	static bool g_showLightEditor = false;
 	static bool g_forceQuit = false;
 	static bool g_showShockPlayerDebug = false;
 
@@ -232,9 +232,11 @@ namespace engine {
 		// Render view
 		g_renderer->renderView(appGetView());
 
+#ifndef FINAL_BUILD
 		// Draw the engine debug overlay
-		//engineDebugOverlay();
-
+		engineDebugOverlay();
+#endif // !FINAL_BUILD
+		
 		// End and render ImGui
 		ImGuiManager::getInstance()->endFrame();
 

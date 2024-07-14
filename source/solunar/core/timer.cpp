@@ -20,7 +20,6 @@ Timer::~Timer()
 {
 }
 
-
 void Timer::init()
 {
 	QueryPerformanceFrequency(&m_frequency);

@@ -2,6 +2,7 @@
 #include "graphics/mesh.h"
 #include "graphics/debugrenderer.h"
 #include "graphics/renderer.h"
+#include "graphics/animatedmodel.h"
 
 namespace engine {
 
@@ -50,5 +51,34 @@ namespace engine {
 	std::shared_ptr<ModelBase> MeshComponent::lockModel()
 	{
 		return m_model.lock();
+	}
+
+	// animated mesh component
+
+	AnimatedMeshComponent::AnimatedMeshComponent()
+	{
+	}
+
+	AnimatedMeshComponent::~AnimatedMeshComponent()
+	{
+		// m_model.reset();
+	}
+
+	void AnimatedMeshComponent::loadXML(tinyxml2::XMLElement& element)
+	{
+		tinyxml2::XMLElement* modelElement = element.FirstChildElement("Model");
+		if (modelElement)
+		{
+			const tinyxml2::XMLAttribute* filenameAttribute = modelElement->FindAttribute("filename");
+			if (filenameAttribute && strlen(filenameAttribute->Value()) > 0)
+			{
+				std::string filename = filenameAttribute->Value();
+				m_model = g_contentManager->loadObject<AnimatedModel>(filename);
+			}
+			else
+			{
+				Core::msg("WARNING: AnimatedMeshComponent at entity(0x%p) has empty filename attribute in Model element!", getEntity());
+			}
+		}
 	}
 }

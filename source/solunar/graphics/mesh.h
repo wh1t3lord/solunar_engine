@@ -26,15 +26,25 @@ namespace engine {
 		MeshComponent();
 		~MeshComponent();
 
-		void loadXML(tinyxml2::XMLElement& element) override;
-		void saveXML(tinyxml2::XMLElement& element) override;
+		virtual void loadXML(tinyxml2::XMLElement& element) override;
+		virtual void saveXML(tinyxml2::XMLElement& element) override;
 
 		virtual void render();
 
 		std::shared_ptr<ModelBase> lockModel();
 
-	private:
+	protected:
 		std::weak_ptr<ModelBase> m_model;
+	};
+
+	class AnimatedMeshComponent : public MeshComponent
+	{
+		ImplementObject(AnimatedMeshComponent, MeshComponent);
+	public:
+		AnimatedMeshComponent();
+		~AnimatedMeshComponent();
+
+		void loadXML(tinyxml2::XMLElement& element) override;
 	};
 
 }
