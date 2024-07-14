@@ -12,19 +12,9 @@ MaterialInstance_Null::~MaterialInstance_Null()
 {
 }
 
-IShaderProgram* MaterialInstance_Null::getStaticMeshShaderProgram()
+IShaderProgram* MaterialInstance_Null::getShaderProgramVariation(VertexFactory vertexFactory, uint32_t pixelVariation)
 {
-    return nullptr;
-}
-
-IShaderProgram* MaterialInstance_Null::getSkinnedShaderProgram()
-{
-    return nullptr;
-}
-
-IShaderProgram* MaterialInstance_Null::getParticleShaderProgram()
-{
-    return nullptr;
+	return nullptr;
 }
 
 }

@@ -6,15 +6,14 @@
 namespace engine
 {
 
-class MaterialInstance_Null : public MaterialInstance
+class MaterialInstance_Null : public IMaterialInstance
 {
 public:
 	MaterialInstance_Null();
 	~MaterialInstance_Null();
 
-	IShaderProgram* getStaticMeshShaderProgram() override;
-	IShaderProgram* getSkinnedShaderProgram() override;
-	IShaderProgram* getParticleShaderProgram() override;
+	// Inherited via IMaterialInstance
+	IShaderProgram* getShaderProgramVariation(VertexFactory vertexFactory, uint32_t pixelVariation) override;
 };
 
 }

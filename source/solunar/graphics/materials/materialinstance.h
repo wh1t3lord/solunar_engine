@@ -12,7 +12,7 @@ enum VertexFactory
 	VertexFactory_Count
 };
 
-enum PixelVariations
+enum PixelVariation
 {
 	PixelVariation_Unlit = 1 << 0,
 	PixelVariation_Lit = 1 << 1,
@@ -20,15 +20,14 @@ enum PixelVariations
 
 class IShaderProgram;
 
-class MaterialInstance
+// \brief Interface for material instance.
+class IMaterialInstance
 {
 public:
-	virtual ~MaterialInstance();
+	virtual ~IMaterialInstance();
 
-	// #TODO: Old deprecated API
-	virtual IShaderProgram* getStaticMeshShaderProgram() = 0;
-	virtual IShaderProgram* getSkinnedShaderProgram() = 0;
-	virtual IShaderProgram* getParticleShaderProgram() = 0;
+	// \brief Get shader program for specific vertex factory and pixel variation(see PixelVariation)
+	virtual IShaderProgram* getShaderProgramVariation(VertexFactory vertexFactory, uint32_t pixelVariation) = 0;
 };
 
 }

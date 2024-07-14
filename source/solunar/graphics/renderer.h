@@ -14,7 +14,7 @@ namespace engine
 	class World;
 	class MeshComponent;
 	class Material;
-	class MaterialInstance;
+	class IMaterialInstance;
 	class GraphicsWorld;
 
 	enum class RendererViewMode
@@ -58,7 +58,7 @@ namespace engine
 		void renderSky(View* view, SkyMeshComponent* skyMesh);
 		void setupLights(GraphicsWorld* graphicsWorld);
 	
-		virtual void bindMaterialForMesh(MeshComponent* mesh, Material* material, MaterialInstance* materialInstance) = 0;
+		virtual void bindMaterialForMesh(MeshComponent* mesh, Material* material, IMaterialInstance* materialInstance) = 0;
 
 		virtual void renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh) = 0;
 		virtual void renderShadows(View* view) = 0;

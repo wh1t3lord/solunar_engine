@@ -7,7 +7,7 @@ namespace engine
 {
 
 class Material;
-class MaterialInstance;
+class IMaterialInstance;
 
 class MaterialInstanceFactory : public Singleton<MaterialInstanceFactory>
 {
@@ -17,7 +17,7 @@ public:
 	static void destroyInstance();
 
 public:
-	MaterialInstance* createMaterialInstance(Material* material);
+	IMaterialInstance* createMaterialInstance(Material* material);
 };
 
 }

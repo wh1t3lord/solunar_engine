@@ -25,7 +25,7 @@ public:
 
 	void endFrame() override;
 
-	void bindMaterialForMesh(MeshComponent* mesh, Material* material, MaterialInstance* materialInstance) override;
+	void bindMaterialForMesh(MeshComponent* mesh, Material* material, IMaterialInstance* materialInstance) override;
 
 	void renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh) override;
 	void renderShadows(View* view) override;

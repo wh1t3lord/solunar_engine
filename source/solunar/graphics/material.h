@@ -16,9 +16,7 @@ namespace engine
 	};
 
 	class TextureMap;
-	class VertexShader;
-	class PixelShader;
-	class MaterialInstance;
+	class IMaterialInstance;
 	class IShaderProgram;
 	struct IRasterizerState;
 	struct IBlendState;
@@ -103,11 +101,11 @@ namespace engine
 		std::weak_ptr<TextureMap> getTexture(MAT_TEX tex);
 		MaterialType getMaterialType() { return m_materialType; }
 
-		MaterialInstance* getMaterialInstance() { return m_materialInstance; }
+		IMaterialInstance* getMaterialInstance() { return m_materialInstance; }
 
 		// #TODO: VERY BAD, LIKE GETTERS
 	public:
-		MaterialInstance* m_materialInstance;
+		IMaterialInstance* m_materialInstance;
 
 		ISamplerState* m_albedoSampler;
 

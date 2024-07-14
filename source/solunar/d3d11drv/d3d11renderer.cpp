@@ -272,7 +272,7 @@ void D3D11Renderer::endFrame()
 	m_swapChain->Present(0, 0);
 }
 
-void D3D11Renderer::bindMaterialForMesh(MeshComponent* mesh, Material* material, MaterialInstance* materialInstance)
+void D3D11Renderer::bindMaterialForMesh(MeshComponent* mesh, Material* material, IMaterialInstance* materialInstance)
 {
 	// OPTICK_EVENT("D3D11Renderer::bindMaterialForMesh");
 
@@ -285,17 +285,13 @@ void D3D11Renderer::bindMaterialForMesh(MeshComponent* mesh, Material* material,
 	material->bind();
 
 	// Initialize shader
-	
-	MaterialInstance_Generic* materialInstanceGeneric = dynamic_cast<MaterialInstance_Generic*>(materialInstance);
-	Assert2(materialInstanceGeneric, "Only MaterialInstance_Generic supported!");
-
 	uint32_t pixelVariation = 0;
 	if (material->m_selfillum)
 		pixelVariation |= PixelVariation_Unlit;
 	else
 		pixelVariation |= PixelVariation_Lit;
 
-	IShaderProgram* shaderProgram = materialInstanceGeneric->getShaderProgram_StaticVertexFactory_Variation(pixelVariation);
+	IShaderProgram* shaderProgram = materialInstance->getShaderProgramVariation(VertexFactory_StaticMesh, pixelVariation);
 	Assert2(shaderProgram, "Unknowed mesh component type!");
 
 	// bind material instance shader and material uniforms

@@ -27,17 +27,17 @@ void MaterialInstanceFactory::destroyInstance()
 	ms_instance = nullptr;
 }
 
-MaterialInstance* MaterialInstanceFactory::createMaterialInstance(Material* material)
+IMaterialInstance* MaterialInstanceFactory::createMaterialInstance(Material* material)
 {
 	Assert(material);
 
-	MaterialInstance* materialInstance = nullptr;
+	IMaterialInstance* materialInstance = nullptr;
 	if (material->getMaterialType() == MaterialType::Generic)
-		materialInstance = (MaterialInstance*)mem_new<MaterialInstance_Generic>();
+		materialInstance = (IMaterialInstance*)mem_new<MaterialInstance_Generic>();
 	else if (material->getMaterialType() == MaterialType::Masked)
-		materialInstance = (MaterialInstance*)mem_new<MaterialInstance_Masked>();
+		materialInstance = (IMaterialInstance*)mem_new<MaterialInstance_Masked>();
 	else
-		materialInstance = (MaterialInstance*)mem_new<MaterialInstance_Null>();
+		materialInstance = (IMaterialInstance*)mem_new<MaterialInstance_Null>();
 	
 	return materialInstance;
 }

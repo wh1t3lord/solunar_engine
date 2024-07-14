@@ -6,15 +6,14 @@
 namespace engine
 {
 
-class MaterialInstance_Masked : public MaterialInstance
+class MaterialInstance_Masked : public IMaterialInstance
 {
 public:
 	MaterialInstance_Masked();
 	~MaterialInstance_Masked();
 
-	IShaderProgram* getStaticMeshShaderProgram() override;
-	IShaderProgram* getSkinnedShaderProgram() override;
-	IShaderProgram* getParticleShaderProgram() override;
+	// Inherited via IMaterialInstance
+	IShaderProgram* getShaderProgramVariation(VertexFactory vertexFactory, uint32_t pixelVariation) override;
 
 };
 

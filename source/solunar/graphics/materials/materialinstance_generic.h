@@ -8,25 +8,15 @@ namespace engine
 
 class IShaderProgram;
 
-class MaterialInstance_Generic : public MaterialInstance
+class MaterialInstance_Generic : public IMaterialInstance
 {
 public:
 	MaterialInstance_Generic();
 	~MaterialInstance_Generic();
 
-	IShaderProgram* getStaticMeshShaderProgram() override { return m_staticMeshShader; }
-	IShaderProgram* getSkinnedShaderProgram() override { return m_skinnedMeshShader; }
-	IShaderProgram* getParticleShaderProgram() override { return m_particleShader; }
-
-	IShaderProgram* getShaderProgram_StaticVertexFactory_Variation(uint32_t pixelVariation);
-
 	IShaderProgram* getShaderProgramVariation(VertexFactory vertexFactory, uint32_t pixelVariation);
 
 private:
-	IShaderProgram* m_staticMeshShader;
-	IShaderProgram* m_skinnedMeshShader;
-	IShaderProgram* m_particleShader;
-
 	std::unordered_map<std::string, IShaderProgram*> m_pixelVariations[VertexFactory_Count];
 
 };

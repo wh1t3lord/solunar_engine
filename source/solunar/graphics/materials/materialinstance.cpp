@@ -4,7 +4,7 @@
 namespace engine
 {
 
-MaterialInstance::~MaterialInstance()
+IMaterialInstance::~IMaterialInstance()
 {
 
 }
