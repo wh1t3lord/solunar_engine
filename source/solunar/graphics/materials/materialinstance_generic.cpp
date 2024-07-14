@@ -9,22 +9,22 @@ namespace engine
 
 static InputLayoutDesc s_vertexInputLayout[] =
 {
-	{ "POSITION", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(Vertex, m_position), INPUT_PER_VERTEX_DATA, 0 },
-	{ "NORMAL", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(Vertex, m_normal),  INPUT_PER_VERTEX_DATA, 0 },
-	{ "TEXCOORD", 0, ImageFormat::RG32F, 0, (UINT)offsetof(Vertex, m_texcoord0),  INPUT_PER_VERTEX_DATA, 0 },
-	{ "TANGENT", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(Vertex, m_tangent),  INPUT_PER_VERTEX_DATA, 0 },
-	{ "BINORMAL", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(Vertex, m_bitangent),  INPUT_PER_VERTEX_DATA, 0 }
+	{ "POSITION", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(Vertex, m_position), INPUT_PER_VERTEX_DATA, 0 },
+	{ "NORMAL", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(Vertex, m_normal), INPUT_PER_VERTEX_DATA, 0 },
+	{ "TEXCOORD", 0, ImageFormat::RG32F, 0, (UINT)offsetof(Vertex, m_texcoord0), INPUT_PER_VERTEX_DATA, 0 },
+	{ "TANGENT", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(Vertex, m_tangent), INPUT_PER_VERTEX_DATA, 0 },
+	{ "BINORMAL", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(Vertex, m_bitangent), INPUT_PER_VERTEX_DATA, 0 }
 };
 
 static InputLayoutDesc s_animatedVertexInputLayout[] =
 {
-	{ "POSITION", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(AnimatedVertex, m_position), INPUT_PER_VERTEX_DATA, 0 },
-	{ "NORMAL", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(AnimatedVertex, m_normal),  INPUT_PER_VERTEX_DATA, 0 },
-	{ "TEXCOORD", 0, ImageFormat::RG32F, 0, (UINT)offsetof(AnimatedVertex, m_texcoord),  INPUT_PER_VERTEX_DATA, 0 },
-	{ "TANGENT", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(AnimatedVertex, m_tangent),  INPUT_PER_VERTEX_DATA, 0 },
-	{ "BINORMAL", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(AnimatedVertex, m_bitangent),  INPUT_PER_VERTEX_DATA, 0 },
-	{ "BLENDWEIGHT", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(AnimatedVertex, m_bitangent),  INPUT_PER_VERTEX_DATA, 0 },
-	{ "BLENDINDICES", 0, ImageFormat::RGBA32, 0, (UINT)offsetof(AnimatedVertex, m_bitangent),  INPUT_PER_VERTEX_DATA, 0 }
+	{ "POSITION", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(AnimatedVertex, m_position), INPUT_PER_VERTEX_DATA, 0 },
+	{ "NORMAL", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(AnimatedVertex, m_normal), INPUT_PER_VERTEX_DATA, 0 },
+	{ "TEXCOORD", 0, ImageFormat::RG32F, 0, (UINT)offsetof(AnimatedVertex, m_texcoord), INPUT_PER_VERTEX_DATA, 0 },
+	{ "TANGENT", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(AnimatedVertex, m_tangent), INPUT_PER_VERTEX_DATA, 0 },
+	{ "BINORMAL", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(AnimatedVertex, m_bitangent), INPUT_PER_VERTEX_DATA, 0 },
+	{ "BLENDWEIGHT", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(AnimatedVertex, m_bitangent), INPUT_PER_VERTEX_DATA, 0 },
+	{ "BLENDINDICES", 0, ImageFormat::RGBA32, 0, (UINT)offsetof(AnimatedVertex, m_bitangent), INPUT_PER_VERTEX_DATA, 0 }
 };
 
 std::string getPixelVariationDefine(uint32_t pixelVariation)

@@ -60,8 +60,8 @@ void DebugRender::initialize()
 	// create input layout
 	InputLayoutDesc layoutDesc[] =
 	{
-		{ "POSITION", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(LineVertex, position), INPUT_PER_VERTEX_DATA, 0 },
-		{ "COLOR", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(LineVertex, color), INPUT_PER_VERTEX_DATA, 0 }
+		{ "POSITION", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(LineVertex, position), INPUT_PER_VERTEX_DATA, 0 },
+		{ "COLOR", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(LineVertex, color), INPUT_PER_VERTEX_DATA, 0 }
 	};
 
 	// create shader

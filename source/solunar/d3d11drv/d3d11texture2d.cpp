@@ -28,6 +28,9 @@ DXGI_FORMAT getDxgiFormat(ImageFormat format)
 	case ImageFormat::RGBA32:
 		return DXGI_FORMAT_R8G8B8A8_UNORM;
 
+	case ImageFormat::RGB32F:
+		return DXGI_FORMAT_R32G32B32_FLOAT;
+
 	case ImageFormat::RGBA32F:
 		return DXGI_FORMAT_R32G32B32A32_FLOAT;
 
