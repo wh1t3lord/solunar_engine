@@ -20,10 +20,14 @@ public:
 
 	IShaderProgram* getShaderProgram_StaticVertexFactory_Variation(uint32_t pixelVariation);
 
+	IShaderProgram* getShaderProgramVariation(VertexFactory vertexFactory, uint32_t pixelVariation);
+
 private:
 	IShaderProgram* m_staticMeshShader;
 	IShaderProgram* m_skinnedMeshShader;
 	IShaderProgram* m_particleShader;
+
+	std::unordered_map<std::string, IShaderProgram*> m_pixelVariations[VertexFactory_Count];
 
 };
 
