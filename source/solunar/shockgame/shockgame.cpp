@@ -25,6 +25,15 @@
 #include "graphics/imguimanager.h"
 #include "graphics/debugrenderer.h"
 
+#undef min
+#undef max
+
+#include <numeric>
+
+// Graphics Objects
+#include "graphics/mesh.h"
+#include "graphics/animatedmodel.h"
+
 #include <array>
 
 namespace engine
@@ -92,6 +101,43 @@ public:
 	}
 
 };
+
+class TestAnimationComponent : public LogicComponent
+{
+	ImplementObject(TestAnimationComponent, LogicComponent);
+public:
+	TestAnimationComponent();
+	~TestAnimationComponent();
+
+	void update(float dt) override;
+
+private:
+	int m_animationIndex = -1;
+};
+
+TestAnimationComponent::TestAnimationComponent()
+{
+}
+
+TestAnimationComponent::~TestAnimationComponent()
+{
+}
+
+void TestAnimationComponent::update(float dt)
+{
+	AnimatedMeshComponent* animatedMeshComponent = getEntity()->getComponent<AnimatedMeshComponent>();
+	std::shared_ptr<ModelBase> modelBase = animatedMeshComponent->lockModel();
+	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
+	if (animatedModel) {
+		if (m_animationIndex == -1) {
+			m_animationIndex = animatedModel->getAnimationByName("test_action");
+			animatedModel->setPlayAnimation(m_animationIndex, true);
+		}
+	}
+
+
+	animatedModel->testPlay(dt);
+}
 
 enum ShockProjectileType
 {
@@ -392,6 +438,7 @@ void registerGameClasses()
 		ObjectGetTypeInfo(LevelManagerComponent),
 		ObjectGetTypeInfo(TestRotatorComponent),
 		ObjectGetTypeInfo(TestPositionUpdaterComponent),
+		ObjectGetTypeInfo(TestAnimationComponent),
 	};
 
 	for (int i = 0; i < sizeof(gameClasses) / sizeof(gameClasses[0]); i++)

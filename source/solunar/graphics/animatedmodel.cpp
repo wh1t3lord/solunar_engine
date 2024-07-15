@@ -10,6 +10,13 @@
 #include "graphics/material.h"
 #include "graphics/animatedmodel.h"
 
+#define ANI_DEBUG
+
+#ifdef ANI_DEBUG
+#include "engine/camera.h"
+#include "graphics/ifontmanager.h"
+#endif // ANI_DEBUG
+
 #define CGLTF_IMPLEMENTATION
 #include <cgltf.h>
 
@@ -37,6 +44,67 @@ bool gltfUnpackValues(const cgltf_primitive& primitive, int64_t index, int64_t v
 	return true;
 }
 
+inline InterpolationType getInterpolationType(cgltf_interpolation_type type)
+{
+	//switch (gltf_animationSampler.interpolation)
+	//{
+	//case cgltf_interpolation_type_linear:
+	//	animationSampler.m_interpolationType = InterpolationType_Linear;
+	//	break;
+
+	//case cgltf_interpolation_type_step:
+	//	animationSampler.m_interpolationType = InterpolationType_Step;
+	//	break;
+
+	//case cgltf_interpolation_type_cubic_spline:
+	//	animationSampler.m_interpolationType = InterpolationType_CubicSpline;
+	//	break;
+	//}
+
+	switch (type)
+	{
+	case cgltf_interpolation_type_linear:
+		return InterpolationType_Linear;
+	
+	case cgltf_interpolation_type_step:
+		return InterpolationType_Step;
+	
+	case cgltf_interpolation_type_cubic_spline:
+		return InterpolationType_CubicSpline;
+
+	default:
+		break;
+	}
+
+	return InterpolationType_Unknown;
+}
+
+inline AnimationPathType getAnimationPathType(cgltf_animation_path_type type)
+{
+	switch (type)
+	{
+	case cgltf_animation_path_type_invalid:
+		break;
+	
+	case cgltf_animation_path_type_translation:
+		return AnimationPathType_Translation;
+	
+	case cgltf_animation_path_type_rotation:
+		return AnimationPathType_Rotation;
+	
+	case cgltf_animation_path_type_scale:
+		return AnimationPathType_Scale;
+	
+	case cgltf_animation_path_type_weights:
+		return AnimationPathType_Weights;
+
+	default:
+		break;
+	}
+
+	return AnimationPathType_Unknown;
+}
+
 // Object registering
 void AnimatedModel::registerObject()
 {
@@ -45,7 +113,6 @@ void AnimatedModel::registerObject()
 
 AnimatedModel::AnimatedModel()
 {
-	m_boneCount = 0;
 }
 
 AnimatedModel::~AnimatedModel()
@@ -182,9 +249,109 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 		m_subMeshes.push_back(submesh);
 	}
 
+	// loading animations
+
 	for (int i = 0; i < data->animations_count; i++) {
-		Core::msg("AnimatedModel: animation %s channels %i", data->animations[i].name, data->animations[i].channels_count);
+		const cgltf_animation& gltf_animation = data->animations[i];
+
+		Animation animation;
+		animation.m_name = gltf_animation.name;
+
+		for (int j = 0; j < gltf_animation.samplers_count; j++) {
+			const cgltf_animation_sampler& gltf_animationSampler = gltf_animation.samplers[j];
+
+			AnimationSampler animationSampler;
+			animationSampler.m_interpolationType = getInterpolationType(gltf_animationSampler.interpolation);
+
+			Assert(animationSampler.m_interpolationType != InterpolationType_Unknown);
+
+			size_t inputCount = gltf_animationSampler.input->count;
+			animationSampler.m_inputs.resize(inputCount);
+			cgltf_accessor_read_float(gltf_animationSampler.input, 0, animationSampler.m_inputs.data(), inputCount);
+
+			size_t outputCount = gltf_animationSampler.output->count;
+			animationSampler.m_outputs.resize(outputCount);
+			cgltf_accessor_unpack_floats(gltf_animationSampler.input, (float*)animationSampler.m_outputs.data(), outputCount);
+
+			animation.m_samplers.push_back(animationSampler);
+		}
+
+		for (const auto& samplers : animation.m_samplers) {
+			for (const auto& input : samplers.m_inputs) {
+				if (input < animation.m_startTime) animation.m_startTime = input;
+				if (input > animation.m_endTime) animation.m_endTime = input;
+			}
+		}
+
+		for (int j = 0; j < gltf_animation.channels_count; j++) {
+			const cgltf_animation_channel& gltf_animationChannel = gltf_animation.channels[j];
+
+			AnimationChannel animationChannel;
+			animationChannel.m_pathType = getAnimationPathType(gltf_animationChannel.target_path);
+			
+			Assert(animationChannel.m_pathType != AnimationPathType_Unknown);
+
+			animationChannel.m_nodeId = cgltf_node_index(data, gltf_animationChannel.target_node);
+			animationChannel.m_samplerId = cgltf_animation_sampler_index(&gltf_animation, gltf_animationChannel.sampler);
+
+ 			animation.m_channels.push_back(animationChannel);
+		}
+
+		m_animations.push_back(animation);
+
+		Core::msg("AnimatedModel: animation %s channels %i", gltf_animation.name, gltf_animation.channels_count);
 	}
+
+	// loading model skin
+	for (int i = 0; i < data->skins_count; i++) {
+		const cgltf_skin& gltf_skin = data->skins[i];
+		m_joints.resize(gltf_skin.joints_count);
+
+		AnimationSkin skin;
+		skin.m_name = gltf_skin.name;
+
+		// load joint too
+		for (int j = 0; j < gltf_skin.joints_count; j++) {
+			const cgltf_node* joint = gltf_skin.joints[j];
+
+			int jointIndex = cgltf_node_index(data, joint);
+			m_joints[jointIndex].m_name = joint->name;
+
+			if (joint->has_translation)
+				m_joints[jointIndex].m_translation = glm::vec3(joint->translation[0], joint->translation[1], joint->translation[2]);
+			else
+				m_joints[jointIndex].m_translation = glm::vec3(0.0f);
+
+			if (joint->has_rotation)
+				m_joints[jointIndex].m_rotation = glm::quat(joint->rotation[3], joint->rotation[0], joint->rotation[1], joint->rotation[2]);
+			else
+				m_joints[jointIndex].m_rotation = glm::identity<glm::quat>();
+
+			if (joint->has_scale)
+				m_joints[jointIndex].m_scale = glm::vec3(joint->scale[0], joint->scale[1], joint->scale[2]);
+			else
+				m_joints[jointIndex].m_scale = glm::vec3(0.0f);
+			
+			if (joint->has_matrix)
+				memcpy(&m_joints[jointIndex].m_matrix[0][0], &joint->matrix[0], 16 * sizeof(float));
+			else
+				m_joints[jointIndex].m_matrix = glm::mat4(1.0f);
+
+			skin.m_joints.push_back(jointIndex);
+		}
+
+		// load the inverse bind matrices
+		size_t inverseBindMatricesCount = gltf_skin.inverse_bind_matrices->count;
+		skin.m_inverseBindMatrices.resize(inverseBindMatricesCount);
+		cgltf_accessor_unpack_floats(gltf_skin.inverse_bind_matrices, (float*)skin.m_inverseBindMatrices.data(), inverseBindMatricesCount);
+
+		if (gltf_skin.skeleton)
+			skin.m_skeletonRootId = cgltf_node_index(data, gltf_skin.skeleton);
+
+		m_skins.push_back(skin);
+	}
+
+	m_nodes.resize(data->nodes_count);
 
 	cgltf_free(data);
 	free(fileData);
@@ -244,8 +411,105 @@ void AnimatedModel::releaseHw()
 	m_subMeshes.clear();
 }
 
+int AnimatedModel::getAnimationByName(const std::string& name)
+{
+	for (int i = 0; i < m_animations.size(); i++)
+		if (m_animations[i].m_name == name)
+			return i;
+
+	return -1;
+}
+
+void AnimatedModel::setPlayAnimation(int index, bool looped)
+{
+	m_currentAnimation = &m_animations[index];
+	m_playLooped = looped;
+}
+
+void AnimatedModel::testPlay(float dt)
+{
+	float animationLengthTime = m_currentAnimation->m_endTime - m_currentAnimation->m_startTime;
+	
+	m_currentTime += 1.0f * dt;
+	if (m_currentTime > animationLengthTime) {
+		
+		if (m_playLooped)
+			m_currentTime = m_currentTime - animationLengthTime;
+		else
+			m_currentTime = m_currentAnimation->m_endTime;
+	}
+
+#ifdef ANI_DEBUG
+	char buf[256];
+	snprintf(buf, sizeof(buf), "Animation: %s", m_currentAnimation->m_name.c_str());
+	g_fontManager->drawSystemFontShadowed(buf, 100, 100, glm::vec4(1.0f));
+
+	snprintf(buf, sizeof(buf), "Current time: %.2f", m_currentTime);
+	g_fontManager->drawSystemFontShadowed(buf, 100, 120, glm::vec4(1.0f));
+#endif // ANI_DEBUG
+
+	float animationCurrentTime = m_currentTime + m_currentAnimation->m_startTime; // смещаем к началу анимации
+	for (int i = 0; i < m_currentAnimation->m_channels.size(); i++) {
+		const AnimationChannel& channel = m_currentAnimation->m_channels[i];
+		const AnimationSampler& sampler = m_currentAnimation->m_samplers[channel.m_samplerId];
+
+		for (size_t j = 0; j < sampler.m_inputs.size() - 1; ++j) {
+			if ((animationCurrentTime >= sampler.m_inputs[j]) && (animationCurrentTime <= sampler.m_inputs[j + 1])) {  // find time sampler
+				float mixValue = std::max(0.0f, animationCurrentTime - sampler.m_inputs[j]) / (sampler.m_inputs[j + 1] - sampler.m_inputs[j]);
+				if (mixValue <= 1.0f) {
+					if (channel.m_pathType == AnimationPathType_Translation) {
+						glm::vec3 A = sampler.m_outputs[j];
+						glm::vec3 B = sampler.m_outputs[j + 1];
+						glm::vec3 translation = glm::lerp(A, B, mixValue);
+						m_nodes[channel.m_nodeId].m_translation = translation;
+					}
+					else if (channel.m_pathType == AnimationPathType_Scale) {
+						glm::vec3 A = sampler.m_outputs[j];
+						glm::vec3 B = sampler.m_outputs[j + 1];
+						glm::vec3 scale = glm::lerp(A, B, mixValue);
+						m_nodes[channel.m_nodeId].m_scale = scale;
+					}
+					else if (channel.m_pathType == AnimationPathType_Rotation) {
+						glm::quat A = (0.0f, sampler.m_outputs[j]);
+						glm::quat B = (0.0f, sampler.m_outputs[j + 1]);
+						glm::quat rotate = glm::slerp(A, B, mixValue);
+						m_nodes[channel.m_nodeId].m_rotation = rotate;
+					}
+
+#ifdef ANI_DEBUG
+					snprintf(buf, sizeof(buf), "Sampler: %i", j);
+					g_fontManager->drawSystemFontShadowed(buf, 100, 140, glm::vec4(1.0f));
+
+					static const char* animationPathStr[AnimationPathType_Count] =
+					{
+						"AnimationPathType_Unknown",
+						"AnimationPathType_Translation",
+						"AnimationPathType_Rotation",
+						"AnimationPathType_Scale",
+						"AnimationPathType_Weights"
+					};
+
+					snprintf(buf, sizeof(buf), "Channel animation path: %s", animationPathStr[channel.m_pathType]);
+					g_fontManager->drawSystemFontShadowed(buf, 100, 160, glm::vec4(1.0f));
+#endif // ANI_DEBUG
+				}
+			}
+		}
+	}
+
+}
+
 ///////////////////////////////////////////////////////////
 // Animated Model Renderer
+
+#include "graphics/shaderconstantmanager.h"
+
+struct BonesCB
+{
+	glm::mat4 matrices[256];
+};
+
+//ConstantBufferProxy g_bonesConstantBuffer;
 
 AnimatedModelRenderer AnimatedModelRenderer::ms_instance;
 
@@ -261,6 +525,9 @@ AnimatedModelRenderer::~AnimatedModelRenderer()
 
 void AnimatedModelRenderer::init()
 {
+	//g_bonesConstantBuffer = ShaderConstantManager::getInstance()->create<BonesCB>("BonesCB");
+
+#if 0
 	// create a dynamic joint-palette texture and sampler
 
 	TextureDesc textureDesc;
@@ -287,10 +554,12 @@ void AnimatedModelRenderer::init()
 	samplerDesc.m_anisotropyLevel = 1.0f;
 
 	m_jointSampler = g_renderDevice->createSamplerState(samplerDesc);
+#endif
 }
 
 void AnimatedModelRenderer::shutdown()
 {
+#if 0
 	if (m_jointSampler)
 	{
 		mem_delete(m_jointSampler);
@@ -302,16 +571,17 @@ void AnimatedModelRenderer::shutdown()
 		mem_delete(m_jointTexture);
 		m_jointTexture = nullptr;
 	}
+#endif
 }
 
 void AnimatedModelRenderer::render(AnimatedModel* model)
 {
 	// compute skinning matrices and write to joint texture upload buffer
 
-	glm::mat4* skinningMatrices = mem_array<glm::mat4>(256);
-	for (int i = 0; i < 256; i++) {
-
-	}
+	//glm::mat4* skinningMatrices = mem_array<glm::mat4>(256);
+	//for (int i = 0; i < 256; i++) {
+	//
+	//}
 }
 
 }

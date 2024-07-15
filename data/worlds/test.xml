@@ -39,6 +39,7 @@
 		<AnimatedMeshComponent>
 			<Model filename="models/anim_test.glb"/>
 		</AnimatedMeshComponent>
+		<TestAnimationComponent/>
 	</Entity>
 	
 	<!-- Test entity with directional light -->

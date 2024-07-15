@@ -43,7 +43,6 @@ VSOutput VSMain(VSInput input)
 	VSOutput output = (VSOutput)0;
 
 	// World position
-	//output.worldPos = mul(input.position, g_modelMatrix);
 	output.worldPos = mul(float4(input.position, 1.0f), g_modelMatrix);
 
 	// Position

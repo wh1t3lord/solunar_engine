@@ -22,6 +22,24 @@ class ITexture2D;
 class ISamplerState;
 class IBufferBase;
 
+enum InterpolationType
+{
+	InterpolationType_Unknown,
+	InterpolationType_Linear,
+	InterpolationType_Step,
+	InterpolationType_CubicSpline,
+	InterpolationType_Count
+};
+
+enum AnimationPathType {
+	AnimationPathType_Unknown,
+	AnimationPathType_Translation,
+	AnimationPathType_Rotation,
+	AnimationPathType_Scale,
+	AnimationPathType_Weights,
+	AnimationPathType_Count
+};
+
 struct AnimatedVertex
 {
 	glm::vec3 m_position;
@@ -33,32 +51,6 @@ struct AnimatedVertex
 	glm::vec4 m_weights;
 };
 
-struct AnimatedModelBoneInfo
-{
-	/*id is index in finalBoneMatrices*/
-	int m_id;
-
-	/*offset matrix transforms vertex from model space to bone space*/
-	glm::mat4 m_offset;
-};
-
-using BoneInfoMap = std::map<std::string, AnimatedModelBoneInfo>;
-
-//struct AnimatedModelSkin
-//{
-//    std::string m_name;
-//    std::vector<int32_t> m_joints;
-//	std::vector<glm::mat4> m_inverseBindMatrices;
-//	int32_t m_skeletonRootId;
-//
-//	void init()
-//	{
-//		m_joints = {};
-//		m_inverseBindMatrices = {};
-//		m_skeletonRootId = -1;
-//	}
-//};
-
 struct AnimatedSubMesh
 {
 	std::vector<AnimatedVertex> m_vertices;
@@ -69,6 +61,45 @@ struct AnimatedSubMesh
 	std::string m_materialName;
 	uint32_t m_verticesCount;
 	uint32_t m_indicesCount;
+};
+
+struct AnimationSampler
+{
+	InterpolationType m_interpolationType = InterpolationType_Unknown;
+	std::vector<float> m_inputs = {};
+	std::vector<glm::vec3> m_outputs = {};
+};
+
+struct AnimationChannel {
+	AnimationPathType m_pathType = AnimationPathType_Unknown;
+	int m_nodeId = -1;
+	int m_samplerId = -1;
+};
+
+struct Animation
+{
+	std::string m_name;
+	std::vector<AnimationSampler> m_samplers;
+	std::vector<AnimationChannel> m_channels;
+	float m_startTime = std::numeric_limits<float>::max();
+	float m_endTime = std::numeric_limits<float>::min();
+};
+
+struct AnimationSkin
+{
+	std::string m_name = "";
+	std::vector<int> m_joints = {};
+	std::vector<glm::mat4> m_inverseBindMatrices = {};
+	int m_skeletonRootId = -1;
+};
+
+struct AnimationNode
+{
+	std::string m_name;
+	glm::vec3 m_translation;
+	glm::quat m_rotation;
+	glm::vec3 m_scale;
+	glm::mat4 m_matrix;
 };
 
 class AnimatedModel : public ModelBase
@@ -86,15 +117,22 @@ public:
 	void createHw() override;
 	void releaseHw() override;
 
-	BoneInfoMap& getBoneMapInfo() { return m_boneInfoMap; }
-	int& getBoneCount() { return m_boneCount; }
-
 	std::vector<AnimatedSubMesh*>& getAnimatedSubmehes() { return m_subMeshes; }
+
+	int getAnimationByName(const std::string& name);
+	void setPlayAnimation(int index, bool looped = false);
+
+	void testPlay(float dt);
 
 private:
 	std::vector<AnimatedSubMesh*> m_subMeshes;
-	BoneInfoMap m_boneInfoMap;
-	int m_boneCount;
+	std::vector<Animation> m_animations;
+	std::vector<AnimationSkin> m_skins;
+	std::vector<AnimationNode> m_joints;
+	std::vector<AnimationNode> m_nodes;
+	Animation* m_currentAnimation;
+	bool m_playLooped = false;
+	float m_currentTime = 0.0f;
 };
 
 class AnimatedModelRenderer : public Singleton<AnimatedModelRenderer>
