@@ -16,6 +16,7 @@
 // Graphics objects
 #include "graphics/image.h"
 #include "graphics/mesh.h"
+#include "graphics/animatedmodel.h"
 #include "graphics/material.h"
 #include "graphics/materials/materialinstance.h"
 #include "graphics/materials/materialinstance_generic.h"
@@ -291,7 +292,13 @@ void D3D11Renderer::bindMaterialForMesh(MeshComponent* mesh, Material* material,
 	else
 		pixelVariation |= PixelVariation_Lit;
 
-	IShaderProgram* shaderProgram = materialInstance->getShaderProgramVariation(VertexFactory_StaticMesh, pixelVariation);
+	IShaderProgram* shaderProgram = nullptr;
+
+	if (mesh->isA<AnimatedMeshComponent>())
+		shaderProgram = materialInstance->getShaderProgramVariation(VertexFactory_SkinnedMesh, pixelVariation);
+	else
+		shaderProgram = materialInstance->getShaderProgramVariation(VertexFactory_StaticMesh, pixelVariation);
+
 	Assert2(shaderProgram, "Unknowed mesh component type!");
 
 	// bind material instance shader and material uniforms
@@ -336,8 +343,10 @@ void D3D11Renderer::renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshCom
 	// setup lights
 	setupLights(graphicsWorld);
 
-	//if (StaticMeshComponent* staticMesh = dynamicCast<StaticMeshComponent>(mesh))
-	renderStaticMesh(graphicsWorld, view, mesh);
+	if (mesh->isA<AnimatedMeshComponent>())
+		renderAnimatedMesh(graphicsWorld, view, mesh);
+	else
+		renderStaticMesh(graphicsWorld, view, mesh);
 }
 
 void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
@@ -374,10 +383,6 @@ void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 		bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
 
 		ShaderConstantManager::getInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
-
-		/*graphicsDevice->setIndexBuffer(it->getIndexBuffer());*/
-
-		/*graphicsDevice->drawElements(PrimitiveMode::Triangles, it->getIndeciesCount());*/
 
 		// install polygon fill mode based on which mode set now
 
@@ -426,6 +431,96 @@ void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 			// reset
 		//	if (getRenderMode() == RendererViewMode::Wireframe)
 		//		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+
+		// return what have been
+		RenderContext::setContext(savedCtx);
+	}
+}
+
+void D3D11Renderer::renderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
+{
+	// OPTICK_EVENT("D3D11Renderer::renderAnimatedMesh");
+
+	std::shared_ptr<ModelBase> model = mesh->lockModel();
+	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(model.get());
+
+	for (const auto& submesh : animatedModel->getAnimatedSubmehes())
+	{
+		// create saved render ctx as previous model.
+		RenderContext savedCtx = RenderContext::getContext();
+
+		// create local copy of render context
+		RenderContext localCtx = RenderContext::getContext();
+
+		// transpose matrices for D3D11
+		//localCtx.model = glm::transpose(localCtx.model);
+
+		// set our local render ctx
+		RenderContext::setContext(localCtx);
+
+		g_renderDevice->setVertexBuffer(submesh->m_vertexBuffer, sizeof(AnimatedVertex), 0);
+		g_renderDevice->setIndexBuffer(submesh->m_indexBuffer, false);
+		g_renderDevice->setVertexFormat(&s_vfVertex);
+
+		//g_renderDevice->setIndexBuffer(it->getIndexBuffer());
+
+		//it->getMaterial()->bind();
+
+		std::shared_ptr<Material> material = submesh->m_material.lock();
+		bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
+
+		ShaderConstantManager::getInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
+
+		// install polygon fill mode based on which mode set now
+
+		// if we showing polys
+		if (m_meshPolysWireframe && m_currentViewMode != RendererViewMode::Wireframe)
+		{
+			// render mesh normaly
+			//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
+			//glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
+
+			// set polygon fill to lines
+		//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+			// hack view
+			RenderContext hackHackHack = localCtx;
+			hackHackHack.proj[2][3] -= 0.0001f;
+			RenderContext::setContext(hackHackHack);
+
+			// hack the view
+			RendererViewMode savedViewMode = m_currentViewMode;
+			m_currentViewMode = RendererViewMode::Wireframe;
+
+			// bind material again
+			bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
+
+			// draw with lines
+			g_renderDevice->drawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
+			//g_renderDevice->draw(PM_TriangleList, 0, submesh->m_verticesCount);
+			//glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
+			//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
+
+			// reset view mode
+			m_currentViewMode = savedViewMode;
+
+			// reset mode
+			//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+		}
+		else
+		{
+			//	if (getRenderMode() == RendererViewMode::Wireframe)
+			//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+			g_renderDevice->drawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
+			//g_renderDevice->draw(PM_TriangleList, 0, submesh->m_verticesCount);
+			//	glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
+				//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
+
+				// reset
+			//	if (getRenderMode() == RendererViewMode::Wireframe)
+			//		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
 
 		// return what have been

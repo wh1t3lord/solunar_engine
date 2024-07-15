@@ -29,8 +29,8 @@ struct AnimatedVertex
 	glm::vec2 m_texcoord;
 	glm::vec3 m_tangent;
 	glm::vec3 m_bitangent;
-	int32_t m_boneIDs[MAX_BONE_WEIGHT];
-	float m_weights[MAX_BONE_WEIGHT];
+	glm::ivec4 m_boneIDs;
+	glm::vec4 m_weights;
 };
 
 struct AnimatedModelBoneInfo
@@ -61,9 +61,14 @@ using BoneInfoMap = std::map<std::string, AnimatedModelBoneInfo>;
 
 struct AnimatedSubMesh
 {
+	std::vector<AnimatedVertex> m_vertices;
+	std::vector<uint32_t> m_indices;
 	IBufferBase* m_vertexBuffer;
+	IBufferBase* m_indexBuffer;
 	std::weak_ptr<Material> m_material;
 	std::string m_materialName;
+	uint32_t m_verticesCount;
+	uint32_t m_indicesCount;
 };
 
 class AnimatedModel : public ModelBase
@@ -76,12 +81,15 @@ public:
 	static void registerObject();
 
 	void load(const std::shared_ptr<DataStream>& dataStream) override;
+	void load_GLTF(const std::shared_ptr<DataStream>& dataStream);
 
 	void createHw() override;
 	void releaseHw() override;
 
 	BoneInfoMap& getBoneMapInfo() { return m_boneInfoMap; }
 	int& getBoneCount() { return m_boneCount; }
+
+	std::vector<AnimatedSubMesh*>& getAnimatedSubmehes() { return m_subMeshes; }
 
 private:
 	std::vector<AnimatedSubMesh*> m_subMeshes;

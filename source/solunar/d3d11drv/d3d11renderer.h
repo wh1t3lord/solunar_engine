@@ -43,6 +43,7 @@ private:
 	void setSwapChainRenderTarget() override;
 
 	void renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh);
+	void renderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh);
 
 private:
 	RendererSingletonStorer m_singletonStorer;

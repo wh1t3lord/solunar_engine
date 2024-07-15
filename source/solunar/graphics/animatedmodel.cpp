@@ -7,180 +7,35 @@
 #include "graphics/core/texture.h"
 #include "graphics/core/buffer.h"
 
+#include "graphics/material.h"
 #include "graphics/animatedmodel.h"
+
+#define CGLTF_IMPLEMENTATION
+#include <cgltf.h>
 
 namespace engine
 {
 
-//const unsigned int kAssimpFlags = 
-//	aiProcessPreset_TargetRealtime_Quality |                     // some optimizations and safety checks
-//	aiProcess_OptimizeMeshes |                                   // minimize number of meshes
-//	//aiProcess_PreTransformVertices |                             // apply node matrices
-//	//	aiProcess_Triangulate |
-//	aiProcess_SplitLargeMeshes |
-//	aiProcess_TransformUVCoords /*|*/ // apply UV transformations
-//	/*aiProcess_FlipUVs*/;
-//
-//inline static glm::mat4 Assimp2Glm(const aiMatrix4x4& from)
-//{
-//	return glm::mat4(
-//		(double)from.a1, (double)from.b1, (double)from.c1, (double)from.d1,
-//		(double)from.a2, (double)from.b2, (double)from.c2, (double)from.d2,
-//		(double)from.a3, (double)from.b3, (double)from.c3, (double)from.d3,
-//		(double)from.a4, (double)from.b4, (double)from.c4, (double)from.d4
-//	);
-//}
-//
-//void SetVertexBoneData(AnimatedVertex& vertex, int boneID, float weight)
-//{
-//	for (int i = 0; i < MAX_BONE_WEIGHT; ++i)
-//	{
-//		if (vertex.m_boneIDs[i] < 0)
-//		{
-//			vertex.m_weights[i] = weight;
-//			vertex.m_boneIDs[i] = boneID;
-//			break;
-//		}
-//	}
-//}
-//
-//void ExtractBoneWeightForVertices(AnimatedModel* model, std::vector<AnimatedVertex>& vertices, aiMesh* mesh, const aiScene* scene)
-//{
-//	auto& boneInfoMap = model->getBoneMapInfo(); //m_BoneInfoMap;
-//	int& boneCount = model->getBoneCount(); // m_BoneCounter;
-//
-//	for (int boneIndex = 0; boneIndex < mesh->mNumBones; ++boneIndex)
-//	{
-//		int boneID = -1;
-//		std::string boneName = mesh->mBones[boneIndex]->mName.C_Str();
-//		if (boneInfoMap.find(boneName) == boneInfoMap.end())
-//		{
-//			AnimatedModelBoneInfo newBoneInfo;
-//			newBoneInfo.m_id = boneCount;
-//			newBoneInfo.m_offset = Assimp2Glm(mesh->mBones[boneIndex]->mOffsetMatrix);
-//			boneInfoMap[boneName] = newBoneInfo;
-//			boneID = boneCount;
-//			boneCount++;
-//		}
-//		else
-//		{
-//			boneID = boneInfoMap[boneName].m_id;
-//		}
-//
-//		Assert(boneID != -1);
-//		auto weights = mesh->mBones[boneIndex]->mWeights;
-//		int numWeights = mesh->mBones[boneIndex]->mNumWeights;
-//
-//		for (int weightIndex = 0; weightIndex < numWeights; ++weightIndex)
-//		{
-//			int vertexId = weights[weightIndex].mVertexId;
-//			float weight = weights[weightIndex].mWeight;
-//			Assert(vertexId <= vertices.size());
-//			SetVertexBoneData(vertices[vertexId], boneID, weight);
-//		}
-//	}
-//}
-//
-//AnimatedSubMesh* ProccessAnimatedSubMesh(AnimatedModel* model, aiMesh* mesh, aiNode* node, const aiScene* scene)
-//{
-//	std::vector<AnimatedVertex> vertices;
-//	std::vector<uint32_t> indecies;
-//
-//	for (uint32_t i = 0; i < mesh->mNumVertices; i++)
-//	{
-//		AnimatedVertex vertex;
-//		vertex.m_position = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
-//		vertex.m_normal = glm::vec3(mesh->mNormals[i].x, mesh->mNormals[i].y, mesh->mNormals[i].z);
-//
-//		if (mesh->mTextureCoords[0])
-//			vertex.m_texcoord = glm::vec2(mesh->mTextureCoords[0][i].x, mesh->mTextureCoords[0][i].y);
-//		else
-//			vertex.m_texcoord = glm::vec2(0.0f, 0.0f);
-//
-//		if (mesh->mTangents)
-//			vertex.m_tangent = glm::vec3(mesh->mTangents[i].x, mesh->mTangents[i].y, mesh->mTangents[i].z);
-//		else
-//			vertex.m_tangent = glm::vec3(0.0f);
-//
-//		if (mesh->mBitangents)
-//			vertex.m_bitangent = glm::vec3(mesh->mBitangents[i].x, mesh->mBitangents[i].y, mesh->mBitangents[i].z);
-//		else
-//			vertex.m_bitangent = glm::vec3(0.0f);
-//
-//		for (int i = 0; i < MAX_BONE_WEIGHT; i++)
-//		{
-//			vertex.m_boneIDs[i] = -1;
-//			vertex.m_weights[i] = 0.0f;
-//		}
-//
-//		vertices.push_back(vertex);
-//	}
-//
-//
-//	for (uint32_t i = 0; i < mesh->mNumFaces; i++)
-//	{
-//		aiFace face = mesh->mFaces[i];
-//
-//		for (uint32_t j = 0; j < face.mNumIndices; j++)
-//			indecies.push_back(face.mIndices[j]);
-//	}
-//
-//	aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
-//
-//	char buffer[256];
-//	sprintf(buffer, "data/materials/%s.xml", material->GetName().C_Str());
-//
-//	std::string bufferString = buffer;
-//	osConvertStandartPath(bufferString);
-//
-//	if (!g_fileSystem->exist(bufferString.c_str()))
-//	{
-//		std::string directoryPath = getDirectoryPath(bufferString);
-//		osConvertPath(directoryPath);
-//
-//		/*		if (!isDirectoryExist(directoryPath.c_str()))
-//					createDirectory(directoryPath.c_str());*/
-//
-//		aiString diffusePath;
-//		material->GetTexture(aiTextureType_DIFFUSE, 0, &diffusePath);
-//
-//		if (diffusePath.length == 0)
-//		{
-//			material->GetTexture(aiTextureType_DIFFUSE, 1, &diffusePath);
-//			if (diffusePath.length == 0)
-//			{
-//				material->GetTexture(aiTextureType_BASE_COLOR, 0, &diffusePath);
-//			}
-//		}
-//
-//
-//		aiString normalPath;
-//		material->GetTexture(aiTextureType_NORMALS, 0, &normalPath);
-//
-//		Material::createMaterialFromImport(material->GetName().C_Str(), diffusePath.C_Str(), normalPath.C_Str());
-//	}
-//
-//	aiMatrix4x4 nodePosition = node->mTransformation;
-//	glm::mat4 transform = glm::mat4(1.0f);
-//	transform = Assimp2Glm(nodePosition);
-//
-//	return nullptr;
-//
-//	//return mem_new<SubMesh>(vertices, indecies, transform, material->GetName().C_Str());
-//}
-//
-//void ProccessAnimatedNode(AnimatedModel* model, std::vector<AnimatedSubMesh*>& submeshes, aiNode* node, const aiScene* scene)
-//{
-//	for (uint32_t i = 0; i < node->mNumMeshes; i++)
-//	{
-//		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
-//		AnimatedSubMesh* submesh = ProccessAnimatedSubMesh(model, mesh, node, scene);
-//		submeshes.push_back(submesh);
-//	}
-//
-//	for (uint32_t i = 0; i < node->mNumChildren; i++)
-//		ProccessAnimatedNode(model, submeshes, node->mChildren[i], scene);
-//}
+// UnpackValue
+template <typename T>
+bool gltfUnpackValues(const cgltf_primitive& primitive, int64_t index, int64_t vtxCount, std::vector<T>& data)
+{
+	if (index == -1) {
+		Core::msg("gltfUnpackValue: Invalid index %i", index);
+		return false;
+	}
+
+	const auto& Attributes = primitive.attributes[index];
+	const size_t NumComponents = cgltf_num_components(Attributes.data->type);
+	if (NumComponents != (sizeof(T) / sizeof(float))) {
+		Core::msg("gltfUnpackValue: Mesh doesn't contain invalid attribute %s information.", Attributes.name);
+		return false;
+	}
+
+	data.resize(vtxCount);
+	cgltf_accessor_unpack_floats(Attributes.data, (float*)data.data(), vtxCount * NumComponents);
+	return true;
+}
 
 // Object registering
 void AnimatedModel::registerObject()
@@ -195,56 +50,202 @@ AnimatedModel::AnimatedModel()
 
 AnimatedModel::~AnimatedModel()
 {
+	releaseHw();
 }
 
 void AnimatedModel::load(const std::shared_ptr<DataStream>& stream)
 {
-	//stream->seek(Seek_End, 0);
-	//long fileLenght = stream->tell();
-	//stream->seek(Seek_Begin, 0);
+	load_GLTF(stream);
+}
 
-	//uint8_t* fileData = mem_array<uint8_t>(fileLenght);
-	//stream->read(fileData, fileLenght);
+void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
+{
+	stream->seek(Seek_End, 0);
+	size_t filesize = stream->tell();
+	stream->seek(Seek_Begin, 0);
 
-	//Assimp::Importer importer;
-	////const aiScene* scene = importer.ReadFile(m_filename.c_str(), aiProcess_Triangulate /*| aiProcess_TransformUVCoords | aiProcess_FlipUVs*/);
-	//const aiScene* scene = importer.ReadFileFromMemory(fileData, fileLenght, kAssimpFlags);
+	uint8_t* fileData = (uint8_t*)malloc(filesize);
+	stream->read(fileData, filesize);
 
-	//if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode)
-	//{
-	//	Core::error("Failed to load model. %s", importer.GetErrorString());
-	//}
+	cgltf_data* data = NULL;
+	cgltf_options options = {};
+	cgltf_result result = cgltf_parse(&options, fileData, filesize, &data);
 
-	//Assert(scene);
+	if (result != cgltf_result_success) {
+		Core::msg("AnimatedModel: Failed to parse GLTF asset.");
+		return;
+	}
 
-	//ProccessAnimatedNode(this, m_subMeshes, scene->mRootNode, scene);
+	result = cgltf_load_buffers(&options, data, nullptr);
+	if (result != cgltf_result_success) {
+		cgltf_free(data);
+		Core::msg("AnimatedModel: Failed to load buffers for GLTF asset .");
+		return;
+	}
 
-	//for (int i = 0; i < scene->mNumAnimations; i++)
-	//{
-	//	aiAnimation* ani = scene->mAnimations[i];
-	//	if (ani)
-	//	{
-	//		Core::msg("Ani: name %s, duration: %.1f", 
-	//			ani->mName.C_Str(),
-	//			(float)ani->mDuration);
-	//	}
-	//}
+	for (int i = 0; i < data->meshes_count; i++) {
+		const cgltf_mesh& mesh = data->meshes[i];
+		
+		// #TODO: more than one primitive !!!
+		const cgltf_primitive& primitive = mesh.primitives[0];
 
-	//mem_free_array(fileData);
+		const size_t vtxCount = primitive.attributes[0].data->count;
+		const size_t idxCount = primitive.indices->count;
+		
+		int64_t attributePosition = -1;
+		int64_t attributeNormal = -1;
+		int64_t attributeTexcoord = -1;
+		int64_t attributeTangent = -1;
+		int64_t attributeBoneIds = -1;
+		int64_t attributeWeights = -1;
 
-	//createHw();
+		for (int j = 0; j < primitive.attributes_count; j++) {
+			const auto& attribute = primitive.attributes[j];
+			std::string name = std::string(attribute.name);
+			if (attribute.data->count != vtxCount) {
+				Core::msg("AnimatedModel: Invalid attribute count in mesh %s for attribute %i.", mesh.name, (int)attribute.type);
+				return;
+			}
+
+			if (attribute.type == cgltf_attribute_type_position) {
+				attributePosition = j;
+			}
+			
+			if (attribute.type == cgltf_attribute_type_normal) {
+				attributeNormal = j;
+			}
+			
+			if (attribute.type == cgltf_attribute_type_texcoord) {
+				attributeTexcoord = j;
+			}
+
+			if (attribute.type == cgltf_attribute_type_tangent) {
+				attributeTangent = j;
+			}
+
+			if (attribute.type == cgltf_attribute_type_joints) {
+				attributeBoneIds = j;
+			}
+
+			if (attribute.type == cgltf_attribute_type_weights) {
+				attributeWeights = j;
+			}
+		}
+
+		std::vector<uint32_t> indices;
+		std::vector<glm::vec3> positions;
+		std::vector<glm::vec2> texcoords;
+		std::vector<glm::vec3> normals;
+		std::vector<glm::vec4> tangents;
+		std::vector<glm::ivec4> joints;
+		std::vector<glm::vec4> weights;
+
+		indices.resize(idxCount);
+		cgltf_accessor_unpack_indices(primitive.indices, indices.data(), sizeof(uint32_t), idxCount);
+
+		gltfUnpackValues(primitive, attributePosition, vtxCount, positions);
+		gltfUnpackValues(primitive, attributeTexcoord, vtxCount, texcoords);
+		gltfUnpackValues(primitive, attributeNormal, vtxCount, normals);
+		gltfUnpackValues(primitive, attributeTangent, vtxCount, tangents);
+		gltfUnpackValues(primitive, attributeBoneIds, vtxCount, joints);
+		gltfUnpackValues(primitive, attributeWeights, vtxCount, weights);
+
+		BoundingBox AABB;
+		AABB.setIdentity();
+
+		for (size_t o = 0; o < vtxCount; o++) {
+			//positions[o].z = -positions[o].z;  // Sparkle uses LH Y+
+			AABB.m_min = glm::min(positions[o], AABB.m_min);
+			AABB.m_max = glm::max(positions[o], AABB.m_max);
+		}
+
+		// calculate vertices
+		std::vector<AnimatedVertex> vertices;
+		for (size_t o = 0; o < vtxCount; o++) {
+			AnimatedVertex vertex;
+			vertex.m_position = positions[o];
+			vertex.m_normal = normals[o];
+			vertex.m_texcoord = texcoords[o];
+			vertex.m_tangent = glm::vec3(tangents[o]);
+			vertex.m_bitangent = glm::cross(vertex.m_normal, vertex.m_tangent);
+			vertex.m_boneIDs = joints[o];
+			vertex.m_weights = weights[o];
+			vertices.push_back(vertex);
+		}
+
+		AnimatedSubMesh* submesh = mem_new<AnimatedSubMesh>();
+		submesh->m_vertices = vertices;
+		submesh->m_verticesCount = vertices.size();
+		submesh->m_indices = indices;
+		submesh->m_indicesCount = indices.size();
+		submesh->m_materialName = "materials/default_material.xml";
+		m_subMeshes.push_back(submesh);
+	}
+
+	for (int i = 0; i < data->animations_count; i++) {
+		Core::msg("AnimatedModel: animation %s channels %i", data->animations[i].name, data->animations[i].channels_count);
+	}
+
+	cgltf_free(data);
+	free(fileData);
+
+	createHw();
 }
 
 void AnimatedModel::createHw()
 {
+	for (int i = 0; i < m_subMeshes.size(); i++)
+	{
+		AnimatedSubMesh* submesh = m_subMeshes[i];
+
+		BufferDesc bufferDesc;
+		memset(&bufferDesc, 0, sizeof(bufferDesc));
+		bufferDesc.m_bufferType = BufferType::VertexBuffer;
+		bufferDesc.m_bufferAccess = BufferAccess::Static;
+		bufferDesc.m_bufferMemorySize = submesh->m_vertices.size() * sizeof(AnimatedVertex);
+
+		SubresourceDesc subresourceDesc;
+		memset(&subresourceDesc, 0, sizeof(subresourceDesc));
+		subresourceDesc.m_memory = submesh->m_vertices.data();
+		subresourceDesc.m_memoryPitch = sizeof(AnimatedVertex);
+
+		submesh->m_vertexBuffer = g_renderDevice->createBuffer(bufferDesc, subresourceDesc);
+		submesh->m_vertices.clear();
+
+		memset(&bufferDesc, 0, sizeof(bufferDesc));
+		bufferDesc.m_bufferType = BufferType::IndexBuffer;
+		bufferDesc.m_bufferAccess = BufferAccess::Static;
+		bufferDesc.m_bufferMemorySize = submesh->m_indices.size() * sizeof(uint32_t);
+
+		memset(&subresourceDesc, 0, sizeof(subresourceDesc));
+		subresourceDesc.m_memory = submesh->m_indices.data();
+		subresourceDesc.m_memoryPitch = sizeof(uint32_t);
+
+		submesh->m_indexBuffer = g_renderDevice->createBuffer(bufferDesc, subresourceDesc);
+		submesh->m_indices.clear();
+
+		submesh->m_material = g_contentManager->loadObject<Material>(submesh->m_materialName);
+	}
 }
 
 void AnimatedModel::releaseHw()
 {
+	for (int i = 0; i < m_subMeshes.size(); i++)
+	{
+		AnimatedSubMesh* submesh = m_subMeshes[i];
+		submesh->m_material.reset();
+
+		mem_delete(submesh->m_indexBuffer);
+		mem_delete(submesh->m_vertexBuffer);
+
+		mem_delete(submesh);
+	}
+
+	m_subMeshes.clear();
 }
 
 ///////////////////////////////////////////////////////////
-// Animated Model Texture Renderer
+// Animated Model Renderer
 
 AnimatedModelRenderer AnimatedModelRenderer::ms_instance;
 

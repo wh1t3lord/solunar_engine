@@ -135,7 +135,7 @@ D3D11ShaderProgram::~D3D11ShaderProgram()
 
 void D3D11ShaderProgram::create(D3D11Device* device, const char* vstext, const char* pstext, const char* defines /*= nullptr*/, InputLayoutDesc* inputLayout /*= nullptr*/, int inputLayoutCount /*= 0*/)
 {
-	ID3DBlob* vertexShaderBlob = createShaderFromText(vstext, ShaderType_Vertex);
+	ID3DBlob* vertexShaderBlob = createShaderFromText(vstext, ShaderType_Vertex, defines);
 	device->getDevice()->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), NULL, &m_vertexShader);
 
 	if (inputLayout && inputLayoutCount > 0)

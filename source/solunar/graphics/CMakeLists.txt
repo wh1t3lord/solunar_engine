@@ -28,5 +28,6 @@ target_include_directories(graphics PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../"
 				    PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 
 target_include_directories(graphics PRIVATE "${CMAKE_SOURCE_DIR}/externals/assimp/include")
+target_include_directories(graphics PRIVATE "${CMAKE_SOURCE_DIR}/externals/cgltf-1.14")
 
 target_link_libraries(graphics imgui core)
