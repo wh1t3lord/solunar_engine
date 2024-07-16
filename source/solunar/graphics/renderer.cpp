@@ -29,6 +29,7 @@
 #include "graphics/ui/rmlsystem.h"
 #include "graphics/postfxmanager.h"
 #include "graphics/imguimanager.h"
+#include "graphics/animatedmodel.h"
 
 #include "engine/camera.h"
 #include "engine/engine.h"
@@ -169,6 +170,8 @@ namespace engine
 
 		g_postFxManager.init(CameraProxy::getInstance()->getView());
 
+		AnimatedModelRenderer::getInstance()->init();
+
 //		ShadowsRenderer::getInstance()->init();
 	}
 
@@ -177,6 +180,8 @@ namespace engine
 		// release inplace resources
 
 		ShadowsRenderer::getInstance()->shutdown();
+
+		AnimatedModelRenderer::getInstance()->shutdown();
 
 		g_postFxManager.shutdown();
 
@@ -295,6 +300,9 @@ namespace engine
 					RenderContext& renderCtx = RenderContext::getContext();
 					renderCtx.model = entity->getWorldTranslation();
 					RenderContext::setContext(renderCtx);
+
+					if (meshComponent->isA(AnimatedMeshComponent::getStaticTypeInfo()))
+						AnimatedModelRenderer::getInstance()->render((AnimatedMeshComponent*)meshComponent);
 
 					// call render function
 					renderMesh(world->getGraphicsWorld(), view, meshComponent);

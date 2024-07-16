@@ -13,7 +13,7 @@ struct VSInput
 	float3 bitangent	: BINORMAL;
 #ifdef SKINNED
 	float4 weights		: BLENDWEIGHT;
-	uint boneIds		: BLENDINDICES;
+	float4 boneIds		: BLENDINDICES;
 #endif
 };
 
@@ -38,6 +38,14 @@ cbuffer GlobalData : register(b0)
 	float4 g_viewDir;
 };
 
+#ifdef SKINNED
+cbuffer SkinningData : register(b1)
+{
+	float4x4 g_bonesMatrices[256];
+};
+#endif
+
+#ifndef SKINNED
 VSOutput VSMain(VSInput input)
 {
 	VSOutput output = (VSOutput)0;
@@ -58,3 +66,31 @@ VSOutput VSMain(VSInput input)
 	
 	return output;
 }
+#else
+VSOutput VSMain(VSInput input)
+{
+	VSOutput output = (VSOutput)0;
+
+	// calculate bone transform
+	row_major float4x4 skinMatrix = input.weights.x * g_bonesMatrices[int(input.boneIds.x)]
+		+ input.weights.y * g_bonesMatrices[int(input.boneIds.y)]
+		+ input.weights.z * g_bonesMatrices[int(input.boneIds.z)]
+		+ input.weights.w * g_bonesMatrices[int(input.boneIds.w)];
+
+	// World position
+	output.worldPos = mul(float4(input.position, 1.0f), skinMatrix);
+	output.worldPos = mul(float4(output.worldPos, 1.0f), g_modelMatrix);
+
+	// Position
+	output.position = mul(float4(output.worldPos, 1.0f), g_viewMatrix);
+	output.position = mul(output.position, g_projectionMatrix);
+
+	// texcoord
+	output.texcoord = input.texcoord;
+
+	// normal
+	output.normal = mul(float4(output.normal, 0.0f), g_modelMatrix);
+	
+	return output;
+}
+#endif

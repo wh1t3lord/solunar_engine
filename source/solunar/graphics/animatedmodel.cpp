@@ -7,15 +7,12 @@
 #include "graphics/core/texture.h"
 #include "graphics/core/buffer.h"
 
+#include "graphics/renderer.h"
 #include "graphics/material.h"
 #include "graphics/animatedmodel.h"
-
-#define ANI_DEBUG
-
-#ifdef ANI_DEBUG
-#include "engine/camera.h"
-#include "graphics/ifontmanager.h"
-#endif // ANI_DEBUG
+#include "graphics/mesh.h"
+#include "graphics/shaderconstantmanager.h"
+#include "graphics/debugrenderer.h"
 
 #define CGLTF_IMPLEMENTATION
 #include <cgltf.h>
@@ -204,7 +201,7 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 		std::vector<glm::vec2> texcoords;
 		std::vector<glm::vec3> normals;
 		std::vector<glm::vec4> tangents;
-		std::vector<glm::ivec4> joints;
+		std::vector<glm::vec4> joints;
 		std::vector<glm::vec4> weights;
 
 		indices.resize(idxCount);
@@ -231,9 +228,25 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 		for (size_t o = 0; o < vtxCount; o++) {
 			AnimatedVertex vertex;
 			vertex.m_position = positions[o];
-			vertex.m_normal = normals[o];
-			vertex.m_texcoord = texcoords[o];
-			vertex.m_tangent = glm::vec3(tangents[o]);
+
+			if (normals.size() > 0) {
+				vertex.m_normal = normals[o];
+			} else {
+				vertex.m_normal = glm::vec3(0.0f);
+			}
+
+			if (texcoords.size() > 0) {
+				vertex.m_texcoord = texcoords[o];
+			} else {
+				vertex.m_texcoord = glm::vec2(0.0f);
+			}
+
+			if (tangents.size() > 0) {
+				vertex.m_tangent = glm::vec3(tangents[o]);
+			} else {
+				vertex.m_tangent = glm::vec3(0.0f);
+			}
+
 			vertex.m_bitangent = glm::cross(vertex.m_normal, vertex.m_tangent);
 			vertex.m_boneIDs = joints[o];
 			vertex.m_weights = weights[o];
@@ -255,7 +268,9 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 		const cgltf_animation& gltf_animation = data->animations[i];
 
 		Animation animation;
-		animation.m_name = gltf_animation.name;
+		animation.m_name = "unknowed animation name";
+		if (gltf_animation.name)
+			animation.m_name = gltf_animation.name;
 
 		for (int j = 0; j < gltf_animation.samplers_count; j++) {
 			const cgltf_animation_sampler& gltf_animationSampler = gltf_animation.samplers[j];
@@ -267,11 +282,20 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 
 			size_t inputCount = gltf_animationSampler.input->count;
 			animationSampler.m_inputs.resize(inputCount);
-			cgltf_accessor_read_float(gltf_animationSampler.input, 0, animationSampler.m_inputs.data(), inputCount);
+			cgltf_accessor_unpack_floats(gltf_animationSampler.input, (float*)animationSampler.m_inputs.data(), inputCount);
 
 			size_t outputCount = gltf_animationSampler.output->count;
 			animationSampler.m_outputs.resize(outputCount);
-			cgltf_accessor_unpack_floats(gltf_animationSampler.input, (float*)animationSampler.m_outputs.data(), outputCount);
+			
+			if (gltf_animationSampler.output->type == cgltf_type_vec3) {
+				for (int k = 0; k < outputCount; k++) {
+					glm::vec3 outputValue = glm::vec3(0.0f);
+					cgltf_accessor_read_float(gltf_animationSampler.output, k, (float*)&outputValue, sizeof(glm::vec3));
+					animationSampler.m_outputs[k] = glm::vec4(outputValue, 0.0f);
+				}	
+			} else if (gltf_animationSampler.output->type == cgltf_type_vec4) {
+				cgltf_accessor_unpack_floats(gltf_animationSampler.output, (float*)animationSampler.m_outputs.data(), outputCount * sizeof(glm::vec4));
+			}
 
 			animation.m_samplers.push_back(animationSampler);
 		}
@@ -305,17 +329,29 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 	// loading model skin
 	for (int i = 0; i < data->skins_count; i++) {
 		const cgltf_skin& gltf_skin = data->skins[i];
-		m_joints.resize(gltf_skin.joints_count);
+	//	m_joints.resize(gltf_skin.joints_count);
 
 		AnimationSkin skin;
-		skin.m_name = gltf_skin.name;
+		skin.m_name = "unknowed skin name";
+		if (gltf_skin.name)
+			skin.m_name = gltf_skin.name;
+
+		skin.m_joints.resize(gltf_skin.joints_count);
 
 		// load joint too
 		for (int j = 0; j < gltf_skin.joints_count; j++) {
 			const cgltf_node* joint = gltf_skin.joints[j];
 
 			int jointIndex = cgltf_node_index(data, joint);
-			m_joints[jointIndex].m_name = joint->name;
+			skin.m_joints[j] = jointIndex;
+#if 0
+			if (joint->name) {
+				m_joints[jointIndex].m_name = joint->name;
+			} else {
+				char buf[32];
+				snprintf(buf, sizeof(buf), "Joint %i", j);
+				m_joints[jointIndex].m_name = buf;
+			}
 
 			if (joint->has_translation)
 				m_joints[jointIndex].m_translation = glm::vec3(joint->translation[0], joint->translation[1], joint->translation[2]);
@@ -336,14 +372,13 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 				memcpy(&m_joints[jointIndex].m_matrix[0][0], &joint->matrix[0], 16 * sizeof(float));
 			else
 				m_joints[jointIndex].m_matrix = glm::mat4(1.0f);
-
-			skin.m_joints.push_back(jointIndex);
+#endif	
 		}
 
 		// load the inverse bind matrices
 		size_t inverseBindMatricesCount = gltf_skin.inverse_bind_matrices->count;
 		skin.m_inverseBindMatrices.resize(inverseBindMatricesCount);
-		cgltf_accessor_unpack_floats(gltf_skin.inverse_bind_matrices, (float*)skin.m_inverseBindMatrices.data(), inverseBindMatricesCount);
+		cgltf_accessor_unpack_floats(gltf_skin.inverse_bind_matrices, (float*)skin.m_inverseBindMatrices.data(), inverseBindMatricesCount * 16);
 
 		if (gltf_skin.skeleton)
 			skin.m_skeletonRootId = cgltf_node_index(data, gltf_skin.skeleton);
@@ -352,6 +387,68 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 	}
 
 	m_nodes.resize(data->nodes_count);
+
+	for (int i = 0; i < data->nodes_count; i++) {
+		m_nodes[i].m_name = data->nodes[i].name;
+
+		if (data->nodes[i].has_translation)
+			m_nodes[i].m_translation = glm::vec3(data->nodes[i].translation[0], data->nodes[i].translation[1], data->nodes[i].translation[2]);
+		else
+			m_nodes[i].m_translation = glm::vec3(0.0f);
+
+		if (data->nodes[i].has_rotation)
+			m_nodes[i].m_rotation = glm::quat(data->nodes[i].rotation[3], data->nodes[i].rotation[0], data->nodes[i].rotation[1], data->nodes[i].rotation[2]);
+		else
+			m_nodes[i].m_rotation = glm::identity<glm::quat>();
+
+		if (data->nodes[i].has_scale)
+			m_nodes[i].m_scale = glm::vec3(data->nodes[i].scale[0], data->nodes[i].scale[1], data->nodes[i].scale[2]);
+		else
+			m_nodes[i].m_scale = glm::vec3(1.0f);
+
+		if (data->nodes[i].has_matrix)
+			memcpy(&m_nodes[i].m_matrix[0][0], &data->nodes[i].matrix[0], 16 * sizeof(float));
+		else
+			m_nodes[i].m_matrix = glm::mat4(1.0f);
+
+		if (data->nodes[i].parent)
+			m_nodes[i].m_parentId = cgltf_node_index(data, data->nodes[i].parent);
+
+		if (data->nodes[i].children_count > 0) {
+			for (int j = 0; j < data->nodes[i].children_count; j++) {
+				m_nodes[i].m_children.push_back(cgltf_node_index(data, data->nodes[i].children[j]));
+			}
+		}
+
+		if (data->nodes[i].skin)
+			m_nodes[i].m_skinId = cgltf_skin_index(data, data->nodes[i].skin);
+	}
+
+#if 0
+	int rootNode = m_nodes.size();
+	m_nodes.resize(m_nodes.size() + 1);
+	//for (int i = 0; i < m_nodes.size(); ++i) {
+	//	const int gltf_node_is = i;
+	//	m_nodes[rootNode].m_children.push_back(gltf_node_is);
+	//}
+
+	for (int i = 0; i < m_nodes.size(); ++i) {
+		if (m_nodes[i].m_parentId == -1)
+			m_nodes[i].m_parentId = rootNode;
+	}
+
+	// main rotate Y
+	m_nodes[rootNode].m_parentId = -1;
+	m_nodes[rootNode].m_matrix = glm::mat4(1.0f);
+	m_nodes[rootNode].m_translation = glm::vec3(0.0f);
+	m_nodes[rootNode].m_scale = glm::vec3(0.01f);
+	m_nodes[rootNode].m_rotation.x = 0;
+	m_nodes[rootNode].m_rotation.y = sinf(180.0 / 2.0 / 180.0 * maths::PI);
+	m_nodes[rootNode].m_rotation.z = 0;
+	m_nodes[rootNode].m_rotation.w = cosf(180.0 / 2.0 / 180.0 * maths::PI);
+#endif
+	//for (auto it : m_joints)
+	//	m_bones.emplace(it.m_name, it);
 
 	cgltf_free(data);
 	free(fileData);
@@ -424,92 +521,121 @@ void AnimatedModel::setPlayAnimation(int index, bool looped)
 {
 	m_currentAnimation = &m_animations[index];
 	m_playLooped = looped;
+	m_currentTime = 0.0f;
 }
 
 void AnimatedModel::testPlay(float dt)
 {
-	float animationLengthTime = m_currentAnimation->m_endTime - m_currentAnimation->m_startTime;
-	
 	m_currentTime += 1.0f * dt;
-	if (m_currentTime > animationLengthTime) {
-		
-		if (m_playLooped)
-			m_currentTime = m_currentTime - animationLengthTime;
-		else
-			m_currentTime = m_currentAnimation->m_endTime;
-	}
+	
+	bool updated = false;
+	Animation& animation = *m_currentAnimation;
+	float time = std::fmod(static_cast<float>(m_currentTime), animation.m_endTime - animation.m_startTime);
 
-#ifdef ANI_DEBUG
-	char buf[256];
-	snprintf(buf, sizeof(buf), "Animation: %s", m_currentAnimation->m_name.c_str());
-	g_fontManager->drawSystemFontShadowed(buf, 100, 100, glm::vec4(1.0f));
+	for (auto& channel : animation.m_channels)
+	{
+		AnimationSampler& sampler = animation.m_samplers[channel.m_samplerId];
+		if (sampler.m_inputs.size() > sampler.m_outputs.size())
+			continue;
 
-	snprintf(buf, sizeof(buf), "Current time: %.2f", m_currentTime);
-	g_fontManager->drawSystemFontShadowed(buf, 100, 120, glm::vec4(1.0f));
-#endif // ANI_DEBUG
-
-	float animationCurrentTime = m_currentTime + m_currentAnimation->m_startTime; // смещаем к началу анимации
-	for (int i = 0; i < m_currentAnimation->m_channels.size(); i++) {
-		const AnimationChannel& channel = m_currentAnimation->m_channels[i];
-		const AnimationSampler& sampler = m_currentAnimation->m_samplers[channel.m_samplerId];
-
-		for (size_t j = 0; j < sampler.m_inputs.size() - 1; ++j) {
-			if ((animationCurrentTime >= sampler.m_inputs[j]) && (animationCurrentTime <= sampler.m_inputs[j + 1])) {  // find time sampler
-				float mixValue = std::max(0.0f, animationCurrentTime - sampler.m_inputs[j]) / (sampler.m_inputs[j + 1] - sampler.m_inputs[j]);
-				if (mixValue <= 1.0f) {
-					if (channel.m_pathType == AnimationPathType_Translation) {
-						glm::vec3 A = sampler.m_outputs[j];
-						glm::vec3 B = sampler.m_outputs[j + 1];
-						glm::vec3 translation = glm::lerp(A, B, mixValue);
-						m_nodes[channel.m_nodeId].m_translation = translation;
-					}
-					else if (channel.m_pathType == AnimationPathType_Scale) {
-						glm::vec3 A = sampler.m_outputs[j];
-						glm::vec3 B = sampler.m_outputs[j + 1];
-						glm::vec3 scale = glm::lerp(A, B, mixValue);
-						m_nodes[channel.m_nodeId].m_scale = scale;
-					}
-					else if (channel.m_pathType == AnimationPathType_Rotation) {
-						glm::quat A = (0.0f, sampler.m_outputs[j]);
-						glm::quat B = (0.0f, sampler.m_outputs[j + 1]);
-						glm::quat rotate = glm::slerp(A, B, mixValue);
-						m_nodes[channel.m_nodeId].m_rotation = rotate;
-					}
-
-#ifdef ANI_DEBUG
-					snprintf(buf, sizeof(buf), "Sampler: %i", j);
-					g_fontManager->drawSystemFontShadowed(buf, 100, 140, glm::vec4(1.0f));
-
-					static const char* animationPathStr[AnimationPathType_Count] =
+		for (std::size_t i = 0; i < sampler.m_inputs.size() - 1; ++i)
+		{
+			if ((time >= sampler.m_inputs[i]) && (time <= sampler.m_inputs[i + 1]))
+			{
+				float u = std::max(0.0f, time - sampler.m_inputs[i]) / (sampler.m_inputs[i + 1] - sampler.m_inputs[i]);
+				if (u <= 1.0f)
+				{
+					/* NOTE: use the previous sampler output information of the current frame              */
+					/* TODO: interpolate the sampler output information before and after the current frame */
+					/*       using the interpolation information stored in the sampler                     */
+					if (channel.m_pathType == AnimationPathType_Translation)
 					{
-						"AnimationPathType_Unknown",
-						"AnimationPathType_Translation",
-						"AnimationPathType_Rotation",
-						"AnimationPathType_Scale",
-						"AnimationPathType_Weights"
-					};
+						auto translation = sampler.m_outputs[i];
+						m_nodes[channel.m_nodeId].m_translation = glm::vec3(translation);
+					}
+					else if (channel.m_pathType == AnimationPathType_Scale)
+					{
+						auto scale = sampler.m_outputs[i];
+						m_nodes[channel.m_nodeId].m_scale = glm::vec3(scale);
+					}
+					else if (channel.m_pathType == AnimationPathType_Rotation)
+					{
+						auto rotation = sampler.m_outputs[i];
+						m_nodes[channel.m_nodeId].m_rotation = glm::quat(rotation.w, rotation.x, rotation.y, rotation.z);
+					}
 
-					snprintf(buf, sizeof(buf), "Channel animation path: %s", animationPathStr[channel.m_pathType]);
-					g_fontManager->drawSystemFontShadowed(buf, 100, 160, glm::vec4(1.0f));
-#endif // ANI_DEBUG
+					updated = true;
 				}
 			}
 		}
 	}
 
+	if (updated == true)
+	{
+		for (int i = 0; i < m_nodes.size(); i++) {
+			updateNode(i);
+		}
+	}
 }
+
+#define MAX_BONES 256
+
+static glm::mat4 s_boneInfoTest[MAX_BONES];
+
+void AnimatedModel::updateNode(int node_id)
+{
+	auto& node = m_nodes[node_id];
+	if (node.m_skinId != -1) {
+		auto& skin = m_skins[node.m_skinId];
+		auto inverse_transform = glm::inverse(getNodeMatrix(node_id)); //glm::inverse(node.m_matrix);
+		unsigned int num_joints = skin.m_joints.size();//m_joints.size(); //std::min(static_cast<unsigned int>(skin.joints.size()), MAX_NUM_JOINTS);
+		for (unsigned int i = 0; i < num_joints; ++i)
+		{
+			/* NOTE: Reference: https://github.com/KhronosGroup/glTF-Tutorials/blob/master/gltfTutorial/gltfTutorial_020_Skins.md */
+			auto joint_mat = skin.m_inverseBindMatrices[i] * getNodeMatrix(skin.m_joints[i]) * inverse_transform;
+			s_boneInfoTest[i] = joint_mat;
+
+		/*	BoneInfo boneInfo;
+			boneInfo.id = skin.m_joints[i];
+			boneInfo.offset = joint_mat;
+			s_boneInfoTest[s_boneInfoTestCounter++] = boneInfo;*/
+
+			//mesh.joint_matrices[i] = joint_mat;
+		}
+	}
+
+	for (int i = 0; i < node.m_children.size(); i++)
+		updateNode(node.m_children[i]);
+}
+
+glm::mat4 AnimatedModel::getNodeMatrix(int nodeId)
+{
+	Assert(nodeId != -1);
+	AnimationNode& node = m_nodes[nodeId];
+	glm::mat4 tranlation = glm::mat4(1.0f);
+	tranlation = glm::scale(tranlation, node.m_scale) * glm::mat4_cast(node.m_rotation) * glm::translate(tranlation, node.m_translation);
+
+	for (auto id = node.m_parentId; id != -1; ) {
+		auto& nodeParent = m_nodes[id];
+		glm::mat4 parentTranlation = glm::mat4(1.0f);
+		parentTranlation = glm::scale(parentTranlation, nodeParent.m_scale) * glm::mat4_cast(nodeParent.m_rotation) * glm::translate(parentTranlation, nodeParent.m_translation);
+		tranlation = tranlation * parentTranlation;
+		id = nodeParent.m_parentId;
+	}
+
+	return tranlation;
+}
+
 
 ///////////////////////////////////////////////////////////
 // Animated Model Renderer
-
-#include "graphics/shaderconstantmanager.h"
 
 struct BonesCB
 {
 	glm::mat4 matrices[256];
 };
 
-//ConstantBufferProxy g_bonesConstantBuffer;
+ConstantBufferProxy g_bonesConstantBuffer;
 
 AnimatedModelRenderer AnimatedModelRenderer::ms_instance;
 
@@ -525,7 +651,7 @@ AnimatedModelRenderer::~AnimatedModelRenderer()
 
 void AnimatedModelRenderer::init()
 {
-	//g_bonesConstantBuffer = ShaderConstantManager::getInstance()->create<BonesCB>("BonesCB");
+	g_bonesConstantBuffer = ShaderConstantManager::getInstance()->create<BonesCB>("BonesCB");
 
 #if 0
 	// create a dynamic joint-palette texture and sampler
@@ -574,8 +700,17 @@ void AnimatedModelRenderer::shutdown()
 #endif
 }
 
-void AnimatedModelRenderer::render(AnimatedModel* model)
+void AnimatedModelRenderer::render(AnimatedMeshComponent* model)
 {
+	glm::mat4* data = (glm::mat4*)g_bonesConstantBuffer->map(BufferMapping::WriteOnly);
+	memcpy(data, s_boneInfoTest, sizeof(s_boneInfoTest));
+	g_bonesConstantBuffer->unmap();
+
+	g_renderDevice->setConstantBufferIndex(ConstantBufferBindings_Skinning, g_bonesConstantBuffer.get());
+
+	//std::shared_ptr<ModelBase> modelBase = model->lockModel();
+	//AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
+
 	// compute skinning matrices and write to joint texture upload buffer
 
 	//glm::mat4* skinningMatrices = mem_array<glm::mat4>(256);

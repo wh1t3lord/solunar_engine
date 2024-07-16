@@ -37,7 +37,7 @@
 		<Rotation x="0" y="0" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		<AnimatedMeshComponent>
-			<Model filename="models/anim_test.glb"/>
+			<Model filename="models/model_player.glb"/>
 		</AnimatedMeshComponent>
 		<TestAnimationComponent/>
 	</Entity>
@@ -56,7 +56,7 @@
 	
 	<!-- Player -->
 	<Entity>
-		<Position x="10" y="1" z="0"/>
+		<Position x="-2" y="1" z="0.5"/>
 		<Rotation x="0" y="0" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		

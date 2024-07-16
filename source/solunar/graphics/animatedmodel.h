@@ -47,7 +47,7 @@ struct AnimatedVertex
 	glm::vec2 m_texcoord;
 	glm::vec3 m_tangent;
 	glm::vec3 m_bitangent;
-	glm::ivec4 m_boneIDs;
+	glm::vec4 m_boneIDs;
 	glm::vec4 m_weights;
 };
 
@@ -67,7 +67,7 @@ struct AnimationSampler
 {
 	InterpolationType m_interpolationType = InterpolationType_Unknown;
 	std::vector<float> m_inputs = {};
-	std::vector<glm::vec3> m_outputs = {};
+	std::vector<glm::vec4> m_outputs = {};
 };
 
 struct AnimationChannel {
@@ -100,6 +100,18 @@ struct AnimationNode
 	glm::quat m_rotation;
 	glm::vec3 m_scale;
 	glm::mat4 m_matrix;
+	std::vector<int> m_children;
+	int m_parentId = -1;
+	int m_skinId = -1;
+};
+
+struct BoneInfo
+{
+	/*id is index in finalBoneMatrices*/
+	int id;
+
+	/*offset matrix transforms vertex from model space to bone space*/
+	glm::mat4 offset;
 };
 
 class AnimatedModel : public ModelBase
@@ -124,16 +136,23 @@ public:
 
 	void testPlay(float dt);
 
+	void updateNode(int node_id);
+
+	glm::mat4 getNodeMatrix(int nodeId);
+
 private:
 	std::vector<AnimatedSubMesh*> m_subMeshes;
 	std::vector<Animation> m_animations;
 	std::vector<AnimationSkin> m_skins;
-	std::vector<AnimationNode> m_joints;
+	//std::vector<AnimationNode> m_joints;
 	std::vector<AnimationNode> m_nodes;
+	std::map<std::string, BoneInfo> m_bones;
 	Animation* m_currentAnimation;
 	bool m_playLooped = false;
 	float m_currentTime = 0.0f;
 };
+
+class AnimatedMeshComponent;
 
 class AnimatedModelRenderer : public Singleton<AnimatedModelRenderer>
 {
@@ -147,7 +166,7 @@ public:
 	void init();
 	void shutdown();
 
-	void render(AnimatedModel* model);
+	void render(AnimatedMeshComponent* model);
 
 private:
 	ITexture2D* m_jointTexture;
