@@ -137,6 +137,7 @@ public:
 	void testPlay(float dt);
 
 	void updateNode(int node_id);
+	void updateNodePreCasheFrow(int node_id);
 
 	glm::mat4 getNodeMatrix(int nodeId);
 

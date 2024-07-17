@@ -130,7 +130,7 @@ void TestAnimationComponent::update(float dt)
 	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
 	if (animatedModel) {
 		if (m_animationIndex == -1) {
-			m_animationIndex = animatedModel->getAnimationByName("idle_rifle");
+			m_animationIndex = animatedModel->getAnimationByName("dead");
 			animatedModel->setPlayAnimation(m_animationIndex, true);
 		}
 	}

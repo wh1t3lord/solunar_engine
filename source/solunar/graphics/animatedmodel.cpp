@@ -13,7 +13,7 @@
 #include "graphics/mesh.h"
 #include "graphics/shaderconstantmanager.h"
 #include "graphics/debugrenderer.h"
-
+#include "glm/ext.hpp"
 #define CGLTF_IMPLEMENTATION
 #include <cgltf.h>
 
@@ -378,7 +378,7 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 		size_t inverseBindMatricesCount = gltf_skin.inverse_bind_matrices->count;
 		skin.m_inverseBindMatrices.resize(inverseBindMatricesCount);
 		cgltf_accessor_unpack_floats(gltf_skin.inverse_bind_matrices, (float*)skin.m_inverseBindMatrices.data(), inverseBindMatricesCount * 16);
-
+		
 		if (gltf_skin.skeleton)
 			skin.m_skeletonRootId = cgltf_node_index(data, gltf_skin.skeleton);
 
@@ -415,8 +415,9 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 			node.m_parentId = cgltf_node_index(data, data->nodes[i].parent);
 
 		if (data->nodes[i].children_count > 0) {
+			node.m_children.resize(data->nodes[i].children_count);
 			for (int j = 0; j < data->nodes[i].children_count; j++) {
-				node.m_children.push_back(cgltf_node_index(data, data->nodes[i].children[j]));
+				node.m_children[j] = cgltf_node_index(data, data->nodes[i].children[j]);
 			}
 		}
 
@@ -424,7 +425,7 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 			node.m_skinId = cgltf_skin_index(data, data->nodes[i].skin);
 	}
 
-#if 0
+#if 1
 	int rootNode = m_nodes.size();
 	m_nodes.resize(m_nodes.size() + 1);
 	
@@ -436,14 +437,17 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 	}
 	// main rotate Y
 	m_nodes[rootNode].m_name = "Root Node";
+	m_nodes[rootNode].m_skinId = -1;
 	m_nodes[rootNode].m_parentId = -1;
 	m_nodes[rootNode].m_matrix = glm::mat4(1.0f);
 	m_nodes[rootNode].m_translation = glm::vec3(0.0f);
-	m_nodes[rootNode].m_scale = glm::vec3(0.01f);
+	m_nodes[rootNode].m_scale = glm::vec3(1.0f);
 	m_nodes[rootNode].m_rotation.x = 0;
 	m_nodes[rootNode].m_rotation.y = sinf(180.0 / 2.0 / 180.0 * maths::PI);
 	m_nodes[rootNode].m_rotation.z = 0;
 	m_nodes[rootNode].m_rotation.w = cosf(180.0 / 2.0 / 180.0 * maths::PI);
+
+	//m_nodes[rootNode].m_rotation = glm::quat(0, 6, 1, 0);
 #endif
 	//for (auto it : m_joints)
 	//	m_bones.emplace(it.m_name, it);
@@ -535,7 +539,7 @@ void AnimatedModel::testPlay(float dt)
 	bool updated = false;
 	Animation& animation = *m_currentAnimation;
 	float time = std::fmod(static_cast<float>(m_currentTime), animation.m_endTime - animation.m_startTime);
-
+	
 	for (auto& channel : animation.m_channels)
 	{
 		AnimationSampler& sampler = animation.m_samplers[channel.m_samplerId];
@@ -594,11 +598,12 @@ void AnimatedModel::testPlay(float dt)
 
 	if (updated == true)
 	{
-		//for (int i = 0; i < m_nodes.size(); i++) {
-		//	updateNode(i);
-		//}
+		updateNodePreCasheFrow(m_nodes.size() - 1);
 
-		updateNode(m_nodes.size() - 1);
+		for (size_t i = 0; i < m_nodes.size() - 1; i++)
+		{
+			updateNode(i);
+		}
 	}
 }
 
@@ -611,15 +616,17 @@ void AnimatedModel::updateNode(int node_id)
 	auto& node = m_nodes[node_id];
 	if (node.m_skinId != -1) {
 		auto& skin = m_skins[node.m_skinId];
+
 		auto inverse_transform = glm::inverse(getNodeMatrix(node_id));
+
+		//Logger::logPrint("frowrikdebug: %s \n", glm::to_string(inverse_transform).c_str());
+
 		unsigned int num_joints = skin.m_joints.size();//m_joints.size(); //std::min(static_cast<unsigned int>(skin.joints.size()), MAX_NUM_JOINTS);
 		for (unsigned int i = 0; i < num_joints; ++i)
 		{
 			/* NOTE: Reference: https://github.com/KhronosGroup/glTF-Tutorials/blob/master/gltfTutorial/gltfTutorial_020_Skins.md */
-			auto joint_mat	=skin.m_inverseBindMatrices[i];
-			joint_mat		= joint_mat * getNodeMatrix(skin.m_joints[i]);
-			joint_mat		= joint_mat * inverse_transform;
-			s_boneInfoTest[i] = joint_mat;
+			
+			s_boneInfoTest[i] =  getNodeMatrix(skin.m_joints[i]) *  skin.m_inverseBindMatrices[i] ;
 
 		/*	BoneInfo boneInfo;
 			boneInfo.id = skin.m_joints[i];
@@ -680,40 +687,37 @@ glm::mat4 makeRotationMatrix(const glm::quat& u)
 						matrix[12], matrix[13], matrix[14], matrix[15]);
 }
 
+
+void AnimatedModel::updateNodePreCasheFrow(int node_id) {
+	Assert(node_id != -1);
+	AnimationNode& node = m_nodes[node_id];
+
+	glm::mat4 Smat = glm::scale(glm::mat4(1.0f), node.m_scale);
+	glm::mat4 Rmat = glm::toMat4(node.m_rotation);
+	glm::mat4 Tmat = glm::translate(glm::mat4(1.0f), node.m_translation);
+
+	glm::mat4 tranlation = Tmat * Rmat * Smat;
+
+	if (node.m_parentId != -1) {
+		auto& nodeParent = m_nodes[node.m_parentId];
+		
+		tranlation = nodeParent.m_matrix * tranlation;
+	}
+
+	node.m_matrix = tranlation;
+
+	///Logger::logPrint("getNodeMatrix: parent %d %s", id, glm::to_string(parentTranlation).c_str());
+
+	for (int i = 0; i < node.m_children.size(); i++)
+		updateNodePreCasheFrow(node.m_children[i]);
+}
+
 glm::mat4 AnimatedModel::getNodeMatrix(int nodeId)
 {
 	Assert(nodeId != -1);
 	AnimationNode& node = m_nodes[nodeId];
-	glm::mat4 tranlation = glm::mat4(1.0f);
-	tranlation =  tranlation * glm::scale(glm::mat4(1.0f), node.m_scale);
-	//tranlation = glm::scale(glm::mat4(1.0f), node.m_scale) *  tranlation ;
-	tranlation = tranlation * glm::toMat4(node.m_rotation);
-	//tranlation = tranlation * makeRotationMatrix(node.m_rotation);
-	//tranlation = glm::toMat4(node.m_rotation) * tranlation;
-	tranlation = tranlation * glm::translate(glm::mat4(1.0f), node.m_translation);
-	//tranlation = glm::translate(glm::mat4(1.0f), node.m_translation) * tranlation ;
-	
-
-	for (auto id = node.m_parentId; id != -1; ) {
-		auto& nodeParent = m_nodes[id];
-		glm::mat4 parentTranlation = glm::mat4(1.0f);
-		parentTranlation = parentTranlation * glm::scale(glm::mat4(1.0f), nodeParent.m_scale);
-		//parentTranlation = glm::scale(glm::mat4(1.0f), nodeParent.m_scale) * parentTranlation;
-		parentTranlation = parentTranlation * glm::toMat4(nodeParent.m_rotation);
-		//parentTranlation = parentTranlation * makeRotationMatrix(nodeParent.m_rotation);
-		//parentTranlation = glm::toMat4(nodeParent.m_rotation) * parentTranlation;
-		parentTranlation = parentTranlation * glm::translate(glm::mat4(1.0f), nodeParent.m_translation);
-		//parentTranlation = glm::translate(glm::mat4(1.0f), nodeParent.m_translation) * parentTranlation ;
-
-		tranlation = tranlation * parentTranlation;
-		//tranlation = parentTranlation *  tranlation;
-		id = nodeParent.m_parentId;
-	}
-
-	return tranlation;
-	//return glm::transpose( tranlation);
+	return node.m_matrix;
 }
-
 
 ///////////////////////////////////////////////////////////
 // Animated Model Renderer
