@@ -360,8 +360,6 @@ namespace engine
 		g_stateManager->setRasterizerState(m_pRasterizerState);
 	}
 
-
-
 	void ImGuiManager::init()
 	{
 		IMGUI_CHECKVERSION();

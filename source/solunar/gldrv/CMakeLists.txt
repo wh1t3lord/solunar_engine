@@ -14,4 +14,4 @@ target_include_directories(gldrv PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../"
 								 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}"
 								 PRIVATE "${CMAKE_SOURCE_DIR}/externals/include")
 
-target_link_libraries(gldrv core glad)
+target_link_libraries(gldrv core glad opengl32)

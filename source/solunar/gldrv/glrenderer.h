@@ -12,6 +12,8 @@ struct RendererSingletonStorer
 	ShaderConstantManager m_constantManager;
 };
 
+struct IRasterizerState;
+
 class GLRenderer : public Renderer
 {
 public:
@@ -46,6 +48,7 @@ private:
 	ITexture2D* m_screenColorTexture;
 	ITexture2D* m_screenDepthTexture;
 	IRenderTarget* m_screenRenderTarget;
+	IRasterizerState* m_rasterizerState;
 
 	std::string m_screenshotFilename;
 	bool m_makeScreenshot;
@@ -53,6 +56,12 @@ private:
 
 	// Унаследовано через Renderer
 	virtual void clearScreen() override;
+
+
+	// Inherited via Renderer
+	void clearRenderTarget(IRenderTarget* renderTarget) override;
+
+	void setSwapChainRenderTarget() override;
 
 };
 	

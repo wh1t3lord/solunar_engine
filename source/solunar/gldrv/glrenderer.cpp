@@ -8,6 +8,8 @@
 #include "gldrv/glrenderer.h"
 #include "gldrv/gldevice.h"
 #include "gldrv/GLShaderProgramManager.h"
+#include "gldrv/glstatemanager.h"
+
 #include "graphics/view.h"
 #include "graphics/image.h"
 #include "graphics/shaderprogram.h"
@@ -27,7 +29,128 @@
 #include "graphics/mesh.h"
 #include "graphics/material.h"
 
+#include "main/main.h"
+
+#include "GL/wglext.h"
+
 namespace engine {
+
+	// this is interface for platform indepented context class.
+	class GLPlatformContext : public Object
+	{
+		ImplementObject(GLPlatformContext, Object);
+	public:
+		GLPlatformContext();
+		virtual ~GLPlatformContext();
+
+		virtual bool create(void* windowHandle);
+		virtual void destroy();
+		virtual void swapBuffers(int swapInterval);
+	};
+
+	GLPlatformContext::GLPlatformContext()
+	{
+	}
+
+	GLPlatformContext::~GLPlatformContext()
+	{
+	}
+
+	bool GLPlatformContext::create(void* windowHandle)
+	{
+		return false;
+	}
+
+	void GLPlatformContext::destroy()
+	{
+	}
+
+	void GLPlatformContext::swapBuffers(int swapInterval)
+	{
+	}
+
+	// Windows OpenGL context
+	class GLPlatformContext_Win32 : public GLPlatformContext
+	{
+		ImplementObject(GLPlatformContext_Win32, GLPlatformContext);
+	public:
+		GLPlatformContext_Win32();
+		~GLPlatformContext_Win32();
+
+		bool create(void* windowHandle) override;
+		void destroy() override;
+		void swapBuffers(int swapInterval) override;
+
+	private:
+		HDC m_hDC = NULL;
+		HGLRC m_openglContext = NULL;
+
+	};
+
+	GLPlatformContext_Win32::GLPlatformContext_Win32()
+	{
+	}
+
+	GLPlatformContext_Win32::~GLPlatformContext_Win32()
+	{
+	}
+
+	bool GLPlatformContext_Win32::create(void* windowHandle)
+	{
+		PIXELFORMATDESCRIPTOR pfd =
+		{
+			sizeof(PIXELFORMATDESCRIPTOR),
+			1,
+			PFD_DRAW_TO_WINDOW | PFD_SUPPORT_OPENGL | PFD_DOUBLEBUFFER,    // Flags
+			PFD_TYPE_RGBA,        // The kind of framebuffer. RGBA or palette.
+			32,                   // Colordepth of the framebuffer.
+			0, 0, 0, 0, 0, 0,
+			0,
+			0,
+			0,
+			0, 0, 0, 0,
+			24,                   // Number of bits for the depthbuffer
+			8,                    // Number of bits for the stencilbuffer
+			0,                    // Number of Aux buffers in the framebuffer.
+			PFD_MAIN_PLANE,
+			0,
+			0, 0, 0
+		};
+
+		m_hDC = GetDC((HWND)windowHandle);
+		int pixelFormat = ChoosePixelFormat(m_hDC, &pfd);
+		SetPixelFormat(m_hDC, pixelFormat, &pfd);
+
+		HGLRC tempContext = wglCreateContext(m_hDC);
+		wglMakeCurrent(m_hDC, tempContext);
+
+		PFNWGLCREATECONTEXTATTRIBSARBPROC wglCreateContextAttribsARB = (PFNWGLCREATECONTEXTATTRIBSARBPROC)wglGetProcAddress("wglCreateContextAttribsARB");
+		assert(wglCreateContextAttribsARB);
+
+		int attribs[] =
+		{
+			WGL_CONTEXT_MAJOR_VERSION_ARB, 3,
+			WGL_CONTEXT_MINOR_VERSION_ARB, 3,
+			WGL_CONTEXT_FLAGS_ARB, 0,
+			0
+		};
+
+		m_openglContext = wglCreateContextAttribsARB(m_hDC, 0, attribs);
+		wglMakeCurrent(NULL, NULL);
+		wglDeleteContext(tempContext);
+		wglMakeCurrent(m_hDC, m_openglContext);
+
+		return true;
+	}
+
+	void GLPlatformContext_Win32::destroy()
+	{
+	}
+
+	void GLPlatformContext_Win32::swapBuffers(int swapInterval)
+	{
+		SwapBuffers(m_hDC);
+	}
 
 	// #TODO: !!! REMOVE !!!
 	// #TODO: !!! UGLY HACK !!!
@@ -77,23 +200,38 @@ namespace engine {
 	}
 #endif
 
-	//void createRenderer()
-	//{
-	//	g_renderer = mem_new<GLRenderer>();
-	//}
+	void createRenderer()
+	{
+		g_renderer = mem_new<GLRenderer>();
+	}
 
-	//void destroyRenderer()
-	//{
-	//	if (g_renderer)
-	//	{
-	//		mem_delete(g_renderer);
-	//		g_renderer = nullptr;
-	//	}
-	//}
+	void destroyRenderer()
+	{
+		if (g_renderer)
+		{
+			mem_delete(g_renderer);
+			g_renderer = nullptr;
+		}
+	}
+
+	void registerGLRendererClasses()
+	{
+		const TypeInfo* classes[] =
+		{
+			ObjectGetTypeInfo(GLPlatformContext),
+			ObjectGetTypeInfo(GLPlatformContext_Win32),
+		};
+
+		for (int i = 0; i < sizeof(classes) / sizeof(classes[0]); i++)
+			TypeManager::getInstance()->registerType(classes[i]);
+	}
+
+	GLPlatformContext* g_platformContext = nullptr;
 
 	GLRenderer::GLRenderer()
 	{
 		m_makeScreenshot = false;
+		m_rasterizerState = nullptr;
 	}
 
 	GLRenderer::~GLRenderer()
@@ -125,6 +263,22 @@ namespace engine {
 
 	void GLRenderer::init()
 	{
+		registerGLRendererClasses();
+
+		// Create OpenGL context
+#ifdef WIN32
+		g_platformContext = (GLPlatformContext*)TypeManager::getInstance()->createObjectByName("GLPlatformContext_Win32");
+#else
+#error "Please implement context here for you're platform'!"
+#endif // WIN32
+
+		// create context itself
+		g_platformContext->create(appGetWindow());
+
+		// initalize glad
+		if (!gladLoadGL())
+			Core::error("Failed to load OpenGL");
+
 		glEnable(GL_CULL_FACE);
 
 		findExtensions();
@@ -139,12 +293,26 @@ namespace engine {
 		// Initialize render device
 		g_renderDevice = (IRenderDevice*)mem_new<GLDevice>();
 
-		// initialize base renderer after device creation
-		Renderer::init();
+		// initialize device state manager
+		g_stateManager = mem_new<GLStateManager>();
+		g_glStateManager->init();
+
+		// 
+		RasterizerStateDesc rasterizerState;
+		memset(&rasterizerState, 0, sizeof(rasterizerState));
+		rasterizerState.m_cullMode = CullMode::Back;
+		rasterizerState.m_frontCCW = true;
+		rasterizerState.m_fillMode = FillMode::Solid;
+
+		m_rasterizerState = g_stateManager->createRasterizerState(rasterizerState);
+		g_stateManager->setRasterizerState(m_rasterizerState);
 
 		// Initialize shader manager with current api
 		g_shaderManager = mem_new<GLShaderProgramManager>();
 		g_shaderManager->init("shaders/gl");
+
+		// initialize base renderer after device creation
+		Renderer::init();
 	}
 
 	void GLRenderer::shutdown()
@@ -160,13 +328,24 @@ namespace engine {
 		glBindVertexArray(0);
 		glDeleteVertexArrays(1, &g_vertexArrayObject);
 
+		g_glStateManager->shutdown();
+		mem_delete(g_stateManager);
+		g_stateManager = nullptr;
+
 		mem_delete(g_renderDevice);
 		g_renderDevice = nullptr;
+
+		g_platformContext->destroy();
+
+		mem_delete(g_platformContext);
+		g_platformContext = nullptr;
 	}
 
 	void GLRenderer::beginFrame()
 	{
 		glBindVertexArray(g_vertexArrayObject);
+
+		g_stateManager->setRasterizerState(m_rasterizerState);
 
 		Renderer::beginFrame();
 	}
@@ -178,9 +357,7 @@ namespace engine {
 		if (m_makeScreenshot)
 			takeScreenshotInternal(); // will reset m_makeScreenshot
 
-#if 0
-		glfwSwapBuffers(g_engineWindow);
-#endif
+		g_platformContext->swapBuffers(0);
 	}
 
 	void GLRenderer::takeScreenshot()
@@ -474,6 +651,14 @@ namespace engine {
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	}
+
+	void GLRenderer::clearRenderTarget(IRenderTarget* renderTarget)
+	{
+	}
+
+	void GLRenderer::setSwapChainRenderTarget()
+	{
 	}
 
 }
