@@ -2,12 +2,11 @@
 #include "gldrv/glrendertarget.h"
 #include "gldrv/gltexture2d.h"
 
-
 namespace engine {
 
-	GLRenderTarget::GLRenderTarget()
+	GLRenderTarget::GLRenderTarget(const RenderTargetCreationDesc& renderTargetDesc)
 	{
-		create();
+		create(renderTargetDesc);
 	}
 
 	GLRenderTarget::~GLRenderTarget()
@@ -15,9 +14,37 @@ namespace engine {
 		m_handle = 0;
 	}
 
-	void GLRenderTarget::create()
+	void GLRenderTarget::create(const RenderTargetCreationDesc& renderTargetDesc)
 	{
+		Assert(renderTargetDesc.m_textures2DCount != 0);
+
 		glGenFramebuffers(1, &m_handle);
+		glBindFramebuffer(GL_FRAMEBUFFER, m_handle);
+
+		std::vector<GLenum> colorAttachments;
+
+		// bind color targets
+		for (int i = 0; i < renderTargetDesc.m_textures2DCount; i++)
+		{
+			Assert(renderTargetDesc.m_textures2D[i]);
+			attachTexture2D(i, renderTargetDesc.m_textures2D[i]);
+			colorAttachments.push_back(GL_COLOR_ATTACHMENT0 + i);
+		}
+
+		if (renderTargetDesc.m_depthTexture2D)
+		{
+			attachDepth(renderTargetDesc.m_depthTexture2D);
+		}
+		
+		// Initialize draw bufferz
+		glDrawBuffers(colorAttachments.size(), colorAttachments.data());
+
+		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+			Core::error("GLRenderTarget::create: Framebuffer is not complete.");
+		}
+	
+		//unbind
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 	void GLRenderTarget::release()

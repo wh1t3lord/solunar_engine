@@ -22,7 +22,7 @@ public:
 
 	//! Create texture 2d.
 	ITexture2D* createTexture2D(const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc) override;
-
+	
 	//! Create texture sampler state.
 	ISamplerState* createSamplerState(const SamplerDesc& samplerDesc) override;
 
@@ -37,7 +37,7 @@ public:
 	void setVertexBuffer(IBufferBase* buffer, uint32_t stride, uint32_t offset) override;
 
 	//! Set Index buffer.
-	void setIndexBuffer(IBufferBase* buffer, bool use16bitsIndices);
+	void setIndexBuffer(IBufferBase* buffer, bool use16bitsIndices) override;
 
 	//! Set texture 2d.
 	void setTexture2D(int slot, ITexture2D* texture) override;

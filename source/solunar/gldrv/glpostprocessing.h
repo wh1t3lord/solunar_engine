@@ -1,16 +1,15 @@
 #ifndef GRAPHICS_GL_GLPOSTPROCESSING_H
 #define GRAPHICS_GL_GLPOSTPROCESSING_H
 
-#include <gfxcommon.h>
-
 namespace engine
 {
 
 class View;
-class Texture2DBase;
-class RenderTargetBase;
-class SamplerStateBase;
-class ShaderProgram;
+class ITexture2D;
+class IRenderTarget;
+class ISamplerState;
+class IShaderProgram;
+class IBufferBase;
 
 class GLPostProcessing
 {
@@ -24,29 +23,31 @@ public:
 	void shutdown();
 
 	void initHDR(View* view);
-	void blurPass(Texture2DBase* screenTexture);
-	void combinePass(Texture2DBase* screenTexture);
+	void blurPass(ITexture2D* screenTexture);
+	void combinePass(ITexture2D* screenTexture);
 
-	void hdrPass(Texture2DBase* screenTexture);
+	void hdrPass(ITexture2D* screenTexture);
 private:
 	TextureDesc m_hdrPingPongTextureDesc;
 
-	Texture2DBase* m_hdrTempTex;
-	RenderTargetBase* m_hdrRenderTarget;
+	ITexture2D* m_hdrTempTex;
+	IRenderTarget* m_hdrRenderTarget;
 
-	Texture2DBase* m_hdrPinPingTextures[2];
-	RenderTargetBase* m_hdrPinPongRenderTargets[2];
+	ITexture2D* m_hdrPinPingTextures[2];
+	IRenderTarget* m_hdrPinPongRenderTargets[2];
 
-	SamplerStateBase* m_hdrPinPongSampler;
+	IBufferBase* m_hdrConstantBuffer;
+
+	ISamplerState* m_hdrPinPongSampler;
 
 	std::vector<glm::vec4> m_blurWeights;
 	uint32_t m_blurWeightsLoc;
 
 	glm::vec2 m_texOffset;
 
-	ShaderProgram* m_hdrPassProgram;
-	ShaderProgram* m_blurPassProgram;
-	ShaderProgram* m_hdrCombineProgram;
+	IShaderProgram* m_hdrPassProgram;
+	IShaderProgram* m_blurPassProgram;
+	IShaderProgram* m_hdrCombineProgram;
 };
 
 extern GLPostProcessing g_postProcessing;

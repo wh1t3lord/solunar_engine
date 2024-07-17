@@ -9,14 +9,15 @@ namespace engine {
 class GLRenderTarget : public IRenderTarget
 {
 public:
-	GLRenderTarget();
+	GLRenderTarget(const RenderTargetCreationDesc& renderTargetDesc);
 	~GLRenderTarget();
 
-	void create();
+	void create(const RenderTargetCreationDesc& renderTargetDesc);
 	void release() override;
 
 	uint32_t getHandle() override;
 
+	// Old stuff of IRenderTarget, can be used ;)
 	void attachTexture2D(int slot, ITexture2D* textureHandle);
 	void attachDepth(ITexture2D* depthTextureHandle);
 

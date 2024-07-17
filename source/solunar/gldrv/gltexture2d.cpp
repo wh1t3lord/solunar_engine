@@ -1,8 +1,6 @@
 #include "gldrv_pch.h"
 #include "gldrv/gltexture2d.h"
 
-#include "glad/glad.h"
-
 namespace engine
 {
 

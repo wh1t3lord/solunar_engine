@@ -17,6 +17,19 @@
 namespace engine
 {
 
+struct GLHDRConstantBuffer
+{
+	glm::vec4 weight[3];
+	glm::vec4 texOffset;
+};
+
+struct GLHDRCombinePassConstants
+{
+
+};
+
+static GLHDRConstantBuffer s_GLHDRConstantBuffer;
+
 // global instance
 GLPostProcessing g_postProcessing;
 
@@ -39,7 +52,6 @@ void GLPostProcessing::init(View* view)
 
 void GLPostProcessing::initHDR(View* view)
 {
-#if 0
 	TextureDesc hdrTextureDesc;
 	memset(&hdrTextureDesc, 0, sizeof(hdrTextureDesc));
 	hdrTextureDesc.m_width = view->m_width;
@@ -51,28 +63,29 @@ void GLPostProcessing::initHDR(View* view)
 
 	m_hdrTempTex = g_renderDevice->createTexture2D(hdrTextureDesc, hdrTextureSubresourceDesc);
 
-	m_hdrRenderTarget = g_renderDevice->createRenderTarget();
-	m_hdrRenderTarget->attachTexture2D(0, m_hdrTempTex);
+	RenderTargetCreationDesc hdrRTDesc;
+	memset(&hdrRTDesc, 0, sizeof(hdrRTDesc));
+	hdrRTDesc.m_textures2D[0] = m_hdrTempTex;
+	hdrRTDesc.m_textures2DCount = 1;
+	m_hdrRenderTarget = g_renderDevice->createRenderTarget(hdrRTDesc);
 
-	g_renderDevice->setRenderTarget(m_hdrRenderTarget);
+	m_hdrPassProgram = g_shaderManager->createShaderProgram("quad.vsh", "hdr_main.psh");
 
-	GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0 };
-	glDrawBuffers(1, DrawBuffers);
+	BufferDesc constantBufferDesc;
+	memset(&constantBufferDesc, 0, sizeof(constantBufferDesc));
+	constantBufferDesc.m_bufferAccess = BufferAccess::Stream;
+	constantBufferDesc.m_bufferType = BufferType::ConstantBuffer;
+	constantBufferDesc.m_bufferMemorySize = sizeof(GLHDRConstantBuffer);
 
-	if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-		Core::error("GLPostProcessing::initHDR: Framebuffer is not complete.");
-	}
+	SubresourceDesc constantSubresourceDesc;
+	memset(&constantSubresourceDesc, 0, sizeof(constantSubresourceDesc));
+	constantSubresourceDesc.m_memory = &s_GLHDRConstantBuffer;
 
-	g_renderDevice->setRenderTarget(0);
-
-	m_hdrPassProgram = g_shaderManager->createShaderProgram("hdr_main", "shaders/quad.vsh", "shaders/hdr_main.fsh");
-#endif
+	m_hdrConstantBuffer = g_renderDevice->createBuffer(constantBufferDesc, constantSubresourceDesc);
 }
-
 
 void GLPostProcessing::initBlur(View* view)
 {
-#if 0
 	// UE3 weights
 	float gaussianWeight1 = 0.54684;
 	float gaussianWeight2 = 0.34047;
@@ -104,20 +117,12 @@ void GLPostProcessing::initBlur(View* view)
 		m_hdrPinPingTextures[i] = g_renderDevice->createTexture2D(m_hdrPingPongTextureDesc, hdrPingPongTextureSubresourceDesc);
 
 		// framebuffer creation
-		m_hdrPinPongRenderTargets[i] = g_renderDevice->createRenderTarget();
-		m_hdrPinPongRenderTargets[i]->attachTexture2D(0, m_hdrPinPingTextures[i]);
+		RenderTargetCreationDesc hdrPingPongRTDesc;
+		memset(&hdrPingPongRTDesc, 0, sizeof(hdrPingPongRTDesc));
+		hdrPingPongRTDesc.m_textures2D[0] = m_hdrPinPingTextures[i];
+		hdrPingPongRTDesc.m_textures2DCount = 1;
 
-		g_renderDevice->setRenderTarget(m_hdrPinPongRenderTargets[i]);
-
-		GLenum DrawBuffers[] = { GL_COLOR_ATTACHMENT0 };
-		glDrawBuffers(1, DrawBuffers);
-
-		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-			Core::error("GLPostProcessing::initBlur: Framebuffer is not complete.");
-		}
-
-		g_renderDevice->setRenderTarget(0);
-
+		m_hdrPinPongRenderTargets[i] = g_renderDevice->createRenderTarget(hdrPingPongRTDesc);
 	}
 
 	SamplerDesc hdrPinPongSamplerDesc;
@@ -130,16 +135,12 @@ void GLPostProcessing::initBlur(View* view)
 	hdrPinPongSamplerDesc.m_anisotropyLevel = 1.0f;
 	m_hdrPinPongSampler = g_renderDevice->createSamplerState(hdrPinPongSamplerDesc);
 
-	m_blurPassProgram = g_shaderManager->createShaderProgram("hdr_blur", "shaders/quad.vsh", "shaders/hdr_blur.fsh");
-	m_blurWeightsLoc = m_blurPassProgram->getUniformLocation("weight");
-
-	m_hdrCombineProgram = g_shaderManager->createShaderProgram("hdr_combine", "shaders/quad.vsh", "shaders/hdr_combine.fsh");
-#endif
+	m_blurPassProgram = g_shaderManager->createShaderProgram("quad.vsh", "hdr_blur.psh");
+	m_hdrCombineProgram = g_shaderManager->createShaderProgram("quad.vsh", "hdr_combine.psh");
 }
 
 void GLPostProcessing::shutdown()
 {
-#if 0
 	if (m_hdrPinPongSampler)
 	{
 
@@ -156,17 +157,18 @@ void GLPostProcessing::shutdown()
 		m_hdrPinPingTextures[i] = nullptr;
 	}
 
+	mem_delete(m_hdrConstantBuffer);
+	m_hdrConstantBuffer = nullptr;
+
 	mem_delete(m_hdrRenderTarget);
 	m_hdrRenderTarget = nullptr;
 
 	mem_delete(m_hdrTempTex);
 	m_hdrTempTex = nullptr;
-#endif
 }
 
-void GLPostProcessing::hdrPass(Texture2DBase* screenTexture)
+void GLPostProcessing::hdrPass(ITexture2D* screenTexture)
 {
-#if 0
 	////////////////////////
 	// lets go
 	////////////////////////
@@ -190,12 +192,10 @@ void GLPostProcessing::hdrPass(Texture2DBase* screenTexture)
 	// combine pass
 	///////////////
 	combinePass(screenTexture);
-#endif
 }
 
-void GLPostProcessing::blurPass(Texture2DBase* screenTexture)
+void GLPostProcessing::blurPass(ITexture2D* screenTexture)
 {
-#if 0
 	Viewport oldViewPort = g_renderDevice->getViewport();
 
 	Viewport blurPassViewport = { 0 };
@@ -212,17 +212,27 @@ void GLPostProcessing::blurPass(Texture2DBase* screenTexture)
 	{
 		g_renderDevice->setRenderTarget(m_hdrPinPongRenderTargets[horizontal]);
 
-		//glClear(GL_COLOR_BUFFER_BIT);
+		g_shaderManager->setShaderProgram(m_blurPassProgram);
 
-		ShaderProgramManager::setShaderProgram(m_blurPassProgram);
-		m_blurPassProgram->setTextureSampler(0, "u_texture");
-		m_blurPassProgram->setInteger("u_horizontal", horizontal);
-		glUniform4fv(m_blurWeightsLoc, 3, (float*)m_blurWeights.data());
-		m_blurPassProgram->setVector2("texOffset", m_texOffset);
-
+		// setup textures
 		g_renderDevice->setSampler(0, m_hdrPinPongSampler);
 		g_renderDevice->setTexture2D(0, first_iteration ? m_hdrTempTex : m_hdrPinPingTextures[!horizontal]);
 
+		// update constant buffer
+		GLHDRConstantBuffer* constants = (GLHDRConstantBuffer*)m_hdrConstantBuffer->map(BufferMapping::WriteOnly);
+		memcpy(constants->weight, m_blurWeights.data(), sizeof(constants->weight));
+		constants->texOffset.x = m_texOffset.x;
+		constants->texOffset.y = m_texOffset.y;
+
+		// is flipped? 
+		constants->texOffset.w = (horizontal) ? 10.0f : 0.0f;
+
+		m_hdrConstantBuffer->unmap();
+
+		// setup constant buffer
+		g_renderDevice->setConstantBufferIndex(0, m_hdrConstantBuffer);
+
+		// render
 		ScreenQuad::renderWithoutTextureBinding(m_blurPassProgram);
 
 		horizontal = !horizontal;
@@ -231,32 +241,27 @@ void GLPostProcessing::blurPass(Texture2DBase* screenTexture)
 	}
 
 	g_renderDevice->setViewport(&oldViewPort);
-#endif
 }
 
-void GLPostProcessing::combinePass(Texture2DBase* screenTexture)
+void GLPostProcessing::combinePass(ITexture2D* screenTexture)
 {
-#if 0
 	g_renderDevice->setRenderTarget(0);
 
 	// clear color
 	//graphicsDevice->clear(ClearRenderTarget | ClearDepth);
 
-	ShaderProgramManager::setShaderProgram(m_hdrCombineProgram);
+	g_shaderManager->setShaderProgram(m_hdrCombineProgram);
 
 	// screen texture
 	g_renderDevice->setSampler(0, m_hdrPinPongSampler);
 	g_renderDevice->setTexture2D(0, screenTexture);
-	m_hdrCombineProgram->setInteger("u_hdrTexture", 0);
 
 	// bloom texture
 	g_renderDevice->setSampler(1, m_hdrPinPongSampler);
 	g_renderDevice->setTexture2D(1, m_hdrPinPingTextures[0]);
-	m_hdrCombineProgram->setInteger("u_bloomTexture", 1);
 
 	// render screen quad
 	ScreenQuad::renderWithoutTextureBinding(m_hdrCombineProgram);
-#endif
 }
 
 }

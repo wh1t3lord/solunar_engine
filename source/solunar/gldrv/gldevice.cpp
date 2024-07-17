@@ -1,4 +1,5 @@
 #include "gldrv_pch.h"
+
 #include "gldrv/gldevice.h"
 #include "gldrv/glrendertarget.h"
 #include "gldrv/gltexture2d.h"
@@ -31,7 +32,7 @@ void GLDevice::destroy()
 
 IRenderTarget* GLDevice::createRenderTarget(const RenderTargetCreationDesc& renderTargetDesc)
 {
-	return (IRenderTarget*)mem_new<GLRenderTarget>();
+	return (IRenderTarget*)mem_new<GLRenderTarget>(renderTargetDesc);
 }
 
 IBufferBase* GLDevice::createBuffer(const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc)
@@ -88,6 +89,8 @@ void GLDevice::setSampler(int slot, ISamplerState* sampler)
 
 void GLDevice::setConstantBuffer(IBufferBase* cb)
 {
+	Assert2(0, "GLDevice::setConstantBuffer is obsolote. Please use setConstantBufferIndex");
+
 	//ASSERT(cb->getBufferDesc().m_bufferType != BufferType::ConstantBuffer);
 
 	GLBufferImpl* bufferImpl = reinterpret_cast<GLBufferImpl*>(cb);
@@ -104,7 +107,6 @@ void GLDevice::setConstantBufferIndex(int slot, IBufferBase* cb)
 
 void GLDevice::setVertexFormat(VertexFormat* vertex_format)
 {
-	Assert2(0, "Obsolote method. Please you input layouts!");
 	Assert(vertex_format);
 	if (vertex_format->count() == 0) {
 		Core::error("GLDevice::setVertexFormat: failed to set empty vertex format");
@@ -142,14 +144,22 @@ void GLDevice::setScissors(float x, float y, float w, float h)
 	glScissor((int)x, (int)y, (int)w, (int)h);
 }
 
+static GLenum s_glPrimiviteMode[PM_UNUSED_COUNT] =
+{
+	GL_LINES,			// PM_LineList
+	GL_LINE_STRIP,		// PM_LineStrip
+	GL_TRIANGLES,		// PM_TriangleList
+	GL_TRIANGLE_STRIP,	// PM_TriangleStrip
+};
+
 void GLDevice::draw(PrimitiveMode primitiveMode, size_t verticesStart, size_t verticesCount)
 {
-	// #TODO: !!!
+	glDrawArrays(s_glPrimiviteMode[primitiveMode], verticesStart, verticesCount);
 }
 
 void GLDevice::drawIndexed(PrimitiveMode primitiveMode, size_t indexStart, size_t indexCount, int baseVertexLocation)
 {
-	// #TODO: !!!
+	glDrawElements(s_glPrimiviteMode[primitiveMode], indexCount, GL_UNSIGNED_INT, NULL);
 }
 
 }

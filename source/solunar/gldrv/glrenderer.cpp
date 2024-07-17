@@ -1,34 +1,37 @@
-#include "renderer.h"
 #include "gldrv_pch.h"
-#include "gldrv/glrenderer.h"
-#include "gldrv/gldevice.h"
-//#include "gldrv/glshaderprogrammanager.h"
-//#include "gldrv/glstatemanager.h"
-#include "gldrv/glrendertarget.h"
 
-// filesystem
 #include "core/file/filesystem.h"
 
-// Base graphics classes
+#include "engine/engine.h"
+#include "engine/entity/world.h"
+
+#include "gldrv/glrenderer.h"
+#include "gldrv/gldevice.h"
+#include "gldrv/GLShaderProgramManager.h"
 #include "graphics/view.h"
-#include "graphics/rendercontext.h"
-
-// Graphics objects
 #include "graphics/image.h"
-#include "graphics/mesh.h"
-//#include "graphics/animatedmodel.h" #TODO: Compile error
-#include "graphics/material.h"
+#include "graphics/shaderprogram.h"
+
+#include "graphics/core/device.h"
+
+// light stuff
+#include "graphics/light.h"
+#include "graphics/lightmanager.h"
+#include "graphics/graphicsworld.h"
+#include "graphics/shadowsrenderer.h"
+
+// material
 #include "graphics/materials/materialinstance.h"
-#include "graphics/materials/materialinstance_generic.h"
 
-// Graphics managers
-#include "graphics/ShaderProgramManager.h"
-#include "graphics/shaderconstantmanager.h"
-
-#include "main/main.h"
-
+// mesh
+#include "graphics/mesh.h"
+#include "graphics/material.h"
 
 namespace engine {
+
+	// #TODO: !!! REMOVE !!!
+	// #TODO: !!! UGLY HACK !!!
+//	extern GLFWwindow* g_engineWindow;
 
 #if 0
 	// GL_ARB_debug_output
@@ -45,7 +48,6 @@ namespace engine {
 		const char* message,
 		const void* userParam)
 	{
-
 		if (type != GL_DEBUG_TYPE_ERROR)
 			return;
 
@@ -75,23 +77,23 @@ namespace engine {
 	}
 #endif
 
-	void createRenderer()
-	{
-		g_renderer = mem_new<GLRenderer>();
-	}
+	//void createRenderer()
+	//{
+	//	g_renderer = mem_new<GLRenderer>();
+	//}
 
-	void destroyRenderer()
-	{
-		if (g_renderer)
-		{
-			mem_delete(g_renderer);
-			g_renderer = nullptr;
-		}
-	}
+	//void destroyRenderer()
+	//{
+	//	if (g_renderer)
+	//	{
+	//		mem_delete(g_renderer);
+	//		g_renderer = nullptr;
+	//	}
+	//}
 
 	GLRenderer::GLRenderer()
 	{
-		m_takeScreenshot = false;
+		m_makeScreenshot = false;
 	}
 
 	GLRenderer::~GLRenderer()
@@ -99,40 +101,106 @@ namespace engine {
 
 	}
 
+	void findExtensions()
+	{
+		int externsionsCount = 0;
+		glGetIntegerv(GL_NUM_EXTENSIONS, &externsionsCount);
+
+		for (int i = 0; i < externsionsCount; i++)
+		{
+			const char* externsionName = (const char*)glGetStringi(GL_EXTENSIONS, i);
+
+			if (strcmp(externsionName, "GL_ARB_sampler_objects") == 0)
+				Core::msg("[gldrv]: found GL_ARB_sampler_objects...");
+			if (strcmp(externsionName, "GL_ARB_separate_shader_objects") == 0)
+				Core::msg("[gldrv]: found GL_ARB_separate_shader_objects...");
+			if (strcmp(externsionName, "GL_EXT_direct_state_access") == 0)
+				Core::msg("[gldrv]: found GL_EXT_direct_state_access...");
+		}
+
+		//exit(0);
+	}
+
+	GLuint g_vertexArrayObject = 0;
+
 	void GLRenderer::init()
 	{
 		glEnable(GL_CULL_FACE);
 
+		findExtensions();
+
 #if 0
 		initGlDebug();
 #endif
+
+		glGenVertexArrays(1, &g_vertexArrayObject);
+		glBindVertexArray(g_vertexArrayObject);
 
 		// Initialize render device
 		g_renderDevice = (IRenderDevice*)mem_new<GLDevice>();
 
 		// initialize base renderer after device creation
 		Renderer::init();
+
+		// Initialize shader manager with current api
+		g_shaderManager = mem_new<GLShaderProgramManager>();
+		g_shaderManager->init("shaders/gl");
 	}
 
 	void GLRenderer::shutdown()
 	{
 		Renderer::shutdown();
 
+		if (g_shaderManager)
+		{
+			mem_delete(g_shaderManager);
+			g_shaderManager = nullptr;
+		}
+
+		glBindVertexArray(0);
+		glDeleteVertexArrays(1, &g_vertexArrayObject);
+
 		mem_delete(g_renderDevice);
 		g_renderDevice = nullptr;
+	}
+
+	void GLRenderer::beginFrame()
+	{
+		glBindVertexArray(g_vertexArrayObject);
+
+		Renderer::beginFrame();
 	}
 
 	void GLRenderer::endFrame()
 	{
 		Renderer::endFrame();
 
-		if (m_takeScreenshot)
-			takeScreenshotInternal(); // will reset m_takeScreenshot
+		if (m_makeScreenshot)
+			takeScreenshotInternal(); // will reset m_makeScreenshot
+
+#if 0
+		glfwSwapBuffers(g_engineWindow);
+#endif
 	}
 
 	void GLRenderer::takeScreenshot()
 	{
-		m_takeScreenshot = true;
+		m_makeScreenshot = true;
+
+#if 0
+		std::string defpath = FileDevice::getInstance()->getDefaultPath();
+		FileDevice::getInstance()->setDefaultPath("");
+
+		char buffer[256];
+		for (int i = 0;; i++)
+		{
+			sprintf(buffer, "sshot_%i.png", i);
+			if (!fileExist(buffer))
+				break;
+		}
+
+		m_screenshotFilename = buffer;
+#endif
 	}
 
 	void GLRenderer::bindMaterialForMesh(MeshComponent* mesh, Material* material, IMaterialInstance* materialInstance)
@@ -141,35 +209,21 @@ namespace engine {
 		Assert(material);
 		Assert(materialInstance);
 
-#if 0
-		IShaderProgram* shaderProgram = nullptr;
-		switch (getRenderMode())
-		{
-		case RendererViewMode::Wireframe:
-			shaderProgram = materialInstance->getWireframeShaderProgram();
-			break;
-
-		case RendererViewMode::Unlit:
-			shaderProgram = materialInstance->getUnlitShaderProgram();
-			break;
-
-		case RendererViewMode::Lit:
-			shaderProgram = materialInstance->getLitShaderProgram();
-			break;
-
-		default:
-			ASSERT2(0, "Unkonwed render mode");
-			break;
-		}
-#endif
-
 		// bind material samplers
 		material->bind();
+#if 0
+		// Initialize shader
+		IShaderProgram* shaderProgram = nullptr;
+
+		if (mesh->isA<StaticMeshComponent>())
+			shaderProgram = materialInstance->getStaticMeshShaderProgram();
+
+		Assert2(shaderProgram, "Unknowed mesh component type!");
 
 		// bind material instance shader and material uniforms
-		//ShaderProgramManager::setShaderProgram(shaderProgram);
+		g_shaderManager->setShaderProgram(shaderProgram);
+		setRenderModeForShader(shaderProgram);
 
-# if 0
 		if (getRenderMode() == RendererViewMode::Wireframe)
 		{
 			glm::vec4 wireframeColor;
@@ -177,29 +231,27 @@ namespace engine {
 			if (mesh->isA(StaticMeshComponent::getStaticTypeInfo()))
 				wireframeColor = glm::vec4(0.0f, 124.0f / 255.0f, 124.0f / 255.0f, 1.0);
 
-			shaderProgram->setVector4("wireframeColor", wireframeColor);
+			//shaderProgram->setVector4("wireframeColor", wireframeColor);
 		}
 
 		material->bindUniformsCustom(shaderProgram);
 
-
 		// bind point lights
-		shaderProgram->setInteger("u_lightsCount", mesh->m_world->getWorldComponent<GraphicsWorld>()->getLightManager()->getLights().size());
-		ShaderConstantManager::getInstance()->setPointLightConstantBuffer();
-# endif
+	//	if (StaticMeshComponent* staticMesh = dynamicCast<StaticMeshComponent>(mesh))
+	//		ShaderConstantManager::getInstance()->setStaticMeshGlobalData(staticMesh, view, )
+		
+		//shaderProgram->setInteger("u_lightsCount", mesh->m_world->getWorldComponent<GraphicsWorld>()->getLightManager()->getLights().size());
+		//ShaderConstantManager::getInstance()->setPointLightConstantBuffer();
+#endif
 	}
 
 	void GLRenderer::renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
 	{
-#if 0
-		if (mesh->isA(StaticMeshComponent::getStaticTypeInfo()))
-		{
-			renderStaticMesh(view, dynamicCast<StaticMeshComponent>(mesh));
-		}
-#endif
+		//if (MeshComponent* staticMesh = dynamicCast<MeshComponent>(mesh))
+			renderStaticMesh(graphicsWorld, view, mesh);
 	}
 
-	void GLRenderer::renderStaticMesh(View* view, MeshComponent* mesh)
+	void GLRenderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
 	{
 #if 0
 		for (auto it : mesh->getModel()->getSubmehes())
@@ -216,7 +268,7 @@ namespace engine {
 			// set our local render ctx
 			RenderContext::setContext(localCtx);
 
-			g_renderDevice->setVertexBuffer(it->getVertexBuffer());
+			g_renderDevice->setVertexBuffer(it->getVertexBuffer(), sizeof(Vertex), 0);
 			g_renderDevice->setVertexFormat(&s_vfVertex);
 
 			//g_renderDevice->setIndexBuffer(it->getIndexBuffer());
@@ -224,6 +276,8 @@ namespace engine {
 			//it->getMaterial()->bind();
 
 			bindMaterialForMesh(mesh, it->getMaterial().get(), it->getMaterial()->getMaterialInstance());
+
+			ShaderConstantManager::getInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
 
 			/*graphicsDevice->setIndexBuffer(it->getIndexBuffer());*/
 
@@ -278,17 +332,15 @@ namespace engine {
 
 			// return what have been
 			RenderContext::setContext(savedCtx);
-
-			// reset material bindings
-			it->getMaterial()->resetAllStates();
 		}
 #endif
 	}
 
 	void GLRenderer::renderStaticMeshCustomShader(View* view, MeshComponent* mesh, IShaderProgram* customShader)
 	{
-		//GraphicsDevice* graphicsDevice = GraphicsDevice::instance();
 #if 0
+		//GraphicsDevice* graphicsDevice = GraphicsDevice::instance();
+
 		for (auto it : mesh->getModel()->getSubmehes())
 		{
 			// create saved render ctx as previous model.
@@ -303,12 +355,12 @@ namespace engine {
 			// set our local render ctx
 			RenderContext::setContext(localCtx);
 
-			g_renderDevice->setVertexBuffer(it->getVertexBuffer());
+			g_renderDevice->setVertexBuffer(it->getVertexBuffer(), sizeof(Vertex), 0);
 			g_renderDevice->setVertexFormat(&s_vfVertex);
 
 			it->getMaterial()->bind();
 
-			ShaderProgramManager::setShaderProgram(customShader);
+			g_shaderManager->setShaderProgram(customShader);
 			it->getMaterial()->bindUniformsCustom(customShader);
 
 			/*graphicsDevice->setIndexBuffer(it->getIndexBuffer());
@@ -319,16 +371,12 @@ namespace engine {
 
 			// return what have been
 			RenderContext::setContext(savedCtx);
-
-			// reset material bindings
-			it->getMaterial()->resetAllStates();
 		}
 #endif
 	}
 
 	void GLRenderer::renderShadows(View* view)
 	{
-#if 0
 		ShadowsRenderer* shadowRenderer = ShadowsRenderer::getInstance();
 		shadowRenderer->beginRender();
 
@@ -341,6 +389,7 @@ namespace engine {
 		renderContext.model = glm::mat4(1.0f);
 		RenderContext::setContext(renderContext);
 
+#if 0
 		const std::shared_ptr<GraphicsWorld>& graphicsWorld = WorldManager::getActiveWorld()->getWorldComponent<GraphicsWorld>();
 		const auto& pointLights = graphicsWorld->getLightManager()->getLights();
 		for (auto it : pointLights)
@@ -354,9 +403,8 @@ namespace engine {
 					renderStaticMeshCustomShader(view, dynamicCast<StaticMeshComponent>(it2), shadowRenderer->getShadowMapShader());
 			}
 		}
-
-		shadowRenderer->endRender();
 #endif
+		shadowRenderer->endRender();
 	}
 
 	enum ContantBuffersBinding
@@ -365,74 +413,23 @@ namespace engine {
 		MaterialData = 1,
 	};
 
-	void GLRenderer::updateGlobalConstants(World* world, IShaderProgram* shader)
+	void GLRenderer::setRenderModeForShader(IShaderProgram* shaderProgram)
 	{
-		updatePointLightsConstants(world, shader);
-	}
-
-	void GLRenderer::updatePointLightsConstants(World* world, IShaderProgram* shader)
-	{
-#if 0
-		// get buffer location
-		int pointLightsCBLocation = shader->getUniformBlockLocation("PointLights");
-
-		// assing binding
-		glUniformBlockBinding(shader->getShaderHandle(), pointLightsCBLocation, ContantBuffersBinding::PointLights);
-
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		// #TODO: TOO HACKY
-		// #HACK: TOO HACKY
-		// too hacky
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////
-		BufferBase* pointLightCB = ShaderConstantManager::getInstance()->getPointLightsConstantBuffer();
-
-		const std::vector<LightComponent*>& lights = world->getWorldComponent<GraphicsWorld>()->getLightManager()->getLights();
-		std::vector<PointLightComponent*> pointLights;
-
-		for (auto it : lights)
-		{
-			if (it->isA(PointLightComponent::getStaticTypeInfo()))
-				pointLights.push_back(dynamicCast<PointLightComponent>(it));
-		}
-
-		if (pointLights.empty())
-		{
-			Core::msg(" GLRenderer::updatePointLightsConstants: Point lights vector is empty");
-			g_renderDevice->setConstantBuffer(0);
-			return;
-		}
-
-		if (pointLights.size() >= MAX_POINT_LIGHTS)
-		{
-			Core::msg(" GLRenderer::updatePointLightsConstants: pointLights.size() >= MAX_POINT_LIGHTS !!!");
-			g_renderDevice->setConstantBuffer(0);
-			return;
-		}
-
-		// get gpu data
-		PointLightCB* pointLightData = (PointLightCB*)pointLightCB->map(BufferMapping::WriteOnly);
-
-		int lightCounter = 0;
-		for (auto it : pointLights)
-		{
-			if (lightCounter >= MAX_POINT_LIGHTS)
-			{
-				Core::msg(" GLRenderer::updatePointLightsConstants: lightCounter >= MAX_POINT_LIGHTS !!!");
-				break;
-			}
-
-			pointLightData[lightCounter].color = glm::vec4(it->m_color, 1.0f);
-			pointLightData[lightCounter].position = glm::vec4(it->m_node->getPosition(), 1.0f);
-			pointLightData[lightCounter].specular = glm::vec4(it->m_specularColor, 1.0f);
-			pointLightData[lightCounter].lightData.r = it->m_radius;
-
-			lightCounter++;
-		}
-
-		// set buffer
-		g_renderDevice->setConstantBufferIndex(ContantBuffersBinding::PointLights, pointLightCB);
-#endif
+		//switch (m_currentViewMode)
+		//{
+		//case RendererViewMode::Wireframe:
+		//	shaderProgram->setInteger("wireframe", 1);
+		//	shaderProgram->setInteger("unlit", 0);
+		//	break;
+		//case RendererViewMode::Unlit:
+		//	shaderProgram->setInteger("unlit", 1);
+		//	shaderProgram->setInteger("wireframe", 0);
+		//	break;
+		//case RendererViewMode::Lit:
+		//	shaderProgram->setInteger("unlit", 0);
+		//	shaderProgram->setInteger("wireframe", 0);
+		//	break;
+		//}
 	}
 
 	void GLRenderer::takeScreenshotInternal()
@@ -470,19 +467,13 @@ namespace engine {
 
 		delete[] screenBuffer;
 
-		m_takeScreenshot = false;
+		m_makeScreenshot = false;
 	}
 
 	void GLRenderer::clearScreen()
 	{
-	}
-
-	void GLRenderer::clearRenderTarget(IRenderTarget* renderTarget)
-	{
-	}
-
-	void GLRenderer::setSwapChainRenderTarget()
-	{
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
 }
