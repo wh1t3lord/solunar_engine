@@ -263,19 +263,22 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 	}
 
 	// loading animations
+	m_animations.resize( data->animations_count);
 
 	for (int i = 0; i < data->animations_count; i++) {
 		const cgltf_animation& gltf_animation = data->animations[i];
 
-		Animation animation;
+		Animation& animation = m_animations[i];
 		animation.m_name = "unknowed animation name";
 		if (gltf_animation.name)
 			animation.m_name = gltf_animation.name;
 
-		for (int j = 0; j < gltf_animation.samplers_count; j++) {
+		animation.m_samplers.resize(gltf_animation.samplers_count);
+		for (int j = 0; j < gltf_animation.samplers_count ; j++) {
 			const cgltf_animation_sampler& gltf_animationSampler = gltf_animation.samplers[j];
 
-			AnimationSampler animationSampler;
+			AnimationSampler& animationSampler = animation.m_samplers[j];
+
 			animationSampler.m_interpolationType = getInterpolationType(gltf_animationSampler.interpolation);
 
 			Assert(animationSampler.m_interpolationType != InterpolationType_Unknown);
@@ -288,7 +291,7 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 			animationSampler.m_outputs.resize(outputCount);
 			
 			if (gltf_animationSampler.output->type == cgltf_type_vec3) {
-				for (int k = 0; k < outputCount; k++) {
+				for (int k = 0; k < outputCount ; k++) {
 					glm::vec3 outputValue = glm::vec3(0.0f);
 					cgltf_accessor_read_float(gltf_animationSampler.output, k, (float*)&outputValue, sizeof(glm::vec3));
 					animationSampler.m_outputs[k] = glm::vec4(outputValue, 0.0f);
@@ -296,8 +299,6 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 			} else if (gltf_animationSampler.output->type == cgltf_type_vec4) {
 				cgltf_accessor_unpack_floats(gltf_animationSampler.output, (float*)animationSampler.m_outputs.data(), outputCount * sizeof(glm::vec4));
 			}
-
-			animation.m_samplers.push_back(animationSampler);
 		}
 
 		for (const auto& samplers : animation.m_samplers) {
@@ -307,31 +308,29 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 			}
 		}
 
+		animation.m_channels.resize(gltf_animation.channels_count);
 		for (int j = 0; j < gltf_animation.channels_count; j++) {
 			const cgltf_animation_channel& gltf_animationChannel = gltf_animation.channels[j];
 
-			AnimationChannel animationChannel;
+			AnimationChannel& animationChannel = animation.m_channels[j];
 			animationChannel.m_pathType = getAnimationPathType(gltf_animationChannel.target_path);
 			
 			Assert(animationChannel.m_pathType != AnimationPathType_Unknown);
 
 			animationChannel.m_nodeId = cgltf_node_index(data, gltf_animationChannel.target_node);
 			animationChannel.m_samplerId = cgltf_animation_sampler_index(&gltf_animation, gltf_animationChannel.sampler);
-
- 			animation.m_channels.push_back(animationChannel);
 		}
-
-		m_animations.push_back(animation);
 
 		Core::msg("AnimatedModel: animation %s channels %i", gltf_animation.name, gltf_animation.channels_count);
 	}
 
 	// loading model skin
+	m_skins.resize(data->skins_count);
 	for (int i = 0; i < data->skins_count; i++) {
 		const cgltf_skin& gltf_skin = data->skins[i];
 	//	m_joints.resize(gltf_skin.joints_count);
 
-		AnimationSkin skin;
+		AnimationSkin& skin = m_skins[i];
 		skin.m_name = "unknowed skin name";
 		if (gltf_skin.name)
 			skin.m_name = gltf_skin.name;
@@ -389,55 +388,54 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 	m_nodes.resize(data->nodes_count);
 
 	for (int i = 0; i < data->nodes_count; i++) {
-		m_nodes[i].m_name = data->nodes[i].name;
+		auto& node = m_nodes[i];
+		node.m_name = data->nodes[i].name;
 
 		if (data->nodes[i].has_translation)
-			m_nodes[i].m_translation = glm::vec3(data->nodes[i].translation[0], data->nodes[i].translation[1], data->nodes[i].translation[2]);
+			node.m_translation = glm::vec3(data->nodes[i].translation[0], data->nodes[i].translation[1], data->nodes[i].translation[2]);
 		else
-			m_nodes[i].m_translation = glm::vec3(0.0f);
+			node.m_translation = glm::vec3(0.0f);
 
 		if (data->nodes[i].has_rotation)
-			m_nodes[i].m_rotation = glm::quat(data->nodes[i].rotation[3], data->nodes[i].rotation[0], data->nodes[i].rotation[1], data->nodes[i].rotation[2]);
+			node.m_rotation = glm::quat(data->nodes[i].rotation[3], data->nodes[i].rotation[0], data->nodes[i].rotation[1], data->nodes[i].rotation[2]);
 		else
-			m_nodes[i].m_rotation = glm::identity<glm::quat>();
+			node.m_rotation = glm::identity<glm::quat>();
 
 		if (data->nodes[i].has_scale)
-			m_nodes[i].m_scale = glm::vec3(data->nodes[i].scale[0], data->nodes[i].scale[1], data->nodes[i].scale[2]);
+			node.m_scale = glm::vec3(data->nodes[i].scale[0], data->nodes[i].scale[1], data->nodes[i].scale[2]);
 		else
-			m_nodes[i].m_scale = glm::vec3(1.0f);
+			node.m_scale = glm::vec3(1.0f);
 
 		if (data->nodes[i].has_matrix)
-			memcpy(&m_nodes[i].m_matrix[0][0], &data->nodes[i].matrix[0], 16 * sizeof(float));
+			memcpy(&node.m_matrix[0][0], &data->nodes[i].matrix[0], 16 * sizeof(float));
 		else
-			m_nodes[i].m_matrix = glm::mat4(1.0f);
+			node.m_matrix = glm::mat4(1.0f);
 
 		if (data->nodes[i].parent)
-			m_nodes[i].m_parentId = cgltf_node_index(data, data->nodes[i].parent);
+			node.m_parentId = cgltf_node_index(data, data->nodes[i].parent);
 
 		if (data->nodes[i].children_count > 0) {
 			for (int j = 0; j < data->nodes[i].children_count; j++) {
-				m_nodes[i].m_children.push_back(cgltf_node_index(data, data->nodes[i].children[j]));
+				node.m_children.push_back(cgltf_node_index(data, data->nodes[i].children[j]));
 			}
 		}
 
 		if (data->nodes[i].skin)
-			m_nodes[i].m_skinId = cgltf_skin_index(data, data->nodes[i].skin);
+			node.m_skinId = cgltf_skin_index(data, data->nodes[i].skin);
 	}
 
 #if 0
 	int rootNode = m_nodes.size();
 	m_nodes.resize(m_nodes.size() + 1);
-	//for (int i = 0; i < m_nodes.size(); ++i) {
-	//	const int gltf_node_is = i;
-	//	m_nodes[rootNode].m_children.push_back(gltf_node_is);
-	//}
-
-	for (int i = 0; i < m_nodes.size(); ++i) {
-		if (m_nodes[i].m_parentId == -1)
+	
+	for (int i = 0; i < m_nodes.size() - 1; ++i) {
+		if (m_nodes[i].m_parentId == -1) {
 			m_nodes[i].m_parentId = rootNode;
+			m_nodes[rootNode].m_children.push_back(i);
+		}
 	}
-
 	// main rotate Y
+	m_nodes[rootNode].m_name = "Root Node";
 	m_nodes[rootNode].m_parentId = -1;
 	m_nodes[rootNode].m_matrix = glm::mat4(1.0f);
 	m_nodes[rootNode].m_translation = glm::vec3(0.0f);
@@ -450,7 +448,8 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 	//for (auto it : m_joints)
 	//	m_bones.emplace(it.m_name, it);
 
-	cgltf_free(data);
+	/// todo !!!!!!!!!!!!!! cgltf_free(data);
+
 	free(fileData);
 
 	createHw();
@@ -524,6 +523,11 @@ void AnimatedModel::setPlayAnimation(int index, bool looped)
 	m_currentTime = 0.0f;
 }
 
+inline glm::quat samplerRotationToGlm(const glm::vec4& v)
+{
+	return glm::quat(v.w, v.x, v.y, v.z);
+}
+
 void AnimatedModel::testPlay(float dt)
 {
 	m_currentTime += 1.0f * dt;
@@ -550,18 +554,36 @@ void AnimatedModel::testPlay(float dt)
 					/*       using the interpolation information stored in the sampler                     */
 					if (channel.m_pathType == AnimationPathType_Translation)
 					{
+						auto A = sampler.m_outputs[i];
+						auto B = sampler.m_outputs[i + 1];
+						auto translation = glm::lerp(A, B, u);
+						m_nodes[channel.m_nodeId].m_translation = translation;
+#if 0
 						auto translation = sampler.m_outputs[i];
 						m_nodes[channel.m_nodeId].m_translation = glm::vec3(translation);
+#endif
 					}
 					else if (channel.m_pathType == AnimationPathType_Scale)
 					{
+						auto A = sampler.m_outputs[i];
+						auto B = sampler.m_outputs[i + 1];
+						auto scale = glm::lerp(A, B, u);
+						m_nodes[channel.m_nodeId].m_scale = scale;
+#if 0
 						auto scale = sampler.m_outputs[i];
 						m_nodes[channel.m_nodeId].m_scale = glm::vec3(scale);
+#endif
 					}
 					else if (channel.m_pathType == AnimationPathType_Rotation)
 					{
+						auto A = samplerRotationToGlm(sampler.m_outputs[i]);
+						auto B = samplerRotationToGlm(sampler.m_outputs[i + 1]);
+						auto rotate = glm::slerp(A, B, u);
+						m_nodes[channel.m_nodeId].m_rotation = glm::normalize(rotate);
+#if 0
 						auto rotation = sampler.m_outputs[i];
 						m_nodes[channel.m_nodeId].m_rotation = glm::quat(rotation.w, rotation.x, rotation.y, rotation.z);
+#endif
 					}
 
 					updated = true;
@@ -572,13 +594,15 @@ void AnimatedModel::testPlay(float dt)
 
 	if (updated == true)
 	{
-		for (int i = 0; i < m_nodes.size(); i++) {
-			updateNode(i);
-		}
+		//for (int i = 0; i < m_nodes.size(); i++) {
+		//	updateNode(i);
+		//}
+
+		updateNode(m_nodes.size() - 1);
 	}
 }
 
-#define MAX_BONES 256
+#define MAX_BONES 64
 
 static glm::mat4 s_boneInfoTest[MAX_BONES];
 
@@ -587,12 +611,14 @@ void AnimatedModel::updateNode(int node_id)
 	auto& node = m_nodes[node_id];
 	if (node.m_skinId != -1) {
 		auto& skin = m_skins[node.m_skinId];
-		auto inverse_transform = glm::inverse(getNodeMatrix(node_id)); //glm::inverse(node.m_matrix);
+		auto inverse_transform = glm::inverse(getNodeMatrix(node_id));
 		unsigned int num_joints = skin.m_joints.size();//m_joints.size(); //std::min(static_cast<unsigned int>(skin.joints.size()), MAX_NUM_JOINTS);
 		for (unsigned int i = 0; i < num_joints; ++i)
 		{
 			/* NOTE: Reference: https://github.com/KhronosGroup/glTF-Tutorials/blob/master/gltfTutorial/gltfTutorial_020_Skins.md */
-			auto joint_mat = skin.m_inverseBindMatrices[i] * getNodeMatrix(skin.m_joints[i]) * inverse_transform;
+			auto joint_mat	=skin.m_inverseBindMatrices[i];
+			joint_mat		= joint_mat * getNodeMatrix(skin.m_joints[i]);
+			joint_mat		= joint_mat * inverse_transform;
 			s_boneInfoTest[i] = joint_mat;
 
 		/*	BoneInfo boneInfo;
@@ -606,6 +632,52 @@ void AnimatedModel::updateNode(int node_id)
 
 	for (int i = 0; i < node.m_children.size(); i++)
 		updateNode(node.m_children[i]);
+
+}
+
+glm::mat4 makeRotationMatrix(const glm::quat& u)
+{
+	float wx, wy, wz, xx, yy, yz, xy, xz, zz;
+
+	// adapted from Shoemake
+	xx = u.x * u.x;
+	xy = u.x * u.y;
+	xz = u.x * u.z;
+	yy = u.y * u.y;
+	zz = u.z * u.z;
+	yz = u.y * u.z;
+
+	wx = u.w * u.x;
+	wy = u.w * u.y;
+	wz = u.w * u.z;
+
+	// make identity matrix
+	float matrix[16];
+
+	matrix[0] = 1.0f - 2.0f * (yy + zz);
+	matrix[4] = 2.0f * (xy - wz);
+	matrix[8] = 2.0f * (xz + wy);
+	matrix[12] = 0.0;
+
+	matrix[1] = 2.0f * (xy + wz);
+	matrix[5] = 1.0f - 2.0f * (xx + zz);
+	matrix[9] = 2.0f * (yz - wx);
+	matrix[13] = 0.0;
+
+	matrix[2] = 2.0f * (xz - wy);
+	matrix[6] = 2.0f * (yz + wx);
+	matrix[10] = 1.0f - 2.0f * (xx + yy);
+	matrix[14] = 0.0;
+
+	matrix[3] = 0;
+	matrix[7] = 0;
+	matrix[11] = 0;
+	matrix[15] = 1;
+
+	return glm::mat4(	matrix[0],	matrix[1],	matrix[2],	matrix[3],
+						matrix[4],	matrix[5],	matrix[6],	matrix[7],
+						matrix[8],	matrix[9],	matrix[10], matrix[11],
+						matrix[12], matrix[13], matrix[14], matrix[15]);
 }
 
 glm::mat4 AnimatedModel::getNodeMatrix(int nodeId)
@@ -613,17 +685,33 @@ glm::mat4 AnimatedModel::getNodeMatrix(int nodeId)
 	Assert(nodeId != -1);
 	AnimationNode& node = m_nodes[nodeId];
 	glm::mat4 tranlation = glm::mat4(1.0f);
-	tranlation = glm::scale(tranlation, node.m_scale) * glm::mat4_cast(node.m_rotation) * glm::translate(tranlation, node.m_translation);
+	tranlation =  tranlation * glm::scale(glm::mat4(1.0f), node.m_scale);
+	//tranlation = glm::scale(glm::mat4(1.0f), node.m_scale) *  tranlation ;
+	tranlation = tranlation * glm::toMat4(node.m_rotation);
+	//tranlation = tranlation * makeRotationMatrix(node.m_rotation);
+	//tranlation = glm::toMat4(node.m_rotation) * tranlation;
+	tranlation = tranlation * glm::translate(glm::mat4(1.0f), node.m_translation);
+	//tranlation = glm::translate(glm::mat4(1.0f), node.m_translation) * tranlation ;
+	
 
 	for (auto id = node.m_parentId; id != -1; ) {
 		auto& nodeParent = m_nodes[id];
 		glm::mat4 parentTranlation = glm::mat4(1.0f);
-		parentTranlation = glm::scale(parentTranlation, nodeParent.m_scale) * glm::mat4_cast(nodeParent.m_rotation) * glm::translate(parentTranlation, nodeParent.m_translation);
+		parentTranlation = parentTranlation * glm::scale(glm::mat4(1.0f), nodeParent.m_scale);
+		//parentTranlation = glm::scale(glm::mat4(1.0f), nodeParent.m_scale) * parentTranlation;
+		parentTranlation = parentTranlation * glm::toMat4(nodeParent.m_rotation);
+		//parentTranlation = parentTranlation * makeRotationMatrix(nodeParent.m_rotation);
+		//parentTranlation = glm::toMat4(nodeParent.m_rotation) * parentTranlation;
+		parentTranlation = parentTranlation * glm::translate(glm::mat4(1.0f), nodeParent.m_translation);
+		//parentTranlation = glm::translate(glm::mat4(1.0f), nodeParent.m_translation) * parentTranlation ;
+
 		tranlation = tranlation * parentTranlation;
+		//tranlation = parentTranlation *  tranlation;
 		id = nodeParent.m_parentId;
 	}
 
 	return tranlation;
+	//return glm::transpose( tranlation);
 }
 
 

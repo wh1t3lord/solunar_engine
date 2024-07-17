@@ -10,6 +10,7 @@ namespace engine
 
 ShockPlayerController::ShockPlayerController() :
 	m_camera(nullptr),
+	m_rigidBody(nullptr),
 	m_flyCam(true)
 {
 	memset(&m_playerStats, 0, sizeof(m_playerStats));
@@ -57,8 +58,8 @@ void ShockPlayerController::initializeCamera()
 
 	m_camera = getEntity()->createComponent<CameraFirstPersonComponent>();
 
-	m_rigidBody = getEntity()->createComponent<RigidBodyProxyComponent>();
-	m_rigidBody->createPlayerController();
+	//m_rigidBody = getEntity()->createComponent<RigidBodyProxyComponent>();
+	//m_rigidBody->createPlayerController();
 
 	activateCamera();
 }
@@ -101,7 +102,7 @@ void ShockPlayerController::update(float dt)
 	updateCamera(dt);
 
 	// update player movement
-	updateMovement(dt);
+	//updateMovement(dt);
 
 	// update debug
 	debugUpdate(dt);
@@ -143,7 +144,7 @@ void ShockPlayerController::updateCamera(float dt)
 	 	input->setCursorPosCallback(false);
 	 }
 
-#if 0
+#if 1
 	 glm::vec3 cameraDirection = CameraProxy::getInstance()->getDirection();
 	 glm::vec3 pos = getEntity()->getPosition();
 	 float camSpeed = 8.0f * dt;
@@ -238,6 +239,9 @@ void ShockPlayerController::updateMovement(float dt)
 
 void ShockPlayerController::debugUpdate(float dt)
 {
+	if (!m_rigidBody)
+		return;
+
 	char buf[256];
 	
 	// Ghost object stuff ...

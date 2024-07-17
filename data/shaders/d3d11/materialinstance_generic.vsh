@@ -80,6 +80,7 @@ VSOutput VSMain(VSInput input)
 	// World position
 	output.worldPos = mul(float4(input.position, 1.0f), skinMatrix);
 	output.worldPos = mul(float4(output.worldPos, 1.0f), g_modelMatrix);
+	//output.worldPos = mul(float4(input.position, 1.0f), g_modelMatrix);
 
 	// Position
 	output.position = mul(float4(output.worldPos, 1.0f), g_viewMatrix);
@@ -89,7 +90,7 @@ VSOutput VSMain(VSInput input)
 	output.texcoord = input.texcoord;
 
 	// normal
-	output.normal = mul(float4(output.normal, 0.0f), g_modelMatrix);
+	output.normal = mul(float4(input.normal, 0.0f), g_modelMatrix);
 	
 	return output;
 }
