@@ -31,8 +31,6 @@
 
 namespace engine
 {
-	VertexFormat s_vfVertex;
-
 	inline static glm::mat4 Assimp2Glm(const aiMatrix4x4& from)
 	{
 		return glm::mat4(
@@ -77,15 +75,6 @@ namespace engine
 
 	SubMesh* ProccessSubMesh(aiMesh* mesh, aiNode* node, const aiScene* scene)
 	{
-		if (s_vfVertex.count() == 0)
-		{
-			s_vfVertex.addPosition(); //glm::vec3 m_position;
-			s_vfVertex.addNormal();   //glm::vec3 m_normal;
-			s_vfVertex.addTexcoord(); //glm::vec2 m_texcoord0;
-			s_vfVertex.addNormal();   //glm::vec3 m_tangent;
-			s_vfVertex.addNormal();   //glm::vec3 m_bitangent;
-		}
-
 		std::vector<Vertex> vertices;
 		std::vector<uint32_t> indecies;
 

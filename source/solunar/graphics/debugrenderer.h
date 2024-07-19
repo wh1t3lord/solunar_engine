@@ -1,7 +1,7 @@
 #ifndef DEBUGRENDERER_H
 #define DEBUGRENDERER_H
+
 #include "shaderprogram.h"
-#include "graphics/vertexformat.h"
 #include "core/math/boundingbox.h"
 
 namespace engine {
@@ -61,8 +61,6 @@ private:
 	glm::mat4 m_modelMatrix;
 
 private:
-	VertexFormat m_lineVertexFormat;
-	
 	IBufferBase* m_verticesBuffer;
 	IBufferBase* m_matrixBuffer;
 	IShaderProgram* m_shaderProgram;

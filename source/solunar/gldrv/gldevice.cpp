@@ -6,8 +6,6 @@
 #include "gldrv/glbufferimpl.h"
 #include "gldrv/glsamplerstate.h"
 
-#include "graphics/vertexformat.h"
-
 namespace engine {
 
 GLDevice::GLDevice()
@@ -105,27 +103,27 @@ void GLDevice::setConstantBufferIndex(int slot, IBufferBase* cb)
 	glBindBufferBase(GL_UNIFORM_BUFFER, slot, bufferImpl ? bufferImpl->getHandle() : 0);
 }
 
-void GLDevice::setVertexFormat(VertexFormat* vertex_format)
-{
-	Assert(vertex_format);
-	if (vertex_format->count() == 0) {
-		Core::error("GLDevice::setVertexFormat: failed to set empty vertex format");
-	}
-
-	size_t appliedOffset = 0;
-	for (VertexAttribute* it = vertex_format->begin(); it != vertex_format->end(); ++it) {
-	
-		if (appliedOffset > 0)
-			glVertexAttribPointer(it->m_offset, it->m_size, GL_FLOAT, GL_FALSE, vertex_format->size() * sizeof(float), (void*)(appliedOffset * sizeof(float)));
-		else
-			glVertexAttribPointer(it->m_offset, it->m_size, GL_FLOAT, GL_FALSE, vertex_format->size() * sizeof(float), (void*)0);
-	
-		//glVertexAttribPointer(it->m_offset, it->m_size, GL_FLOAT, GL_FALSE, format->size() * sizeof(float), (void*)appliedOffset);
-		glEnableVertexAttribArray(it->m_offset);
-
-		appliedOffset += it->m_size;
-	}
-}
+//void GLDevice::setVertexFormat(VertexFormat* vertex_format)
+//{
+//	Assert(vertex_format);
+//	if (vertex_format->count() == 0) {
+//		Core::error("GLDevice::setVertexFormat: failed to set empty vertex format");
+//	}
+//
+//	size_t appliedOffset = 0;
+//	for (VertexAttribute* it = vertex_format->begin(); it != vertex_format->end(); ++it) {
+//	
+//		if (appliedOffset > 0)
+//			glVertexAttribPointer(it->m_offset, it->m_size, GL_FLOAT, GL_FALSE, vertex_format->size() * sizeof(float), (void*)(appliedOffset * sizeof(float)));
+//		else
+//			glVertexAttribPointer(it->m_offset, it->m_size, GL_FLOAT, GL_FALSE, vertex_format->size() * sizeof(float), (void*)0);
+//	
+//		//glVertexAttribPointer(it->m_offset, it->m_size, GL_FLOAT, GL_FALSE, format->size() * sizeof(float), (void*)appliedOffset);
+//		glEnableVertexAttribArray(it->m_offset);
+//
+//		appliedOffset += it->m_size;
+//	}
+//}
 
 void GLDevice::setViewport(Viewport* viewport)
 {

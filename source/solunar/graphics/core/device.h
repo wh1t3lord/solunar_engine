@@ -50,9 +50,6 @@ namespace engine {
 		//! set sampler desc.
 		virtual void setSampler(int slot, ISamplerState* sampler) = 0;
 
-		//! Set vertex format.
-		virtual void setVertexFormat(VertexFormat* vertex_format) = 0;
-
 		//! Set viewport
 		virtual void setViewport(Viewport* viewport) = 0;
 

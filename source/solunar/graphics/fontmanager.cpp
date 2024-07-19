@@ -12,8 +12,6 @@
 #include "graphics/core/buffer.h"
 #include "graphics/core/statemanager.h"
 
-#include "graphics/vertexformat.h"
-
 // renderer
 #include "graphics/view.h"
 #include "graphics/renderer.h"

@@ -373,7 +373,6 @@ void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 		RenderContext::setContext(localCtx);
 
 		g_renderDevice->setVertexBuffer(submesh->getVertexBuffer(), sizeof(Vertex), 0);
-		g_renderDevice->setVertexFormat(&s_vfVertex);
 
 		//g_renderDevice->setIndexBuffer(it->getIndexBuffer());
 
@@ -461,7 +460,6 @@ void D3D11Renderer::renderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view,
 
 		g_renderDevice->setVertexBuffer(submesh->m_vertexBuffer, sizeof(AnimatedVertex), 0);
 		g_renderDevice->setIndexBuffer(submesh->m_indexBuffer, false);
-		g_renderDevice->setVertexFormat(&s_vfVertex);
 
 		//g_renderDevice->setIndexBuffer(it->getIndexBuffer());
 

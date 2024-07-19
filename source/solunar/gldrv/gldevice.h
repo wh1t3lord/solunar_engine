@@ -45,9 +45,6 @@ public:
 	//! set sampler desc.
 	void setSampler(int slot, ISamplerState* sampler) override;
 
-	//! Set vertex format.
-	void setVertexFormat(VertexFormat* vertex_format) override;
-
 	//! Set viewport
 	void setViewport(Viewport* viewport) override;
 

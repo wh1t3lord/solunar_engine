@@ -71,9 +71,6 @@ void DebugRender::initialize()
 		nullptr,
 		layoutDesc,
 		sizeof(layoutDesc) / sizeof(layoutDesc[0]));
-	
-	m_lineVertexFormat.addPosition(); // position
-	m_lineVertexFormat.addPosition(); // color
 }
 
 void DebugRender::shutdown()
@@ -264,7 +261,6 @@ void DebugRender::drawLinesInternal(View* view)
 		return;
 
 	g_renderDevice->setVertexBuffer(m_verticesBuffer, sizeof(LineVertex), 0);
-	g_renderDevice->setVertexFormat(&m_lineVertexFormat);
 	
 	//m_verticesBuffer->updateSubresource(m_lines.data(), m_lines.size() * sizeof(Line));
 

@@ -3,7 +3,6 @@
 
 #include "core/math/boundingbox.h"
 #include "graphics/graphicsobject.h"
-#include "graphics/vertexformat.h"
 
 namespace engine
 {
@@ -18,13 +17,11 @@ namespace engine
 		glm::vec3 m_bitangent;
 	};
 
-	extern VertexFormat s_vfVertex;
-
 	class ModelBase;
 	class Material;
 	struct IBufferBase;
 
-	IBufferBase* createVBFromModel(VertexFormat* meshVF, int countOfVertexDecls, const std::string& filename, int* verticesCount);
+	//IBufferBase* createVBFromModel(VertexFormat* meshVF, int countOfVertexDecls, const std::string& filename, int* verticesCount);
 
 	class SubMesh
 	{

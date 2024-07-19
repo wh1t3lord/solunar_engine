@@ -219,10 +219,6 @@ void D3D11Device::setSampler(int slot, ISamplerState* sampler)
 	}
 }
 
-void D3D11Device::setVertexFormat(VertexFormat* vertex_format)
-{
-}
-
 void D3D11Device::setViewport(Viewport* viewport)
 {
 	Assert(viewport);
