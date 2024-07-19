@@ -255,4 +255,15 @@ void D3D11Texture2D::destroy()
 	}
 }
 
+void D3D11Texture2D::updateTexture(const void* data, int rowPitch, int depthPitch)
+{
+	g_d3d11Device->getDeviceContext()->UpdateSubresource(
+		m_texture,
+		0,
+		NULL,
+		data,
+		rowPitch,
+		depthPitch);
+}
+
 }

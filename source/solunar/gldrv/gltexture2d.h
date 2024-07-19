@@ -15,6 +15,8 @@ public:
 	void create(const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc);
 	void destroy();
 
+	void updateTexture(const void* data, int rowPitch, int depthPitch) override;
+
 	SurfaceDesc getSurfaceDesc() override;
 
 	uint32_t getHandle() { return m_textureHandle; }
@@ -22,6 +24,7 @@ public:
 private:
 	SurfaceDesc m_surfaceDesc;
 	uint32_t m_textureHandle;
+
 };
 
 }

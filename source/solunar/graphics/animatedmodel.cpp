@@ -13,7 +13,10 @@
 #include "graphics/mesh.h"
 #include "graphics/shaderconstantmanager.h"
 #include "graphics/debugrenderer.h"
+#include "graphics/screenquad.h"
+
 #include "glm/ext.hpp"
+
 #define CGLTF_IMPLEMENTATION
 #include <cgltf.h>
 
@@ -456,6 +459,11 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 
 	/// todo !!!!!!!!!!!!!! cgltf_free(data);
 
+	// #TODO: cgltf has very SLOW memory freeing, fix with fixed allocator or custom allocator
+#ifdef NDEBUG
+	cgltf_free(data);
+#endif // !NDEBUG
+
 	free(fileData);
 
 	createHw();
@@ -758,7 +766,7 @@ void AnimatedModelRenderer::init()
 	TextureDesc textureDesc;
 	memset(&textureDesc, 0, sizeof(textureDesc));
 	textureDesc.m_textureType = TextureType::Texture2D;
-	textureDesc.m_width = MAX_JOINTS * 3;
+	textureDesc.m_width = MAX_JOINTS * 4;
 	textureDesc.m_height = MAX_INSTANCES;
 	textureDesc.m_mipmapLevel = 1;
 	textureDesc.m_format = ImageFormat::RGBA32F;
@@ -807,15 +815,16 @@ void AnimatedModelRenderer::render(AnimatedMeshComponent* model)
 
 	g_renderDevice->setConstantBufferIndex(ConstantBufferBindings_Skinning, g_bonesConstantBuffer.get());
 
+#if 0
 	//std::shared_ptr<ModelBase> modelBase = model->lockModel();
 	//AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
 
 	// compute skinning matrices and write to joint texture upload buffer
+	m_jointTexture->updateTexture(s_boneInfoTest, 0/*sizeof(s_boneInfoTest)*/, 0);
 
-	//glm::mat4* skinningMatrices = mem_array<glm::mat4>(256);
-	//for (int i = 0; i < 256; i++) {
-	//
-	//}
+	// draw texture
+	ScreenQuad::render(m_jointTexture);
+#endif
 }
 
 }

@@ -16,6 +16,8 @@ public:
 	void create(D3D11Device* device, const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc);
 	void destroy();
 
+	void updateTexture(const void* data, int rowPitch, int depthPitch) override;
+
 	SurfaceDesc getSurfaceDesc() override { return m_surfaceDesc; }
 	TextureDesc getTextureDesc() { return m_textureDesc; }
 

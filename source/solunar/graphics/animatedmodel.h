@@ -9,7 +9,7 @@ namespace engine
 
 // the upper limit for joint palette size is 256 (because the mesh joint indices
 // are stored in packed byte-size vertex formats), but the example mesh only needs less than 64
-#define MAX_JOINTS (64)
+#define MAX_JOINTS 256 //(64) #TODO ::!!!!!!
 
 // this defines the size of the instance-buffer and height of the joint-texture
 #define MAX_INSTANCES (512)

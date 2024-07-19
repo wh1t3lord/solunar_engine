@@ -9,6 +9,8 @@ class ITexture
 public:
 	virtual ~ITexture() {}
 
+	virtual void updateTexture(const void* data, int rowPitch, int depthPitch) = 0;
+
 	virtual SurfaceDesc getSurfaceDesc() = 0;
 };
 
