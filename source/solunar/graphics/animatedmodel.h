@@ -141,6 +141,8 @@ public:
 
 	glm::mat4 getNodeMatrix(int nodeId);
 
+	const BoundingBox& getBoundingBox();
+
 private:
 	std::vector<AnimatedSubMesh*> m_subMeshes;
 	std::vector<Animation> m_animations;
@@ -151,6 +153,8 @@ private:
 	Animation* m_currentAnimation;
 	bool m_playLooped = false;
 	float m_currentTime = 0.0f;
+	
+	BoundingBox m_boundingBox;
 };
 
 class AnimatedMeshComponent;

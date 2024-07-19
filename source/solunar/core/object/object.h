@@ -136,6 +136,20 @@ namespace engine
 		return std::weak_ptr<T>();
 	}
 
+	template <typename T, typename U>
+	std::weak_ptr<T> dynamicCastWeakPtr(const std::weak_ptr<U>& object)
+	{
+		if (std::shared_ptr<U> objectPtr = object.lock())
+		{
+			if (objectPtr->isA<T>())
+			{
+				return std::static_pointer_cast<T>(objectPtr);
+			}
+		}
+
+		return std::weak_ptr<T>();
+	}
+
 	void objectDeleter(Object* p);
 }
 

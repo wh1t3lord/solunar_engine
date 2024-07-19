@@ -223,6 +223,8 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 			AABB.m_max = glm::max(positions[o], AABB.m_max);
 		}
 
+		m_boundingBox = AABB;
+
 		// calculate vertices
 		std::vector<AnimatedVertex> vertices;
 		for (size_t o = 0; o < vtxCount; o++) {
@@ -717,6 +719,11 @@ glm::mat4 AnimatedModel::getNodeMatrix(int nodeId)
 	Assert(nodeId != -1);
 	AnimationNode& node = m_nodes[nodeId];
 	return node.m_matrix;
+}
+
+const BoundingBox& AnimatedModel::getBoundingBox()
+{
+	return m_boundingBox;
 }
 
 ///////////////////////////////////////////////////////////

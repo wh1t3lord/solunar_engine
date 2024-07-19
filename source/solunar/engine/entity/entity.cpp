@@ -179,6 +179,11 @@ glm::mat4 Entity::getLocalTranslation()
 	return tranlation;
 }
 
+void Entity::setBoundingBox(const BoundingBox& boundingBox)
+{
+	m_boundingBox = boundingBox;
+}
+
 const BoundingBox& Entity::getLocalBoundingBox()
 {
 	return m_boundingBox;

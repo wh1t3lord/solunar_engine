@@ -39,6 +39,8 @@ public:
 
 	glm::mat4 getWorldTranslation();
 	glm::mat4 getLocalTranslation();
+
+	void setBoundingBox(const BoundingBox& boundingBox);
 	const BoundingBox& getLocalBoundingBox();
 	const BoundingBox& getBoundingBox();
 
