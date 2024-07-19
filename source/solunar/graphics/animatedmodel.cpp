@@ -626,7 +626,7 @@ void AnimatedModel::updateNode(int node_id)
 		{
 			/* NOTE: Reference: https://github.com/KhronosGroup/glTF-Tutorials/blob/master/gltfTutorial/gltfTutorial_020_Skins.md */
 			
-			s_boneInfoTest[i] =  getNodeMatrix(skin.m_joints[i]) *  skin.m_inverseBindMatrices[i] ;
+			s_boneInfoTest[i] = getNodeMatrix(skin.m_joints[i]) *  skin.m_inverseBindMatrices[i] ;
 
 		/*	BoneInfo boneInfo;
 			boneInfo.id = skin.m_joints[i];
