@@ -4,7 +4,7 @@ if (MSVC)
     # Always generate PDBs
     add_compile_options(/Zi)
     add_link_options(/DEBUG)
-
+	#add_compile_options(-fsanitize=address)
     add_compile_options(/W3) # Warning level
 endif()
 

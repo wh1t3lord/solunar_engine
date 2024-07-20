@@ -135,6 +135,41 @@ void TestAnimationComponent::update(float dt)
 		}
 	}
 
+	animatedModel->testPlay(dt);
+}
+
+class ViewmodelAnimationController : public LogicComponent
+{
+	ImplementObject(ViewmodelAnimationController, LogicComponent);
+public:
+	ViewmodelAnimationController();
+	~ViewmodelAnimationController();
+
+	void update(float dt) override;
+
+private:
+	int m_animationIndex = -1;
+};
+
+ViewmodelAnimationController::ViewmodelAnimationController()
+{
+}
+
+ViewmodelAnimationController::~ViewmodelAnimationController()
+{
+}
+
+void ViewmodelAnimationController::update(float dt)
+{
+	AnimatedMeshComponent* animatedMeshComponent = getEntity()->getComponent<AnimatedMeshComponent>();
+	std::shared_ptr<ModelBase> modelBase = animatedMeshComponent->lockModel();
+	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
+	if (animatedModel) {
+		if (m_animationIndex == -1) {
+			m_animationIndex = animatedModel->getAnimationByName("Armature|Armature|Hide");
+			animatedModel->setPlayAnimation(m_animationIndex, true);
+		}
+	}
 
 	animatedModel->testPlay(dt);
 }
@@ -439,6 +474,7 @@ void registerGameClasses()
 		ObjectGetTypeInfo(TestRotatorComponent),
 		ObjectGetTypeInfo(TestPositionUpdaterComponent),
 		ObjectGetTypeInfo(TestAnimationComponent),
+		ObjectGetTypeInfo(ViewmodelAnimationController),
 	};
 
 	for (int i = 0; i < sizeof(gameClasses) / sizeof(gameClasses[0]); i++)

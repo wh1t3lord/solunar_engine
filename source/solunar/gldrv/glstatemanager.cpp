@@ -229,9 +229,9 @@ void GLStateManager::setRasterizerState(IRasterizerState* rasterizerState)
         glCullFace(getGLCullMode(desc.m_cullMode));
         glFrontFace(desc.m_frontCCW ? GL_CCW : GL_CW); // #TODO: INSPECT PLEASE
 
-        if (desc.m_scissorEnable)
-            glEnable(GL_SCISSOR_TEST);
-        else
+      //if (desc.m_scissorEnable)
+      //    glEnable(GL_SCISSOR_TEST);
+      //else
             glDisable(GL_SCISSOR_TEST);
 
         previousRasterizerState = rasterizerState;

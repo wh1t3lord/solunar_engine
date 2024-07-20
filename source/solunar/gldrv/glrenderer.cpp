@@ -303,6 +303,7 @@ namespace engine {
 		rasterizerState.m_cullMode = CullMode::Back;
 		rasterizerState.m_frontCCW = true;
 		rasterizerState.m_fillMode = FillMode::Solid;
+		rasterizerState.m_scissorEnable = false;
 
 		m_rasterizerState = g_stateManager->createRasterizerState(rasterizerState);
 		g_stateManager->setRasterizerState(m_rasterizerState);
@@ -346,7 +347,7 @@ namespace engine {
 		glBindVertexArray(g_vertexArrayObject);
 
 		g_stateManager->setRasterizerState(m_rasterizerState);
-
+		
 		Renderer::beginFrame();
 	}
 

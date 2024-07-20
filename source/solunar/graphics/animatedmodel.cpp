@@ -217,6 +217,13 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 		gltfUnpackValues(primitive, attributeBoneIds, vtxCount, joints);
 		gltfUnpackValues(primitive, attributeWeights, vtxCount, weights);
 
+		// flip uvs
+		for (auto& it : texcoords) {
+			it.y = 1.0f - it.y;
+		}
+
+		// Bounding box calculation
+
 		BoundingBox AABB;
 		AABB.setIdentity();
 
@@ -253,17 +260,51 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 			}
 
 			vertex.m_bitangent = glm::cross(vertex.m_normal, vertex.m_tangent);
-			vertex.m_boneIDs = joints[o];
-			vertex.m_weights = weights[o];
+
+			if (joints.size() > 0) {
+				vertex.m_boneIDs = joints[o];
+			} else {
+				vertex.m_boneIDs = glm::vec4(0.0f);
+			}
+
+			if (weights.size() > 0) {
+				vertex.m_weights = weights[o];
+			} else {
+				vertex.m_weights = glm::vec4(0.0f);
+			}
+;
 			vertices.push_back(vertex);
 		}
+
+		std::string materialname = "materials/default_material.xml";
+		if (primitive.material && strlen(primitive.material->name) > 0)
+			materialname = std::string("materials/models/") + std::string(primitive.material->name) + ".xml"; // #TODO: SHIT !!!!
+
+#if 0
+		if (data->materials_count != data->meshes_count)
+			Core::msg("AnimatedModel::load_GLTF: wrong material count! using default ...");
+
+		if (data->materials_count < data->meshes_count)
+			Core::msg("AnimatedModel::load_GLTF: material count less than mesh count (%i < %i)! using default ...",
+				data->materials_count, data->meshes_count);
+
+		// #TODO: This shit should be rewritten !!!
+		//if (data->materials_count == data->meshes_count)
+		if (i < data->materials_count)
+		{
+			if (data->materials[i].name && strlen(data->materials[i].name) <= 0)
+				Core::msg("AnimatedModel::load_GLTF: material name on mesh %i are empty! using default ...", i);
+			else if (data->materials[i].name && strlen(data->materials[i].name) > 0)
+				materialname = std::string("materials/models/") + std::string(data->materials[i].name) + ".xml"; // #TODO: SHIT !!!!
+		}
+#endif
 
 		AnimatedSubMesh* submesh = mem_new<AnimatedSubMesh>();
 		submesh->m_vertices = vertices;
 		submesh->m_verticesCount = vertices.size();
 		submesh->m_indices = indices;
 		submesh->m_indicesCount = indices.size();
-		submesh->m_materialName = "materials/default_material.xml";
+		submesh->m_materialName = materialname;
 		m_subMeshes.push_back(submesh);
 	}
 
@@ -446,7 +487,7 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 	m_nodes[rootNode].m_parentId = -1;
 	m_nodes[rootNode].m_matrix = glm::mat4(1.0f);
 	m_nodes[rootNode].m_translation = glm::vec3(0.0f);
-	m_nodes[rootNode].m_scale = glm::vec3(1.0f);
+	m_nodes[rootNode].m_scale = glm::vec3(0.1f);
 	m_nodes[rootNode].m_rotation.x = 0;
 	m_nodes[rootNode].m_rotation.y = sinf(180.0 / 2.0 / 180.0 * maths::PI);
 	m_nodes[rootNode].m_rotation.z = 0;
@@ -461,8 +502,9 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 
 	// #TODO: cgltf has very SLOW memory freeing, fix with fixed allocator or custom allocator
 #ifdef NDEBUG
-	cgltf_free(data);
+	//cgltf_free(data);
 #endif // !NDEBUG
+	cgltf_free(data);
 
 	free(fileData);
 
@@ -502,6 +544,8 @@ void AnimatedModel::createHw()
 		submesh->m_indices.clear();
 
 		submesh->m_material = g_contentManager->loadObject<Material>(submesh->m_materialName);
+		if (submesh->m_material.expired())
+			submesh->m_material = getDefaultMaterial();
 	}
 }
 
@@ -617,7 +661,7 @@ void AnimatedModel::testPlay(float dt)
 	}
 }
 
-#define MAX_BONES 64
+#define MAX_BONES 256
 
 static glm::mat4 s_boneInfoTest[MAX_BONES];
 
@@ -631,11 +675,13 @@ void AnimatedModel::updateNode(int node_id)
 
 		//Logger::logPrint("frowrikdebug: %s \n", glm::to_string(inverse_transform).c_str());
 
-		unsigned int num_joints = skin.m_joints.size();//m_joints.size(); //std::min(static_cast<unsigned int>(skin.joints.size()), MAX_NUM_JOINTS);
+		unsigned int num_joints = skin.m_joints.size();//skin.m_joints.size();//m_joints.size(); //std::min(static_cast<unsigned int>(skin.joints.size()), MAX_NUM_JOINTS);
 		for (unsigned int i = 0; i < num_joints; ++i)
 		{
 			/* NOTE: Reference: https://github.com/KhronosGroup/glTF-Tutorials/blob/master/gltfTutorial/gltfTutorial_020_Skins.md */
 			
+		//	jointMatrix(j) = globalTransformOfJointNode(j) * inverseBindMatrixForJoint(j);
+
 			s_boneInfoTest[i] = getNodeMatrix(skin.m_joints[i]) *  skin.m_inverseBindMatrices[i] ;
 
 		/*	BoneInfo boneInfo;

@@ -450,8 +450,11 @@ namespace engine
 		V[2] = 1 - 2 * (o.x * o.x + o.y * o.y);
 		data->m_direction = glm::vec4(-V, 1.0f);
 
+#ifndef FINAL_BUILD
 		g_debugRender.drawLine(directionalLight->getEntity()->getPosition(),
 			directionalLight->getEntity()->getPosition() + V, glm::vec3(1.0f, 1.0f, 0.0f));
+#endif // !FINAL_BUILD
+
 #endif
 		//	data->m_direction = glm::vec4(glm::radians(directionalLight->m_direction), 1.0f);
 

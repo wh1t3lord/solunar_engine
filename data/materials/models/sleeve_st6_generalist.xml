@@ -1,0 +1,10 @@
+<Material>
+    <Shader>diffuse</Shader>
+    <AlbedoTexture filename="textures/models/test/sleeve_st6_generalist_Base_color.png"/>
+    <NormalTexture filename=""/>
+    <SpecularTexture filename=""/>
+    <RenderState>
+        <DepthWrite value="true"/>
+        <SelfIllumination value="false"/>
+    </RenderState>
+</Material>

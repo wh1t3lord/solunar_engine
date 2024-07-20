@@ -1,7 +1,6 @@
 #include "graphicspch.h"
 #include "graphics/screenquad.h"
 #include "graphics/core/device.h"
-#include "graphics/vertexformat.h"
 #include "graphics/shaderprogram.h"
 #include "graphics/ShaderProgramManager.h"
 #include "graphics/renderer.h"

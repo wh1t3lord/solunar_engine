@@ -46,6 +46,26 @@ void destroyRenderer()
 	}
 }
 
+void reportRenderDevice()
+{
+	IDXGIDevice* dxgiDevice = nullptr;
+	D3D11_CHECK(g_d3d11Device->getDevice()->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice));
+
+	IDXGIAdapter* dxgiAdapter = nullptr;
+	D3D11_CHECK(dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)&dxgiAdapter));
+
+	DXGI_ADAPTER_DESC adapterDesc;
+	dxgiAdapter->GetDesc(&adapterDesc);
+
+	Core::msg("D3D11RenderDevice: GPU: %S, Video Memory: %zu MB",
+		adapterDesc.Description,
+		adapterDesc.DedicatedVideoMemory / 1024 / 1024);
+
+	// release stuff
+	dxgiAdapter->Release();
+	dxgiDevice->Release();
+}
+
 D3D11Renderer::D3D11Renderer() :
 	m_renderTargetView(nullptr),
 	m_depthStencilTexture(nullptr),
@@ -69,6 +89,9 @@ void D3D11Renderer::init()
 	// Initialize render device
 	g_renderDevice = (IRenderDevice*)mem_new<D3D11Device>();
 	((D3D11Device*)g_renderDevice)->create();
+
+	// report about device
+	reportRenderDevice();
 
 	// initalize swap chain
 	createSwapChain();

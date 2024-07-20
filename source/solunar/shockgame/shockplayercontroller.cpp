@@ -58,8 +58,8 @@ void ShockPlayerController::initializeCamera()
 
 	m_camera = getEntity()->createComponent<CameraFirstPersonComponent>();
 
-	//m_rigidBody = getEntity()->createComponent<RigidBodyProxyComponent>();
-	//m_rigidBody->createPlayerController();
+	m_rigidBody = getEntity()->createComponent<RigidBodyProxyComponent>();
+	m_rigidBody->createPlayerController();
 
 	activateCamera();
 }
@@ -102,7 +102,7 @@ void ShockPlayerController::update(float dt)
 	updateCamera(dt);
 
 	// update player movement
-	//updateMovement(dt);
+	updateMovement(dt);
 
 	// update debug
 	debugUpdate(dt);
@@ -144,7 +144,7 @@ void ShockPlayerController::updateCamera(float dt)
 	 	input->setCursorPosCallback(false);
 	 }
 
-#if 1
+#if 0
 	 glm::vec3 cameraDirection = CameraProxy::getInstance()->getDirection();
 	 glm::vec3 pos = getEntity()->getPosition();
 	 float camSpeed = 8.0f * dt;

@@ -180,7 +180,7 @@ namespace engine {
 
 		graphicsShutdown();
 
-		g_graphicsOptions.saveSettings("engine.ini");
+		g_graphicsOptions.saveSettings("GameSettings.ini");
 
 		Engine::shutdown();
 

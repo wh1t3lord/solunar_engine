@@ -31,21 +31,33 @@
 	</Entity>
 	-->
 	
-	<!-- Test animated model -->
+	<!-- Test animated model
 	<Entity>
-		<Position x="0" y="0" z="0"/>
+		<Position x="2" y="0" z="2"/>
 		<Rotation x="0" y="0" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		<AnimatedMeshComponent>
 			<Model filename="models/model_player.glb"/>
 		</AnimatedMeshComponent>
 		<TestAnimationComponent/>
+	</Entity> -->
+	
+	<!-- Test animated model
+	<Entity>
+		<Position x="0" y="-0.7" z="0"/>
+		<Rotation x="0" y="0" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		<AnimatedMeshComponent>
+			<Model filename="models/viewmodel_test.glb"/>
+		</AnimatedMeshComponent>
+		<ViewmodelAnimationController/>
 	</Entity>
+	 -->
 	
 	<!-- Test entity with directional light -->
 	<Entity>
 		<Position x="0" y="0" z="0"/>
-		<Rotation x="0" y="20" z="0"/>
+		<Rotation x="0" y="120" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		
 		<DirectionalLightComponent>
