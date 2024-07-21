@@ -12,6 +12,7 @@
 #include "engine/gameinterface.h"
 #include "engine/camera.h"
 #include "engine/entity/world.h"
+#include "engine/audio/audiomanager.h"
 
 #include "graphics/graphics.h"
 #include "graphics/graphicsoptions.h"
@@ -139,8 +140,8 @@ namespace engine {
 		graphicsInit();
 		
 		// initialize audio manager
-		//AudioManager* pAudioManager = AudioManager::createInstance();
-		//pAudioManager->init();
+		AudioManager* audioManager = AudioManager::createInstance();
+		audioManager->init();
 
 		// game init
 		//Game::init();
@@ -196,8 +197,8 @@ namespace engine {
 
 		//Game::shutdown();
 
-		//AudioManager::getInstance()->shutdown();
-		//AudioManager::destroyInstance();
+		AudioManager::getInstance()->shutdown();
+		AudioManager::destroyInstance();
 
 		//ImguiManager::getInstance()->shutdown();
 
@@ -248,7 +249,7 @@ namespace engine {
 		Engine::update();
 
 		// sound
-		//AudioManager::getInstance()->update();
+		AudioManager::getInstance()->update();
 
 		// install current view
 		g_renderer->setView(CameraProxy::getInstance()->getView());

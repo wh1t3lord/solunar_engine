@@ -6,6 +6,8 @@
 #include "engine/engine.h"
 #include "engine/camera.h"
 
+#include "engine/audio/musicmanager.h"
+
 #include "graphics/texturemap.h"
 #include "graphics/imguimanager.h"
 
@@ -29,6 +31,8 @@ void ShockGameMainMenuComponent::onWorldSet(World* world)
 	Component::onWorldSet(world);
 	 
 	g_mainMenuBackground = g_contentManager->loadObject<TextureMap>("textures/ui/ui_menu_background.png");
+
+	MusicManager::getInstance()->play("sounds/music/temp_mainmenu.mp3", true);
 }
 
 void ShockGameMainMenuComponent::update(float dt)
@@ -56,6 +60,8 @@ void ShockGameMainMenuComponent::update(float dt)
 	if (ImGui::Button("New Game", kButtonSize))
 	{
 	//	loadLevel("env_test");
+
+		MusicManager::getInstance()->stop();
 		EngineStateManager::getInstance()->loadWorld("worlds/env_test.xml");
 	}
 
