@@ -17,7 +17,7 @@ public:
 	IShaderProgram* getShaderProgramVariation(VertexFactory vertexFactory, uint32_t pixelVariation);
 
 private:
-	std::unordered_map<std::string, IShaderProgram*> m_pixelVariations[VertexFactory_Count];
+	
 
 };
 

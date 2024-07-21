@@ -250,8 +250,8 @@ namespace engine {
 		btTransform startTransform; startTransform.setIdentity();
 		startTransform.setOrigin(glmVectorToBt(getEntity()->getPosition()));
 
-		float fRadius = 0.3f;
-		float fHeight = 0.4f;
+		float fRadius = 0.4f;
+		float fHeight = 0.1f;
 		m_capsuleShape = mem_new<btCapsuleShape>(fRadius, fHeight);
 
 		m_ghostObject = mem_new<btPairCachingGhostObject>();

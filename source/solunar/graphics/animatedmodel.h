@@ -81,8 +81,8 @@ struct Animation
 	std::string m_name;
 	std::vector<AnimationSampler> m_samplers;
 	std::vector<AnimationChannel> m_channels;
-	float m_startTime = std::numeric_limits<float>::max();
-	float m_endTime = std::numeric_limits<float>::min();
+	float m_startTime = FLT_MAX; //std::numeric_limits<float>::max();
+	float m_endTime = -FLT_MAX;//std::numeric_limits<float>::min();
 };
 
 struct AnimationSkin
@@ -143,6 +143,10 @@ public:
 
 	const BoundingBox& getBoundingBox();
 
+	/** Node accessing */
+	int getNodeByName(const std::string& name);
+	void setNodeScale(int nodeid, const glm::vec3& scale);
+
 private:
 	std::vector<AnimatedSubMesh*> m_subMeshes;
 	std::vector<Animation> m_animations;
@@ -155,6 +159,9 @@ private:
 	float m_currentTime = 0.0f;
 	
 	BoundingBox m_boundingBox;
+
+public:
+	glm::mat4 m_bonesMatrices[MAX_JOINTS];
 };
 
 class AnimatedMeshComponent;

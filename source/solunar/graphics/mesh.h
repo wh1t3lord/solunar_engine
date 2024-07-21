@@ -33,6 +33,7 @@ namespace engine {
 		virtual void render();
 
 		std::shared_ptr<ModelBase> lockModel();
+		std::weak_ptr<ModelBase> getModel();
 
 	protected:
 		std::weak_ptr<ModelBase> m_model;

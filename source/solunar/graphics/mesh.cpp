@@ -60,6 +60,11 @@ namespace engine {
 		return m_model.lock();
 	}
 
+	std::weak_ptr<ModelBase> MeshComponent::getModel()
+	{
+		return m_model;
+	}
+
 	// animated mesh component
 
 	AnimatedMeshComponent::AnimatedMeshComponent()

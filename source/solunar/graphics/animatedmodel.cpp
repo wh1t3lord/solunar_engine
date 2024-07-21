@@ -487,7 +487,7 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 	m_nodes[rootNode].m_parentId = -1;
 	m_nodes[rootNode].m_matrix = glm::mat4(1.0f);
 	m_nodes[rootNode].m_translation = glm::vec3(0.0f);
-	m_nodes[rootNode].m_scale = glm::vec3(0.1f);
+	m_nodes[rootNode].m_scale = glm::vec3(1.0f);//glm::vec3(0.1f);
 	m_nodes[rootNode].m_rotation.x = 0;
 	m_nodes[rootNode].m_rotation.y = sinf(180.0 / 2.0 / 180.0 * maths::PI);
 	m_nodes[rootNode].m_rotation.z = 0;
@@ -661,10 +661,6 @@ void AnimatedModel::testPlay(float dt)
 	}
 }
 
-#define MAX_BONES 256
-
-static glm::mat4 s_boneInfoTest[MAX_BONES];
-
 void AnimatedModel::updateNode(int node_id)
 {
 	auto& node = m_nodes[node_id];
@@ -682,7 +678,7 @@ void AnimatedModel::updateNode(int node_id)
 			
 		//	jointMatrix(j) = globalTransformOfJointNode(j) * inverseBindMatrixForJoint(j);
 
-			s_boneInfoTest[i] = getNodeMatrix(skin.m_joints[i]) *  skin.m_inverseBindMatrices[i] ;
+			m_bonesMatrices[i] = getNodeMatrix(skin.m_joints[i]) *  skin.m_inverseBindMatrices[i] ;
 
 		/*	BoneInfo boneInfo;
 			boneInfo.id = skin.m_joints[i];
@@ -780,6 +776,21 @@ const BoundingBox& AnimatedModel::getBoundingBox()
 	return m_boundingBox;
 }
 
+int AnimatedModel::getNodeByName(const std::string& name)
+{
+	for (int i = 0; i < m_nodes.size(); i++)
+		if (m_nodes[i].m_name == name)
+			return i;
+
+	return -1;
+}
+
+void AnimatedModel::setNodeScale(int nodeid, const glm::vec3& scale)
+{
+	Assert(nodeid != -1);
+	m_nodes[nodeid].m_scale = scale;
+}
+
 ///////////////////////////////////////////////////////////
 // Animated Model Renderer
 
@@ -855,11 +866,22 @@ void AnimatedModelRenderer::shutdown()
 
 void AnimatedModelRenderer::render(AnimatedMeshComponent* model)
 {
+	std::shared_ptr<ModelBase> modelBase = model->lockModel();
+	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
+
+	glm::mat4* data = (glm::mat4*)g_bonesConstantBuffer->map(BufferMapping::WriteOnly);
+	memcpy(data, animatedModel->m_bonesMatrices, sizeof(animatedModel->m_bonesMatrices));
+	g_bonesConstantBuffer->unmap();
+
+	g_renderDevice->setConstantBufferIndex(ConstantBufferBindings_Skinning, g_bonesConstantBuffer.get());
+
+#if 0
 	glm::mat4* data = (glm::mat4*)g_bonesConstantBuffer->map(BufferMapping::WriteOnly);
 	memcpy(data, s_boneInfoTest, sizeof(s_boneInfoTest));
 	g_bonesConstantBuffer->unmap();
 
 	g_renderDevice->setConstantBufferIndex(ConstantBufferBindings_Skinning, g_bonesConstantBuffer.get());
+#endif
 
 #if 0
 	//std::shared_ptr<ModelBase> modelBase = model->lockModel();

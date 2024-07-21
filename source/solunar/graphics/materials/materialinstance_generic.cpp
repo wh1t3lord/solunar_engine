@@ -27,6 +27,8 @@ static InputLayoutDesc s_animatedVertexInputLayout[] =
 	{ "BLENDINDICES", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(AnimatedVertex, m_boneIDs), INPUT_PER_VERTEX_DATA, 0 }
 };
 
+static std::unordered_map<std::string, IShaderProgram*> m_pixelVariations[VertexFactory_Count];
+
 std::string getPixelVariationDefine(uint32_t pixelVariation)
 {
 	std::string defines;

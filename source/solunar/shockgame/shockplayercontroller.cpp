@@ -6,6 +6,10 @@
 #include "graphics/imguimanager.h"
 #include "graphics/ifontmanager.h"
 
+#include <numeric>
+#include <limits>
+#include "graphics/animatedmodel.h"
+
 namespace engine
 {
 
@@ -78,6 +82,10 @@ void ShockPlayerController::initializeCamera()
 	m_weaponMesh = m_weaponEntity->createComponent<AnimatedMeshComponent>();
 	m_weaponMesh->loadModel("models/viewmodel_test.glb");
 
+	std::weak_ptr<AnimatedModel> weaponModel = dynamicCastWeakPtr<AnimatedModel, ModelBase>(m_weaponMesh->getModel());
+	int rootNodeIndex = weaponModel.lock()->getNodeByName("Root Node");
+	weaponModel.lock()->setNodeScale(rootNodeIndex, glm::vec3(0.1f));
+
 	// little hack #TODO: please remove ViewmodelAnimationController from shockgame.cpp
 	Component* viewmodelComponent = (Component*)TypeManager::getInstance()->createObjectByName("ViewmodelAnimationController");
 	m_weaponEntity->addComponent(viewmodelComponent);
@@ -147,6 +155,11 @@ void ShockPlayerController::update(float dt)
 			Entity* entity = rq.m_entity;
 			Core::msg("ShockPlayerController::update(): looking at entity 0x%p", entity);
 		}
+	}
+
+	if (input->getKeyWithReset(KeyboardKeys::KEY_F1))
+	{
+		getWorld()->togglePhysicsDebugDraw();
 	}
 }
 
