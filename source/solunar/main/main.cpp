@@ -122,6 +122,14 @@ namespace engine
 			g_fMouseInClient = FALSE;
 			return 0;
 		}
+
+		case WM_ACTIVATE:
+		{
+			if (LOWORD(wParam) == WA_INACTIVE)
+				InputManager::getInstance()->setCursorCapture(false);
+			
+			break;
+		}
 		
 		default:
 			break;

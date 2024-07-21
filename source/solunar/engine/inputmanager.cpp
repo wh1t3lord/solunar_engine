@@ -14,6 +14,7 @@ namespace engine
 		m_cursorPos = glm::vec2(0.0f);
 		m_lastCursorPos = glm::vec2(0.0f);
 		m_deltaCursorPos = glm::vec2(0.0f);
+		m_captureCursor = false;
 	}
 
 	InputManager::~InputManager()
@@ -25,13 +26,9 @@ namespace engine
 		m_lastCodePoint = 0;
 		//m_deltaCursorPos = glm::vec2(0.0f);
 
-		static bool toggleCursor = true;
-		if (getKeyWithReset(KeyboardKeys::KEY_LEFT_ALT))
-			toggleCursor = !toggleCursor;
-
-		if (GetForegroundWindow() == (HWND)appGetWindow() && toggleCursor)
+		if (m_captureCursor)
 		{
-			ShowCursor(FALSE);
+			//ShowCursor(FALSE);
 
 			RECT rect = {};
 			GetClientRect((HWND)appGetWindow(), &rect);
@@ -65,14 +62,16 @@ namespace engine
 
 			m_lastCursorPos = m_cursorPos;
 
+#if 0
 			char buf[256];
 			snprintf(buf, sizeof(buf), "%i %i", pt.x, pt.y);
 			g_fontManager->drawSystemFontShadowed(buf, 300, 300, glm::vec4(1.0f, 1.0f,1.0f, 1.0f));
+#endif
 		}
 		else
 		{
 			resetDelta();
-			ShowCursor(TRUE);
+		//	ShowCursor(TRUE);
 		}
 	}
 
@@ -134,6 +133,28 @@ namespace engine
 	{
 		m_deltaCursorPos.x = 0.0f;
 		m_deltaCursorPos.y = 0.0f;
+	}
+
+	void InputManager::setCursorCapture(bool capture)
+	{
+#if 1
+		// check for foreground window
+		if (GetForegroundWindow() == (HWND)appGetWindow())
+			m_captureCursor = capture;
+		else
+			m_captureCursor = false; // reset anyways
+
+		if (m_captureCursor)
+		{
+			//ShowCursor(FALSE);
+		}
+		else
+		{
+			//ShowCursor(TRUE);
+		}
+#else
+		m_captureCursor = capture;
+#endif
 	}
 
 }

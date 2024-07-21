@@ -157,6 +157,8 @@ namespace engine
 		glm::vec2 getDeltaCursorPos();
 		void resetDelta();
 
+		void setCursorCapture(bool capture);
+
 	private:
 		bool m_keys[420];
 
@@ -165,6 +167,8 @@ namespace engine
 		glm::vec2 m_deltaCursorPos;
 
 		uint32_t m_lastCodePoint;
+
+		bool m_captureCursor;
 
 	};
 }

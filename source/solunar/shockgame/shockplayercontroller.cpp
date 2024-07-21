@@ -56,6 +56,8 @@ void ShockPlayerController::onEntityRemove()
 void ShockPlayerController::activateCamera()
 {
 	CameraProxy::getInstance()->setCameraComponent(m_camera);
+
+	ShowCursor(FALSE);
 }
 
 void ShockPlayerController::initializeCamera()
@@ -104,6 +106,8 @@ void ShockPlayerController::update(float dt)
 	// 	initializeComponents();
 	// 	//ASSERT2(m_rigidBody, "Node don't have rigid body component.");
 	// }
+
+	InputManager::getInstance()->setCursorCapture(true);
 
 #if 0
 	// set position
@@ -260,15 +264,18 @@ void ShockPlayerController::updateMovement(float dt)
 	 m_onTheGround = true;
 	 if (isPlayerMove && m_onTheGround)
 	 {
+		 glm::vec3 camdir = camera->getDirection();
+		 camdir.y = 0.0f;
+
 		 glm::vec3 dir = glm::vec3(0.0f);
 		 if (inputManager->getKey(KeyboardKeys::KEY_W))
-			 dir += camera->getDirection();
+			 dir += camdir;
 		 if (inputManager->getKey(KeyboardKeys::KEY_S))
-			 dir -= camera->getDirection();
+			 dir -= camdir;
 		 if (inputManager->getKey(KeyboardKeys::KEY_A))
-			 dir -= glm::normalize(glm::cross(camera->getDirection(), glm::vec3(0.0f, 1.0f, 0.0f)));
+			 dir -= glm::normalize(glm::cross(camdir, glm::vec3(0.0f, 1.0f, 0.0f)));
 		 if (inputManager->getKey(KeyboardKeys::KEY_D))
-			 dir += glm::normalize(glm::cross(camera->getDirection(), glm::vec3(0.0f, 1.0f, 0.0f)));
+			 dir += glm::normalize(glm::cross(camdir, glm::vec3(0.0f, 1.0f, 0.0f)));
 
 		 // apply impulse to rigid body
 		 //m_rigidBody->applyImpulse(dir);
@@ -291,6 +298,8 @@ void ShockPlayerController::debugUpdate(float dt)
 {
 	if (!m_rigidBody)
 		return;
+
+	return;
 
 	char buf[256];
 	
