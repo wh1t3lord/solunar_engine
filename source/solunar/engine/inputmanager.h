@@ -144,8 +144,7 @@ namespace engine
 		// ACTIONS
 		void keyboardAction(uint32_t keyId, bool state);
 		void cursorPosAction(float x, float y);
-		bool getCursorPosCallback() { return m_bCursorPosCallbackState; }
-		bool setCursorPosCallback(bool state) { return m_bCursorPosCallbackState =  state; }
+		void cursorPosAction_New(float x, float y, float deltaX, float deltaY);
 		void characterAction(uint32_t codepoint);
 
 		// GETTERS
@@ -156,19 +155,17 @@ namespace engine
 		bool getKeyWithReset(KeyboardKeys key);
 
 		glm::vec2 getDeltaCursorPos();
+		void resetDelta();
 
 	private:
 		bool m_keys[420];
-		bool m_bCursorPosCallbackState;
 
 		glm::vec2 m_cursorPos;
-		glm::vec2 m_lastCurPos;
+		glm::vec2 m_lastCursorPos;
 		glm::vec2 m_deltaCursorPos;
-		bool m_firstMouse;
 
 		uint32_t m_lastCodePoint;
 
-		//glm::vec2 m_accumulatedDeltaCursorPos;
 	};
 }
 

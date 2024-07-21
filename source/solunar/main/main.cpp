@@ -74,6 +74,8 @@ namespace engine
 		Core::shutdown();
 	}
 
+	BOOL g_fMouseInClient;
+
 	LRESULT CALLBACK wndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	{
 		switch (Msg)
@@ -96,6 +98,31 @@ namespace engine
 			break;
 		}
 
+		case WM_MOUSEMOVE:
+		{
+			if (!g_fMouseInClient) {
+				g_fMouseInClient = TRUE;
+				TRACKMOUSEEVENT tme = { sizeof(tme) };
+				tme.dwFlags = TME_LEAVE;
+				tme.hwndTrack = hWnd;
+				TrackMouseEvent(&tme);
+
+				//SetCapture(hWnd);
+			}
+			break;
+		}
+
+		case WM_MOUSELEAVE:
+		{
+			// #TODO: For menu
+			//ReleaseCapture();
+
+			//SetCursorPos(0, 0);
+
+			g_fMouseInClient = FALSE;
+			return 0;
+		}
+		
 		default:
 			break;
 		}

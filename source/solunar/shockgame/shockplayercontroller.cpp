@@ -3,6 +3,7 @@
 
 #include "engine/inputmanager.h"
 
+#include "graphics/imguimanager.h"
 #include "graphics/ifontmanager.h"
 
 namespace engine
@@ -67,10 +68,11 @@ void ShockPlayerController::initializeCamera()
 	activateCamera();
 
 	// create weapon
-	m_weaponEntity = getEntity()->createChild();
+	Entity* hackEntity = getEntity()->createChild();
+	hackEntity->quaternionRotate(glm::vec3(0.0f, 1.0f, 0.0f), -90.0f);
 
-	// set position
-	m_weaponEntity->setPosition(glm::vec3(0.0f, -1.7f, -2.0f));
+	m_weaponEntity = hackEntity->createChild();
+	m_weaponEntity->setPosition(glm::vec3(0.1f, -3.4f, -0.7f));
 
 	// load model
 	m_weaponMesh = m_weaponEntity->createComponent<AnimatedMeshComponent>();
@@ -94,6 +96,14 @@ void ShockPlayerController::update(float dt)
 	// 	initializeComponents();
 	// 	//ASSERT2(m_rigidBody, "Node don't have rigid body component.");
 	// }
+
+#if 0
+	// set position
+	static glm::vec3 s_weaponOffset = glm::vec3(0.0f);
+	ImGui::DragFloat3("", glm::value_ptr(s_weaponOffset), 0.1, -4.0f, 4.0f);
+
+	m_weaponEntity->setPosition(s_weaponOffset);
+#endif
 
 	View* view = CameraProxy::getInstance()->getView();
 	
@@ -152,14 +162,24 @@ void ShockPlayerController::updateCamera(float dt)
 {
 	 InputManager* input = InputManager::getInstance();
 	 glm::vec2 mousePos = input->getCursorPos();
+
+#if 0
 	 glm::vec2 deltaMousePos = input->getDeltaCursorPos();
-	 
-	 if (input->getCursorPosCallback())
-	 {
-	 	m_camera->updateFromMousePosition(deltaMousePos);
-	 	getEntity()->setRotation(m_camera->getDirection());
-	 	input->setCursorPosCallback(false);
-	 }
+
+	 m_camera->updateFromMousePosition(deltaMousePos);
+#else
+	 static glm::vec2 deltaMousePos = glm::vec2(0.0f);
+
+	 deltaMousePos += input->getDeltaCursorPos();
+
+	 m_camera->updateFromMousePosition(deltaMousePos);
+	 input->resetDelta();
+#endif
+	 //getEntity()->setRotation(m_camera->getDirection());
+	 //m_weaponEntity->setRotation(m_camera->getDirection());
+
+	glm::quat rot = glm::eulerAngleYX(glm::radians(-m_camera->m_yaw), glm::radians(m_camera->m_pitch));
+	m_weaponEntity->setRotation(rot);
 
 #if 0
 	 glm::vec3 cameraDirection = CameraProxy::getInstance()->getDirection();

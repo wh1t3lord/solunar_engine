@@ -79,6 +79,8 @@ namespace engine
 
 		IRenderTarget* getSwapChainRenderTarget() { return m_swapChainRenderTarget; }
 
+		void renderLoadscreen();
+
 	protected:
 		ITexture2D* m_screenColorTexture;
 		ITexture2D* m_screenDepthTexture;

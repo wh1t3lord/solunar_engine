@@ -497,6 +497,13 @@ namespace engine
 		m_showOctree = !m_showOctree;
 	}
 
+	void Renderer::renderLoadscreen()
+	{
+		beginFrame();
+		ImGui::Text("Loading ...");
+		endFrame();
+	}
+
 	std::weak_ptr<Material> getDefaultMaterial()
 	{
 		return g_defaultMaterial;

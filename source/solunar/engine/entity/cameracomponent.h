@@ -35,7 +35,8 @@ public:
 	//! Set directly your euler angles
 	void setEulerRotation(float yaw, float pitch, float roll);
 
-protected:
+	// #TODO: make getters 
+public:
 	float m_yaw;
 	float m_pitch;
 	float m_roll;

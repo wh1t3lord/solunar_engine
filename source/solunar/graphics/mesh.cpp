@@ -50,6 +50,11 @@ namespace engine {
 #endif // !FINAL_BUILD
 	}
 
+	void MeshComponent::loadModel(const std::string& filename)
+	{
+		m_model = g_contentManager->loadObject<ModelBase>(filename);
+	}
+
 	std::shared_ptr<ModelBase> MeshComponent::lockModel()
 	{
 		return m_model.lock();

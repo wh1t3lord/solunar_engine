@@ -28,6 +28,7 @@ namespace engine {
 
 		virtual void loadXML(tinyxml2::XMLElement& element) override;
 		virtual void saveXML(tinyxml2::XMLElement& element) override;
+		void loadModel(const std::string& filename);
 
 		virtual void render();
 

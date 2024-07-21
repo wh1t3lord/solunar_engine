@@ -105,7 +105,7 @@ void CameraFirstPersonComponent::updateFromMousePosition(const glm::vec2 mousePo
 	//m_pitch += mousePos.y;
 	//m_pitch = glm::clamp(m_pitch, -90.0f, 90.0f);
 
-	getEntity()->setEulerRotation(glm::vec3(m_pitch, m_yaw, 0.0f));
+//	getEntity()->setEulerRotation(glm::vec3(m_pitch, m_yaw, 0.0f));
 
 	////m_node->setRotation(glm::quat(glm::vec3(m_pitch, m_yaw, 0.0f)));
 	//m_node->setEulerRotation(glm::vec3(m_pitch, m_yaw, 0.0f));
