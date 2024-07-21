@@ -1,4 +1,5 @@
 #include "graphicspch.h"
+#if 0
 #include "graphics/ui/rmlrenderer.h"
 
 #include "graphics/core/buffer.h"
@@ -302,3 +303,4 @@ void RmlRenderer::SetTransform(const Rml::Matrix4f* transform)
 }
 
 }
+#endif

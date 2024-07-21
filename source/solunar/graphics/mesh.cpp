@@ -90,4 +90,23 @@ namespace engine {
 			}
 		}
 	}
+
+	void AnimatedMeshComponent::loadModel(const std::string& filename)
+	{
+		if (!filename.empty())
+		{
+			m_model = g_contentManager->loadObject<AnimatedModel>(filename);
+
+			// guarantee cast, trust me 
+			std::weak_ptr<AnimatedModel> animatedModel = dynamicCastWeakPtr<AnimatedModel, ModelBase>(m_model);
+
+			Entity* entity = getEntity();
+			if (entity)
+				entity->setBoundingBox(animatedModel.lock()->getBoundingBox()); // #TODO: too shitty usage, lock and unlock on stack :(
+		}
+		else
+		{
+			Core::msg("WARNING: AnimatedMeshComponent at entity(0x%p) has empty filename!", getEntity());
+		}
+	}
 }

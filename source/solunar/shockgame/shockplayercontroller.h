@@ -3,6 +3,7 @@
 
 #include "engine/physics/shapescomponent.h"
 #include "engine/physics/rigidbodycomponent.h"
+#include "graphics/mesh.h"
 #include "game/gamelogic/player/playercontrollercomponent.h"
 
 namespace engine
@@ -41,9 +42,14 @@ private:
 
 private:
 	ShockPlayerStats m_playerStats;
-	CameraFirstPersonComponent* m_camera;
 
 	RigidBodyProxyComponent* m_rigidBody;
+
+	Entity* m_cameraEntity;
+	CameraFirstPersonComponent* m_camera;
+
+	Entity* m_weaponEntity;
+	AnimatedMeshComponent* m_weaponMesh;
 
 public:
 	bool m_flyCam;

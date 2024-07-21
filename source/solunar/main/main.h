@@ -9,6 +9,7 @@ namespace engine {
 	void* appGetWindow();
 	View* appGetView();
 	void appPresent();
+	void appFireExit();
 
 	void createEngineView();
 

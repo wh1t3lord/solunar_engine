@@ -1,3 +1,6 @@
+#include "graphicspch.h"
+
+#if 0
 #include "core/timer.h"
 
 #include "graphics/ui/rmlsystem.h"
@@ -178,3 +181,4 @@ Rml::Context* RmlSystem::getContext()
 }
 
 }
+#endif

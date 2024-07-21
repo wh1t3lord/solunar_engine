@@ -246,6 +246,14 @@ Component* Entity::getComponentByTypeInfo(const TypeInfo* typeinfo)
 	return nullptr;
 }
 
+void Entity::addComponent(Component* component)
+{
+	Assert(component);
+	m_components.push_back(component);
+	if (m_world) component->onWorldSet(m_world);
+	component->onEntitySet(this);
+}
+
 void Entity::updateWorldTransform()
 {
 	m_worldTransform = glm::identity<glm::mat4>();

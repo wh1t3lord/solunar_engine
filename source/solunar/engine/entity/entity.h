@@ -60,6 +60,8 @@ public:
 	template <typename T>
 	inline std::vector<T*> getComponents();
 
+	void addComponent(Component* component);
+
 private:
 	void updateWorldTransform();
 	void transformBBox();

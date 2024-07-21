@@ -45,6 +45,7 @@ namespace engine {
 		~AnimatedMeshComponent();
 
 		void loadXML(tinyxml2::XMLElement& element) override;
+		void loadModel(const std::string& filename);
 	};
 
 }

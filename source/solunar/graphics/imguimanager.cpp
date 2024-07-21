@@ -192,6 +192,7 @@ namespace engine
 					// Bind texture, Draw
 					ITexture2D* texture = (ITexture2D*)pcmd->GetTexID();
 					g_renderDevice->setTexture2D(0, texture);
+					g_renderDevice->setSampler(0, m_pFontSampler); // #TODO: THIS IS SHIT
 					g_renderDevice->drawIndexed(PM_TriangleList,  pcmd->IdxOffset + global_idx_offset, pcmd->ElemCount, pcmd->VtxOffset + global_vtx_offset);
 
 				}

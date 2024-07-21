@@ -1,4 +1,5 @@
 #include "graphicspch.h"
+#if 0
 #include "graphics/ui/rmlfilesystem.h"
 
 #include "core/file/datastream.h"
@@ -80,3 +81,4 @@ size_t RmlFileSystem::Tell(Rml::FileHandle file)
 //}
 
 }
+#endif

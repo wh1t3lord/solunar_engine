@@ -59,6 +59,12 @@ namespace engine {
 	static bool g_forceQuit = false;
 	static bool g_showShockPlayerDebug = false;
 
+	// #TODO: SO WRONG
+	void appFireExit()
+	{
+		g_forceQuit = true;
+	}
+
 	void engineDebugOverlay()
 	{
 		if (ImGui::BeginMainMenuBar())
