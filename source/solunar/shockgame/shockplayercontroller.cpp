@@ -9,7 +9,10 @@ namespace engine
 {
 
 ShockPlayerController::ShockPlayerController() :
+	m_cameraEntity(nullptr),
 	m_camera(nullptr),
+	m_weaponEntity(nullptr),
+	m_weaponMesh(nullptr),
 	m_rigidBody(nullptr),
 	m_flyCam(true)
 {
@@ -62,6 +65,20 @@ void ShockPlayerController::initializeCamera()
 	m_rigidBody->createPlayerController();
 
 	activateCamera();
+
+	// create weapon
+	m_weaponEntity = getEntity()->createChild();
+
+	// set position
+	m_weaponEntity->setPosition(glm::vec3(0.0f, -1.7f, -2.0f));
+
+	// load model
+	m_weaponMesh = m_weaponEntity->createComponent<AnimatedMeshComponent>();
+	m_weaponMesh->loadModel("models/viewmodel_test.glb");
+
+	// little hack #TODO: please remove ViewmodelAnimationController from shockgame.cpp
+	Component* viewmodelComponent = (Component*)TypeManager::getInstance()->createObjectByName("ViewmodelAnimationController");
+	m_weaponEntity->addComponent(viewmodelComponent);
 }
 
 void ShockPlayerController::initializeComponents()

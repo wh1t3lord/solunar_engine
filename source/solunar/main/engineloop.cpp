@@ -4,6 +4,7 @@
 #include "main/main.h"
 
 #include "core/timer.h"
+#include "core/utils/iniFile.h"
 #include "core/file/contentmanager.h"
 
 #include "engine/engine.h"
@@ -111,6 +112,17 @@ namespace engine {
 			shockGamePlayerDebug(&g_showShockPlayerDebug);
 	}
 
+	static std::string g_startWorldFilename;
+
+	void loadEnvironmentConfig()
+	{
+		CIniFile environment("environment.ini");
+		if (!environment.ReadFile())
+			return; // defaults
+
+		g_startWorldFilename = environment.GetValue("Global_PC", "StartWorld");
+	}
+
 	void EngineLoop::initialize()
 	{
 		initEngineCommandLine();
@@ -150,6 +162,15 @@ namespace engine {
 			const char* worldFileName = g_commandLine.getOptionParameter("-world");
 			char stringBuffer[256];
 			snprintf(stringBuffer, sizeof(stringBuffer), "worlds/%s.xml", worldFileName);
+			EngineStateManager::getInstance()->loadWorld(stringBuffer);
+		}
+
+		loadEnvironmentConfig();
+
+		if (!g_startWorldFilename.empty())
+		{
+			char stringBuffer[256];
+			snprintf(stringBuffer, sizeof(stringBuffer), "worlds/%s.xml", g_startWorldFilename.c_str());
 			EngineStateManager::getInstance()->loadWorld(stringBuffer);
 		}
 

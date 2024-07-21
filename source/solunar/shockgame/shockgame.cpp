@@ -4,6 +4,7 @@
 #include "shockgame/shockeventlistener.h"
 #include "shockgame/shocksignalmanager.h"
 #include "shockgame/shockplayercontroller.h"
+#include "shockgame/shockgameui.h"
 
 // Base game includes
 #include "game/gamelogic/camera/cameramanager.h"
@@ -489,6 +490,7 @@ void registerShockClasses()
 		ObjectGetTypeInfo(ShockPlayerController),
 		ObjectGetTypeInfo(ShockAIComponent),
 		ObjectGetTypeInfo(ShockProjectileComponent),
+		ObjectGetTypeInfo(ShockGameMainMenuComponent),
 	};
 
 	for (int i = 0; i < sizeof(shockClasses) / sizeof(shockClasses[0]); i++)
