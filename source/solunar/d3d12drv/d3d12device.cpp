@@ -1,11 +1,12 @@
 #include "d3d12drv_pch.h"
 #include "d3d12drv/d3d12device.h"
-//#include "d3d12drv/d3d12bufferimpl.h"
+#include "d3d12drv/d3d12bufferimpl.h"
 //#include "d3d12drv/d3d12rendertarget.h"
 //#include "d3d12drv/d3d12texture2d.h"
 //#include "d3d12drv/d3d12samplerstate.h"
 
 #pragma comment(lib, "d3d12.lib")
+#pragma comment(lib, "dxgi.lib")
 //#pragma comment(lib, "d3dcompiler.lib")
 //#pragma comment(lib, "dxguid.lib")
 
@@ -84,9 +85,17 @@ void D3D12Device::create()
 	// Create D3D12 device
 	D3D12_CHECK(D3D12CreateDevice(dxgiAdapter4, D3D_FEATURE_LEVEL_12_0, __uuidof(ID3D12Device), reinterpret_cast<void**>(&m_device)));
 
+	DXGI_ADAPTER_DESC adapterDesc;
+	dxgiAdapter4->GetDesc(&adapterDesc);
+
+	Core::msg("D3D12RenderDevice: GPU: %S, Video Memory: %zu MB",
+		adapterDesc.Description,
+		adapterDesc.DedicatedVideoMemory / 1024 / 1024);
+
 	// Release adapters
 	dxgiAdapter4->Release(); dxgiAdapter4 = nullptr;
-	dxgiAdapter->Release(); dxgiAdapter = nullptr;
+	//dxgiAdapter->Release(); dxgiAdapter = nullptr;
+
 }
 
 void D3D12Device::destroy()
@@ -106,8 +115,7 @@ IRenderTarget* D3D12Device::createRenderTarget(const RenderTargetCreationDesc& r
 
 IBufferBase* D3D12Device::createBuffer(const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc)
 {
-//	return mem_new<D3D12BufferImpl>(this, bufferDesc, subresourceDesc);
-	return nullptr;
+	return mem_new<D3D12BufferImpl>(this, bufferDesc, subresourceDesc);
 }
 
 ITexture2D* D3D12Device::createTexture2D(const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc)
