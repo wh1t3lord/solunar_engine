@@ -463,7 +463,40 @@ namespace engine
 		g_renderDevice->setConstantBufferIndex(CBBindings_DirectionalLight, g_directionalLightConstantBuffer.get());
 	}
 
+	void setupPointLight(GraphicsWorld* graphicsWorld)
+	{
+		LightManager* lightMgr = graphicsWorld->getLightManager();
+		
+		const std::vector<LightComponent*>& lights = lightMgr->getLights();
 
+		std::vector<PointLightComponent*> pointLights;
+		for (auto& it : lights)
+		{
+			if (it->isA(PointLightComponent::getStaticTypeInfo()))
+				pointLights.push_back(dynamicCast<PointLightComponent>(it));
+		}
+
+		PointLightCB* globalData = (PointLightCB*)g_pointLightConstantBuffer->map(BufferMapping::WriteOnly);
+		for (int i = 0; i < pointLights.size(); i++)
+		{
+			auto it = pointLights[i];
+			globalData->pointLights[i].color = glm::vec4(it->m_color, 1.0f);
+			globalData->pointLights[i].position = glm::vec4(it->getEntity()->getPosition(), 1.0f);
+			globalData->pointLights[i].specular = glm::vec4(it->m_specularColor, 1.0f);
+			globalData->pointLights[i].lightData.r = it->m_radius;
+		}
+
+		g_pointLightConstantBuffer->unmap();
+		globalData = nullptr;
+
+		LightGlobalDataCB* lightGlobalData = (LightGlobalDataCB*)g_lightDataConstantBuffer->map(BufferMapping::WriteOnly);
+		lightGlobalData->m_pointLightCount = pointLights.size();
+		g_lightDataConstantBuffer->unmap();
+		lightGlobalData = nullptr;
+
+		g_renderDevice->setConstantBufferIndex(ConstantBufferBindings_PointLights, g_pointLightConstantBuffer.get());
+		g_renderDevice->setConstantBufferIndex(ConstantBufferBinding_LightData, g_lightDataConstantBuffer.get());
+	}
 
 	void Renderer::setupLights(GraphicsWorld* graphicsWorld)
 	{
@@ -474,6 +507,7 @@ namespace engine
 		setupLightData();
 
 		setupDirectionalLight(lightMgr->getDirectionalLight());
+		setupPointLight(graphicsWorld);
 	}
 
 	void Renderer::endFrame()
