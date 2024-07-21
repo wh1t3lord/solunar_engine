@@ -38,6 +38,12 @@ void Timer::update()
 
 float Timer::getDelta()
 {
+	// #TODO: rework timer
+	if (m_deltaTime > 0.5f)
+		m_deltaTime = 0.5f;
+	if (m_deltaTime < 0.001f)
+		m_deltaTime = 0.001f;
+
 	return m_deltaTime;
 }
 

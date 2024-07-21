@@ -168,7 +168,7 @@ namespace engine {
 
 		loadEnvironmentConfig();
 
-		if (!g_startWorldFilename.empty())
+		if (!g_startWorldFilename.empty() && !g_commandLine.hasOption("-world"))
 		{
 			char stringBuffer[256];
 			snprintf(stringBuffer, sizeof(stringBuffer), "worlds/%s.xml", g_startWorldFilename.c_str());

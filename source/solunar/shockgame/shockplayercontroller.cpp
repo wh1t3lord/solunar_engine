@@ -196,7 +196,7 @@ void ShockPlayerController::updateMovement(float dt)
 	 
 	 Camera* camera = CameraProxy::getInstance();
 	 
-#if 1
+#if 0
 	 m_onTheGround = true;
 	 if (isPlayerMove && m_onTheGround)
 	 {
