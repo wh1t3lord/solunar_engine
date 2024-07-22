@@ -241,7 +241,7 @@ namespace engine {
 
 		// Begin ImGui frame
 		ImGuiManager::getInstance()->beginFrame();
-		
+
 		// update camera
 		CameraProxy::getInstance()->updateProxy();
 

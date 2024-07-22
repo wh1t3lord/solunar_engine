@@ -46,21 +46,6 @@ bool gltfUnpackValues(const cgltf_primitive& primitive, int64_t index, int64_t v
 
 inline InterpolationType getInterpolationType(cgltf_interpolation_type type)
 {
-	//switch (gltf_animationSampler.interpolation)
-	//{
-	//case cgltf_interpolation_type_linear:
-	//	animationSampler.m_interpolationType = InterpolationType_Linear;
-	//	break;
-
-	//case cgltf_interpolation_type_step:
-	//	animationSampler.m_interpolationType = InterpolationType_Step;
-	//	break;
-
-	//case cgltf_interpolation_type_cubic_spline:
-	//	animationSampler.m_interpolationType = InterpolationType_CubicSpline;
-	//	break;
-	//}
-
 	switch (type)
 	{
 	case cgltf_interpolation_type_linear:

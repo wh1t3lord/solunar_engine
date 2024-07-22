@@ -12,7 +12,6 @@ Timer* Timer::getInstance()
 
 Timer::Timer()
 {
-	m_floatFrequency = 0.0f;
 	m_deltaTime = 0.0f;
 }
 
@@ -22,36 +21,33 @@ Timer::~Timer()
 
 void Timer::init()
 {
-	QueryPerformanceFrequency(&m_frequency);
-	m_floatFrequency = (float)m_frequency.QuadPart;
-
-	QueryPerformanceCounter(&m_startTime);
+	QueryPerformanceFrequency((LARGE_INTEGER*)&m_frequency);
+	QueryPerformanceCounter((LARGE_INTEGER*)&m_startTime);
 	m_endTime = m_startTime;
 }
 
 void Timer::update()
 {
-	QueryPerformanceCounter(&m_startTime);
-	m_deltaTime = static_cast<float>(m_startTime.QuadPart - m_endTime.QuadPart) / m_frequency.QuadPart;
+	QueryPerformanceCounter((LARGE_INTEGER*)&m_startTime);
+	m_deltaTime = (float)(m_startTime - m_endTime) / m_frequency;
+
+	// #TODO: rework timer
+	if (m_deltaTime > 0.5f)
+		m_deltaTime = 0.5f;
+
 	m_endTime = m_startTime;
 }
 
 float Timer::getDelta()
 {
-	// #TODO: rework timer
-	if (m_deltaTime > 0.5f)
-		m_deltaTime = 0.5f;
-	if (m_deltaTime < 0.001f)
-		m_deltaTime = 0.001f;
-
 	return m_deltaTime;
 }
 
 float Timer::getTime()
 {
-	LARGE_INTEGER time;
-	QueryPerformanceCounter(&time);
-	return static_cast<float>(time.QuadPart / m_frequency.QuadPart);
+	INT64 time;
+	QueryPerformanceCounter((LARGE_INTEGER*)&time);
+	return static_cast<float>(time / m_frequency);
 }
 #endif // WIN32
 }

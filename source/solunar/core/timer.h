@@ -24,11 +24,10 @@ public:
 	float getTime();
 
 private:
-	LARGE_INTEGER m_frequency;
-	LARGE_INTEGER m_startTime;
-	LARGE_INTEGER m_endTime;
+	INT64 m_frequency;
+	INT64 m_startTime;
+	INT64 m_endTime;
 
-	float m_floatFrequency;
 	float m_deltaTime;
 };
 #endif // WIN32
