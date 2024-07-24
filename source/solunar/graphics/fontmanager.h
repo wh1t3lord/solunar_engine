@@ -26,6 +26,26 @@ struct FontVertex
 const int kMaxFontVBSize = sizeof(FontVertex)	* 1024;
 const int kMaxFontIBSize = sizeof(uint32_t)		* 1024;
 
+class FontManager;
+
+class FontImpl : public IFont
+{
+	friend class FontManager;
+public:
+	FontImpl();
+	~FontImpl();
+
+	void create(const char* filename, float size);
+	void destroy();
+
+	// Inherited via IFont
+	void drawText(const char* text, float x, float y, const glm::vec4& color) override;
+
+private:
+	stbtt_bakedchar m_fontChars[96];
+	ITexture2D* m_fontTexture;
+};
+
 class FontManager : public IFontManager
 {
 public:
@@ -34,6 +54,10 @@ public:
 	
 	void initialize() override;
 	void shutdown() override;
+
+	IFont* createFont(const char* filename, float size) override;
+
+	void drawFontText(IFont* font, const char* text, float x, float y, const glm::vec4& color) override;
 
 	void drawSystemFont(const char* text, float x, float y, const glm::vec4& color) override;
 
@@ -52,6 +76,19 @@ private:
 	};
 
 	std::vector<SystemStringDrawInfo> m_systemDrawStrings;
+
+	struct StringDrawInfo
+	{
+		FontImpl* m_font;
+		std::string m_string;
+		float m_x;
+		float m_y;
+		glm::vec4 m_color;
+	};
+
+	std::vector<StringDrawInfo> m_drawStrings;
+
+	std::unordered_map<std::string, FontImpl*> m_fonts;
 
 	// System font
 	stbtt_bakedchar m_systemFontChars[96];

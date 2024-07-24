@@ -394,6 +394,12 @@ namespace engine
 	{
 		m_material.reset();
 
+		if (m_indexBuffer)
+		{
+			mem_delete(m_indexBuffer);
+			m_indexBuffer = nullptr;
+		}
+
 		if (m_vertexBuffer)
 		{
 			mem_delete(m_vertexBuffer);

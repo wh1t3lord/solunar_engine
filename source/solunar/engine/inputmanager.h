@@ -1,11 +1,9 @@
 #ifndef INPUTMANAGER_H
 #define INPUTMANAGER_H
 
-//#include <GLFW/glfw3.h>
-
 namespace engine
 {
-	enum class KeyboardKeys
+	enum KeyboardKeys
 	{
 		KEY_UNKNOWN = -1,
 		KEY_SPACE = 32,
@@ -127,49 +125,48 @@ namespace engine
 		KEY_RIGHT_CONTROL = 345,
 		KEY_RIGHT_ALT = 346,
 		KEY_RIGHT_SUPER = 347,
-		KEY_MENU = 348
+		KEY_MENU = 348,
+		KEY_COUNT
 	};
 
-	class InputManager : public Singleton<InputManager>
+	class InputManager : public Singleton<InputManager> //public Object, public Singleton<InputManager>
 	{
-	private:
-		static InputManager ms_inputManager;
-
+		//ImplementObject(InputManager, Object);
 	public:
 		InputManager();
-		~InputManager();
+		virtual ~InputManager();
 
-		void update();
+		// Update the input manager
+		virtual void update();
 
-		// ACTIONS
-		void keyboardAction(uint32_t keyId, bool state);
-		void cursorPosAction(float x, float y);
-		void cursorPosAction_New(float x, float y, float deltaX, float deltaY);
-		void characterAction(uint32_t codepoint);
+		// Get is key pressed. 
+		virtual bool isPressed(uint32_t key);
 
-		// GETTERS
-		bool getKey(KeyboardKeys key);
-		glm::vec2 getCursorPos() { return m_cursorPos; }
-		uint32_t getLastCharacter() { return m_lastCodePoint; }
+		// Get is key pressed and reset it. 
+		virtual bool isPressedWithReset(uint32_t key);
 
-		bool getKeyWithReset(KeyboardKeys key);
+		// Set cursor capture
+		virtual void setCursorCapture(bool capture);
 
-		glm::vec2 getDeltaCursorPos();
+		// Show or hide cursor
+		virtual void setCursorHiding(bool hide);
+
+		// Reset mouse delta
 		void resetDelta();
 
-		void setCursorCapture(bool capture);
+		// Get cursor position.
+		const glm::vec2& getCursorPos() const { return m_cursorPos; }
 
-	private:
-		bool m_keys[420];
+		// Get delta cursor position.
+		const glm::vec2& getDeltaCursorPos() const { return m_deltaCursorPos; }
 
+	protected:
+		bool m_keys[KEY_COUNT];
 		glm::vec2 m_cursorPos;
 		glm::vec2 m_lastCursorPos;
 		glm::vec2 m_deltaCursorPos;
-
-		uint32_t m_lastCodePoint;
-
 		bool m_captureCursor;
-
+		bool m_hideCursor;
 	};
 }
 

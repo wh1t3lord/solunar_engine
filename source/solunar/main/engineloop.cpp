@@ -272,7 +272,7 @@ namespace engine {
 		g_renderer->endFrame();
 
 		// Take screenshot
-		if (input->getKeyWithReset(KeyboardKeys::KEY_F12))
+		if (input->isPressedWithReset(KeyboardKeys::KEY_F12))
 			g_renderer->takeScreenshot();
 
 		return true;

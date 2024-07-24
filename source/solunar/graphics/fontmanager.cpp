@@ -159,9 +159,6 @@ void FontManager::initPrivate()
 
 void FontManager::flushPrimitives()
 {
-	if (m_systemDrawStrings.empty())
-		return;
-
 	Assert2(g_renderer, "Called before renderer initialization.");
 	Assert(m_systemFontTexture);
 	Assert(m_vertexBuffer);
@@ -195,6 +192,9 @@ void FontManager::flushPrimitives()
 	// disable depth test
 	g_stateManager->setDepthStencilState(m_depthStencilState, 0);
 
+	// bind vertex buffer
+	g_renderDevice->setVertexBuffer(m_vertexBuffer, sizeof(FontVertex), 0);
+
 	for (auto& it : m_systemDrawStrings)
 	{
 		// map our text buffer
@@ -227,18 +227,64 @@ void FontManager::flushPrimitives()
 		// unmap
 		m_vertexBuffer->unmap();
 
-		// bind vertex buffer
-		g_renderDevice->setVertexBuffer(m_vertexBuffer, sizeof(FontVertex), 0);
-
 		// draw 
 		g_renderDevice->draw(PM_TriangleList, 0, numVertices);
 	}
 
 	m_systemDrawStrings.clear();
+
+	// draw font strings
+	for (auto& it : m_drawStrings)
+	{
+		// bind texture 
+		g_renderDevice->setTexture2D(0, it.m_font->m_fontTexture);
+
+		// map our text buffer
+		FontVertex* fontVertices = (FontVertex*)m_vertexBuffer->map(BufferMapping::WriteOnly);
+
+		uint32_t numVertices = 0;
+		size_t stringLength = it.m_string.length();
+
+		for (int i = 0; i < stringLength; i++)
+		{
+			stbtt_aligned_quad q;
+			stbtt_GetBakedQuad(it.m_font->m_fontChars, 512, 512, it.m_string[i] - 32, &it.m_x, &it.m_y, &q, 1);
+
+			fontVertices[numVertices + 0].position = glm::vec2(q.x0, (float)view->m_height - q.y0); fontVertices[numVertices + 0].texcoord = glm::vec2(q.s0, q.t0);
+			fontVertices[numVertices + 1].position = glm::vec2(q.x1, (float)view->m_height - q.y0); fontVertices[numVertices + 1].texcoord = glm::vec2(q.s1, q.t0);
+			fontVertices[numVertices + 2].position = glm::vec2(q.x1, (float)view->m_height - q.y1); fontVertices[numVertices + 2].texcoord = glm::vec2(q.s1, q.t1);
+			fontVertices[numVertices + 3].position = glm::vec2(q.x0, (float)view->m_height - q.y1); fontVertices[numVertices + 3].texcoord = glm::vec2(q.s0, q.t1);
+			fontVertices[numVertices + 4].position = glm::vec2(q.x0, (float)view->m_height - q.y0); fontVertices[numVertices + 4].texcoord = glm::vec2(q.s0, q.t0);
+			fontVertices[numVertices + 5].position = glm::vec2(q.x1, (float)view->m_height - q.y1); fontVertices[numVertices + 5].texcoord = glm::vec2(q.s1, q.t1);
+
+			fontVertices[numVertices + 0].color = it.m_color;
+			fontVertices[numVertices + 1].color = it.m_color;
+			fontVertices[numVertices + 2].color = it.m_color;
+			fontVertices[numVertices + 3].color = it.m_color;
+			fontVertices[numVertices + 4].color = it.m_color;
+			fontVertices[numVertices + 5].color = it.m_color;
+			numVertices += 6;
+		}
+
+		// unmap
+		m_vertexBuffer->unmap();
+
+		// draw 
+		g_renderDevice->draw(PM_TriangleList, 0, numVertices);
+	}
+
+	m_drawStrings.clear();
 }
 
 void FontManager::shutdown()
 {
+	for (auto& it : m_fonts)
+	{
+		mem_delete(it.second);
+	}
+
+	m_fonts.clear();
+
 	if (m_constantBuffer)
 	{
 		mem_delete(m_constantBuffer);
@@ -264,6 +310,24 @@ void FontManager::shutdown()
 	}
 }
 
+IFont* FontManager::createFont(const char* filename, float size)
+{
+	m_fonts[filename] = mem_new<FontImpl>();
+	m_fonts[filename]->create(filename, size);
+	return m_fonts[filename];
+}
+
+void FontManager::drawFontText(IFont* font, const char* text, float x, float y, const glm::vec4& color)
+{
+	StringDrawInfo drawInfo = {};
+	drawInfo.m_font = (FontImpl*)font;
+	drawInfo.m_string = text;
+	drawInfo.m_x = x;
+	drawInfo.m_y = y;
+	drawInfo.m_color = color;
+	m_drawStrings.push_back(drawInfo);
+}
+
 void FontManager::drawSystemFont(const char* text, float x, float y, const glm::vec4& color)
 {
 	SystemStringDrawInfo drawInfo = {};
@@ -272,6 +336,69 @@ void FontManager::drawSystemFont(const char* text, float x, float y, const glm::
 	drawInfo.m_y = y;
 	drawInfo.m_color = color;
 	m_systemDrawStrings.push_back(drawInfo);
+}
+
+// Font implementation
+
+FontImpl::FontImpl() :
+	m_fontTexture(nullptr)
+{
+	memset(m_fontChars, 0, sizeof(m_fontChars));
+}
+
+FontImpl::~FontImpl()
+{
+	destroy();
+}
+
+void FontImpl::create(const char* filename, float size)
+{
+	Assert2(g_renderDevice, "Please initialize font manager after core graphics initialization");
+
+	// load system font
+	DataStreamPtr stream = g_contentManager->openStream(filename);
+	stream->seek(Seek_End, 0);
+	long fileLength = stream->tell();
+	stream->seek(Seek_Begin, 0);
+
+	uint8_t* ttfBuffer = new uint8_t[fileLength];
+	stream->read(ttfBuffer, fileLength);
+
+	uint8_t* tmpBitmap = new uint8_t[512 * 512]; //res of the bitmap
+	stbtt_BakeFontBitmap(ttfBuffer, 0, size, tmpBitmap, 512, 512, 32, 96, m_fontChars);
+
+	TextureDesc textureDesc;
+	memset(&textureDesc, 0, sizeof(textureDesc));
+	textureDesc.m_textureType = TextureType::Texture2D;
+	textureDesc.m_width = 512;
+	textureDesc.m_height = 512;
+	textureDesc.m_mipmapLevel = 0;
+	textureDesc.m_format = ImageFormat::R32;
+
+	SubresourceDesc subresourceDesc;
+	memset(&subresourceDesc, 0, sizeof(subresourceDesc));
+	subresourceDesc.m_memory = tmpBitmap;
+	subresourceDesc.m_memoryPitch = 512;
+
+	m_fontTexture = g_renderDevice->createTexture2D(textureDesc, subresourceDesc);
+
+	delete[] tmpBitmap;
+	delete[] ttfBuffer;
+}
+
+void FontImpl::destroy()
+{
+	if (m_fontTexture)
+	{
+		mem_delete(m_fontTexture);
+		m_fontTexture = nullptr;
+	}
+}
+
+void FontImpl::drawText(const char* text, float x, float y, const glm::vec4& color)
+{
+	Assert(g_fontManager);
+	g_fontManager->drawFontText(this, text, x, y, color);
 }
 
 }

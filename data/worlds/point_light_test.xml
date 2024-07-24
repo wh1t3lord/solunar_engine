@@ -18,7 +18,7 @@
 	
 	<!-- Test animated model -->
 	<Entity>
-		<Position x="2" y="0" z="2"/>
+		<Position x="1.2" y="0" z="1.2"/>
 		<Rotation x="0" y="0" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		<AnimatedMeshComponent>
@@ -36,7 +36,7 @@
 			<AmbientColor r="0.501" g="0.443" b="0.337"/>
 			<Color r="0.678" g="0.596" b="0.427"/>
 			<SpecularColor r="0.678" g="0.596" b="0.427"/>
-			<Radius value="12"/>
+			<Radius value="2"/>
 		</PointLightComponent>
 	</Entity> 
 	
@@ -57,8 +57,8 @@
 		<Scale x="1" y="1" z="1"/>
 		
 		<DirectionalLightComponent>
-			<AmbientColor r="0.0" g="0.0" b="0.0"/>
-			<Color r="0.0" g="0.0" b="0.0"/>
+			<AmbientColor r="0.501" g="0.443" b="0.337"/>
+			<Color r="0.678" g="0.596" b="0.427"/>
 		</DirectionalLightComponent>
 	</Entity>
 	

@@ -57,7 +57,8 @@ void ShockPlayerController::activateCamera()
 {
 	CameraProxy::getInstance()->setCameraComponent(m_camera);
 
-	ShowCursor(FALSE);
+	g_engineData.m_shouldCaptureMouse = true;
+	g_engineData.m_shouldHideMouse = true;
 }
 
 void ShockPlayerController::initializeCamera()
@@ -99,6 +100,8 @@ void ShockPlayerController::initializeComponents()
 	// m_rigidBody = getNode()->getComponentByTypeSafe<RigidBodyComponent>();
 }
 
+static IFont* s_font = nullptr;
+
 void ShockPlayerController::update(float dt)
 {
 	// if (m_rigidBody == nullptr)
@@ -107,7 +110,10 @@ void ShockPlayerController::update(float dt)
 	// 	//ASSERT2(m_rigidBody, "Node don't have rigid body component.");
 	// }
 
-	InputManager::getInstance()->setCursorCapture(true);
+	if (!s_font)
+		s_font = g_fontManager->createFont("textures/ui/RobotoMono-Regular.ttf", 64.0f);
+
+	g_engineData.m_shouldCaptureMouse = true;
 
 #if 0
 	// set position
@@ -143,11 +149,13 @@ void ShockPlayerController::update(float dt)
 	// update player movement
 	updateMovement(dt);
 
+	s_font->drawText("Test text", 300.0f, 300.0f, glm::vec4(1.0f));	
+
 	// update debug
 	debugUpdate(dt);
 
 	InputManager* input = InputManager::getInstance();
-	if (input->getKey(KeyboardKeys::KEY_F))
+	if (input->isPressed(KeyboardKeys::KEY_F))
 	{
 		Camera* camera = CameraProxy::getInstance();
 		glm::vec3 rayStart = camera->getPosition() + camera->getDirection();
@@ -161,7 +169,7 @@ void ShockPlayerController::update(float dt)
 		}
 	}
 
-	if (input->getKeyWithReset(KeyboardKeys::KEY_F1))
+	if (input->isPressedWithReset(KeyboardKeys::KEY_F1))
 	{
 		getWorld()->togglePhysicsDebugDraw();
 	}
@@ -226,10 +234,10 @@ void ShockPlayerController::updateMovement(float dt)
 	 
 	 InputManager* inputManager = InputManager::getInstance();
 	 
-	 bool isPlayerMove = (inputManager->getKey(KeyboardKeys::KEY_W)) ||
-	 					(inputManager->getKey(KeyboardKeys::KEY_S)) ||
-	 					(inputManager->getKey(KeyboardKeys::KEY_A)) ||
-	 					(inputManager->getKey(KeyboardKeys::KEY_D));
+	 bool isPlayerMove = (inputManager->isPressed(KeyboardKeys::KEY_W)) ||
+	 					(inputManager->isPressed(KeyboardKeys::KEY_S)) ||
+	 					(inputManager->isPressed(KeyboardKeys::KEY_A)) ||
+	 					(inputManager->isPressed(KeyboardKeys::KEY_D));
 	 
 	 Camera* camera = CameraProxy::getInstance();
 	 
@@ -268,13 +276,13 @@ void ShockPlayerController::updateMovement(float dt)
 		 camdir.y = 0.0f;
 
 		 glm::vec3 dir = glm::vec3(0.0f);
-		 if (inputManager->getKey(KeyboardKeys::KEY_W))
+		 if (inputManager->isPressed(KeyboardKeys::KEY_W))
 			 dir += camdir;
-		 if (inputManager->getKey(KeyboardKeys::KEY_S))
+		 if (inputManager->isPressed(KeyboardKeys::KEY_S))
 			 dir -= camdir;
-		 if (inputManager->getKey(KeyboardKeys::KEY_A))
+		 if (inputManager->isPressed(KeyboardKeys::KEY_A))
 			 dir -= glm::normalize(glm::cross(camdir, glm::vec3(0.0f, 1.0f, 0.0f)));
-		 if (inputManager->getKey(KeyboardKeys::KEY_D))
+		 if (inputManager->isPressed(KeyboardKeys::KEY_D))
 			 dir += glm::normalize(glm::cross(camdir, glm::vec3(0.0f, 1.0f, 0.0f)));
 
 		 // apply impulse to rigid body
