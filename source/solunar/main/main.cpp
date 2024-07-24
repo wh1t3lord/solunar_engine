@@ -15,6 +15,7 @@
 #include "main/win32_keys.h"
 
 #include "backends/imgui_impl_win32.h"
+#include <engine/inputmanager_win32.h>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
@@ -78,6 +79,8 @@ namespace engine
 
 	LRESULT CALLBACK wndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	{
+		InputManager_Win32* inputManager = (InputManager_Win32*)InputManager::getInstance();
+
 		switch (Msg)
 		{
 		case WM_CLOSE:
@@ -87,14 +90,14 @@ namespace engine
 		case WM_KEYDOWN:
 		{
 			Win32Keys::Keys key = static_cast<Win32Keys::Keys>(wParam);
-			InputManager::getInstance()->keyboardAction(static_cast<int>(getKeyFromWin32(key)), true);
+			inputManager->keyboardAction(static_cast<int>(getKeyFromWin32(key)), true);
 			break;
 		}
 
 		case WM_KEYUP:
 		{
 			Win32Keys::Keys key = static_cast<Win32Keys::Keys>(wParam);
-			InputManager::getInstance()->keyboardAction(static_cast<int>(getKeyFromWin32(key)), false);
+			inputManager->keyboardAction(static_cast<int>(getKeyFromWin32(key)), false);
 			break;
 		}
 

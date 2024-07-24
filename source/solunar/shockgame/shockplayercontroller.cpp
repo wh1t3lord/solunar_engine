@@ -57,7 +57,7 @@ void ShockPlayerController::activateCamera()
 {
 	CameraProxy::getInstance()->setCameraComponent(m_camera);
 
-	ShowCursor(FALSE);
+	InputManager::getInstance()->setCursorHiding(true);
 }
 
 void ShockPlayerController::initializeCamera()
@@ -147,7 +147,7 @@ void ShockPlayerController::update(float dt)
 	debugUpdate(dt);
 
 	InputManager* input = InputManager::getInstance();
-	if (input->getKey(KeyboardKeys::KEY_F))
+	if (input->isPressed(KeyboardKeys::KEY_F))
 	{
 		Camera* camera = CameraProxy::getInstance();
 		glm::vec3 rayStart = camera->getPosition() + camera->getDirection();
@@ -161,7 +161,7 @@ void ShockPlayerController::update(float dt)
 		}
 	}
 
-	if (input->getKeyWithReset(KeyboardKeys::KEY_F1))
+	if (input->isPressedWithReset(KeyboardKeys::KEY_F1))
 	{
 		getWorld()->togglePhysicsDebugDraw();
 	}
@@ -226,10 +226,10 @@ void ShockPlayerController::updateMovement(float dt)
 	 
 	 InputManager* inputManager = InputManager::getInstance();
 	 
-	 bool isPlayerMove = (inputManager->getKey(KeyboardKeys::KEY_W)) ||
-	 					(inputManager->getKey(KeyboardKeys::KEY_S)) ||
-	 					(inputManager->getKey(KeyboardKeys::KEY_A)) ||
-	 					(inputManager->getKey(KeyboardKeys::KEY_D));
+	 bool isPlayerMove = (inputManager->isPressed(KeyboardKeys::KEY_W)) ||
+	 					(inputManager->isPressed(KeyboardKeys::KEY_S)) ||
+	 					(inputManager->isPressed(KeyboardKeys::KEY_A)) ||
+	 					(inputManager->isPressed(KeyboardKeys::KEY_D));
 	 
 	 Camera* camera = CameraProxy::getInstance();
 	 
@@ -268,13 +268,13 @@ void ShockPlayerController::updateMovement(float dt)
 		 camdir.y = 0.0f;
 
 		 glm::vec3 dir = glm::vec3(0.0f);
-		 if (inputManager->getKey(KeyboardKeys::KEY_W))
+		 if (inputManager->isPressed(KeyboardKeys::KEY_W))
 			 dir += camdir;
-		 if (inputManager->getKey(KeyboardKeys::KEY_S))
+		 if (inputManager->isPressed(KeyboardKeys::KEY_S))
 			 dir -= camdir;
-		 if (inputManager->getKey(KeyboardKeys::KEY_A))
+		 if (inputManager->isPressed(KeyboardKeys::KEY_A))
 			 dir -= glm::normalize(glm::cross(camdir, glm::vec3(0.0f, 1.0f, 0.0f)));
-		 if (inputManager->getKey(KeyboardKeys::KEY_D))
+		 if (inputManager->isPressed(KeyboardKeys::KEY_D))
 			 dir += glm::normalize(glm::cross(camdir, glm::vec3(0.0f, 1.0f, 0.0f)));
 
 		 // apply impulse to rigid body
