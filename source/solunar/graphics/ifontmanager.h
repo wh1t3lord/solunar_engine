@@ -7,6 +7,8 @@ namespace engine
 class IFontManager
 {
 public:
+	virtual ~IFontManager() {}
+
 	virtual void initialize() = 0;
 	virtual void shutdown() = 0;
 
