@@ -4,6 +4,14 @@
 namespace engine
 {
 
+class IFont
+{
+public:
+	virtual ~IFont() {}
+
+	virtual void drawText(const char* text, float x, float y, const glm::vec4& color) = 0;
+};
+
 class IFontManager
 {
 public:
@@ -11,6 +19,10 @@ public:
 
 	virtual void initialize() = 0;
 	virtual void shutdown() = 0;
+
+	virtual IFont* createFont(const char* filename, float size) = 0;
+
+	virtual void drawFontText(IFont* font, const char* text, float x, float y, const glm::vec4& color) = 0;
 
 	virtual void drawSystemFont(const char* text, float x, float y, const glm::vec4& color) = 0;
 	inline void drawSystemFontShadowed(const char* text, float x, float y, const glm::vec4& color);

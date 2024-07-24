@@ -1,8 +1,6 @@
 #ifndef D3D11DRV_PCH_H
 #define D3D11DRV_PCH_H
 
-#include <unordered_map>
-
 // Direct3D 12
 #include <d3d12.h>
 //#include <dxgi1_4.h>
