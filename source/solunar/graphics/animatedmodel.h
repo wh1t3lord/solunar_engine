@@ -131,8 +131,10 @@ public:
 
 	std::vector<AnimatedSubMesh*>& getAnimatedSubmehes() { return m_subMeshes; }
 
+	/** Animation accessing */
 	int getAnimationByName(const std::string& name);
 	void setPlayAnimation(int index, bool looped = false);
+	void pauseAnimationPlay();
 
 	void testPlay(float dt);
 
@@ -157,6 +159,7 @@ private:
 	Animation* m_currentAnimation;
 	bool m_playLooped = false;
 	float m_currentTime = 0.0f;
+	float m_speed = 1.0f;
 	
 	BoundingBox m_boundingBox;
 

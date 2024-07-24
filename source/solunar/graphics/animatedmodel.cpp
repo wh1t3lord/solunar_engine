@@ -566,6 +566,11 @@ void AnimatedModel::setPlayAnimation(int index, bool looped)
 	m_currentTime = 0.0f;
 }
 
+void AnimatedModel::pauseAnimationPlay()
+{
+	m_speed = 0.0f;
+}
+
 inline glm::quat samplerRotationToGlm(const glm::vec4& v)
 {
 	return glm::quat(v.w, v.x, v.y, v.z);
@@ -573,10 +578,14 @@ inline glm::quat samplerRotationToGlm(const glm::vec4& v)
 
 void AnimatedModel::testPlay(float dt)
 {
-	m_currentTime += 1.0f * dt;
+	m_currentTime += m_speed * dt;
 	
 	bool updated = false;
 	Animation& animation = *m_currentAnimation;
+
+	if (animation.m_startTime >= m_currentTime)
+		m_currentTime = animation.m_startTime;
+
 	float time = std::fmod(static_cast<float>(m_currentTime), animation.m_endTime - animation.m_startTime);
 	
 	for (auto& channel : animation.m_channels)
@@ -601,10 +610,6 @@ void AnimatedModel::testPlay(float dt)
 						auto B = sampler.m_outputs[i + 1];
 						auto translation = glm::lerp(A, B, u);
 						m_nodes[channel.m_nodeId].m_translation = translation;
-#if 0
-						auto translation = sampler.m_outputs[i];
-						m_nodes[channel.m_nodeId].m_translation = glm::vec3(translation);
-#endif
 					}
 					else if (channel.m_pathType == AnimationPathType_Scale)
 					{
@@ -612,10 +617,6 @@ void AnimatedModel::testPlay(float dt)
 						auto B = sampler.m_outputs[i + 1];
 						auto scale = glm::lerp(A, B, u);
 						m_nodes[channel.m_nodeId].m_scale = scale;
-#if 0
-						auto scale = sampler.m_outputs[i];
-						m_nodes[channel.m_nodeId].m_scale = glm::vec3(scale);
-#endif
 					}
 					else if (channel.m_pathType == AnimationPathType_Rotation)
 					{
@@ -623,10 +624,6 @@ void AnimatedModel::testPlay(float dt)
 						auto B = samplerRotationToGlm(sampler.m_outputs[i + 1]);
 						auto rotate = glm::slerp(A, B, u);
 						m_nodes[channel.m_nodeId].m_rotation = glm::normalize(rotate);
-#if 0
-						auto rotation = sampler.m_outputs[i];
-						m_nodes[channel.m_nodeId].m_rotation = glm::quat(rotation.w, rotation.x, rotation.y, rotation.z);
-#endif
 					}
 
 					updated = true;

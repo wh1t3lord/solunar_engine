@@ -31,9 +31,6 @@ void Timer::update()
 	QueryPerformanceCounter((LARGE_INTEGER*)&m_startTime);
 	m_deltaTime = (float)(m_startTime - m_endTime) / m_frequency;
 
-	// #TODO: rework timer
-	if (m_deltaTime > 0.5f)
-		m_deltaTime = 0.5f;
 
 	m_endTime = m_startTime;
 }

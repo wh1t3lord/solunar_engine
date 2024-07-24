@@ -169,6 +169,7 @@ void ViewmodelAnimationController::update(float dt)
 		if (m_animationIndex == -1) {
 			m_animationIndex = animatedModel->getAnimationByName("Armature|Armature|Hide");
 			animatedModel->setPlayAnimation(m_animationIndex, true);
+			animatedModel->pauseAnimationPlay();
 		}
 	}
 

@@ -54,7 +54,7 @@ void D3D11Device::create()
 	D3D_FEATURE_LEVEL featureLevel = (D3D_FEATURE_LEVEL)0;
 
 	UINT deviceCreationFlags = 0;
-#ifndef NDEBUG
+#ifdef NDEBUG
 	deviceCreationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
