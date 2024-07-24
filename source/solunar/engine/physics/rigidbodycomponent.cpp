@@ -131,6 +131,9 @@ namespace engine {
 	{
 		Assert(m_physicsWorld);
 
+		if (m_rigidBody)
+			return;
+
 		m_compoundShape = mem_new<btCompoundShape>();
 
 		btVector3 localInertia(0.0f, 0.0f, 0.0f);
@@ -223,6 +226,15 @@ namespace engine {
 
 	RigidBodyProxyComponent::~RigidBodyProxyComponent()
 	{
+		getPhysicsWorld()->getWorld()->removeAction(m_characterController);
+		getPhysicsWorld()->getWorld()->removeCollisionObject(m_ghostObject);
+		m_ghostObject->setCollisionShape(nullptr);
+		getPhysicsWorld()->getWorld()->getPairCache()->setInternalGhostPairCallback(nullptr);
+
+		mem_delete(m_capsuleShape);
+		mem_delete(m_ghostCallback);
+		mem_delete(m_ghostObject);
+		mem_delete(m_characterController);
 	}
 
 	void RigidBodyProxyComponent::registerObject()
