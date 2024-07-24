@@ -26,11 +26,13 @@ namespace engine
 
 		ITexture2D*			getTexture()				{ return m_shadowMap; }
 		IShaderProgram*		getShader_StaticMesh()		{ return m_shadowShader_StaticMesh; }
+		IShaderProgram*		getShader_AnimationMesh()	{ return m_shadowShader_AnimationMesh; }
 
 	private:
 		ITexture2D* m_shadowMap;
 		IRenderTarget* m_shadowFbo;
 		IShaderProgram* m_shadowShader_StaticMesh;
+		IShaderProgram* m_shadowShader_AnimationMesh;
 
 		Viewport m_originalViewport;
 	};

@@ -183,6 +183,8 @@ namespace engine
 	std::string getDirectoryPath(const std::string& filepath);
 	void osConvertPath(std::string& path);
 	void osConvertStandartPath(std::string& path);
+
+	extern InputLayoutDesc g_vertexInputLayout[5];
 }
 
 #endif // !MODEL_H

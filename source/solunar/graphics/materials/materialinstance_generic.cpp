@@ -7,26 +7,6 @@
 namespace engine
 {
 
-static InputLayoutDesc s_vertexInputLayout[] =
-{
-	{ "POSITION", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(Vertex, m_position), INPUT_PER_VERTEX_DATA, 0 },
-	{ "NORMAL", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(Vertex, m_normal), INPUT_PER_VERTEX_DATA, 0 },
-	{ "TEXCOORD", 0, ImageFormat::RG32F, 0, (UINT)offsetof(Vertex, m_texcoord0), INPUT_PER_VERTEX_DATA, 0 },
-	{ "TANGENT", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(Vertex, m_tangent), INPUT_PER_VERTEX_DATA, 0 },
-	{ "BINORMAL", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(Vertex, m_bitangent), INPUT_PER_VERTEX_DATA, 0 }
-};
-
-static InputLayoutDesc s_animatedVertexInputLayout[] =
-{
-	{ "POSITION", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(AnimatedVertex, m_position), INPUT_PER_VERTEX_DATA, 0 },
-	{ "NORMAL", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(AnimatedVertex, m_normal), INPUT_PER_VERTEX_DATA, 0 },
-	{ "TEXCOORD", 0, ImageFormat::RG32F, 0, (UINT)offsetof(AnimatedVertex, m_texcoord), INPUT_PER_VERTEX_DATA, 0 },
-	{ "TANGENT", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(AnimatedVertex, m_tangent), INPUT_PER_VERTEX_DATA, 0 },
-	{ "BINORMAL", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(AnimatedVertex, m_bitangent), INPUT_PER_VERTEX_DATA, 0 },
-	{ "BLENDWEIGHT", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(AnimatedVertex, m_weights), INPUT_PER_VERTEX_DATA, 0 },
-	{ "BLENDINDICES", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(AnimatedVertex, m_boneIDs), INPUT_PER_VERTEX_DATA, 0 }
-};
-
 static std::unordered_map<std::string, IShaderProgram*> m_pixelVariations[VertexFactory_Count];
 
 std::string getPixelVariationDefine(uint32_t pixelVariation)
@@ -81,8 +61,8 @@ IShaderProgram* MaterialInstance_Generic::getShaderProgramVariation(VertexFactor
 			"materialinstance_generic.vsh",
 			"materialinstance_generic.psh",
 			defines.c_str(),
-			s_vertexInputLayout,
-			sizeof(s_vertexInputLayout) / sizeof(s_vertexInputLayout[0]));
+			g_vertexInputLayout,
+			sizeof(g_vertexInputLayout) / sizeof(g_vertexInputLayout[0]));
 		break;
 	case VertexFactory_SkinnedMesh:
 		defines += "SKINNED\n";
@@ -91,8 +71,8 @@ IShaderProgram* MaterialInstance_Generic::getShaderProgramVariation(VertexFactor
 			"materialinstance_generic.vsh",
 			"materialinstance_generic.psh",
 			defines.c_str(),
-			s_animatedVertexInputLayout,
-			sizeof(s_animatedVertexInputLayout) / sizeof(s_animatedVertexInputLayout[0]));
+			g_animatedVertexInputLayout,
+			sizeof(g_animatedVertexInputLayout) / sizeof(g_animatedVertexInputLayout[0]));
 		break;
 	//case VertexFactory_Billboard:
 	//	break;

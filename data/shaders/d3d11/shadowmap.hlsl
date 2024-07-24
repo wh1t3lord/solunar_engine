@@ -18,7 +18,7 @@ struct VSInput
 #endif
 #ifdef SKINNED
 	float4 weights		: BLENDWEIGHT;
-	uint boneIds		: BLENDINDICES;
+	float4 boneIds		: BLENDINDICES;
 #endif
 };
 
@@ -39,6 +39,12 @@ cbuffer GlobalData : register(b0)
 	float4 g_viewDir;
 };
 
+cbuffer SkinningData : register(b1)
+{
+	row_major float4x4 g_bonesMatrices[64];
+};
+
+#ifndef SKINNED
 VSOutput VSMain(VSInput input)
 {
 	VSOutput output = (VSOutput)0;
@@ -48,3 +54,14 @@ VSOutput VSMain(VSInput input)
 	output.position = mul(output.position, g_projectionMatrix);	
 	return output;
 }
+#else
+VSOutput VSMain(VSInput input)
+{
+	VSOutput output = (VSOutput)0;
+
+	// Position
+	output.position = mul(float4(output.worldPos, 1.0f), g_viewMatrix);
+	output.position = mul(output.position, g_projectionMatrix);	
+	return output;
+}
+#endif

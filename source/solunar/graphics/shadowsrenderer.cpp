@@ -6,14 +6,18 @@
 #include "graphics/core/rendertarget.h"
 
 // Graphics classes
+#include "graphics/rendercontext.h"
 #include "graphics/renderer.h"
 #include "graphics/shadowsrenderer.h"
 #include "graphics/shaderprogram.h"
 #include "graphics/ShaderProgramManager.h"
+#include "graphics/shaderconstantmanager.h"
 #include "graphics/graphicsworld.h"
 #include "graphics/mesh.h"
 #include "graphics/light.h"
 #include "graphics/lightmanager.h"
+#include "graphics/animatedmodel.h"
+#include "graphics/screenquad.h"
 
 namespace engine
 {
@@ -21,7 +25,10 @@ namespace engine
 
 	ShadowsRenderer::ShadowsRenderer()
 	{
+		m_shadowMap = nullptr;
+		m_shadowFbo = nullptr;
 		m_shadowShader_StaticMesh = nullptr;
+		m_shadowShader_AnimationMesh = nullptr;
 		memset(&m_originalViewport, 0, sizeof(m_originalViewport));
 	}
 
@@ -57,7 +64,20 @@ namespace engine
 		m_shadowFbo = g_renderDevice->createRenderTarget(renderTargetDesc);
 
 		// Create shader for static mesh
-		m_shadowShader_StaticMesh = g_shaderManager->createShaderProgram("shadowmap.hlsl", "shadowmap.hlsl");
+		m_shadowShader_StaticMesh = g_shaderManager->createShaderProgram(
+			"shadowmap.hlsl",
+			"shadowmap.hlsl",
+			nullptr,
+			g_vertexInputLayout,
+			sizeof(g_vertexInputLayout) / sizeof(g_vertexInputLayout[0]));
+
+		// Create shader for animated mesh
+		m_shadowShader_AnimationMesh = g_shaderManager->createShaderProgram(
+			"shadowmap.hlsl",
+			"shadowmap.hlsl",
+			"SKINNED\n",
+			g_vertexInputLayout,
+			sizeof(g_vertexInputLayout) / sizeof(g_vertexInputLayout[0]));
 	}
 
 	void ShadowsRenderer::shutdown()
@@ -105,8 +125,83 @@ namespace engine
 		if (!directionalLightEntity)
 			return;
 
+		float near_plane = 1.0f, far_plane = 7.5f;
+		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+
 		// calculate view matrix for light
-		//glm::mat4 lightViewMatrix = glm::lookAt(  )
+		glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f), 
+										  glm::vec3( 0.0f, 0.0f,  0.0f), 
+										  glm::vec3( 0.0f, 1.0f,  0.0f));
+
+		RenderContext renderContext;
+		renderContext.width = kShadowMapSize;
+		renderContext.height = kShadowMapSize;
+		renderContext.proj = lightProjection;
+		renderContext.view = lightView;
+		renderContext.model = directionalLightEntity->getWorldTranslation();
+		ShaderConstantManager::getInstance()->setStaticMeshGlobalData(mesh, view, renderContext, graphicsWorld);
+
+		if (mesh->isA<AnimatedMeshComponent>())
+			AnimatedModelRenderer::getInstance()->render(dynamicCast<AnimatedMeshComponent>(mesh));
+
+		// shader selection
+		IShaderProgram* shaderProgram = nullptr;
+		if (mesh->isA<AnimatedMeshComponent>())
+			shaderProgram = m_shadowShader_AnimationMesh;
+		else
+			shaderProgram = m_shadowShader_StaticMesh;
+
+		g_shaderManager->setShaderProgram(shaderProgram);
+
+		if (mesh->isA<AnimatedMeshComponent>())
+		{
+			std::shared_ptr<ModelBase> model = mesh->lockModel();
+			AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(model.get());
+
+			for (const auto& submesh : animatedModel->getAnimatedSubmehes())
+			{
+				// transpose matrices for D3D11
+				//localCtx.model = glm::transpose(localCtx.model);
+
+				g_renderDevice->setVertexBuffer(submesh->m_vertexBuffer, sizeof(AnimatedVertex), 0);
+				g_renderDevice->setIndexBuffer(submesh->m_indexBuffer, false);
+
+				ShaderConstantManager::getInstance()->setStaticMeshGlobalData(mesh, view, renderContext, graphicsWorld);
+
+				g_renderDevice->drawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
+			}
+		}
+		else
+		{
+			std::shared_ptr<ModelBase> model = mesh->lockModel();
+
+			for (const auto& submesh : model->getSubmehes())
+			{
+				// create saved render ctx as previous model.
+				RenderContext savedCtx = renderContext;
+
+				// create local copy of render context
+				RenderContext localCtx = savedCtx;
+
+				// and overwrite model matrix
+				localCtx.model = savedCtx.model * submesh->getTransform();
+
+				// transpose matrices for D3D11
+				//localCtx.model = glm::transpose(localCtx.model);
+
+				// set our local render ctx
+				RenderContext::setContext(localCtx);
+
+				g_renderDevice->setVertexBuffer(submesh->getVertexBuffer(), sizeof(Vertex), 0);
+
+				ShaderConstantManager::getInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
+				
+				g_renderDevice->draw(PM_TriangleList, 0, submesh->getVerticesCount());
+
+				// return what have been
+				renderContext = savedCtx;
+			}
+		}
 	}
 
 	void ShadowsRenderer::endRender()
@@ -116,6 +211,9 @@ namespace engine
 
 		// restore viewport
 		g_renderDevice->setViewport(&m_originalViewport);
+
+		// draw shadow map
+		ScreenQuad::render(m_shadowMap);
 	}
 
 }

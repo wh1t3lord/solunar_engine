@@ -172,7 +172,7 @@ namespace engine
 
 		AnimatedModelRenderer::getInstance()->init();
 
-//		ShadowsRenderer::getInstance()->init();
+		ShadowsRenderer::getInstance()->init();
 	}
 
 	void Renderer::shutdown()
@@ -265,7 +265,7 @@ namespace engine
 
 			std::vector<Entity*> drawableEntities = entityManager.getEntitiesWithComponent<MeshComponent>();
 			
-#if 0
+#if 1
 			// shadow map pass
 			ShadowsRenderer::getInstance()->beginRender();
 
@@ -275,16 +275,9 @@ namespace engine
 				MeshComponent* meshComponent = entity->getComponent<MeshComponent>();
 				if (meshComponent)
 				{
-					// setup render context
-					RenderContext& renderCtx = RenderContext::getContext();
-					renderCtx.model = entity->getWorldTranslation();
-					RenderContext::setContext(renderCtx);
-
 					// call render function
 					//renderMesh(world->getGraphicsWorld(), view, meshComponent);
 					ShadowsRenderer::getInstance()->renderMesh(world->getGraphicsWorld(), view, meshComponent);
-
-					meshComponent->render();
 				}
 			}
 

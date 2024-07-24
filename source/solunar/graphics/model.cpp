@@ -31,6 +31,7 @@
 
 namespace engine
 {
+
 	inline static glm::mat4 Assimp2Glm(const aiMatrix4x4& from)
 	{
 		return glm::mat4(
