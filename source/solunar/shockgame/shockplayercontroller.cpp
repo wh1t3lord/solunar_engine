@@ -57,7 +57,8 @@ void ShockPlayerController::activateCamera()
 {
 	CameraProxy::getInstance()->setCameraComponent(m_camera);
 
-	InputManager::getInstance()->setCursorHiding(true);
+	g_engineData.m_shouldCaptureMouse = true;
+	g_engineData.m_shouldHideMouse = true;
 }
 
 void ShockPlayerController::initializeCamera()
@@ -99,6 +100,8 @@ void ShockPlayerController::initializeComponents()
 	// m_rigidBody = getNode()->getComponentByTypeSafe<RigidBodyComponent>();
 }
 
+static IFont* s_font = nullptr;
+
 void ShockPlayerController::update(float dt)
 {
 	// if (m_rigidBody == nullptr)
@@ -107,7 +110,10 @@ void ShockPlayerController::update(float dt)
 	// 	//ASSERT2(m_rigidBody, "Node don't have rigid body component.");
 	// }
 
-	InputManager::getInstance()->setCursorCapture(true);
+	if (!s_font)
+		s_font = g_fontManager->createFont("textures/ui/RobotoMono-Regular.ttf", 64.0f);
+
+	g_engineData.m_shouldCaptureMouse = true;
 
 #if 0
 	// set position
@@ -142,6 +148,8 @@ void ShockPlayerController::update(float dt)
 
 	// update player movement
 	updateMovement(dt);
+
+	s_font->drawText("Test text", 300.0f, 300.0f, glm::vec4(1.0f));	
 
 	// update debug
 	debugUpdate(dt);

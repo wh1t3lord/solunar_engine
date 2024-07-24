@@ -7,6 +7,7 @@
 #include "core/file/contentdevice.h"
 #include "core/file/contentmanager.h"
 
+#include "engine/engine.h"
 #include "engine/camera.h"
 
 #include "graphics/graphicsoptions.h"
@@ -76,6 +77,26 @@ namespace engine
 	}
 
 	BOOL g_fMouseInClient;
+	BOOL g_fGainedFocus = true;
+
+	void onLostFocus()
+	{
+		InputManager::getInstance()->setCursorCapture(false);
+		InputManager::getInstance()->setCursorHiding(false);
+
+		g_fGainedFocus = false;
+	}
+
+	void onGainedFocus()
+	{
+		g_fGainedFocus = true;
+
+		if (g_engineData.m_shouldCaptureMouse)
+			InputManager::getInstance()->setCursorCapture(true);
+
+		if (g_engineData.m_shouldHideMouse)
+			InputManager::getInstance()->setCursorHiding(true);
+	}
 
 	LRESULT CALLBACK wndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	{
@@ -126,10 +147,16 @@ namespace engine
 			return 0;
 		}
 
+		//case WM_KILLFOCUS:
+		//	InputManager::getInstance()->setCursorCapture(false);
+		//	break;
+
 		case WM_ACTIVATE:
 		{
 			if (LOWORD(wParam) == WA_INACTIVE)
-				InputManager::getInstance()->setCursorCapture(false);
+				onLostFocus();
+			else
+				onGainedFocus();
 			
 			break;
 		}
@@ -141,6 +168,18 @@ namespace engine
 		ImGui_ImplWin32_WndProcHandler(hWnd, Msg, wParam, lParam);
 
 		return DefWindowProcA(hWnd, Msg, wParam, lParam);
+	}
+
+	void inputUpdate()
+	{
+		if (g_fGainedFocus)
+		{
+			if (g_engineData.m_shouldCaptureMouse)
+				InputManager::getInstance()->setCursorCapture(true);
+
+			if (g_engineData.m_shouldHideMouse)
+				InputManager::getInstance()->setCursorHiding(true);
+		}
 	}
 
 	void createEngineView()
@@ -212,6 +251,8 @@ namespace engine
 			}
 			else
 			{
+				inputUpdate();
+
 				if (!engineLoop->update())
 					break;
 			}

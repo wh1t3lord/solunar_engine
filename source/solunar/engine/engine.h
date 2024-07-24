@@ -53,6 +53,14 @@ namespace engine
 		EngineState m_currentState;
 		EngineState m_nextState;
 	};
+
+	struct EngineData
+	{
+		bool m_shouldCaptureMouse = false;
+		bool m_shouldHideMouse = false;
+	};
+
+	extern EngineData g_engineData;
 }
 
 #endif // !ENGINE_H

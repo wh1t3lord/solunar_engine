@@ -53,6 +53,8 @@ namespace engine
 	//	LoadingRoomManager::registerObject();*/
 	//}
 
+	EngineData g_engineData;
+
 	// There is more nice looking object registration
 	void registerEngineObjects()
 	{
