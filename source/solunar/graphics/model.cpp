@@ -329,7 +329,7 @@ namespace engine
 
 			BufferDesc indexBufferDesc;
 			memset(&indexBufferDesc, 0, sizeof(indexBufferDesc));
-			indexBufferDesc.m_bufferType = BufferType::VertexBuffer;
+			indexBufferDesc.m_bufferType = BufferType::IndexBuffer;
 			indexBufferDesc.m_bufferAccess = BufferAccess::Static;
 			indexBufferDesc.m_bufferMemorySize = submesh->m_indecies.size() * sizeof(uint32_t);
 

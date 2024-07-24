@@ -396,6 +396,7 @@ void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 		RenderContext::setContext(localCtx);
 
 		g_renderDevice->setVertexBuffer(submesh->getVertexBuffer(), sizeof(Vertex), 0);
+		g_renderDevice->setIndexBuffer(submesh->getIndexBuffer(), false);
 
 		//g_renderDevice->setIndexBuffer(it->getIndexBuffer());
 
@@ -446,7 +447,8 @@ void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 		//	if (getRenderMode() == RendererViewMode::Wireframe)
 		//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-			g_renderDevice->draw(PM_TriangleList, 0, submesh->getVerticesCount());
+			//g_renderDevice->draw(PM_TriangleList, 0, submesh->getVerticesCount());
+			g_renderDevice->drawIndexed(PM_TriangleList, 0, submesh->getIndeciesCount(), 0);
 		//	glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
 			//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
 
