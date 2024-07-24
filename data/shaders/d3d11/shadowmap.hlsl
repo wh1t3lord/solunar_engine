@@ -67,7 +67,6 @@ VSOutput VSMain(VSInput input)
 }
 #endif
 
-float PSMain(VSOutput input) : SV_Depth
+void PSMain(VSOutput input)
 {
-	return input.position.z;
 }

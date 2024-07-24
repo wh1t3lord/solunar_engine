@@ -76,22 +76,22 @@ namespace engine
 			"shadowmap.hlsl",
 			"shadowmap.hlsl",
 			"SKINNED\n",
-			g_vertexInputLayout,
-			sizeof(g_vertexInputLayout) / sizeof(g_vertexInputLayout[0]));
+			g_animatedVertexInputLayout,
+			sizeof(g_animatedVertexInputLayout) / sizeof(g_animatedVertexInputLayout[0]));
 	}
 
 	void ShadowsRenderer::shutdown()
 	{
-		if (m_shadowMap)
-		{
-			mem_delete(m_shadowMap);
-			m_shadowMap = nullptr;
-		}
-
 		if (m_shadowFbo)
 		{
 			mem_delete(m_shadowFbo);
 			m_shadowFbo = nullptr;
+		}
+
+		if (m_shadowMap)
+		{
+			mem_delete(m_shadowMap);
+			m_shadowMap = nullptr;
 		}
 	}
 
@@ -128,7 +128,7 @@ namespace engine
 		if (!directionalLightEntity)
 			return;
 
-		float near_plane = 1.0f, far_plane = 7.5f;
+		float near_plane = 1.0f, far_plane = 70.5f;
 		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
 
 		// calculate view matrix for light
@@ -192,6 +192,8 @@ namespace engine
 				// transpose matrices for D3D11
 				//localCtx.model = glm::transpose(localCtx.model);
 
+			//	RenderContext::setContext(localCtx);
+
 				g_renderDevice->setVertexBuffer(submesh->getVertexBuffer(), sizeof(Vertex), 0);
 
 				ShaderConstantManager::getInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
@@ -211,9 +213,6 @@ namespace engine
 
 		// restore viewport
 		g_renderDevice->setViewport(&m_originalViewport);
-
-		// draw shadow map
-		ScreenQuad::render(m_shadowMap);
 	}
 
 }
