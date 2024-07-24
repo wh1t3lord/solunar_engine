@@ -102,6 +102,9 @@ namespace engine
 		// set framebuffer
 		g_renderDevice->setRenderTarget(m_shadowFbo);
 
+		// clear target
+		g_renderer->clearRenderTarget(m_shadowFbo);
+
 		// install shadowmap viewport
 		Viewport vp;
 		vp.m_x = 0;
@@ -188,9 +191,6 @@ namespace engine
 
 				// transpose matrices for D3D11
 				//localCtx.model = glm::transpose(localCtx.model);
-
-				// set our local render ctx
-				RenderContext::setContext(localCtx);
 
 				g_renderDevice->setVertexBuffer(submesh->getVertexBuffer(), sizeof(Vertex), 0);
 

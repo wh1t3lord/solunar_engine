@@ -25,7 +25,6 @@ struct VSInput
 struct VSOutput
 {
 	float4 position		: SV_Position;
-	float4 depthPosition: SV_Depth;
 };
 
 cbuffer GlobalData : register(b0)
@@ -41,7 +40,7 @@ cbuffer GlobalData : register(b0)
 
 cbuffer SkinningData : register(b1)
 {
-	row_major float4x4 g_bonesMatrices[64];
+	row_major float4x4 g_bonesMatrices[256];
 };
 
 #ifndef SKINNED
@@ -50,7 +49,8 @@ VSOutput VSMain(VSInput input)
 	VSOutput output = (VSOutput)0;
 
 	// Position
-	output.position = mul(float4(output.worldPos, 1.0f), g_viewMatrix);
+	output.position = mul(float4(input.position, 1.0f), g_modelMatrix);
+	output.position = mul(output.position, g_viewMatrix);	
 	output.position = mul(output.position, g_projectionMatrix);	
 	return output;
 }
@@ -60,8 +60,14 @@ VSOutput VSMain(VSInput input)
 	VSOutput output = (VSOutput)0;
 
 	// Position
-	output.position = mul(float4(output.worldPos, 1.0f), g_viewMatrix);
+	output.position = mul(float4(input.position, 1.0f), g_modelMatrix);
+	output.position = mul(output.position, g_viewMatrix);	
 	output.position = mul(output.position, g_projectionMatrix);	
 	return output;
 }
 #endif
+
+float PSMain(VSOutput input) : SV_Depth
+{
+	return input.position.z;
+}

@@ -188,16 +188,19 @@ void D3D11Texture2D::create(D3D11Device* device, const TextureDesc& textureDesc,
 	d3dTextureDesc.Usage = D3D11_USAGE_DEFAULT;
 	d3dTextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
 
+	// #TODO: FIX !!!
+	if (textureDesc.m_format == ImageFormat::DEPTH32F && textureDesc.m_renderTargetUsage)
+		d3dTextureDesc.Format = DXGI_FORMAT_R32_TYPELESS;
+	
+	// #TODO: FIX !!!
 	bool isDepth =	textureDesc.m_format == ImageFormat::DEPTH32F ||
 					textureDesc.m_format == ImageFormat::DEPTH32 ||
 					textureDesc.m_format == ImageFormat::DEPTH24;
-
+	// #TODO: FIX !!!
 	if (isDepth)
 		d3dTextureDesc.BindFlags |= D3D11_BIND_DEPTH_STENCIL;
 	else if (textureDesc.m_renderTargetUsage)
 		d3dTextureDesc.BindFlags |= D3D11_BIND_RENDER_TARGET;
-
-
 
 #if 0
 	// #TODO: HACK

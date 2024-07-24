@@ -100,9 +100,21 @@ void D3D11RenderTarget::create(D3D11Device* device, const RenderTargetCreationDe
 
 		D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 		memset(&depthStencilViewDesc, 0, sizeof(depthStencilViewDesc));
-		depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 		depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 		depthStencilViewDesc.Texture2D.MipSlice = 0;
+
+		// #TODO: !!!! FIX !!!!!
+		if (texture2D->getTextureDesc().m_format == ImageFormat::DEPTH32F)
+			depthStencilViewDesc.Format = getDxgiFormat(texture2D->getTextureDesc().m_format);
+		else
+			depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+		// #TODO: !!!! FIX !!!!!
+	/*	D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
+		memset(&depthStencilViewDesc, 0, sizeof(depthStencilViewDesc));
+		depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+		depthStencilViewDesc.Texture2D.MipSlice = 0;*/
 
 		D3D11_CHECK(device->getDevice()->CreateDepthStencilView(texture2D->getTexture(), &depthStencilViewDesc, &m_depthStencilView));
 	}
@@ -158,6 +170,12 @@ void D3D11RenderTarget::bind(D3D11Device* device)
 		// #TODO: Hack with depth stencil installation
 		deviceContext->OMSetRenderTargets(1, &m_renderTargetViews[i], (i == 0) ? m_depthStencilView : nullptr);
 		deviceContext->PSGetShaderResources(i, 1, &m_shaderResourceViews[i]);
+	}
+
+	// #TODO: !!!
+	if (m_renderTargetDesc.m_depthTexture2D && m_renderTargetDesc.m_textures2DCount==0)
+	{
+		deviceContext->OMSetRenderTargets(0, nullptr, m_depthStencilView);
 	}
 }
 

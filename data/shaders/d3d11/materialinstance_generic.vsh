@@ -41,7 +41,7 @@ cbuffer GlobalData : register(b0)
 #ifdef SKINNED
 cbuffer SkinningData : register(b1)
 {
-	row_major float4x4 g_bonesMatrices[64];
+	row_major float4x4 g_bonesMatrices[256];
 };
 #endif
 
