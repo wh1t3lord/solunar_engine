@@ -126,7 +126,6 @@ void D3D11StateManager::shutdown()
 
     m_blendStates.clear();
 
-
     for (auto it : m_depthStencilStates)
     {
         destroyDepthStencilState(it.second);
@@ -134,14 +133,12 @@ void D3D11StateManager::shutdown()
 
     m_depthStencilStates.clear();
 
-
     for (auto it : m_samplerStates)
     {
         destroySamplerState(it.second);
     }
 
     m_samplerStates.clear();
-
 
     for (auto it : m_rasterizerStates)
     {
@@ -154,14 +151,11 @@ void D3D11StateManager::shutdown()
 IRasterizerState* D3D11StateManager::createRasterizerState(const RasterizerStateDesc& rasterizerDesc)
 {
     // Find already created IRasterizerState
-    // costyl
-#if 0
 	auto it = m_rasterizerStates.find(rasterizerDesc);
     if (it != m_rasterizerStates.end())
     {
         return (*it).second;
     }
-#endif
 
 	D3D11_RASTERIZER_DESC d3drasterizerDesc = {};
     d3drasterizerDesc.FillMode              = getD3DFillMode(rasterizerDesc.m_fillMode);
