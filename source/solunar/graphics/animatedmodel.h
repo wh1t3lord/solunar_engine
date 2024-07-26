@@ -61,6 +61,8 @@ struct AnimatedSubMesh
 	std::string m_materialName;
 	uint32_t m_verticesCount;
 	uint32_t m_indicesCount;
+
+	void create();
 };
 
 struct AnimationSampler

@@ -500,37 +500,9 @@ void AnimatedModel::createHw()
 {
 	for (int i = 0; i < m_subMeshes.size(); i++)
 	{
-		AnimatedSubMesh* submesh = m_subMeshes[i];
-
-		BufferDesc bufferDesc;
-		memset(&bufferDesc, 0, sizeof(bufferDesc));
-		bufferDesc.m_bufferType = BufferType::VertexBuffer;
-		bufferDesc.m_bufferAccess = BufferAccess::Static;
-		bufferDesc.m_bufferMemorySize = submesh->m_vertices.size() * sizeof(AnimatedVertex);
-
-		SubresourceDesc subresourceDesc;
-		memset(&subresourceDesc, 0, sizeof(subresourceDesc));
-		subresourceDesc.m_memory = submesh->m_vertices.data();
-		subresourceDesc.m_memoryPitch = sizeof(AnimatedVertex);
-
-		submesh->m_vertexBuffer = g_renderDevice->createBuffer(bufferDesc, subresourceDesc);
-		submesh->m_vertices.clear();
-
-		memset(&bufferDesc, 0, sizeof(bufferDesc));
-		bufferDesc.m_bufferType = BufferType::IndexBuffer;
-		bufferDesc.m_bufferAccess = BufferAccess::Static;
-		bufferDesc.m_bufferMemorySize = submesh->m_indices.size() * sizeof(uint32_t);
-
-		memset(&subresourceDesc, 0, sizeof(subresourceDesc));
-		subresourceDesc.m_memory = submesh->m_indices.data();
-		subresourceDesc.m_memoryPitch = sizeof(uint32_t);
-
-		submesh->m_indexBuffer = g_renderDevice->createBuffer(bufferDesc, subresourceDesc);
-		submesh->m_indices.clear();
-
-		submesh->m_material = g_contentManager->loadObject<Material>(submesh->m_materialName);
-		if (submesh->m_material.expired())
-			submesh->m_material = getDefaultMaterial();
+		m_subMeshes[i]->create();
+		//AnimatedSubMesh* submesh = m_subMeshes[i];
+		
 	}
 }
 
@@ -875,6 +847,39 @@ void AnimatedModelRenderer::render(AnimatedMeshComponent* model)
 	// draw texture
 	ScreenQuad::render(m_jointTexture);
 #endif
+}
+
+void AnimatedSubMesh::create()
+{
+	BufferDesc bufferDesc;
+	memset(&bufferDesc, 0, sizeof(bufferDesc));
+	bufferDesc.m_bufferType = BufferType::VertexBuffer;
+	bufferDesc.m_bufferAccess = BufferAccess::Static;
+	bufferDesc.m_bufferMemorySize = m_vertices.size() * sizeof(AnimatedVertex);
+
+	SubresourceDesc subresourceDesc;
+	memset(&subresourceDesc, 0, sizeof(subresourceDesc));
+	subresourceDesc.m_memory = m_vertices.data();
+	subresourceDesc.m_memoryPitch = sizeof(AnimatedVertex);
+
+	m_vertexBuffer = g_renderDevice->createBuffer(bufferDesc, subresourceDesc);
+	m_vertices.clear();
+
+	memset(&bufferDesc, 0, sizeof(bufferDesc));
+	bufferDesc.m_bufferType = BufferType::IndexBuffer;
+	bufferDesc.m_bufferAccess = BufferAccess::Static;
+	bufferDesc.m_bufferMemorySize = m_indices.size() * sizeof(uint32_t);
+
+	memset(&subresourceDesc, 0, sizeof(subresourceDesc));
+	subresourceDesc.m_memory = m_indices.data();
+	subresourceDesc.m_memoryPitch = sizeof(uint32_t);
+
+	m_indexBuffer = g_renderDevice->createBuffer(bufferDesc, subresourceDesc);
+	m_indices.clear();
+
+	m_material = g_contentManager->loadObject<Material>(m_materialName);
+	if (m_material.expired())
+		m_material = getDefaultMaterial();
 }
 
 }
