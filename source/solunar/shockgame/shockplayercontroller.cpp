@@ -204,7 +204,7 @@ void ShockPlayerController::updateCamera(float dt)
 	 //m_weaponEntity->setRotation(m_camera->getDirection());
 
 	glm::quat rot = glm::eulerAngleYX(glm::radians(-m_camera->m_yaw), glm::radians(m_camera->m_pitch));
-	m_weaponEntity->setRotation(rot);
+	m_weaponEntity->setRotation(glm::slerp(rot, m_weaponEntity->getRotation(), 55.0f * dt));
 
 #if 0
 	 glm::vec3 cameraDirection = CameraProxy::getInstance()->getDirection();
