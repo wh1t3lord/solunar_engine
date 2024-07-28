@@ -212,6 +212,7 @@ namespace engine
 		g_engineWindow = CreateWindowA("EngineWindowClass", title, windowStyle, 0, 0, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, NULL, NULL);
 		ShowWindow(g_engineWindow, SW_SHOW);
 		UpdateWindow(g_engineWindow);
+		SetForegroundWindow(g_engineWindow);
 
 		g_engineView = mem_new<View>();
 		g_engineView->m_width = width;
