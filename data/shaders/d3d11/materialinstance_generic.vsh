@@ -41,7 +41,7 @@ cbuffer GlobalData : register(b0)
 #ifdef SKINNED
 cbuffer SkinningData : register(b1)
 {
-	row_major float4x4 g_bonesMatrices[64];
+	row_major float4x4 g_bonesMatrices[256];
 };
 #endif
 
@@ -72,8 +72,7 @@ VSOutput VSMain(VSInput input)
 	VSOutput output = (VSOutput)0;
 
 	// calculate bone transform
-	row_major 
-	float4x4 skinMatrix = input.weights.x * g_bonesMatrices[int(input.boneIds.x)]
+	row_major float4x4 skinMatrix = input.weights.x * g_bonesMatrices[int(input.boneIds.x)]
 		+ input.weights.y * g_bonesMatrices[int(input.boneIds.y)]
 		+ input.weights.z * g_bonesMatrices[int(input.boneIds.z)]
 		+ input.weights.w * g_bonesMatrices[int(input.boneIds.w)];
@@ -84,7 +83,6 @@ VSOutput VSMain(VSInput input)
 
 	// Position
 	output.position = mul(float4(input.position, 1.0f), skinMatrix);
-	//output.position = mul(float4(input.position, 1.0f), skinMatrix  );
 	output.position = mul(output.position, g_modelMatrix);
 	output.position = mul(output.position, g_viewMatrix);
 	output.position = mul(output.position, g_projectionMatrix);
@@ -93,7 +91,6 @@ VSOutput VSMain(VSInput input)
 	output.texcoord = input.texcoord;
 
 	// normal
-	//output.normal = mul(float4(input.normal, 0.0f), g_modelMatrix);
 	output.normal = normalize(mul(float4(input.normal, 0.0f), skinMatrix));
 	output.normal = mul(float4(output.normal, 0.0f), g_modelMatrix);
 	
