@@ -37,6 +37,8 @@
 
 #include <array>
 
+#include "core/object/propertymanager.h"
+
 namespace engine
 {
 
@@ -461,6 +463,77 @@ void ShockAIComponent::saveXML(tinyxml2::XMLElement& element)
 //	ShockPlayerController::registerObject();
 //}
 
+class PropertyTestObject : public Object
+{
+	ImplementObject(PropertyTestObject, Object);
+public:
+	PropertyTestObject();
+	~PropertyTestObject();
+
+	static void registerProperties();
+
+private:
+	BoundingBox m_boundingBox;
+	glm::vec2 m_vec2;
+	glm::vec3 m_vec3;
+	glm::vec4 m_vec4;
+	glm::quat m_quat;
+	glm::mat4 m_matrix;
+	std::string m_string;
+};
+
+PropertyTestObject::PropertyTestObject()
+{
+	m_boundingBox.setIdentity();
+	m_vec2 = glm::vec2(1.0f);
+	m_vec3 = glm::vec3(1.0f);
+	m_vec4 = glm::vec4(1.0f);
+	m_quat = glm::identity<glm::quat>();
+	m_matrix = glm::identity<glm::mat4>();
+	m_string = "Test String";
+}
+
+PropertyTestObject::~PropertyTestObject()
+{
+}
+
+#define REGISTER_PROPERTY(className, propertyType, propertyName) \
+	PropertyManager::getInstance()->registerProperty(className::getStaticTypeInfo(), mem_new<propertyType>(#propertyName, offsetof(className, propertyName)));
+
+void PropertyTestObject::registerProperties()
+{
+	REGISTER_PROPERTY(PropertyTestObject, PropertyBoundingBox, m_boundingBox);
+	REGISTER_PROPERTY(PropertyTestObject, PropertyVector2, m_vec2);
+	REGISTER_PROPERTY(PropertyTestObject, PropertyVector3, m_vec3);
+	REGISTER_PROPERTY(PropertyTestObject, PropertyVector4, m_vec4);
+	REGISTER_PROPERTY(PropertyTestObject, PropertyQuaternion, m_quat);
+	REGISTER_PROPERTY(PropertyTestObject, PropertyMatrix4, m_matrix);
+	REGISTER_PROPERTY(PropertyTestObject, PropertyString, m_string);
+	//PropertyManager::getInstance()->registerProperty(typeInfo, mem_new<PropertyBoundingBox>("m_boundingBox", offsetof(PropertyTestObject, m_boundingBox)));
+	//PropertyManager::getInstance()->registerProperty(typeInfo, mem_new<PropertyString>("m_string", offsetof(PropertyTestObject, m_string)));
+}
+
+void testRegisteringProperties()
+{
+	TypeManager::getInstance()->registerObject<PropertyTestObject>();
+
+	PropertyTestObject::registerProperties();
+
+	// test accessing
+	PropertyTestObject* propertyTestObject = mem_new<PropertyTestObject>();
+
+	IProperty* bboxProperty = PropertyManager::getInstance()->findProperty(PropertyTestObject::getStaticTypeInfo(), "m_boundingBox");
+	IProperty* stringProperty = PropertyManager::getInstance()->findProperty(PropertyTestObject::getStaticTypeInfo(), "m_string");
+
+	BoundingBox boundingBox;
+	PropertyGetValue(propertyTestObject, bboxProperty, boundingBox);
+
+	std::string stringValue;
+	PropertyGetValue(propertyTestObject, stringProperty, stringValue);
+	
+	mem_delete(propertyTestObject);
+}
+
 // More beautiful way to register classes
 void registerGameClasses()
 {
@@ -535,6 +608,8 @@ void ShockGameInterface::initialize()
 
 	// register shock objects
 	registerShockClasses();
+
+	testRegisteringProperties();
 
 	exportClassesForEditor();
 
