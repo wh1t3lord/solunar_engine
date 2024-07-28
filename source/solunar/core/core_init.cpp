@@ -7,6 +7,7 @@
 #include "core/object/typemanager.h"
 #include "core/object/object.h"
 #include "core/object/serializableobject.h"
+#include "core/object/propertymanager.h"
 
 namespace engine
 {
@@ -49,6 +50,8 @@ void Core::shutdown()
 		mem_delete(g_fileSystem);
 		g_fileSystem = nullptr;
 	}
+
+	PropertyManager::getInstance()->shutdown();
 
 	MemoryManager::shutdown();
 

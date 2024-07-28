@@ -509,8 +509,6 @@ void PropertyTestObject::registerProperties()
 	REGISTER_PROPERTY(PropertyTestObject, PropertyQuaternion, m_quat);
 	REGISTER_PROPERTY(PropertyTestObject, PropertyMatrix4, m_matrix);
 	REGISTER_PROPERTY(PropertyTestObject, PropertyString, m_string);
-	//PropertyManager::getInstance()->registerProperty(typeInfo, mem_new<PropertyBoundingBox>("m_boundingBox", offsetof(PropertyTestObject, m_boundingBox)));
-	//PropertyManager::getInstance()->registerProperty(typeInfo, mem_new<PropertyString>("m_string", offsetof(PropertyTestObject, m_string)));
 }
 
 void testRegisteringProperties()
@@ -583,9 +581,60 @@ void exportClassesForEditor()
 
 	for (auto it : registeredTypes)
 	{
+		//if (!it->isA<Component>())
+		//	continue;
+
 		tinyxml2::XMLElement* component = doc.NewElement("Class");
 		component->SetAttribute("classname", it->getClassName());
 		pRoot->InsertFirstChild(component);
+
+		std::vector<IProperty*> properties;
+		PropertyManager::getInstance()->getTypeProperties(it, properties);
+		if (!properties.empty())
+		{
+			tinyxml2::XMLElement* propertiesElement = doc.NewElement("Properties");
+			component->InsertFirstChild(propertiesElement);
+
+			for (auto prop : properties)
+			{
+				tinyxml2::XMLElement* propertyElement = doc.NewElement("Property");
+				propertiesElement->InsertFirstChild(propertyElement);
+
+				propertyElement->SetAttribute("name", prop->getName());
+
+				PropertyType propertyType = prop->getType();
+				switch (propertyType)
+				{
+				case PropertyType_Integer:
+					propertyElement->SetAttribute("type", "Integer");
+					break;
+				case PropertyType_Vector2:
+					propertyElement->SetAttribute("type", "Vector2");
+					break;
+				case PropertyType_Vector3:
+					propertyElement->SetAttribute("type", "Vector3");
+					break;
+				case PropertyType_Vector4:
+					propertyElement->SetAttribute("type", "Vector4");
+					break;
+				case PropertyType_Quaternion:
+					propertyElement->SetAttribute("type", "Quaternion");
+					break;
+				case PropertyType_Matrix4x4:
+					propertyElement->SetAttribute("type", "Matrix4x4");
+					break;
+				case PropertyType_BoundingBox:
+					propertyElement->SetAttribute("type", "BoundingBox");
+					break;
+				case PropertyType_String:
+					propertyElement->SetAttribute("type", "String");
+					break;
+				default:
+					Assert2(0, "!!!");
+					break;
+				}
+			}
+		}
 	}
 
 	doc.SaveFile("editor_classes.xml");
