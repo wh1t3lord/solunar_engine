@@ -28,6 +28,7 @@
 // mesh
 #include "graphics/mesh.h"
 #include "graphics/material.h"
+#include "graphics/animatedmodel.h"
 
 #include "main/main.h"
 
@@ -69,6 +70,7 @@ namespace engine {
 	{
 	}
 
+#ifdef WIN32
 	// Windows OpenGL context
 	class GLPlatformContext_Win32 : public GLPlatformContext
 	{
@@ -151,10 +153,45 @@ namespace engine {
 	{
 		SwapBuffers(m_hDC);
 	}
+#else
+	// Linux OpenGL context
+	class GLPlatformContext_GLX : public GLPlatformContext
+	{
+		ImplementObject(GLPlatformContext_GLX, GLPlatformContext);
+	public:
+		GLPlatformContext_GLX();
+		~GLPlatformContext_GLX();
 
-	// #TODO: !!! REMOVE !!!
-	// #TODO: !!! UGLY HACK !!!
-//	extern GLFWwindow* g_engineWindow;
+		bool create(void* windowHandle) override;
+		void destroy() override;
+		void swapBuffers(int swapInterval) override;
+
+	private:
+		GLXContext m_openglContext = 0;
+
+	};
+
+	GLPlatformContext_GLX::GLPlatformContext_GLX()
+	{
+	}
+
+	GLPlatformContext_GLX::~GLPlatformContext_GLX()
+	{
+	}
+
+	bool GLPlatformContext_GLX::create(void* windowHandle)
+	{
+		return false;
+	}
+
+	void GLPlatformContext_GLX::destroy()
+	{
+	}
+
+	void GLPlatformContext_GLX::swapBuffers(int swapInterval)
+	{
+	}
+#endif // WIN32
 
 #if 0
 	// GL_ARB_debug_output
@@ -219,7 +256,11 @@ namespace engine {
 		const TypeInfo* classes[] =
 		{
 			ObjectGetTypeInfo(GLPlatformContext),
+#ifdef WIN32
 			ObjectGetTypeInfo(GLPlatformContext_Win32),
+#else
+			ObjectGetTypeInfo(GLPlatformContext_GLX),
+#endif // WIN32
 		};
 
 		for (int i = 0; i < sizeof(classes) / sizeof(classes[0]); i++)
@@ -282,6 +323,10 @@ namespace engine {
 		glEnable(GL_CULL_FACE);
 
 		findExtensions();
+
+		int maxVertexUniformBlocks = 0;
+		glGetIntegerv(GL_MAX_VERTEX_UNIFORM_BLOCKS, &maxVertexUniformBlocks);
+		Core::msg("GLRenderer: Max vertex uniform blocks: %i", maxVertexUniformBlocks);
 
 #if 0
 		initGlDebug();
@@ -415,6 +460,10 @@ namespace engine {
 	void GLRenderer::renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
 	{
 		//if (MeshComponent* staticMesh = dynamicCast<MeshComponent>(mesh))
+
+		if (mesh->isA<AnimatedMeshComponent>())
+			renderAnimatedMesh(graphicsWorld, view, mesh);
+		else
 			renderStaticMesh(graphicsWorld, view, mesh);
 	}
 
@@ -496,6 +545,95 @@ namespace engine {
 				// reset
 				if (getRenderMode() == RendererViewMode::Wireframe)
 					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			}
+
+			// return what have been
+			RenderContext::setContext(savedCtx);
+		}
+	}
+
+	void GLRenderer::renderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
+	{
+		// OPTICK_EVENT("GLRenderer::renderAnimatedMesh");
+
+		std::shared_ptr<ModelBase> model = mesh->lockModel();
+		AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(model.get());
+
+		for (const auto& submesh : animatedModel->getAnimatedSubmehes())
+		{
+			// create saved render ctx as previous model.
+			RenderContext savedCtx = RenderContext::getContext();
+
+			// create local copy of render context
+			RenderContext localCtx = RenderContext::getContext();
+
+			// transpose matrices for D3D11
+			//localCtx.model = glm::transpose(localCtx.model);
+
+			// set our local render ctx
+			RenderContext::setContext(localCtx);
+
+			g_renderDevice->setVertexBuffer(submesh->m_vertexBuffer, sizeof(AnimatedVertex), 0);
+			g_renderDevice->setIndexBuffer(submesh->m_indexBuffer, false);
+
+			//g_renderDevice->setIndexBuffer(it->getIndexBuffer());
+
+			//it->getMaterial()->bind();
+
+			std::shared_ptr<Material> material = submesh->m_material.lock();
+			bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
+
+			ShaderConstantManager::getInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
+
+			// install polygon fill mode based on which mode set now
+
+			// if we showing polys
+			if (m_meshPolysWireframe && m_currentViewMode != RendererViewMode::Wireframe)
+			{
+				// render mesh normaly
+				//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
+				//glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
+
+				// set polygon fill to lines
+			//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+				// hack view
+				RenderContext hackHackHack = localCtx;
+				hackHackHack.proj[2][3] -= 0.0001f;
+				RenderContext::setContext(hackHackHack);
+
+				// hack the view
+				RendererViewMode savedViewMode = m_currentViewMode;
+				m_currentViewMode = RendererViewMode::Wireframe;
+
+				// bind material again
+				bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
+
+				// draw with lines
+				g_renderDevice->drawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
+				//g_renderDevice->draw(PM_TriangleList, 0, submesh->m_verticesCount);
+				//glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
+				//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
+
+				// reset view mode
+				m_currentViewMode = savedViewMode;
+
+				// reset mode
+				//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+			}
+			else
+			{
+				//	if (getRenderMode() == RendererViewMode::Wireframe)
+				//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+				g_renderDevice->drawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
+				//g_renderDevice->draw(PM_TriangleList, 0, submesh->m_verticesCount);
+				//	glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
+					//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
+
+					// reset
+				//	if (getRenderMode() == RendererViewMode::Wireframe)
+				//		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			}
 
 			// return what have been

@@ -35,6 +35,7 @@ public:
 
 private:
 	void renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh);
+	void renderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh);
 	void renderStaticMeshCustomShader(View* view, MeshComponent* mesh, IShaderProgram* customShader); 
 
 	void setRenderModeForShader(IShaderProgram* shaderProgram);

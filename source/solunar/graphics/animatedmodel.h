@@ -47,8 +47,8 @@ struct AnimatedVertex
 	glm::vec2 m_texcoord;
 	glm::vec3 m_tangent;
 	glm::vec3 m_bitangent;
-	glm::vec4 m_boneIDs;
 	glm::vec4 m_weights;
+	glm::vec4 m_boneIDs;
 };
 
 struct AnimatedSubMesh
