@@ -14,6 +14,7 @@ class Entity : public SerializableObject
 	friend class World;
 public:
 	ImplementObject(Entity, SerializableObject);
+	DeclarePropertyRegister(Entity);
 
 public:
 	Entity();
@@ -82,7 +83,7 @@ private:
 
 	glm::mat4 m_worldTransform;
 	BoundingBox m_boundingBox;
-	BoundingBox m_WorldBoundingBox;
+	BoundingBox m_worldBoundingBox;
 	glm::quat m_rotation;
 	glm::vec3 m_position;
 	glm::vec3 m_scale;

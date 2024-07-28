@@ -36,6 +36,7 @@
 #include "graphics/animatedmodel.h"
 
 #include <array>
+#include <algorithm>
 
 #include "core/object/propertymanager.h"
 
@@ -497,18 +498,15 @@ PropertyTestObject::~PropertyTestObject()
 {
 }
 
-#define REGISTER_PROPERTY(className, propertyType, propertyName) \
-	PropertyManager::getInstance()->registerProperty(className::getStaticTypeInfo(), mem_new<propertyType>(#propertyName, offsetof(className, propertyName)));
-
 void PropertyTestObject::registerProperties()
 {
-	REGISTER_PROPERTY(PropertyTestObject, PropertyBoundingBox, m_boundingBox);
-	REGISTER_PROPERTY(PropertyTestObject, PropertyVector2, m_vec2);
-	REGISTER_PROPERTY(PropertyTestObject, PropertyVector3, m_vec3);
-	REGISTER_PROPERTY(PropertyTestObject, PropertyVector4, m_vec4);
-	REGISTER_PROPERTY(PropertyTestObject, PropertyQuaternion, m_quat);
-	REGISTER_PROPERTY(PropertyTestObject, PropertyMatrix4, m_matrix);
-	REGISTER_PROPERTY(PropertyTestObject, PropertyString, m_string);
+	RegisterProperty(PropertyTestObject, PropertyBoundingBox, m_boundingBox);
+	RegisterProperty(PropertyTestObject, PropertyVector2, m_vec2);
+	RegisterProperty(PropertyTestObject, PropertyVector3, m_vec3);
+	RegisterProperty(PropertyTestObject, PropertyVector4, m_vec4);
+	RegisterProperty(PropertyTestObject, PropertyQuaternion, m_quat);
+	RegisterProperty(PropertyTestObject, PropertyMatrix4, m_matrix);
+	RegisterProperty(PropertyTestObject, PropertyString, m_string);
 }
 
 void testRegisteringProperties()

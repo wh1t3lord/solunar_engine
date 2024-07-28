@@ -17,6 +17,7 @@ enum PropertyType
 {
 	PropertyType_Unknown,
 	PropertyType_Integer,
+	PropertyType_Float,
 	PropertyType_Vector2,
 	PropertyType_Vector3,
 	PropertyType_Vector4,
@@ -106,6 +107,7 @@ inline void PropertyGetValue(Object* object, IProperty* property, std::string& v
 
 // typedefing 
 using PropertyInt = PropertyImpl<int, PropertyType_Integer>;
+using PropertyFloat = PropertyImpl<int, PropertyType_Float>;
 using PropertyString = PropertyImpl<std::string, PropertyType_String>;
 using PropertyVector2 = PropertyImpl<glm::vec2, PropertyType_Vector2>;
 using PropertyVector3 = PropertyImpl<glm::vec3, PropertyType_Vector3>;
@@ -113,6 +115,10 @@ using PropertyVector4 = PropertyImpl<glm::vec4, PropertyType_Vector4>;
 using PropertyQuaternion = PropertyImpl<glm::quat, PropertyType_Quaternion>;
 using PropertyMatrix4 = PropertyImpl<glm::quat, PropertyType_Matrix4x4>;
 using PropertyBoundingBox = PropertyImpl<BoundingBox, PropertyType_BoundingBox>;
+
+// Macro for more beautiful registration
+#define RegisterProperty(className, propertyType, propertyName) \
+	PropertyManager::getInstance()->registerProperty(className::getStaticTypeInfo(), mem_new<propertyType>(#propertyName, offsetof(className, propertyName)));
 
 // \brief Property Manager - managing properties list for each TypeInfo 
 class PropertyManager : public Singleton<PropertyManager>
@@ -135,6 +141,39 @@ public:
 private:
 	std::unordered_map<size_t, std::vector<IProperty*>> m_properies;
 };
+
+typedef void (*RegisterPropertiesFunc)();
+
+// \brief PropertyRegistrator - Singleton which register class properties.
+class PropertyRegistrator
+{
+public:
+	static PropertyRegistrator* getInstance();
+
+public:
+	PropertyRegistrator();
+	~PropertyRegistrator();
+
+	void addFunc(RegisterPropertiesFunc func);
+
+	void registerClasses();
+
+private:
+	std::vector<RegisterPropertiesFunc> m_funcs;
+};
+
+#define DeclarePropertyRegister(className) \
+	static void registerProperties();
+
+#define BeginPropertyRegister(className) \
+	void className::registerProperties()
+	
+#define EndPropertyRegister(className) \
+	static struct Registrator##className##Props { \
+		Registrator##className##Props() { \
+			PropertyRegistrator::getInstance()->addFunc(className::registerProperties); \
+		} \
+	} g_registrator##className##Props;
 
 }
 

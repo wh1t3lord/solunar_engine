@@ -13,6 +13,13 @@
 namespace engine
 {
 
+BeginPropertyRegister(ShockPlayerController)
+{
+	RegisterProperty(ShockPlayerController, PropertyFloat, m_playerStats.m_health);
+	RegisterProperty(ShockPlayerController, PropertyFloat, m_playerStats.m_endurance);
+}
+EndPropertyRegister(ShockPlayerController);
+
 ShockPlayerController::ShockPlayerController() :
 	m_cameraEntity(nullptr),
 	m_camera(nullptr),

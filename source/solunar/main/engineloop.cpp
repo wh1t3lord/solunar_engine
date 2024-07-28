@@ -6,6 +6,7 @@
 #include "core/timer.h"
 #include "core/utils/iniFile.h"
 #include "core/file/contentmanager.h"
+#include "core/object/propertymanager.h"
 
 #include "engine/engine.h"
 #include "engine/inputmanager.h"
@@ -157,6 +158,9 @@ namespace engine {
 		//	std::shared_ptr<ModelBase> model = g_contentManager->loadModelOld(g_modelConvertName);
 		//	model->saveBinary(g_modelConvertName);
 		//}
+
+		// Register properties #TODO: PLEASE MAKE IT MORE NORMAL
+		PropertyRegistrator::getInstance()->registerClasses();
 
 		if (g_commandLine.hasOption("-world"))
 		{

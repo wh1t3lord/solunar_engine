@@ -6,6 +6,17 @@
 namespace engine
 {
 
+BeginPropertyRegister(Entity)
+{
+	RegisterProperty(Entity, PropertyMatrix4, m_worldTransform);
+	RegisterProperty(Entity, PropertyBoundingBox, m_boundingBox);
+	RegisterProperty(Entity, PropertyBoundingBox, m_worldBoundingBox);
+	RegisterProperty(Entity, PropertyVector3, m_position);
+	RegisterProperty(Entity, PropertyQuaternion, m_rotation);
+	RegisterProperty(Entity, PropertyVector3, m_scale);
+}
+EndPropertyRegister(Entity);
+
 Entity::Entity() :
 	m_world(nullptr),
 	m_rootEntity(nullptr),
@@ -15,7 +26,7 @@ Entity::Entity() :
 	m_scale(1.0f, 1.0f, 1.0f)
 {
 	m_boundingBox.setIdentity();
-	m_WorldBoundingBox.setIdentity();
+	m_worldBoundingBox.setIdentity();
 }
 
 Entity::~Entity()
@@ -191,7 +202,7 @@ const BoundingBox& Entity::getLocalBoundingBox()
 
 const BoundingBox& Entity::getBoundingBox()
 {
-	return m_WorldBoundingBox;
+	return m_worldBoundingBox;
 }
 
 void Entity::setRootEntity(Entity* Entity)
@@ -293,7 +304,7 @@ BoundingBox Entity_TransformBox(const BoundingBox& box, const glm::mat4& m)
 
 void Entity::transformBBox()
 {
-	m_WorldBoundingBox = Entity_TransformBox(m_boundingBox, getWorldTranslation());
+	m_worldBoundingBox = Entity_TransformBox(m_boundingBox, getWorldTranslation());
 }
 
 void Entity::quaternionRotate(const glm::vec3& axis, float angle)

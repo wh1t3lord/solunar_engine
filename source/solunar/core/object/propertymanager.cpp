@@ -71,4 +71,31 @@ void PropertyManager::getTypeProperties(const TypeInfo* typeInfo, std::vector<IP
 	}
 }
 
+PropertyRegistrator* PropertyRegistrator::getInstance()
+{
+	static PropertyRegistrator s_propertyRegistrator;
+	return &s_propertyRegistrator;
+}
+
+PropertyRegistrator::PropertyRegistrator()
+{
+}
+
+PropertyRegistrator::~PropertyRegistrator()
+{
+}
+
+void PropertyRegistrator::addFunc(RegisterPropertiesFunc func)
+{
+	m_funcs.push_back(func);
+}
+
+void PropertyRegistrator::registerClasses()
+{
+	for (auto it : m_funcs)
+		it();
+
+	m_funcs.clear();
+}
+
 }
