@@ -102,51 +102,6 @@ inline GLenum getD3DBlendOp(BlendOp blendop)
     }
 }
 
-// proximity objects for state manager
-
-// implementation of IRasterizerState interface
-struct IRasterizerState
-{
-    RasterizerStateDesc m_desc;
-};
-
-// implementation of IBlendState interface
-struct IBlendState
-{
-    BlendStateDesc m_desc;
-};
-
-// implementation of IDepthStencilState interface
-struct IDepthStencilState
-{
-    DepthStencilDesc m_desc;
-};
-
-std::vector<IRasterizerState> g_rasterizerStates;
-std::vector<IBlendState> g_blendStates;
-std::vector<IDepthStencilState> g_depthStencilStates;
-
-IRasterizerState* allocateRasterizerState(const RasterizerStateDesc& desc)
-{
-    IRasterizerState state = { desc };
-    g_rasterizerStates.push_back(state);
-    return &g_rasterizerStates.back();
-}
-
-IBlendState* allocateBlendState(const BlendStateDesc& desc)
-{
-    IBlendState state = { desc };
-    g_blendStates.push_back(state);
-    return &g_blendStates.back();
-}
-
-IDepthStencilState* allocateDepthStencilState(const DepthStencilDesc& desc)
-{
-    IDepthStencilState state = { desc };
-    g_depthStencilStates.push_back(state);
-    return &g_depthStencilStates.back();
-}
-
 GLStateManager::GLStateManager()
 {
 }

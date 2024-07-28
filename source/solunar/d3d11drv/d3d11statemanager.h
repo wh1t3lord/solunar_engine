@@ -8,7 +8,7 @@
 namespace engine
 {
 
-template<typename T>
+template <typename T>
 struct AnyStructComparer
 {
     bool operator()( const T & Left, const T & Right ) const
