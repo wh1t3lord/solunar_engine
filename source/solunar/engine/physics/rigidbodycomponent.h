@@ -13,6 +13,7 @@ namespace engine {
 	class RigidBodyComponent : public Component
 	{
 		ImplementObject(RigidBodyComponent, Component);
+		DeclarePropertyRegister(RigidBodyComponent);
 	public:
 		RigidBodyComponent();
 		~RigidBodyComponent();

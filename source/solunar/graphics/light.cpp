@@ -7,6 +7,15 @@
 
 namespace engine
 {
+	BeginPropertyRegister(LightComponent)
+	{
+		RegisterProperty(LightComponent, PropertyVector3, m_color);
+		RegisterProperty(LightComponent, PropertyVector3, m_ambientColor);
+		RegisterProperty(LightComponent, PropertyVector3, m_specularColor);
+		RegisterProperty(LightComponent, PropertyFloat, m_radius);
+	}
+	EndPropertyRegister(LightComponent)
+
 	LightComponent::LightComponent()
 	{
 		m_color = glm::vec3(2.0);
@@ -120,6 +129,12 @@ namespace engine
 	void PointLightComponent::saveXML(tinyxml2::XMLElement& element)
 	{
 	}
+
+	BeginPropertyRegister(DirectionalLightComponent)
+	{
+		RegisterProperty(DirectionalLightComponent, PropertyVector3, m_direction);
+	}
+	EndPropertyRegister(DirectionalLightComponent)
 
 	void DirectionalLightComponent::registerObject()
 	{

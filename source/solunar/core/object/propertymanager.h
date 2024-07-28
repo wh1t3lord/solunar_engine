@@ -16,6 +16,7 @@ namespace engine
 enum PropertyType
 {
 	PropertyType_Unknown,
+	PropertyType_Bool,
 	PropertyType_Integer,
 	PropertyType_Float,
 	PropertyType_Vector2,
@@ -106,6 +107,7 @@ inline void PropertyGetValue(Object* object, IProperty* property, std::string& v
 }
 
 // typedefing 
+using PropertyBool = PropertyImpl<int, PropertyType_Bool>;
 using PropertyInt = PropertyImpl<int, PropertyType_Integer>;
 using PropertyFloat = PropertyImpl<int, PropertyType_Float>;
 using PropertyString = PropertyImpl<std::string, PropertyType_String>;

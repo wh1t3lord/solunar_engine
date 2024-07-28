@@ -192,6 +192,7 @@ enum ShockProjectileType
 class ShockProjectileComponent : public LogicComponent
 {
 	ImplementObject(ShockProjectileComponent, LogicComponent);
+	DeclarePropertyRegister(ShockProjectileComponent);
 public:
 	ShockProjectileComponent();
 	~ShockProjectileComponent();
@@ -207,6 +208,12 @@ public:
 private:
 	glm::vec3 m_direction;
 };
+
+BeginPropertyRegister(ShockProjectileComponent)
+{
+	RegisterProperty(ShockProjectileComponent, PropertyVector3, m_direction);
+}
+EndPropertyRegister(ShockProjectileComponent)
 
 ShockProjectileComponent::ShockProjectileComponent() :
 	m_direction(0.0f)
@@ -342,6 +349,7 @@ std::string shockAITypeToString(ShockAIType type)
 class ShockAIComponent : public LogicComponent
 {
 	ImplementObject(ShockAIComponent, LogicComponent);
+	DeclarePropertyRegister(ShockAIComponent);
 public:
 	ShockAIComponent();
 	~ShockAIComponent();
@@ -358,6 +366,14 @@ private:
 	bool m_fire;
 	bool m_disable;
 };
+
+BeginPropertyRegister(ShockAIComponent)
+{
+	RegisterProperty(ShockAIComponent, PropertyInt, m_aiType);
+	RegisterProperty(ShockAIComponent, PropertyBool, m_fire);
+	RegisterProperty(ShockAIComponent, PropertyBool, m_disable);
+}
+EndPropertyRegister(ShockAIComponent);
 
 ShockAIComponent::ShockAIComponent() :
 	m_aiType(ShockAIType_None),
@@ -445,91 +461,6 @@ void ShockAIComponent::saveXML(tinyxml2::XMLElement& element)
 	aitype->SetAttribute("value", aitypeString.c_str());
 }
 
-//void registerGameClasses()
-//{
-//	MainMenuWorldComponent),
-//	PlayerControllerComponent),
-//	WeaponComponent),
-//	WeaponAutoComponent),
-//	WeaponPistolComponent),
-//	WeaponChainComponent),
-//	LevelManagerComponent),
-//
-//	TestRotatorComponent),
-//}
-
-//void registerShockClasses()
-//{
-//	ShockSignal::registerObject();
-//	ShockPlayerController::registerObject();
-//}
-
-class PropertyTestObject : public Object
-{
-	ImplementObject(PropertyTestObject, Object);
-public:
-	PropertyTestObject();
-	~PropertyTestObject();
-
-	static void registerProperties();
-
-private:
-	BoundingBox m_boundingBox;
-	glm::vec2 m_vec2;
-	glm::vec3 m_vec3;
-	glm::vec4 m_vec4;
-	glm::quat m_quat;
-	glm::mat4 m_matrix;
-	std::string m_string;
-};
-
-PropertyTestObject::PropertyTestObject()
-{
-	m_boundingBox.setIdentity();
-	m_vec2 = glm::vec2(1.0f);
-	m_vec3 = glm::vec3(1.0f);
-	m_vec4 = glm::vec4(1.0f);
-	m_quat = glm::identity<glm::quat>();
-	m_matrix = glm::identity<glm::mat4>();
-	m_string = "Test String";
-}
-
-PropertyTestObject::~PropertyTestObject()
-{
-}
-
-void PropertyTestObject::registerProperties()
-{
-	RegisterProperty(PropertyTestObject, PropertyBoundingBox, m_boundingBox);
-	RegisterProperty(PropertyTestObject, PropertyVector2, m_vec2);
-	RegisterProperty(PropertyTestObject, PropertyVector3, m_vec3);
-	RegisterProperty(PropertyTestObject, PropertyVector4, m_vec4);
-	RegisterProperty(PropertyTestObject, PropertyQuaternion, m_quat);
-	RegisterProperty(PropertyTestObject, PropertyMatrix4, m_matrix);
-	RegisterProperty(PropertyTestObject, PropertyString, m_string);
-}
-
-void testRegisteringProperties()
-{
-	TypeManager::getInstance()->registerObject<PropertyTestObject>();
-
-	PropertyTestObject::registerProperties();
-
-	// test accessing
-	PropertyTestObject* propertyTestObject = mem_new<PropertyTestObject>();
-
-	IProperty* bboxProperty = PropertyManager::getInstance()->findProperty(PropertyTestObject::getStaticTypeInfo(), "m_boundingBox");
-	IProperty* stringProperty = PropertyManager::getInstance()->findProperty(PropertyTestObject::getStaticTypeInfo(), "m_string");
-
-	BoundingBox boundingBox;
-	PropertyGetValue(propertyTestObject, bboxProperty, boundingBox);
-
-	std::string stringValue;
-	PropertyGetValue(propertyTestObject, stringProperty, stringValue);
-	
-	mem_delete(propertyTestObject);
-}
-
 // More beautiful way to register classes
 void registerGameClasses()
 {
@@ -567,77 +498,6 @@ void registerShockClasses()
 		TypeManager::getInstance()->registerType(shockClasses[i]);
 }
 
-void exportClassesForEditor()
-{
-	tinyxml2::XMLDocument doc;
-
-	tinyxml2::XMLNode* pRoot = doc.NewElement("Classes");
-	doc.InsertFirstChild(pRoot);
-
-	std::vector<const TypeInfo*> registeredTypes;
-	TypeManager::getInstance()->getRegisteredTypes(registeredTypes);
-
-	for (auto it : registeredTypes)
-	{
-		//if (!it->isA<Component>())
-		//	continue;
-
-		tinyxml2::XMLElement* component = doc.NewElement("Class");
-		component->SetAttribute("classname", it->getClassName());
-		pRoot->InsertFirstChild(component);
-
-		std::vector<IProperty*> properties;
-		PropertyManager::getInstance()->getTypeProperties(it, properties);
-		if (!properties.empty())
-		{
-			tinyxml2::XMLElement* propertiesElement = doc.NewElement("Properties");
-			component->InsertFirstChild(propertiesElement);
-
-			for (auto prop : properties)
-			{
-				tinyxml2::XMLElement* propertyElement = doc.NewElement("Property");
-				propertiesElement->InsertFirstChild(propertyElement);
-
-				propertyElement->SetAttribute("name", prop->getName());
-
-				PropertyType propertyType = prop->getType();
-				switch (propertyType)
-				{
-				case PropertyType_Integer:
-					propertyElement->SetAttribute("type", "Integer");
-					break;
-				case PropertyType_Vector2:
-					propertyElement->SetAttribute("type", "Vector2");
-					break;
-				case PropertyType_Vector3:
-					propertyElement->SetAttribute("type", "Vector3");
-					break;
-				case PropertyType_Vector4:
-					propertyElement->SetAttribute("type", "Vector4");
-					break;
-				case PropertyType_Quaternion:
-					propertyElement->SetAttribute("type", "Quaternion");
-					break;
-				case PropertyType_Matrix4x4:
-					propertyElement->SetAttribute("type", "Matrix4x4");
-					break;
-				case PropertyType_BoundingBox:
-					propertyElement->SetAttribute("type", "BoundingBox");
-					break;
-				case PropertyType_String:
-					propertyElement->SetAttribute("type", "String");
-					break;
-				default:
-					Assert2(0, "!!!");
-					break;
-				}
-			}
-		}
-	}
-
-	doc.SaveFile("editor_classes.xml");
-}
-
 ShockGameInterface::ShockGameInterface()
 {
 }
@@ -655,10 +515,6 @@ void ShockGameInterface::initialize()
 
 	// register shock objects
 	registerShockClasses();
-
-	testRegisteringProperties();
-
-	exportClassesForEditor();
 
 	// add event listener
 //	g_eventManager.addEventListener(&g_shockEventListener);

@@ -4,6 +4,12 @@
 namespace engine
 {
 
+BeginPropertyRegister(Component)
+{
+	RegisterProperty(Component, PropertyBool, m_isActive);
+}
+EndPropertyRegister(Component)
+
 Component::Component() :
 	m_entity(nullptr),
 	m_world(nullptr),

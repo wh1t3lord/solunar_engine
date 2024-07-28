@@ -7,6 +7,16 @@
 
 namespace engine {
 
+	BeginPropertyRegister(RigidBodyComponent)
+	{
+		RegisterProperty(RigidBodyComponent, PropertyFloat, m_mass);
+		RegisterProperty(RigidBodyComponent, PropertyBool, m_isEnable);
+		RegisterProperty(RigidBodyComponent, PropertyBool, m_static);
+		RegisterProperty(RigidBodyComponent, PropertyBool, m_isKinematic);
+	//	RegisterProperty(RigidBodyComponent, PropertyBool, m_inWorld); INTERNAL !!!
+	}
+	EndPropertyRegister(RigidBodyComponent)
+
 	RigidBodyComponent::RigidBodyComponent()
 	{
 		m_rigidBody = nullptr;
@@ -14,7 +24,7 @@ namespace engine {
 		m_physicsWorld = nullptr;
 
 		m_mass = 0.0f;
-		m_isEnable = 0.0f;
+		m_isEnable = false;
 		m_static = false;
 		m_isKinematic = false;
 		m_inWorld = false;

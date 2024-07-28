@@ -43,6 +43,7 @@ namespace engine
 	class LightComponent : public Component
 	{
 		ImplementObject(LightComponent, Component);
+		DeclarePropertyRegister(LightComponent);
 	public:
 		LightComponent();
 		~LightComponent();
@@ -77,6 +78,7 @@ namespace engine
 	class DirectionalLightComponent : public LightComponent
 	{
 		ImplementObject(DirectionalLightComponent, LightComponent);
+		DeclarePropertyRegister(DirectionalLightComponent);
 	public:
 		static void registerObject();
 

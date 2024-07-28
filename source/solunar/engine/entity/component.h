@@ -14,7 +14,7 @@ class Component : public SerializableObject
 	friend class World;
 public:
 	ImplementObject(Component, SerializableObject);
-
+	DeclarePropertyRegister(Component);
 public:
 	Component();
 	virtual ~Component();
