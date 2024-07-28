@@ -498,6 +498,26 @@ void registerShockClasses()
 		TypeManager::getInstance()->registerType(shockClasses[i]);
 }
 
+void exportClassesForEditor()
+{
+	tinyxml2::XMLDocument doc;
+
+	tinyxml2::XMLNode* pRoot = doc.NewElement("Classes");
+	doc.InsertFirstChild(pRoot);
+
+	std::vector<const TypeInfo*> registeredTypes;
+	TypeManager::getInstance()->getRegisteredTypes(registeredTypes);
+
+	for (auto it : registeredTypes)
+	{
+		tinyxml2::XMLElement* component = doc.NewElement("Class");
+		component->SetAttribute("classname", it->getClassName());
+		pRoot->InsertFirstChild(component);
+	}
+
+	doc.SaveFile("editor_classes.xml");
+}
+
 ShockGameInterface::ShockGameInterface()
 {
 }
@@ -515,6 +535,8 @@ void ShockGameInterface::initialize()
 
 	// register shock objects
 	registerShockClasses();
+
+	exportClassesForEditor();
 
 	// add event listener
 //	g_eventManager.addEventListener(&g_shockEventListener);
