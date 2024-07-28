@@ -27,8 +27,6 @@ static InputLayoutDesc s_animatedVertexInputLayout[] =
 	{ "BLENDINDICES", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(AnimatedVertex, m_boneIDs), INPUT_PER_VERTEX_DATA, 0 }
 };
 
-static std::unordered_map<std::string, IShaderProgram*> m_pixelVariations[VertexFactory_Count];
-
 std::string getPixelVariationDefine(uint32_t pixelVariation)
 {
 	std::string defines;
@@ -49,6 +47,8 @@ std::string getPixelVariationName(const std::string& instanceName, uint32_t pixe
 	return shaderName;
 }
 
+IShaderProgram* MaterialInstance_Generic::ms_pixelVariations[VertexFactory_Count][512];
+
 MaterialInstance_Generic::MaterialInstance_Generic()
 {
 }
@@ -61,13 +61,10 @@ IShaderProgram* MaterialInstance_Generic::getShaderProgramVariation(VertexFactor
 {
 	Assert(vertexFactory <= VertexFactory_Count);
 
+	if (ms_pixelVariations[vertexFactory][pixelVariation])
+		return ms_pixelVariations[vertexFactory][pixelVariation];
+
 	std::string variationName = getPixelVariationName("materialinstance_generic", pixelVariation);
-	auto& pixelVariationMap = m_pixelVariations[vertexFactory];
-
-	auto it = pixelVariationMap.find(variationName);
-	if (it != pixelVariationMap.end())
-		return it->second;
-
 	Core::msg("Graphics: Generation variation '%s' for MaterialInstance_Generic", variationName.c_str());
 
 	std::string defines = getPixelVariationDefine(pixelVariation);
@@ -100,7 +97,7 @@ IShaderProgram* MaterialInstance_Generic::getShaderProgramVariation(VertexFactor
 
 	Assert2(shaderProgram, "Unknowed vertex factory");
 
-	pixelVariationMap.emplace(variationName, shaderProgram);
+	ms_pixelVariations[vertexFactory][pixelVariation] = shaderProgram;
 
 	return shaderProgram;
 }

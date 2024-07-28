@@ -17,7 +17,7 @@ public:
 	IShaderProgram* getShaderProgramVariation(VertexFactory vertexFactory, uint32_t pixelVariation);
 
 private:
-	
+	static IShaderProgram* ms_pixelVariations[VertexFactory_Count][512];
 
 };
 
