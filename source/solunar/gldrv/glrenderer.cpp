@@ -461,6 +461,9 @@ namespace engine {
 	{
 		//if (MeshComponent* staticMesh = dynamicCast<MeshComponent>(mesh))
 
+		// setup lights
+		setupLights(graphicsWorld);
+
 		if (mesh->isA<AnimatedMeshComponent>())
 			renderAnimatedMesh(graphicsWorld, view, mesh);
 		else

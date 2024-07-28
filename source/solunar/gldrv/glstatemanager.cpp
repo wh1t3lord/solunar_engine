@@ -134,6 +134,17 @@ IRasterizerState* GLStateManager::createRasterizerState(const RasterizerStateDes
 {
 #if 0
     // Find already created IRasterizerState
+    for (int i = 0; i < m_rasterizerStates.size(); i++)
+    {
+    }
+
+    IRasterizerState state = { rasterizerDesc };
+    m_rasterizerStates.push_back(state);
+    return &m_rasterizerStates[m_rasterizerStates.size() - 1]; //(IRasterizerState*)&state;
+#endif
+
+#if 0
+    // Find already created IRasterizerState
     // costyl
 #if 0
 	auto it = m_rasterizerStates.find(rasterizerDesc);
@@ -167,9 +178,9 @@ void GLStateManager::setRasterizerState(IRasterizerState* rasterizerState)
         glCullFace(getGLCullMode(desc.m_cullMode));
         glFrontFace(desc.m_frontCCW ? GL_CCW : GL_CW); // #TODO: INSPECT PLEASE
 
-      //if (desc.m_scissorEnable)
-      //    glEnable(GL_SCISSOR_TEST);
-      //else
+       // if (desc.m_scissorEnable)
+       //     glEnable(GL_SCISSOR_TEST);
+       // else
             glDisable(GL_SCISSOR_TEST);
 
         previousRasterizerState = rasterizerState;
@@ -251,6 +262,7 @@ void GLStateManager::destroyDepthStencilState(IDepthStencilState* state)
 
 void GLStateManager::setDepthStencilState(IDepthStencilState* state, uint32_t stencilRef)
 {
+    glEnable(GL_DEPTH_TEST);
     //ID3D11DepthStencilState* d3dDSState = (ID3D11DepthStencilState*)state;
     //g_d3d11Device->getDeviceContext()->OMSetDepthStencilState(d3dDSState, stencilRef);
 }
