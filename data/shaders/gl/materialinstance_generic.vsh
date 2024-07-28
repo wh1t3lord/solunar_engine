@@ -95,14 +95,15 @@ void main()
 	// texcoord
 	v_texcoord = texcoord;
 	
-	// calculate normal matrix
-	mat3 normalMatrix = transpose(inverse(mat3(u_modelMatrix)));
-	
 	// tangent & bitanget & normal
-	v_tangent = normalMatrix * tangent;
-	v_bitangent = normalMatrix * bitangent;
-	v_normal = normalMatrix * normal;
+	//v_tangent = normalMatrix * tangent;
+	//v_bitangent = normalMatrix * bitangent;
+	//v_normal = normalMatrix * normal;
 
+	v_normal = normalize(vec3(skinMatrix * vec4(normal, 0.0f)));
+	v_normal = vec3(u_modelMatrix * vec4(v_normal, 0.0f));
+	//v_normal.x = -v_normal.x;
+	
 	// removed tbn matrix building from fragment to vertex shader
 	v_tbn = mat3(v_tangent, v_bitangent, v_normal);
 	
