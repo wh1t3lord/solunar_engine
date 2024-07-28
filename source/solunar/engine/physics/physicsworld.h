@@ -1,7 +1,7 @@
 #ifndef PHYSICSWORLD_H
 #define PHYSICSWORLD_H
 
-#include "physics/bullet_private.h"
+#include "engine/physics/bullet_private.h"
 
 namespace engine
 {

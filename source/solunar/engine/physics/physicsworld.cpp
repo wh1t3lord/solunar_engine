@@ -38,7 +38,7 @@ namespace engine
 
 		// set the standart gravity
 		//m_world->setGravity(btVector3(0, 0, 0));
-		getWorld()->setGravity(btVector3(0.0, -15.0, 0.0));
+		//getWorld()->setGravity(btVector3(0.0, -15.0, 0.0));
 	}
 
 	PhysicsWorld::~PhysicsWorld()
@@ -73,6 +73,8 @@ namespace engine
 
 	void PhysicsWorld::step(float delta)
 	{
+		m_world->stepSimulation(delta, 12, m_stepTime);
+#if 0
 		if (delta < 0.01f)
 		{
 			m_accumulatedTime += delta;
@@ -86,6 +88,7 @@ namespace engine
 		{
 			m_world->stepSimulation(delta);
 		}
+#endif
 
 		//m_debugDraw = true;
 		if (m_debugDraw)
