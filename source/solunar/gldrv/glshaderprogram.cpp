@@ -25,6 +25,7 @@ GLuint createShader(GLenum target, const char* filename, const char* defines = n
 		size_t definesStringLength = versionLocation + strlen("#version 330 core") + 2;
 		std::string newContentString = content.substr(0, definesStringLength);
 
+		newContentString.append("#define ");
 		newContentString.append(defines);
 		newContentString.append(content.substr(definesStringLength));
 
@@ -53,7 +54,7 @@ GLuint createShader(GLenum target, const char* filename, const char* defines = n
 	return shader;
 }
 
-GLShaderProgram::GLShaderProgram(const std::string& vsfilename, const std::string& fsfilename)
+GLShaderProgram::GLShaderProgram(const std::string& vsfilename, const std::string& fsfilename, InputLayoutDesc* inputLayout /*= nullptr*/, int inputLayoutCount /*= 0*/)
 {
 	m_defines = "";
 
@@ -75,9 +76,12 @@ GLShaderProgram::GLShaderProgram(const std::string& vsfilename, const std::strin
 		glGetProgramInfoLog(m_program, 512, NULL, infoLog);
 		Core::error("IShaderProgram::IShaderProgram: failed to link program %s", infoLog);
 	}
+
+	m_inputLayout.resize(inputLayoutCount);
+	memcpy(m_inputLayout.data(), inputLayout, inputLayoutCount * sizeof(InputLayoutDesc));
 }
 
-GLShaderProgram::GLShaderProgram(const std::string& vsfilename, const std::string& fsfilename, const char* defines)
+GLShaderProgram::GLShaderProgram(const std::string& vsfilename, const std::string& fsfilename, const char* defines, InputLayoutDesc* inputLayout /*= nullptr*/, int inputLayoutCount /*= 0*/)
 {
 	m_defines = defines ? defines : "";
 
@@ -99,6 +103,9 @@ GLShaderProgram::GLShaderProgram(const std::string& vsfilename, const std::strin
 		glGetProgramInfoLog(m_program, 512, NULL, infoLog);
 		Core::error("IShaderProgram::IShaderProgram: failed to link program %s", infoLog);
 	}
+
+	m_inputLayout.resize(inputLayoutCount);
+	memcpy(m_inputLayout.data(), inputLayout, inputLayoutCount * sizeof(InputLayoutDesc));
 }
 
 GLShaderProgram::~GLShaderProgram()
@@ -109,6 +116,11 @@ GLShaderProgram::~GLShaderProgram()
 GLuint GLShaderProgram::getProgramhandle()
 {
 	return m_program;
+}
+
+const std::vector<InputLayoutDesc>& GLShaderProgram::getInputLayout()
+{
+	return m_inputLayout;
 }
 
 }

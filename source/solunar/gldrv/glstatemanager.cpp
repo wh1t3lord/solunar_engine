@@ -117,21 +117,8 @@ void GLStateManager::init()
 
 void GLStateManager::shutdown()
 {
-    for (auto it : m_blendStates)
-    {
-        destroyBlendState(it.second);
-    }
-
     m_blendStates.clear();
-
-
-    for (auto it : m_depthStencilStates)
-    {
-        destroyDepthStencilState(it.second);
-    }
-
     m_depthStencilStates.clear();
-
 
     for (auto it : m_samplerStates)
     {
@@ -140,18 +127,12 @@ void GLStateManager::shutdown()
 
     m_samplerStates.clear();
 
-
-    //for (auto it : m_rasterizerStates)
-    //{
-    //    destroyRasterizerState(it.second);
-    //}
-    g_rasterizerStates.clear();
-
     m_rasterizerStates.clear();
 }
 
 IRasterizerState* GLStateManager::createRasterizerState(const RasterizerStateDesc& rasterizerDesc)
 {
+#if 0
     // Find already created IRasterizerState
     // costyl
 #if 0
@@ -168,6 +149,8 @@ IRasterizerState* GLStateManager::createRasterizerState(const RasterizerStateDes
     m_rasterizerStates.emplace(rasterizerDesc, rasterizerState);
 
 	return rasterizerState;
+#endif
+    return nullptr;
 }
 
 void GLStateManager::destroyRasterizerState(IRasterizerState* rasterizerState)
@@ -215,6 +198,7 @@ void GLStateManager::destroySamplerState(ISamplerState* samplerState)
 
 IBlendState* GLStateManager::createBlendState(const BlendStateDesc& blendStateDesc)
 {
+#if 0
     // Find already created IBlendState
     auto it = m_blendStates.find(blendStateDesc);
     if (it != m_blendStates.end())
@@ -226,6 +210,8 @@ IBlendState* GLStateManager::createBlendState(const BlendStateDesc& blendStateDe
     IBlendState* blendState = allocateBlendState(blendStateDesc);
     m_blendStates.emplace(blendStateDesc, blendState);
     return blendState;
+#endif
+    return nullptr;
 }
 
 void GLStateManager::destroyBlendState(IBlendState* blendState)
@@ -241,6 +227,7 @@ void GLStateManager::setBlendState(IBlendState* blendState, const float blendFac
 
 IDepthStencilState* GLStateManager::createDepthStencilState(const DepthStencilDesc& desc)
 {
+#if 0
     // Find already created IDepthStencilState
     auto it = m_depthStencilStates.find(desc);
     if (it != m_depthStencilStates.end())
@@ -253,6 +240,8 @@ IDepthStencilState* GLStateManager::createDepthStencilState(const DepthStencilDe
     IDepthStencilState* depthStencilState = allocateDepthStencilState(desc);
     m_depthStencilStates.emplace(desc, depthStencilState);
     return depthStencilState;
+#endif
+    return nullptr;
 }
 
 void GLStateManager::destroyDepthStencilState(IDepthStencilState* state)

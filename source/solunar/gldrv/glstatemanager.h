@@ -54,7 +54,6 @@ struct SamplerStateKey
 	SamplerStateKey(const SamplerDesc& samplerDesc) : m_samplerDesc(samplerDesc) {}
 };
 
-
 struct BlendStateKey
 {
 	BlendStateDesc m_blendStateDesc;
@@ -102,7 +101,7 @@ private:
 	//std::map<DepthStencilKey, IDepthStencilState, AnyStructComparer<DepthStencilKey>> m_depthStencilStates;
 
 	std::vector<IRasterizerState> m_rasterizerStates;
-	std::vector<ISamplerState> m_samplerStates;
+	std::map<SamplerStateKey, ISamplerState*, AnyStructComparer<SamplerStateKey>> m_samplerStates;
 	std::vector<IBlendState> m_blendStates;
 	std::vector<IDepthStencilState> m_depthStencilStates;
 	

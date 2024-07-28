@@ -26,7 +26,10 @@ namespace engine
 		RGBA32F,
 		DEPTH32F,
 
-		RGBA32_UNORM
+		RGBA32_UNORM,
+
+		// not used, just for counting
+		LAST
 	};
 
 	enum class BufferMapping

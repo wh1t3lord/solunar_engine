@@ -383,44 +383,33 @@ namespace engine {
 
 	void GLRenderer::bindMaterialForMesh(MeshComponent* mesh, Material* material, IMaterialInstance* materialInstance)
 	{
+		// OPTICK_EVENT("GLRenderer::bindMaterialForMesh");
+
 		Assert(mesh);
 		Assert(material);
 		Assert(materialInstance);
 
 		// bind material samplers
 		material->bind();
-#if 0
+
 		// Initialize shader
+		uint32_t pixelVariation = 0;
+		if (material->m_selfillum)
+			pixelVariation |= PixelVariation_Unlit;
+		else
+			pixelVariation |= PixelVariation_Lit;
+
 		IShaderProgram* shaderProgram = nullptr;
 
-		if (mesh->isA<StaticMeshComponent>())
-			shaderProgram = materialInstance->getStaticMeshShaderProgram();
+		if (mesh->isA<AnimatedMeshComponent>())
+			shaderProgram = materialInstance->getShaderProgramVariation(VertexFactory_SkinnedMesh, pixelVariation);
+		else
+			shaderProgram = materialInstance->getShaderProgramVariation(VertexFactory_StaticMesh, pixelVariation);
 
 		Assert2(shaderProgram, "Unknowed mesh component type!");
 
 		// bind material instance shader and material uniforms
 		g_shaderManager->setShaderProgram(shaderProgram);
-		setRenderModeForShader(shaderProgram);
-
-		if (getRenderMode() == RendererViewMode::Wireframe)
-		{
-			glm::vec4 wireframeColor;
-
-			if (mesh->isA(StaticMeshComponent::getStaticTypeInfo()))
-				wireframeColor = glm::vec4(0.0f, 124.0f / 255.0f, 124.0f / 255.0f, 1.0);
-
-			//shaderProgram->setVector4("wireframeColor", wireframeColor);
-		}
-
-		material->bindUniformsCustom(shaderProgram);
-
-		// bind point lights
-	//	if (StaticMeshComponent* staticMesh = dynamicCast<StaticMeshComponent>(mesh))
-	//		ShaderConstantManager::getInstance()->setStaticMeshGlobalData(staticMesh, view, )
-		
-		//shaderProgram->setInteger("u_lightsCount", mesh->m_world->getWorldComponent<GraphicsWorld>()->getLightManager()->getLights().size());
-		//ShaderConstantManager::getInstance()->setPointLightConstantBuffer();
-#endif
 	}
 
 	void GLRenderer::renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
@@ -431,8 +420,8 @@ namespace engine {
 
 	void GLRenderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
 	{
-#if 0
-		for (auto it : mesh->getModel()->getSubmehes())
+		std::shared_ptr<ModelBase> model = mesh->lockModel();
+		for (auto it : model->getSubmehes())
 		{
 			// create saved render ctx as previous model.
 			RenderContext savedCtx = RenderContext::getContext();
@@ -447,13 +436,13 @@ namespace engine {
 			RenderContext::setContext(localCtx);
 
 			g_renderDevice->setVertexBuffer(it->getVertexBuffer(), sizeof(Vertex), 0);
-			g_renderDevice->setVertexFormat(&s_vfVertex);
 
 			//g_renderDevice->setIndexBuffer(it->getIndexBuffer());
 
 			//it->getMaterial()->bind();
 
-			bindMaterialForMesh(mesh, it->getMaterial().get(), it->getMaterial()->getMaterialInstance());
+			std::shared_ptr<Material> material = it->lockMaterial();
+			bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
 
 			ShaderConstantManager::getInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
 
@@ -483,7 +472,8 @@ namespace engine {
 				m_currentViewMode = RendererViewMode::Wireframe;
 
 				// bind material again
-				bindMaterialForMesh(mesh, it->getMaterial().get(), it->getMaterial()->getMaterialInstance());
+				std::shared_ptr<Material> material = it->lockMaterial();
+				bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
 
 				// draw with lines
 				glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
@@ -511,7 +501,6 @@ namespace engine {
 			// return what have been
 			RenderContext::setContext(savedCtx);
 		}
-#endif
 	}
 
 	void GLRenderer::renderStaticMeshCustomShader(View* view, MeshComponent* mesh, IShaderProgram* customShader)
