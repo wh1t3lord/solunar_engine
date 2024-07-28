@@ -261,15 +261,8 @@ void Entity::updateWorldTransform()
 	// rotate matrix by euler
 	glm::mat4 rotation = glm::mat4_cast(m_rotation);
 
-#if 0
 	if (m_rootEntity)
-		m_worldTransform = m_rootEntity->getWorldTranslation() * glm::translate(m_worldTransform, m_position) * rotation * glm::scale(m_worldTransform, m_scale);
-	else
-		m_worldTransform = glm::translate(m_worldTransform, m_position) * rotation * glm::scale(m_worldTransform, m_scale);
-#endif
-
-	if (m_rootEntity)
-		m_worldTransform = m_rootEntity->getWorldTranslation() * glm::scale(m_worldTransform, m_scale)  * rotation * glm::translate(m_worldTransform, m_position);
+		m_worldTransform = m_rootEntity->getWorldTranslation() * glm::scale(m_worldTransform, m_scale) * rotation * glm::translate(m_worldTransform, m_position);
 	else
 		m_worldTransform = glm::scale(m_worldTransform, m_scale) * rotation * glm::translate(m_worldTransform, m_position);
 }

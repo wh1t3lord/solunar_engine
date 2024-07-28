@@ -62,8 +62,9 @@ public:
 
 	void addComponent(Component* component);
 
-private:
 	void updateWorldTransform();
+
+private:
 	void transformBBox();
 
 private:
