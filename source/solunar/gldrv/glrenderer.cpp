@@ -237,19 +237,19 @@ namespace engine {
 	}
 #endif
 
-	void createRenderer()
-	{
-		g_renderer = mem_new<GLRenderer>();
-	}
+	//void createRenderer()
+	//{
+	//	g_renderer = mem_new<GLRenderer>();
+	//}
 
-	void destroyRenderer()
-	{
-		if (g_renderer)
-		{
-			mem_delete(g_renderer);
-			g_renderer = nullptr;
-		}
-	}
+	//void destroyRenderer()
+	//{
+	//	if (g_renderer)
+	//	{
+	//		mem_delete(g_renderer);
+	//		g_renderer = nullptr;
+	//	}
+	//}
 
 	void registerGLRendererClasses()
 	{
@@ -472,8 +472,11 @@ namespace engine {
 
 	void GLRenderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
 	{
+		// OPTICK_EVENT("GLRenderer::renderStaticMesh");
+
 		std::shared_ptr<ModelBase> model = mesh->lockModel();
-		for (auto it : model->getSubmehes())
+
+		for (const auto& submesh : model->getSubmehes())
 		{
 			// create saved render ctx as previous model.
 			RenderContext savedCtx = RenderContext::getContext();
@@ -482,25 +485,24 @@ namespace engine {
 			RenderContext localCtx = RenderContext::getContext();
 
 			// and overwrite model matrix
-			localCtx.model = savedCtx.model * it->getTransform();
+			localCtx.model = savedCtx.model * submesh->getTransform();
+
+			// transpose matrices for D3D11
+			//localCtx.model = glm::transpose(localCtx.model);
 
 			// set our local render ctx
 			RenderContext::setContext(localCtx);
 
-			g_renderDevice->setVertexBuffer(it->getVertexBuffer(), sizeof(Vertex), 0);
+			g_renderDevice->setVertexBuffer(submesh->getVertexBuffer(), sizeof(Vertex), 0);
 
 			//g_renderDevice->setIndexBuffer(it->getIndexBuffer());
 
 			//it->getMaterial()->bind();
 
-			std::shared_ptr<Material> material = it->lockMaterial();
+			std::shared_ptr<Material> material = submesh->lockMaterial();
 			bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
 
 			ShaderConstantManager::getInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
-
-			/*graphicsDevice->setIndexBuffer(it->getIndexBuffer());*/
-
-			/*graphicsDevice->drawElements(PrimitiveMode::Triangles, it->getIndeciesCount());*/
 
 			// install polygon fill mode based on which mode set now
 
@@ -509,10 +511,10 @@ namespace engine {
 			{
 				// render mesh normaly
 				//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
-				glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
+				//glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
 
 				// set polygon fill to lines
-				glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+			//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 				// hack view
 				RenderContext hackHackHack = localCtx;
@@ -524,30 +526,31 @@ namespace engine {
 				m_currentViewMode = RendererViewMode::Wireframe;
 
 				// bind material again
-				std::shared_ptr<Material> material = it->lockMaterial();
 				bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
 
 				// draw with lines
-				glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
+				g_renderDevice->draw(PM_TriangleList, 0, submesh->getVerticesCount());
+				//glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
 				//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
 
 				// reset view mode
 				m_currentViewMode = savedViewMode;
 
 				// reset mode
-				glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			}
 			else
 			{
-				if (getRenderMode() == RendererViewMode::Wireframe)
-					glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				//	if (getRenderMode() == RendererViewMode::Wireframe)
+				//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-				glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
-				//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
+				g_renderDevice->draw(PM_TriangleList, 0, submesh->getVerticesCount());
+				//	glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
+					//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
 
-				// reset
-				if (getRenderMode() == RendererViewMode::Wireframe)
-					glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+					// reset
+				//	if (getRenderMode() == RendererViewMode::Wireframe)
+				//		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			}
 
 			// return what have been
@@ -782,6 +785,7 @@ namespace engine {
 	{
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearDepth(1.0f);
 	}
 
 	void GLRenderer::clearRenderTarget(IRenderTarget* renderTarget)

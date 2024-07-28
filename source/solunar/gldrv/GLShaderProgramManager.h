@@ -21,6 +21,9 @@ public:
 
 	void setShaderProgram(IShaderProgram* program) override;
 	void deleteProgram(IShaderProgram* program) override;
+
+private:
+	std::vector<IShaderProgram*> m_programs;
 };
 
 }

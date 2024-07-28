@@ -30,6 +30,16 @@ GLShaderProgramManager::GLShaderProgramManager()
 
 GLShaderProgramManager::~GLShaderProgramManager()
 {
+	for (auto it : m_programs)
+	{
+		if (it)
+		{
+			mem_delete(it);
+			it = nullptr;
+		}
+	}
+
+	m_programs.clear();
 }
 
 IShaderProgram* GLShaderProgramManager::createShaderProgram(
@@ -65,7 +75,7 @@ IShaderProgram* GLShaderProgramManager::createShaderProgram(
 	pspath += fsfilename;
 
 	GLShaderProgram* program = mem_new<GLShaderProgram>(vspath, pspath, defines, inputLayout, inputLayoutCount);
-	//m_programs.push_back(program);
+	m_programs.push_back(program);
 	return (GLShaderProgram*)program;
 }
 
@@ -103,6 +113,8 @@ void GLShaderProgramManager::setShaderProgram(IShaderProgram* program)
 
 void GLShaderProgramManager::deleteProgram(IShaderProgram* program)
 {
+	Assert(program);
+
 	if (program) {
 		mem_delete(program);
 	}

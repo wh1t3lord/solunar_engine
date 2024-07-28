@@ -9,7 +9,7 @@ namespace engine {
 
 struct RendererSingletonStorer
 {
-	ShaderConstantManager m_constantManager;
+	//ShaderConstantManager m_constantManager;
 };
 
 struct IRasterizerState;
