@@ -29,6 +29,12 @@ namespace engine
 			return isA(T::getStaticTypeInfo());
 		}
 
+		template <typename T>
+		const bool isExactly() const
+		{
+			return isExactly(T::getStaticTypeInfo());
+		}
+
 	public:
 		const char* m_name;
 		StaticConstructor_t m_staticConstructor;

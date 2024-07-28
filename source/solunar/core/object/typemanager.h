@@ -31,6 +31,8 @@ public:
 	template <typename T>
 	void registerObject();
 
+	void getRegisteredTypes(std::vector<const TypeInfo*>& registeredTypes);
+
 private:
 	std::vector<const TypeInfo*> m_registeredTypes;
 };

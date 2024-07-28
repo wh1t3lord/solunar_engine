@@ -78,4 +78,9 @@ void TypeManager::registerType(const TypeInfo* typeInfo)
 	m_registeredTypes.push_back(typeInfo);
 }
 
+void TypeManager::getRegisteredTypes(std::vector<const TypeInfo*>& registeredTypes)
+{
+	registeredTypes = m_registeredTypes;
+}
+
 }
