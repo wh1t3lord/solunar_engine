@@ -186,6 +186,11 @@ namespace engine
 		Core::msg("Engine: Loading world %s", filename.c_str());
 
 		std::shared_ptr<DataStream> stream = g_contentManager->openStream(filename);
+		if (!stream)
+		{
+			Core::msg("Engine::loadWorld: Failed to load world %s. File not exist!", filename.c_str());
+			return;
+		}
 
 		stream->seek(Seek_End, 0);
 		size_t length = stream->tell();
@@ -200,7 +205,7 @@ namespace engine
 		
 		if (error != tinyxml2::XML_SUCCESS)
 		{
-			Core::error("Engine::loadWorld: Failed to parse world %s.", filename.c_str());
+			Core::error("Engine::loadWorld: Failed to parse world %s. %s", filename.c_str(), doc.ErrorStr());
 		}
 		
 		tinyxml2::XMLElement* worldElement = doc.FirstChildElement("World");;
