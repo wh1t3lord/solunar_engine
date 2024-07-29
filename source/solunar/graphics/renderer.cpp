@@ -490,7 +490,7 @@ namespace engine
 		globalData = nullptr;
 
 		LightGlobalDataCB* lightGlobalData = (LightGlobalDataCB*)g_lightDataConstantBuffer->map(BufferMapping::WriteOnly);
-		lightGlobalData->m_pointLightCount = pointLights.size();
+		lightGlobalData->m_pointLightCount = (uint32_t)pointLights.size();
 		g_lightDataConstantBuffer->unmap();
 		lightGlobalData = nullptr;
 

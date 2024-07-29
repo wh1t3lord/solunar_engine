@@ -24,6 +24,7 @@
 #include "graphics/lightmanager.h"
 
 #include "shockgame/shockgame.h"
+#include "shockgame/shockplayercontroller.h"
 
 namespace engine {
 

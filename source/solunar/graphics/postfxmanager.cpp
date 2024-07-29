@@ -74,14 +74,14 @@ void PostFxManager::initHDR(View* view)
 void PostFxManager::initBlur(View* view)
 {
 	// UE3 weights
-	float gaussianWeight1 = 0.54684;
-	float gaussianWeight2 = 0.34047;
-	float gaussianWeight3 = 0.11269;
+	float gaussianWeight1 = 0.54684f;
+	float gaussianWeight2 = 0.34047f;
+	float gaussianWeight3 = 0.11269f;
 
 	// my weights
-	//float gaussianWeight1 = 0.27407;
-	//float gaussianWeight2 = 0.45186;
-	//float gaussianWeight3 = 0.27407;
+	//float gaussianWeight1 = 0.27407f;
+	//float gaussianWeight2 = 0.45186f;
+	//float gaussianWeight3 = 0.27407f;
 
 	m_blurWeights.push_back(glm::vec4(glm::vec3(gaussianWeight1), 0.33333));
 	m_blurWeights.push_back(glm::vec4(glm::vec3(gaussianWeight2), 0.33333));
@@ -195,7 +195,7 @@ void PostFxManager::blurPass(ITexture2D* screenTexture)
 	// #TODO: too slow(TM) pass
 	bool horizontal = true, first_iteration = true;
 	int amount = 4;
-	for (unsigned int i = 0; i < amount; i++)
+	for (int i = 0; i < amount; i++)
 	{
 		g_renderDevice->setRenderTarget(m_hdrPinPongRenderTargets[horizontal]);
 

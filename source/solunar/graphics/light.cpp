@@ -18,9 +18,9 @@ namespace engine
 
 	LightComponent::LightComponent()
 	{
-		m_color = glm::vec3(2.0);
-		m_ambientColor = glm::vec3(0.2);
-		m_specularColor = glm::vec3(1.0);
+		m_color = glm::vec3(2.0f);
+		m_ambientColor = glm::vec3(0.2f);
+		m_specularColor = glm::vec3(1.0f);
 	//	m_shininess = 128;
 		m_radius = 5.0f;
 	}

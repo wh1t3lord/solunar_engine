@@ -118,7 +118,7 @@ void ShockPlayerController::update(float dt)
 	// }
 
 	if (!s_font)
-		s_font = g_fontManager->createFont("textures/ui/RobotoMono-Regular.ttf", 64.0f);
+		s_font = g_fontManager->createFont("textures/ui/RobotoMono-Bold.ttf", 32.0f);
 
 	g_engineData.m_shouldCaptureMouse = true;
 
@@ -146,8 +146,8 @@ void ShockPlayerController::update(float dt)
 	char enduranceText[64];
 	snprintf(enduranceText, sizeof(enduranceText), "Endurance: %.0f", m_playerStats.m_endurance);
 
-	g_fontManager->drawSystemFont(healthText, 25, view->m_height - 50, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
-	g_fontManager->drawSystemFont(enduranceText, 25, view->m_height - 25, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
+	s_font->drawText(healthText, 25.0f, view->m_height - 50.0f, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
+	s_font->drawText(enduranceText, 25.0f, view->m_height - 25.0f, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
 #endif
 
 	// update camera look
@@ -155,8 +155,6 @@ void ShockPlayerController::update(float dt)
 
 	// update player movement
 	updateMovement(dt);
-
-	s_font->drawText("Test text", 300.0f, 300.0f, glm::vec4(1.0f));	
 
 	// update debug
 	debugUpdate(dt);
@@ -371,6 +369,38 @@ void ShockPlayerController::debugUpdate(float dt)
 	bool onGround = m_rigidBody->getCharacterController()->onGround();
 	snprintf(buf, sizeof(buf), "onGround: %s", onGround ? "true" : "false");
 	g_fontManager->drawSystemFontShadowed(buf, 0, 380, glm::vec4(1.0f));
+}
+
+void shockGamePlayerDebug(bool* open)
+{
+	if (ImGui::Begin("Shock Player Debug", open))
+	{
+		World* world = Engine::ms_world;
+		if (world)
+		{
+			std::vector<Entity*> players = world->getEntityManager().getEntitiesWithComponent<ShockPlayerController>();
+			if (!players.empty())
+			{
+				Entity* player = players[0];
+				ShockPlayerController* playerController = player->getComponent<ShockPlayerController>();
+				if (playerController)
+				{
+					ImGui::Checkbox("Fly cam", &playerController->m_flyCam);
+				}
+			}
+			else
+			{
+				ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "Player with ShockPlayerController doesn't exist!");
+			}
+		}
+		else
+		{
+			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), "World is not loaded!");
+		}
+	}
+
+	ImGui::End();
+
 }
 
 }

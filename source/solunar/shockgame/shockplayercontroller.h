@@ -9,6 +9,8 @@
 namespace engine
 {
 
+class CameraFirstPersonComponent;
+
 struct ShockPlayerStats
 {
 	float m_endurance;
@@ -55,6 +57,8 @@ private:
 public:
 	bool m_flyCam;
 };
+
+void shockGamePlayerDebug(bool* open);
 
 }
 

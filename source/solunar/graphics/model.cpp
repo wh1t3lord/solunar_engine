@@ -117,7 +117,7 @@ namespace engine
 		aiMaterial* material = scene->mMaterials[mesh->mMaterialIndex];
 
 		char buffer[256];
-		sprintf(buffer, "data/materials/%s.xml", material->GetName().C_Str());
+		snprintf(buffer, sizeof(buffer), "data/materials/%s.xml", material->GetName().C_Str());
 
 		std::string bufferString = buffer;
 		osConvertStandartPath(bufferString);
@@ -258,7 +258,7 @@ namespace engine
 		ModelFileHeader header = { 0 };
 		header.magic = MODELFILE_MAGIC;
 		header.version = kModelFileVersion;
-		header.submeshCount = m_subMeshes.size();
+		header.submeshCount = (uint32_t)m_subMeshes.size();
 		g_fileSystem->write(file, &header, sizeof(file));
 
 		for (SubMesh* pSubMesh : m_subMeshes)
@@ -283,7 +283,7 @@ namespace engine
 			pBufferVertices = nullptr;
 
 			// Transform vertices to OpenGL space.
-			for (int i = 0; i < pSubMesh->getVerticesCount(); i++)
+			for (uint32_t i = 0; i < pSubMesh->getVerticesCount(); i++)
 			{
 				pVertices[i].m_position = pSubMesh->getTransform() * glm::vec4(pVertices[i].m_position, 0.0f);
 			}
@@ -316,7 +316,7 @@ namespace engine
 			memset(&vertexBufferDesc, 0, sizeof(vertexBufferDesc));
 			vertexBufferDesc.m_bufferType = BufferType::VertexBuffer;
 			vertexBufferDesc.m_bufferAccess = BufferAccess::Static;
-			vertexBufferDesc.m_bufferMemorySize = submesh->m_vertices.size() * sizeof(Vertex);
+			vertexBufferDesc.m_bufferMemorySize = (uint32_t)submesh->m_vertices.size() * sizeof(Vertex);
 
 			SubresourceDesc vertexBufferSubresourceDesc;
 			memset(&vertexBufferSubresourceDesc, 0, sizeof(vertexBufferSubresourceDesc));
@@ -330,7 +330,7 @@ namespace engine
 			memset(&indexBufferDesc, 0, sizeof(indexBufferDesc));
 			indexBufferDesc.m_bufferType = BufferType::VertexBuffer;
 			indexBufferDesc.m_bufferAccess = BufferAccess::Static;
-			indexBufferDesc.m_bufferMemorySize = submesh->m_indecies.size() * sizeof(uint32_t);
+			indexBufferDesc.m_bufferMemorySize = (uint32_t)submesh->m_indecies.size() * sizeof(uint32_t);
 
 			SubresourceDesc indexBufferSubresourceDesc;
 			memset(&indexBufferSubresourceDesc, 0, sizeof(indexBufferSubresourceDesc));
@@ -381,8 +381,8 @@ namespace engine
 
 		m_vertices = vertices;
 		m_indecies = indecies;
-		m_verticesCount = vertices.size();
-		m_indeciesCount = indecies.size();
+		m_verticesCount = (uint32_t)vertices.size();
+		m_indeciesCount = (uint32_t)indecies.size();
 	}
 
 	SubMesh::~SubMesh()
@@ -460,7 +460,7 @@ namespace engine
 		Assert2(submeshData.verticesCount != 0, "Mesh has zero vertices, internal error...");
 		Assert2(submeshData.indicesCount != 0, "Mesh has zero indices, internal error...");
 
-		for (int i = 0; i < submeshData.verticesCount; i++)
+		for (uint32_t i = 0; i < submeshData.verticesCount; i++)
 		{
 			Vertex vertex;
 			stream->read(&vertex);
@@ -468,9 +468,9 @@ namespace engine
 			m_vertices.push_back(vertex);
 		}
 
-		m_verticesCount = m_vertices.size();
+		m_verticesCount = (uint32_t)m_vertices.size();
 
-		for (int i = 0; i < submeshData.indicesCount; i++)
+		for (uint32_t i = 0; i < submeshData.indicesCount; i++)
 		{
 			unsigned int index;
 			stream->read(&index);
@@ -478,7 +478,7 @@ namespace engine
 			m_indices.push_back(index);
 		}
 
-		m_indicesCount = m_indices.size();
+		m_indicesCount = (uint32_t)m_indices.size();
 	}
 
 	void ModelSubmesh::save(DataStreamPtr stream)
@@ -495,7 +495,7 @@ namespace engine
 		memset(&verticesBufferDesc, 0, sizeof(verticesBufferDesc));
 		verticesBufferDesc.m_bufferType = BufferType::VertexBuffer;
 		verticesBufferDesc.m_bufferAccess = BufferAccess::Static;
-		verticesBufferDesc.m_bufferMemorySize = m_vertices.size() * sizeof(Vertex);
+		verticesBufferDesc.m_bufferMemorySize = (uint32_t)m_vertices.size() * sizeof(Vertex);
 
 		SubresourceDesc verticesSubresourceDesc;
 		memset(&verticesSubresourceDesc, 0, sizeof(verticesSubresourceDesc));
@@ -511,7 +511,7 @@ namespace engine
 		memset(&indicesBufferDesc, 0, sizeof(indicesBufferDesc));
 		indicesBufferDesc.m_bufferType = BufferType::IndexBuffer;
 		indicesBufferDesc.m_bufferAccess = BufferAccess::Static;
-		indicesBufferDesc.m_bufferMemorySize = m_indices.size() * sizeof(unsigned int);
+		indicesBufferDesc.m_bufferMemorySize = (uint32_t)m_indices.size() * sizeof(unsigned int);
 
 		SubresourceDesc indicesSubresourceDesc;
 		memset(&indicesSubresourceDesc, 0, sizeof(indicesSubresourceDesc));
@@ -575,7 +575,7 @@ namespace engine
 		if (header.submeshCount == 0)
 			Core::error("Model has zero sub meshes, cannot load");
 
-		for (int i = 0; i < header.submeshCount; i++)
+		for (uint32_t i = 0; i < header.submeshCount; i++)
 		{
 			// Create submesh
 			ModelSubmesh* submeshPtr = (ModelSubmesh*)TypeManager::getInstance()->createObjectByTypeInfo(ModelSubmesh::getStaticTypeInfo());
@@ -592,7 +592,7 @@ namespace engine
 		ModelFileHeader header = { 0 };
 		header.magic = MODELFILE_MAGIC;
 		header.version = kModelFileVersion;
-		header.submeshCount = m_submeshes.size();
+		header.submeshCount = (uint32_t)m_submeshes.size();
 		stream->write(&header);
 
 		for (auto pSubMesh : m_submeshes)

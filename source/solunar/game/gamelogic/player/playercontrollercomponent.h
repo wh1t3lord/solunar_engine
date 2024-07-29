@@ -1,6 +1,8 @@
 #ifndef PLAYERCONTROLLER_H
 #define PLAYERCONTROLLER_H
 
+#include "engine/entity/logiccomponent.h"
+
 namespace engine {
 	
 	class PlayerControllerComponent : public LogicComponent

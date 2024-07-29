@@ -286,9 +286,9 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 
 		AnimatedSubMesh* submesh = mem_new<AnimatedSubMesh>();
 		submesh->m_vertices = vertices;
-		submesh->m_verticesCount = vertices.size();
+		submesh->m_verticesCount = (uint32_t)vertices.size();
 		submesh->m_indices = indices;
-		submesh->m_indicesCount = indices.size();
+		submesh->m_indicesCount = (uint32_t)indices.size();
 		submesh->m_materialName = materialname;
 		m_subMeshes.push_back(submesh);
 	}
@@ -348,8 +348,8 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 			
 			Assert(animationChannel.m_pathType != AnimationPathType_Unknown);
 
-			animationChannel.m_nodeId = cgltf_node_index(data, gltf_animationChannel.target_node);
-			animationChannel.m_samplerId = cgltf_animation_sampler_index(&gltf_animation, gltf_animationChannel.sampler);
+			animationChannel.m_nodeId = (int)cgltf_node_index(data, gltf_animationChannel.target_node);
+			animationChannel.m_samplerId = (int)cgltf_animation_sampler_index(&gltf_animation, gltf_animationChannel.sampler);
 		}
 
 		Core::msg("AnimatedModel: animation %s channels %i", gltf_animation.name, gltf_animation.channels_count);
@@ -372,7 +372,7 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 		for (int j = 0; j < gltf_skin.joints_count; j++) {
 			const cgltf_node* joint = gltf_skin.joints[j];
 
-			int jointIndex = cgltf_node_index(data, joint);
+			int jointIndex = (int)cgltf_node_index(data, joint);
 			skin.m_joints[j] = jointIndex;
 #if 0
 			if (joint->name) {
@@ -411,7 +411,7 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 		cgltf_accessor_unpack_floats(gltf_skin.inverse_bind_matrices, (float*)skin.m_inverseBindMatrices.data(), inverseBindMatricesCount * 16);
 		
 		if (gltf_skin.skeleton)
-			skin.m_skeletonRootId = cgltf_node_index(data, gltf_skin.skeleton);
+			skin.m_skeletonRootId = (int)cgltf_node_index(data, gltf_skin.skeleton);
 
 		m_skins.push_back(skin);
 	}
@@ -443,21 +443,21 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 			node.m_matrix = glm::mat4(1.0f);
 
 		if (data->nodes[i].parent)
-			node.m_parentId = cgltf_node_index(data, data->nodes[i].parent);
+			node.m_parentId = (int)cgltf_node_index(data, data->nodes[i].parent);
 
 		if (data->nodes[i].children_count > 0) {
 			node.m_children.resize(data->nodes[i].children_count);
 			for (int j = 0; j < data->nodes[i].children_count; j++) {
-				node.m_children[j] = cgltf_node_index(data, data->nodes[i].children[j]);
+				node.m_children[j] = (int)cgltf_node_index(data, data->nodes[i].children[j]);
 			}
 		}
 
 		if (data->nodes[i].skin)
-			node.m_skinId = cgltf_skin_index(data, data->nodes[i].skin);
+			node.m_skinId = (int)cgltf_skin_index(data, data->nodes[i].skin);
 	}
 
 #if 1
-	int rootNode = m_nodes.size();
+	int rootNode = (int)m_nodes.size();
 	m_nodes.resize(m_nodes.size() + 1);
 	
 	for (int i = 0; i < m_nodes.size() - 1; ++i) {
@@ -606,9 +606,9 @@ void AnimatedModel::testPlay(float dt)
 
 	if (updated == true)
 	{
-		updateNodePreCasheFrow(m_nodes.size() - 1);
+		updateNodePreCasheFrow((int)m_nodes.size() - 1);
 
-		for (size_t i = 0; i < m_nodes.size() - 1; i++)
+		for (int i = 0; i < (int)m_nodes.size() - 1; i++)
 		{
 			updateNode(i);
 		}
@@ -625,8 +625,8 @@ void AnimatedModel::updateNode(int node_id)
 
 		//Logger::logPrint("frowrikdebug: %s \n", glm::to_string(inverse_transform).c_str());
 
-		unsigned int num_joints = skin.m_joints.size();//skin.m_joints.size();//m_joints.size(); //std::min(static_cast<unsigned int>(skin.joints.size()), MAX_NUM_JOINTS);
-		for (unsigned int i = 0; i < num_joints; ++i)
+		size_t num_joints = skin.m_joints.size();//skin.m_joints.size();//m_joints.size(); //std::min(static_cast<unsigned int>(skin.joints.size()), MAX_NUM_JOINTS);
+		for (size_t i = 0; i < num_joints; ++i)
 		{
 			/* NOTE: Reference: https://github.com/KhronosGroup/glTF-Tutorials/blob/master/gltfTutorial/gltfTutorial_020_Skins.md */
 			
@@ -855,7 +855,7 @@ void AnimatedSubMesh::create()
 	memset(&bufferDesc, 0, sizeof(bufferDesc));
 	bufferDesc.m_bufferType = BufferType::VertexBuffer;
 	bufferDesc.m_bufferAccess = BufferAccess::Static;
-	bufferDesc.m_bufferMemorySize = m_vertices.size() * sizeof(AnimatedVertex);
+	bufferDesc.m_bufferMemorySize = (uint32_t)m_vertices.size() * sizeof(AnimatedVertex);
 
 	SubresourceDesc subresourceDesc;
 	memset(&subresourceDesc, 0, sizeof(subresourceDesc));
@@ -868,7 +868,7 @@ void AnimatedSubMesh::create()
 	memset(&bufferDesc, 0, sizeof(bufferDesc));
 	bufferDesc.m_bufferType = BufferType::IndexBuffer;
 	bufferDesc.m_bufferAccess = BufferAccess::Static;
-	bufferDesc.m_bufferMemorySize = m_indices.size() * sizeof(uint32_t);
+	bufferDesc.m_bufferMemorySize = (uint32_t)m_indices.size() * sizeof(uint32_t);
 
 	memset(&subresourceDesc, 0, sizeof(subresourceDesc));
 	subresourceDesc.m_memory = m_indices.data();

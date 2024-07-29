@@ -20,7 +20,7 @@ namespace engine
 // Forward declaration
 class ITexture2D;
 class ISamplerState;
-class IBufferBase;
+struct IBufferBase;
 
 enum InterpolationType
 {

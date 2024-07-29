@@ -138,8 +138,8 @@ namespace engine
 		// Accessors
 		IBufferBase* getVerticesBuffer() const { return m_verticesBuffer; }
 		IBufferBase* getIndicesBuffer() const { return m_indicesBuffer; }
-		const size_t getVerticesCount() const { return m_verticesCount; }
-		const size_t getIndicesCount() const { return m_indicesCount; }
+		const uint32_t getVerticesCount() const { return m_verticesCount; }
+		const uint32_t getIndicesCount() const { return m_indicesCount; }
 		std::weak_ptr<Material> getMaterial() const { return m_material; }
 
 	private:
@@ -153,8 +153,8 @@ namespace engine
 		IBufferBase* m_verticesBuffer;
 		IBufferBase* m_indicesBuffer;
 
-		size_t m_verticesCount;
-		size_t m_indicesCount;
+		uint32_t m_verticesCount;
+		uint32_t m_indicesCount;
 
 	};
 

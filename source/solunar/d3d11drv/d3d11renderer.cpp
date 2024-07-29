@@ -606,7 +606,7 @@ void D3D11Renderer::takeScreenshotInternal()
 	char buffer[256];
 	for (int i = 0;; i++)
 	{
-		sprintf(buffer, "sshot_%i.png", i);
+		snprintf(buffer, sizeof(buffer), "sshot_%i.png", i);
 
 		FileHandle fh = g_fileSystem->open(buffer);
 		if (!fh)

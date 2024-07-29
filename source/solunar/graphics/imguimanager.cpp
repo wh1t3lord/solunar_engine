@@ -341,8 +341,8 @@ namespace engine
 		// Setup viewport
 		Viewport vp;
 		memset(&vp, 0, sizeof(Viewport));
-		vp.m_width = draw_data->DisplaySize.x;
-		vp.m_height = draw_data->DisplaySize.y;
+		vp.m_width = (int)draw_data->DisplaySize.x;
+		vp.m_height = (int)draw_data->DisplaySize.y;
 		vp.m_x = vp.m_y = 0;
 		g_renderDevice->setViewport(&vp);
 

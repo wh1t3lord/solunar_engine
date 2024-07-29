@@ -18,8 +18,6 @@ public:
 
 ShockGameInterface* getShockGameInterface();
 
-void shockGamePlayerDebug(bool* open);
-
 }
 
 #endif // !SHOCKGAME_H
