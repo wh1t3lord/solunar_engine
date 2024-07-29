@@ -253,7 +253,7 @@ void DemoGameMainMenuComponent::update(float dt)
 	if (ImGui::Button("New Game", kButtonSize))
 	{
 		MusicManager::getInstance()->stop();
-		EngineStateManager::getInstance()->loadWorld("worlds/env_test.xml");
+		EngineStateManager::getInstance()->loadWorld("worlds/demoworld.xml");
 	}
 
 	if (ImGui::Button("Settings", kButtonSize))
