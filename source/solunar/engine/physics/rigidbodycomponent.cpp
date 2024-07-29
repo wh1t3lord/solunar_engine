@@ -5,6 +5,8 @@
 
 #include "engine/entity/world.h"
 
+#include "core/timer.h"
+
 namespace engine {
 
 	BeginPropertyRegister(RigidBodyComponent)
@@ -278,6 +280,7 @@ namespace engine {
 
 		m_ghostObject = mem_new<btPairCachingGhostObject>();
 		m_ghostObject->setWorldTransform(startTransform);
+		m_ghostObject->setCollisionFlags(btCollisionObject::CF_CHARACTER_OBJECT);
 
 		m_ghostCallback = mem_new<btGhostPairCallback>();
 		getPhysicsWorld()->getWorld()->getPairCache()->setInternalGhostPairCallback(m_ghostCallback);
@@ -289,11 +292,14 @@ namespace engine {
 			m_capsuleShape, 
 			0.25f, 
 			btVector3(0.0f, 1.0f, 0.0f));
-		
+
+		m_characterController->setMaxJumpHeight(0.8f);
+		m_characterController->setGravity(getPhysicsWorld()->getWorld()->getGravity());
+
 		getPhysicsWorld()->getWorld()->addCollisionObject(
-			m_ghostObject//,
-			//getCollisionParameter(eFilterGroup),
-			//getCollisionParameter(eFilterMask)
+			m_ghostObject,
+			btBroadphaseProxy::CharacterFilter,
+			btBroadphaseProxy::AllFilter
 		);
 
 		getPhysicsWorld()->getWorld()->addAction(m_characterController);

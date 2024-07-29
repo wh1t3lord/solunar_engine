@@ -275,7 +275,7 @@ void ShockPlayerController::updateMovement(float dt)
 			 glmVectorToBt(glm::vec3(0.0f)),
 			 2.0f);
 #else
-	 m_onTheGround = true;
+	 m_onTheGround = m_rigidBody->getCharacterController()->onGround();
 	 if (isPlayerMove && m_onTheGround)
 	 {
 		 glm::vec3 camdir = camera->getDirection();
@@ -293,12 +293,26 @@ void ShockPlayerController::updateMovement(float dt)
 
 		 // apply impulse to rigid body
 		 //m_rigidBody->applyImpulse(dir);
-		 m_rigidBody->setDirection(glm::normalize(dir) * dt * 2.0f);
+		 if (glm::length(dir) >= 0.01f)
+			m_rigidBody->setDirection(glm::normalize(dir) * dt * 2.0f);
 		 //m_rigidBody->setPositionForce(getEntity()->getPosition());
+		
 	 }
 
 	 if (!isPlayerMove)
 		 m_rigidBody->setDirection(glm::vec3(0.0f));
+
+	 // #TODO: Save jump velocity vector
+	 if (inputManager->isPressed(KeyboardKeys::KEY_SPACE) && m_onTheGround)
+	 {
+		 const glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);
+		 const float jumpPower = 6.0f;
+
+		 glm::vec3 cameraDirection = camera->getDirection();
+		 cameraDirection.y = 0.0f;
+		 
+		 m_rigidBody->getCharacterController()->jump(glmVectorToBt((upVector + cameraDirection) * jumpPower));
+	 }
 
 #endif
 
