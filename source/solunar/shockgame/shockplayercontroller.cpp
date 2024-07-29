@@ -86,7 +86,7 @@ void ShockPlayerController::initializeCamera()
 	hackEntity->quaternionRotate(glm::vec3(0.0f, 1.0f, 0.0f), -90.0f);
 
 	m_weaponEntity = hackEntity->createChild();
-	m_weaponEntity->setPosition(glm::vec3(0.1f, -3.4f, -0.7f));
+	m_weaponEntity->setPosition(glm::vec3(0.2f, -3.5f, -0.3f));
 
 	// load model
 	m_weaponMesh = m_weaponEntity->createComponent<AnimatedMeshComponent>();
@@ -121,6 +121,7 @@ void ShockPlayerController::update(float dt)
 		s_font = g_fontManager->createFont("textures/ui/RobotoMono-Bold.ttf", 32.0f);
 
 	g_engineData.m_shouldCaptureMouse = true;
+	//g_engineData.m_shouldHideMouse = false;
 
 #if 0
 	// set position

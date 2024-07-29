@@ -219,6 +219,8 @@ void registerShockClasses()
 		TypeManager::getInstance()->registerType(shockClasses[i]);
 }
 
+#define DEMO_GAME
+
 ShockGameInterface::ShockGameInterface()
 {
 }
@@ -236,6 +238,10 @@ void ShockGameInterface::initialize()
 
 	// register shock objects
 	registerShockClasses();
+
+#ifdef DEMO_GAME
+	TypeManager::getInstance()->registerType(DemoGameMainMenuComponent::getStaticTypeInfo());
+#endif // DEMO_GAME
 
 	// add event listener
 //	g_eventManager.addEventListener(&g_shockEventListener);
