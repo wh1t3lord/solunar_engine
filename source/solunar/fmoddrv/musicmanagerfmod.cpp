@@ -62,7 +62,7 @@ namespace engine
 	bool MusicManagerFMOD::isPlaying()
 	{
 		if (m_musicSource)
-			return (m_musicSource ? m_musicSource->isPlaying() : false);
+			return m_musicSource->isPlaying();
 
 		return false;
 	}
