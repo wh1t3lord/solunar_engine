@@ -30,6 +30,27 @@ private:
 
 	float m_deltaTime;
 };
+#else
+class Timer
+{
+public:
+	static Timer* getInstance();
+
+public:
+	Timer();
+	~Timer();
+
+	void init();
+
+	void update();
+
+	float getDelta();
+	float getTime();
+private:
+	clock_t m_startTime;
+	clock_t m_endTime;
+	float m_deltaTime;
+};
 #endif // WIN32
 
 }
