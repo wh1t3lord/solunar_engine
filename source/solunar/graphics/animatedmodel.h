@@ -141,7 +141,7 @@ public:
 	void testPlay(float dt);
 
 	void updateNode(int node_id);
-	void updateNodePreCasheFrow(int node_id);
+	void updateNodeTransform(int node_id);
 
 	glm::mat4 getNodeMatrix(int nodeId);
 
@@ -163,6 +163,8 @@ private:
 	float m_currentTime = 0.0f;
 	float m_speed = 1.0f;
 	
+	int m_rootNodeId;
+
 	BoundingBox m_boundingBox;
 
 public:
