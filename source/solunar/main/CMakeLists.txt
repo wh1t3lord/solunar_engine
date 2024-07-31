@@ -5,7 +5,11 @@ file(GLOB MAIN_SRC
 
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${MAIN_SRC})
 
-add_executable(main WIN32 ${MAIN_SRC})
+if (MSVC)
+	add_executable(main WIN32 ${MAIN_SRC})
+else()
+	add_executable(main ${MAIN_SRC})
+endif()
 
 set_target_name_ex(main "solunar_main")
 set_engine_out_dir(main "${CMAKE_SOURCE_DIR}/bin")
@@ -15,9 +19,9 @@ target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../"
 
 # MSVC (Windows Linkage)
 if (MSVC)
-	#target_link_libraries(main shockgame fmoddrv d3d11drv gldrv engine core)
-	target_link_libraries(main shockgame miniaudiodrv d3d11drv gldrv engine core)
-	
+	target_link_libraries(main shockgame fmoddrv d3d11drv gldrv engine core)
+	#target_link_libraries(main shockgame miniaudiodrv d3d11drv gldrv engine core)
+
 	if (CMAKE_SIZEOF_VOID_P EQUAL 4)
 		target_link_directories(main PRIVATE "${CMAKE_SOURCE_DIR}/externals/assimp/libs/x32")
 		target_link_directories(main PRIVATE "${CMAKE_SOURCE_DIR}/externals/fmod_studio/lib/x86")
