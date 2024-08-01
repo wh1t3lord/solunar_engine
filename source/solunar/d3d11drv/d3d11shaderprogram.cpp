@@ -1,5 +1,8 @@
 #include "d3d11drv_pch.h"
 #include "d3d11drv/d3d11shaderprogram.h"
+#include "d3d11drv/d3d11shaderprogrammanager.h"
+
+#include "core/file/contentmanager.h"
 
 //#define CREATE_INPUT_LAYOUT_FROM_REFLECT
 
@@ -21,24 +24,46 @@ public:
 	STDMETHOD(Close)(THIS_ LPCVOID pData);
 };
 
+
+// https://www.asawicki.info/news_1515_implementing_id3d10include
+
 STDMETHODIMP D3D11Include::Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
 {
-#if 0
-	DataStreamPtr fileStream = g_contentManager->openStream(pFileName);
+	std::string includeFilename = g_shaderManager->getShaderPath();
+	includeFilename += "/";
+	includeFilename += pFileName;
 
-	fileStream->seek(FileSeek::End, 0);
-	long length = fileStream->tell();
-	fileStream->seek(FileSeek::Begin, 0);
-#endif
+	DataStreamPtr stream = g_contentManager->openStream(includeFilename);
+	if (!stream)
+		return E_FAIL;
 
+	stream->seek(Seek_End, 0);
+	long length = stream->tell();
+	stream->seek(Seek_Begin, 0);
 
-	return E_NOTIMPL;
+	if (!length)
+		return E_FAIL;
+
+	void* fileBuffer = malloc(length);
+	stream->read(fileBuffer, length);
+
+	*ppData = fileBuffer;
+	*pBytes = (UINT)length;
+
+	return S_OK;
 }
 
 STDMETHODIMP D3D11Include::Close(LPCVOID pData)
 {
-	return E_NOTIMPL;
+	if (!pData)
+		return E_FAIL;
+
+	free((void*)pData);
+
+	return S_OK;
 }
+
+D3D11Include g_d3d11Include;
 
 ID3DBlob* createShaderFromText(const char* text, ShaderType shaderType, const char* defines = nullptr)
 {
@@ -74,7 +99,7 @@ ID3DBlob* createShaderFromText(const char* text, ShaderType shaderType, const ch
 	shaderMacro.push_back(D3D_SHADER_MACRO{ NULL, NULL });
 
 	HRESULT hr = D3DCompile(text, strlen(text), "UNKNOWED", defines ? shaderMacro.data() : NULL,
-		NULL, entryPoint, shaderTarget, D3DCOMPILE_DEBUG, 0, &shaderBlob, &errorTextBlob);
+		&g_d3d11Include, entryPoint, shaderTarget, D3DCOMPILE_DEBUG, 0, &shaderBlob, &errorTextBlob);
 	if (FAILED(hr))
 	{
 		std::string errorText = "Failed to compile shader!";
