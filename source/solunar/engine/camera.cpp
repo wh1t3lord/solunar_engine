@@ -51,7 +51,7 @@ namespace engine
 			Assert(m_cameraComponent->getEntity());
 			Entity* entity = m_cameraComponent->getEntity();
 
-			m_position = entity->getPosition();
+			m_position = entity->getWorldPosition();
 
 
 			// update internal values

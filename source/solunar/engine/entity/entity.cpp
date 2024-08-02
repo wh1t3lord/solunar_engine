@@ -210,6 +210,16 @@ void Entity::setRootEntity(Entity* Entity)
 	m_rootEntity = Entity;
 }
 
+glm::vec3 Entity::getWorldPosition() const
+{
+	if (m_rootEntity) {
+		m_rootEntity->updateWorldTransform();
+		return glm::vec3(m_rootEntity->getWorldTranslation() * glm::vec4(m_position, 1.0f));
+	}
+	
+	return m_position;
+}
+
 void Entity::onWorldSet(World* world)
 {
 	m_world = world;

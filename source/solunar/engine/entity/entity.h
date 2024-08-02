@@ -27,6 +27,8 @@ public:
 
 	void setRootEntity(Entity* node);
 
+	glm::vec3 getWorldPosition() const;
+
 	glm::vec3 getPosition()	const	{ return m_position; }
 	glm::quat getRotation()	const	{ return m_rotation; }
 	glm::vec3 getScale()	const	{ return m_scale; }

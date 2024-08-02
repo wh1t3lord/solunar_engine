@@ -16,7 +16,7 @@
 	<!-- Test entity with directional light -->
 	<Entity>
 		<Position x="0" y="0" z="0"/>
-		<Rotation x="-90" y="0" z="0"/>
+		<Rotation x="-80" y="90" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		
 		<DirectionalLightComponent>
@@ -26,7 +26,7 @@
 	
 	<!-- Player -->
 	<Entity>
-		<Position x="0" y="0" z="0"/>
+		<Position x="0" y="10" z="0"/>
 		<Rotation x="0" y="0" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		
@@ -40,6 +40,7 @@
 		<Scale x="1" y="1" z="1"/>
 
 		<RigidBodyComponent>
+			<Position x="0" y="4" z="0"/>
 			<Static value="true"/>
 		</RigidBodyComponent>
 		
@@ -48,4 +49,13 @@
 		</BoxShapeComponent>
 	</Entity>
 	<!-------------------------->
+	
+	<Entity>
+		<Position x="0" y="0" z="0"/>
+		<Rotation x="0" y="90" z="0"/>
+		<Scale x="1000" y="1000" z="1000"/>
+		<MeshComponent>
+			<Model filename="models/demo_sky.dae"/>
+		</MeshComponent>
+	</Entity>
 </World>

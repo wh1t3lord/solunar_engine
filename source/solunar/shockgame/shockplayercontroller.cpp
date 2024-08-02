@@ -74,7 +74,11 @@ void ShockPlayerController::initializeCamera()
 	// m_cameraTransform = m_cameraNode->createComponentByType<TransformComponent>();
 	// m_camera = m_cameraNode->createComponentByType<CameraFirstPersonComponent>();
 
-	m_camera = getEntity()->createComponent<CameraFirstPersonComponent>();
+	m_cameraEntity = getEntity()->createChild();
+	m_cameraEntity->setPosition(glm::vec3(0.0f, 0.5f, 0.0f));
+
+	m_camera = m_cameraEntity->createComponent<CameraFirstPersonComponent>();
+	//m_camera = getEntity()->createComponent<CameraFirstPersonComponent>();
 
 	m_rigidBody = getEntity()->createComponent<RigidBodyProxyComponent>();
 	m_rigidBody->createPlayerController();
@@ -82,7 +86,8 @@ void ShockPlayerController::initializeCamera()
 	activateCamera();
 
 	// create weapon
-	Entity* hackEntity = getEntity()->createChild();
+	Entity* hackEntity = m_cameraEntity->createChild();
+	//Entity* hackEntity = getEntity()->createChild();
 	hackEntity->quaternionRotate(glm::vec3(0.0f, 1.0f, 0.0f), -90.0f);
 
 	m_weaponEntity = hackEntity->createChild();
@@ -327,9 +332,7 @@ void ShockPlayerController::debugUpdate(float dt)
 	if (!m_rigidBody)
 		return;
 
-	return;
-
-	char buf[256];
+	static char buf[256];
 	
 	// Ghost object stuff ...
 
@@ -360,6 +363,8 @@ void ShockPlayerController::debugUpdate(float dt)
 
 	snprintf(buf, sizeof(buf), "Delta: %f", dt);
 	g_fontManager->drawSystemFontShadowed(buf, 0, 300, glm::vec4(1.0f));
+
+	//Core::msg("%f", dt);
 
 	btVector3 linearVelocity = m_rigidBody->getCharacterController()->getLinearVelocity();
 	snprintf(buf, sizeof(buf), "Linear velocity: %.2f %.2f %.2f",

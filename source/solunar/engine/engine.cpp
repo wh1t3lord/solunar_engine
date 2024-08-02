@@ -11,6 +11,8 @@
 #include "engine/physics/rigidbodycomponent.h"
 #include "engine/physics/trianglemeshshape.h"
 
+#include "core/timer.h"
+
 namespace engine
 {
 
@@ -216,6 +218,10 @@ namespace engine
 		ms_world = world;
 		
 		delete[] data;
+
+		// update timer
+		Timer::getInstance()->update();
+		Timer::getInstance()->update();
 	}
 
 	void Engine::loadEmptyWorld()
