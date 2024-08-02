@@ -67,16 +67,6 @@ private:
 	void initPrivate();
 
 private:
-	struct SystemStringDrawInfo
-	{
-		std::string m_string;
-		float m_x;
-		float m_y;
-		glm::vec4 m_color;
-	};
-
-	std::vector<SystemStringDrawInfo> m_systemDrawStrings;
-
 	struct StringDrawInfo
 	{
 		FontImpl* m_font;
@@ -91,8 +81,7 @@ private:
 	std::unordered_map<std::string, FontImpl*> m_fonts;
 
 	// System font
-	stbtt_bakedchar m_systemFontChars[96];
-	ITexture2D* m_systemFontTexture;
+	IFont* m_systemFont;
 	
 	// Shared font data
 	ISamplerState* m_textureSampler;

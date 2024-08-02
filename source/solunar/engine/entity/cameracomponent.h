@@ -30,7 +30,7 @@ public:
 	virtual ~CameraYawPitchRollComponent();
 
 	//! Update yaw, pitch and roll angle from mouse position.
-	virtual void updateFromMousePosition(const glm::vec2 mousePos);
+	virtual void updateFromMousePosition(const glm::vec2& mousePos);
 
 	//! Set directly your euler angles
 	void setEulerRotation(float yaw, float pitch, float roll);
@@ -51,7 +51,7 @@ public:
 	virtual ~CameraFirstPersonComponent();
 
 	//! Update yaw, pitch and roll angle from mouse position.
-	virtual void updateFromMousePosition(const glm::vec2 mousePos);
+	virtual void updateFromMousePosition(const glm::vec2& mousePos);
 };
 
 }
