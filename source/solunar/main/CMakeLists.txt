@@ -15,7 +15,7 @@ set_target_name_ex(main "solunar_main")
 set_engine_out_dir(main "${CMAKE_SOURCE_DIR}/bin")
 
 target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../"
-								  PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
+								PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 
 # MSVC (Windows Linkage)
 if (MSVC)
@@ -52,5 +52,5 @@ if (MSVC)
 			$<TARGET_FILE_DIR:main>/fmodL.dll)
 	endif()
 else() # Linux Linkage
-	target_link_libraries(main shockgame miniaudio gldrv engine core)
+	target_link_libraries(main shockgame miniaudiodrv gldrv engine core)
 endif()

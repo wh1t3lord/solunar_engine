@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<PhysicsMaterials>
+	<Material name="default">
+		<!-- Table of impact sounds, #TODO: did it should be a event name instead filename -->
+		<OnImpactSound = "sounds/physics/concrete_inpact_01"/>
+		<OnImpactSound = "sounds/physics/concrete_inpact_02"/>
+		<OnImpactSound = "sounds/physics/concrete_inpact_02"/>
+		<Inertia value="1.0"/>
+	</Material>
+</PhysicsMaterials>

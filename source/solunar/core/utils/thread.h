@@ -7,7 +7,7 @@ namespace engine
 #ifdef _WIN32
 typedef unsigned ThreadId;
 #else
-// ???
+typedef unsigned ThreadId;
 #endif // _WIN32
 
 class Thread

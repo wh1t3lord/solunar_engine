@@ -116,9 +116,12 @@ public:
 	TestAnimationComponent();
 	~TestAnimationComponent();
 
+	void loadXML(tinyxml2::XMLElement& element) override;
+
 	void update(float dt) override;
 
 private:
+	std::string m_animationName;
 	int m_animationIndex = -1;
 };
 
@@ -130,6 +133,19 @@ TestAnimationComponent::~TestAnimationComponent()
 {
 }
 
+void TestAnimationComponent::loadXML(tinyxml2::XMLElement& element)
+{
+	tinyxml2::XMLElement* animationNameElement = element.FirstChildElement("AnimationName");
+	if (animationNameElement)
+	{
+		const tinyxml2::XMLAttribute* animationNameAttribute = animationNameElement->FindAttribute("value");
+		if (animationNameAttribute)
+		{
+			m_animationName = animationNameAttribute->Value();
+		}
+	}
+}
+
 void TestAnimationComponent::update(float dt)
 {
 	AnimatedMeshComponent* animatedMeshComponent = getEntity()->getComponent<AnimatedMeshComponent>();
@@ -137,7 +153,7 @@ void TestAnimationComponent::update(float dt)
 	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
 	if (animatedModel) {
 		if (m_animationIndex == -1) {
-			m_animationIndex = animatedModel->getAnimationByName("idle");
+			m_animationIndex = animatedModel->getAnimationByName(m_animationName);
 			animatedModel->setPlayAnimation(m_animationIndex, true);
 		}
 	}

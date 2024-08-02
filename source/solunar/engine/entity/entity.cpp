@@ -15,7 +15,7 @@ BeginPropertyRegister(Entity)
 	RegisterProperty(Entity, PropertyQuaternion, m_rotation);
 	RegisterProperty(Entity, PropertyVector3, m_scale);
 }
-EndPropertyRegister(Entity);
+EndPropertyRegister(Entity)
 
 Entity::Entity() :
 	m_world(nullptr),

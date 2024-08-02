@@ -38,7 +38,7 @@ CameraYawPitchRollComponent::~CameraYawPitchRollComponent()
 {
 }
 
-void CameraYawPitchRollComponent::updateFromMousePosition(const glm::vec2 mousePos)
+void CameraYawPitchRollComponent::updateFromMousePosition(const glm::vec2& mousePos)
 {
 	Assert(0);
 }
@@ -79,7 +79,7 @@ float wrapBetween(float value, float min, float max) {
 	return (float)(value - range * floor((value - min) / range));
 }
 
-void CameraFirstPersonComponent::updateFromMousePosition(const glm::vec2 mousePos)
+void CameraFirstPersonComponent::updateFromMousePosition(const glm::vec2& mousePos)
 {
 	float xoffset = mousePos.x;
 	float yoffset = mousePos.y;
