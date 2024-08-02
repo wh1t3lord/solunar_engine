@@ -34,7 +34,7 @@ extern IFontManager* g_fontManager;
 
 inline void IFontManager::drawSystemFontShadowed(const char* text, float x, float y, const glm::vec4& color)
 {
-	drawSystemFont(text, x + 1.5f, y + 1.5f, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
+	drawSystemFont(text, x + 1.0f, y + 1.0f, glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	drawSystemFont(text, x, y, color);
 }
 

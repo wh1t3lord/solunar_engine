@@ -327,8 +327,6 @@ void ShockPlayerController::debugUpdate(float dt)
 	if (!m_rigidBody)
 		return;
 
-	return;
-
 	char buf[256];
 	
 	// Ghost object stuff ...
