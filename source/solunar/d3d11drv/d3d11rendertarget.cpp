@@ -110,26 +110,6 @@ void D3D11RenderTarget::create(D3D11Device* device, const RenderTargetCreationDe
 
 void D3D11RenderTarget::release()
 {
-	//for (ID3D11ShaderResourceView** it = m_shaderResourceViews.begin(); it != m_shaderResourceViews.end(); ++it)
-	//{
-	//	ID3D11ShaderResourceView* handle = (*it);
-	//	if (handle)
-	//	{
-	//		handle->Release();
-	//		handle = nullptr;
-	//	}
-	//}
-
-	//for (ID3D11RenderTargetView** it = m_renderTargetViews.begin(); it != m_renderTargetViews.end(); ++it)
-	//{
-	//	ID3D11RenderTargetView* handle = (*it);
-	//	if (handle)
-	//	{
-	//		handle->Release();
-	//		handle = nullptr;
-	//	}
-	//}
-
 	for (auto& it : m_shaderResourceViews)
 	{
 		if (it)
@@ -157,7 +137,7 @@ void D3D11RenderTarget::bind(D3D11Device* device)
 	{
 		// #TODO: Hack with depth stencil installation
 		deviceContext->OMSetRenderTargets(1, &m_renderTargetViews[i], (i == 0) ? m_depthStencilView : nullptr);
-		deviceContext->PSGetShaderResources(i, 1, &m_shaderResourceViews[i]);
+		deviceContext->PSSetShaderResources(i, 1, &m_shaderResourceViews[i]);
 	}
 }
 
