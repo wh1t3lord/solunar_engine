@@ -41,68 +41,65 @@ inline D3D11_CULL_MODE getD3DCullMode(CullMode cullmode)
 
 inline D3D11_BLEND getD3DBlend(Blend blend)
 {
-    return (D3D11_BLEND)blend;
-
     switch (blend)
     {
     case BLEND_ZERO:
         return D3D11_BLEND_ZERO;
     case BLEND_ONE:
-        break;
+        return D3D11_BLEND_ONE;
     case BLEND_SRC_COLOR:
-        break;
+        return D3D11_BLEND_SRC_COLOR;
     case BLEND_INV_SRC_COLOR:
-        break;
+        return D3D11_BLEND_INV_SRC_COLOR;
     case BLEND_SRC_ALPHA:
-        break;
+        return D3D11_BLEND_SRC_ALPHA;
     case BLEND_INV_SRC_ALPHA:
-        break;
+        return D3D11_BLEND_INV_SRC_ALPHA;
     case BLEND_DEST_ALPHA:
-        break;
+        return D3D11_BLEND_DEST_ALPHA;
     case BLEND_INV_DEST_ALPHA:
-        break;
+        return D3D11_BLEND_INV_DEST_ALPHA;
     case BLEND_DEST_COLOR:
-        break;
+        return D3D11_BLEND_DEST_COLOR;
     case BLEND_INV_DEST_COLOR:
-        break;
+        return D3D11_BLEND_INV_DEST_COLOR;
     case BLEND_SRC_ALPHA_SAT:
-        break;
+        return D3D11_BLEND_SRC_ALPHA_SAT;
     case BLEND_BLEND_FACTOR:
-        break;
+        return D3D11_BLEND_BLEND_FACTOR;
     case BLEND_INV_BLEND_FACTOR:
-        break;
+        return D3D11_BLEND_INV_BLEND_FACTOR;
     case BLEND_SRC1_COLOR:
-        break;
+        return D3D11_BLEND_SRC1_COLOR;
     case BLEND_INV_SRC1_COLOR:
-        break;
+        return D3D11_BLEND_INV_SRC1_COLOR;
     case BLEND_SRC1_ALPHA:
-        break;
+        return D3D11_BLEND_SRC1_ALPHA;
     case BLEND_INV_SRC1_ALPHA:
-        break;
-    default:
-        break;
+        return D3D11_BLEND_INV_SRC1_ALPHA;
     }
+
+    return (D3D11_BLEND)blend;
 }
 
 inline D3D11_BLEND_OP getD3DBlendOp(BlendOp blendop)
 {
-    return (D3D11_BLEND_OP)blendop;
 
     switch (blendop)
     {
-    case engine::BLEND_OP_ADD:
-        break;
-    case engine::BLEND_OP_SUBTRACT:
-        break;
-    case engine::BLEND_OP_REV_SUBTRACT:
-        break;
-    case engine::BLEND_OP_MIN:
-        break;
-    case engine::BLEND_OP_MAX:
-        break;
-    default:
-        break;
+    case BLEND_OP_ADD:
+        return D3D11_BLEND_OP_ADD;
+    case BLEND_OP_SUBTRACT:
+        return D3D11_BLEND_OP_SUBTRACT;
+    case BLEND_OP_REV_SUBTRACT:
+        return D3D11_BLEND_OP_REV_SUBTRACT;
+    case BLEND_OP_MIN:
+        return D3D11_BLEND_OP_MIN;
+    case BLEND_OP_MAX:
+        return D3D11_BLEND_OP_MAX;
     }
+
+    return (D3D11_BLEND_OP)0;
 }
 
 D3D11StateManager::D3D11StateManager()
