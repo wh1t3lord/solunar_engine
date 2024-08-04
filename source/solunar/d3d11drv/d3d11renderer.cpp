@@ -27,7 +27,10 @@
 
 #include "main/main.h"
 
+#include <d3d9.h>
 #include <dxgidebug.h>
+
+#pragma comment(lib, "d3d9.lib")
 
 namespace engine
 {
@@ -376,6 +379,8 @@ void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 {
 	// OPTICK_EVENT("D3D11Renderer::renderStaticMesh");
 
+	D3DPERF_BeginEvent(D3DCOLOR_XRGB(255, 0, 0), L"RenderStaticMesh");
+
 	std::shared_ptr<ModelBase> model = mesh->lockModel();
 
 	for (const auto& submesh : model->getSubmehes())
@@ -458,11 +463,15 @@ void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 		// return what have been
 		RenderContext::setContext(savedCtx);
 	}
+
+	D3DPERF_EndEvent();
 }
 
 void D3D11Renderer::renderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
 {
 	// OPTICK_EVENT("D3D11Renderer::renderAnimatedMesh");
+
+	D3DPERF_BeginEvent(D3DCOLOR_XRGB(255, 0, 0), L"RenderAnimatedMesh");
 
 	std::shared_ptr<ModelBase> model = mesh->lockModel();
 	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(model.get());
@@ -547,6 +556,8 @@ void D3D11Renderer::renderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view,
 		// return what have been
 		RenderContext::setContext(savedCtx);
 	}
+
+	D3DPERF_EndEvent();
 }
 
 void D3D11Renderer::renderShadows(View* view)

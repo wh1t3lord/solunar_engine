@@ -15,7 +15,9 @@ public:
 	void create(const RenderTargetCreationDesc& renderTargetDesc);
 	void release() override;
 
-	uint32_t getHandle() override;
+	uint32_t getHandle();
+
+	void setDebugName(const char* debugName) override;
 
 	// Old stuff of IRenderTarget, can be used ;)
 	void attachTexture2D(int slot, ITexture2D* textureHandle);

@@ -22,11 +22,11 @@ public:
 	void create(D3D11Device* device, const RenderTargetCreationDesc& renderTargetDesc);
 	void release() override;
 
+	void setDebugName(const char* debugName) override;
+
 	void bind(D3D11Device* device);
 
 private:
-
-
 	std::array<ID3D11RenderTargetView*, kMaxRenderTargetTextures> m_renderTargetViews;
 	std::array<ID3D11ShaderResourceView*, kMaxRenderTargetTextures> m_shaderResourceViews;
 
@@ -34,7 +34,6 @@ private:
 
 	ID3D11DepthStencilView* m_depthStencilView;
 
-	uint32_t getHandle() override { return 0; }
 };
 
 }

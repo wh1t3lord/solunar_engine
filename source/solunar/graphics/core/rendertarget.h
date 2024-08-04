@@ -23,8 +23,8 @@ namespace engine {
 		//! Release the render target.
 		virtual void release() = 0;
 
-		//! Get the GAPI handle.
-		virtual uint32_t getHandle() = 0;
+		//! Set debug name.
+		virtual void setDebugName(const char* debugName) = 0;
 	};
 
 }

@@ -266,4 +266,10 @@ void D3D11Texture2D::updateTexture(const void* data, int rowPitch, int depthPitc
 		depthPitch);
 }
 
+void D3D11Texture2D::setDebugName(const char* debugName)
+{
+	D3D11_CHECK(m_texture->SetPrivateData(WKPDID_D3DDebugObjectName, strlen(debugName), debugName));
+	D3D11_CHECK(m_textureSRV->SetPrivateData(WKPDID_D3DDebugObjectName, strlen(debugName), debugName));
+}
+
 }
