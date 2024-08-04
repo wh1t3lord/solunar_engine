@@ -6,6 +6,7 @@
 #include "graphics/core/device.h"
 #include "graphics/core/texture.h"
 #include "graphics/core/rendertarget.h"
+#include "graphics/core/statemanager.h"
 
 #include "graphics/ShaderProgramManager.h"
 #include "graphics/shaderprogram.h"
@@ -41,6 +42,17 @@ void PostFxManager::init(View* view)
 {
 	initHDR(view);
 	initBlur(view);
+
+	BlendStateDesc blendState = {};
+	blendState.m_renderTarget[0].m_blendEnable = false;
+	blendState.m_renderTarget[0].m_srcBlend = BLEND_SRC_COLOR;
+	blendState.m_renderTarget[0].m_destBlend = BLEND_ZERO;
+	blendState.m_renderTarget[0].m_blendOp = BLEND_OP_ADD;
+	blendState.m_renderTarget[0].m_srcBlendAlpha = BLEND_ZERO;
+	blendState.m_renderTarget[0].m_destBlendAlpha = BLEND_ONE;
+	blendState.m_renderTarget[0].m_blendOpAlpha = BLEND_OP_ADD;
+	blendState.m_renderTarget[0].m_renderTargetWriteMask = COLOR_WRITE_ENABLE_ALL;
+	m_blendState = g_stateManager->createBlendState(blendState);
 }
 
 void PostFxManager::initHDR(View* view)
@@ -183,6 +195,8 @@ void PostFxManager::shutdown()
 void PostFxManager::hdrPass(ITexture2D* screenTexture)
 {
 	// lets go
+	const float blend_factor[4] = { 0.f, 0.f, 0.f, 0.f };
+	g_stateManager->setBlendState(m_blendState, blend_factor, 0xffffffff);
 
 	// setup device state
 	g_renderDevice->setRenderTarget(m_hdrRenderTarget);

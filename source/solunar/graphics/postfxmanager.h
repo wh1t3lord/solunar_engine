@@ -11,6 +11,7 @@ class ITexture2D;
 class IRenderTarget;
 class ISamplerState;
 class IShaderProgram;
+struct IBlendState;
 
 class PostFxManager
 {
@@ -48,6 +49,8 @@ private:
 	IShaderProgram* m_blurPassProgram;
 	IShaderProgram* m_blurPassHorizontalProgram;
 	IShaderProgram* m_hdrCombineProgram;
+
+	IBlendState* m_blendState;
 
 	ConstantBufferProxy m_hdrconstants;
 };

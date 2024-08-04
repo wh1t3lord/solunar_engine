@@ -1,6 +1,5 @@
 Texture2D g_texture 	: register(t0);
-//SamplerState g_sampler 	: register(s0);
-SamplerState g_sampler { AddressU = Clamp; AddressV = Wrap; };
+SamplerState g_sampler 	: register(s0);
 
 cbuffer HDRConstants : register(b0)
 {
@@ -10,7 +9,7 @@ cbuffer HDRConstants : register(b0)
 
 float4 PSMain(float4 position : SV_POSITION, float2 texcoord : TEXCOORD) : SV_Target
 {
-	float4 fragColor = float4(0.f, 0.f, 0.f, 0.f);
+	float4 fragColor = float4(0.f, 0.f, 0.f, 1.f);
 	
     // sampled texture
     float4 color = g_texture.Sample(g_sampler, texcoord);
@@ -21,12 +20,14 @@ float4 PSMain(float4 position : SV_POSITION, float2 texcoord : TEXCOORD) : SV_Ta
     // loop
 	const int sampleCount = 3;
 #ifdef BLUR_HORIZONTAL
+	[unroll]
     for (int i = 0; i < sampleCount; ++i)
     {
         result += g_texture.Sample(g_sampler, texcoord + float2(texOffset.x * i, 0.0f)) * weight[i];
         result += g_texture.Sample(g_sampler, texcoord - float2(texOffset.x * i, 0.0f)) * weight[i];
     }
 #else
+	[unroll]
     for (int i = 0; i < sampleCount; ++i)
     {
         result += g_texture.Sample(g_sampler, texcoord + float2(0.0f, texOffset.y * i)) * weight[i];

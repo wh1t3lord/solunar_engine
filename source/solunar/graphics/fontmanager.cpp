@@ -129,6 +129,20 @@ void FontManager::initPrivate()
 	desc.m_frontFace.m_stencilFunc = COMPARISON_ALWAYS;
 	desc.m_backFace = desc.m_frontFace;
 	m_depthStencilState = g_stateManager->createDepthStencilState(desc);
+
+
+	// Create the blending setup
+	BlendStateDesc blendStateDesc = {};
+	blendStateDesc.m_alphaToCoverageEnable = false;
+	blendStateDesc.m_renderTarget[0].m_blendEnable = true;
+	blendStateDesc.m_renderTarget[0].m_srcBlend = BLEND_SRC_ALPHA;
+	blendStateDesc.m_renderTarget[0].m_destBlend = BLEND_INV_SRC_ALPHA;
+	blendStateDesc.m_renderTarget[0].m_blendOp = BLEND_OP_ADD;
+	blendStateDesc.m_renderTarget[0].m_srcBlendAlpha = BLEND_ONE;
+	blendStateDesc.m_renderTarget[0].m_destBlendAlpha = BLEND_INV_SRC_ALPHA;
+	blendStateDesc.m_renderTarget[0].m_blendOpAlpha = BLEND_OP_ADD;
+	blendStateDesc.m_renderTarget[0].m_renderTargetWriteMask = COLOR_WRITE_ENABLE_ALL;
+	m_pBlendState = g_stateManager->createBlendState(blendStateDesc);
 }
 
 void FontManager::flushPrimitives()
@@ -163,6 +177,10 @@ void FontManager::flushPrimitives()
 
 	// disable depth test
 	g_stateManager->setDepthStencilState(m_depthStencilState, 0);
+
+	// Setup blend state
+	const float blend_factor[4] = { 0.f, 0.f, 0.f, 0.f };
+	g_stateManager->setBlendState(m_pBlendState, blend_factor, 0xffffffff);
 
 	// bind vertex buffer
 	g_renderDevice->setVertexBuffer(m_vertexBuffer, sizeof(FontVertex), 0);
@@ -248,7 +266,7 @@ IFont* FontManager::createFont(const char* filename, float size)
 
 void FontManager::drawFontText(IFont* font, const char* text, float x, float y, const glm::vec4& color)
 {
-	StringDrawInfo drawInfo = {};
+	StringDrawInfo drawInfo;
 	drawInfo.m_font = (FontImpl*)font;
 	drawInfo.m_string = text;
 	drawInfo.m_x = x;

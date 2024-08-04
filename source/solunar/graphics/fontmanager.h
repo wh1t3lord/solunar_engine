@@ -14,6 +14,7 @@ class IShaderProgram;
 class ISamplerState;
 struct IRasterizerState;
 struct IDepthStencilState;
+struct IBlendState;
 
 struct FontVertex
 {
@@ -91,6 +92,7 @@ private:
 	IShaderProgram* m_shaderProgram;
 	IRasterizerState* m_rasterizerState;
 	IDepthStencilState* m_depthStencilState;
+	IBlendState* m_pBlendState;
 
 };
 
