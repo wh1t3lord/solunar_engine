@@ -18,8 +18,6 @@ namespace engine
 	void ScreenQuad::init()
 	{
 
-		// OpenGL Buffer
-#if 1
 		float quadVertices[] = {
 			// positions         // texCoords
 			-1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
@@ -30,18 +28,6 @@ namespace engine
 			 1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
 			 1.0f,  1.0f, 0.0f,  1.0f, 1.0f
 		};
-#else
-		// DirectX Buffer
-		float quadVertices[] = {
-			// positions			  // texCoords
-			-1.0f,  1.0f, 0.0f,       0.0f, 0.0f,
-			 1.0f,  1.0f, 0.0f,       1.0f, 0.0f,
-			 1.0f, -1.0f, 0.0f,       1.0f, 1.0f,
-			-1.0f,  1.0f, 0.0f,       0.0f, 0.0f,
-			 1.0f, -1.0f, 0.0f,       1.0f, 1.0f,
-			-1.0f, -1.0f, 0.0f,       0.0f, 1.0f
-		};
-#endif
 
 		BufferDesc bufferDesc;
 		memset(&bufferDesc, 0, sizeof(bufferDesc));

@@ -252,8 +252,8 @@ namespace engine
 
 		//renderShadows(view);
 	
-		//g_renderDevice->setRenderTarget(m_screenRenderTarget);
-		//clearRenderTarget(m_screenRenderTarget);
+		g_renderDevice->setRenderTarget(m_screenRenderTarget);
+		clearRenderTarget(m_screenRenderTarget);
 
 		// get camera
 		Camera* camera = CameraProxy::getInstance();
@@ -264,32 +264,7 @@ namespace engine
 			EntityManager& entityManager = world->getEntityManager();
 
 			std::vector<Entity*> drawableEntities = entityManager.getEntitiesWithComponent<MeshComponent>();
-			
-#if 0
-			// shadow map pass
-			ShadowsRenderer::getInstance()->beginRender();
 
-			// color pass
-			for (auto entity : drawableEntities)
-			{
-				MeshComponent* meshComponent = entity->getComponent<MeshComponent>();
-				if (meshComponent)
-				{
-					// setup render context
-					RenderContext& renderCtx = RenderContext::getContext();
-					renderCtx.model = entity->getWorldTranslation();
-					RenderContext::setContext(renderCtx);
-
-					// call render function
-					//renderMesh(world->getGraphicsWorld(), view, meshComponent);
-					ShadowsRenderer::getInstance()->renderMesh(world->getGraphicsWorld(), view, meshComponent);
-
-					meshComponent->render();
-				}
-			}
-
-			ShadowsRenderer::getInstance()->endRender();
-#endif
 			// color pass
 			for (auto entity : drawableEntities)
 			{
@@ -311,58 +286,8 @@ namespace engine
 				}
 			}
 		}
-#if 0
-		const std::shared_ptr<World> world = WorldManager::getActiveWorld();
-		if (world)
-		{
-			std::shared_ptr<GraphicsWorld> graphicsWorld = world->getWorldComponent<GraphicsWorld>();
-			if (graphicsWorld)
-			{
-				// update drawables
-				//graphicsWorld->updateDrawables();
-
-				const std::vector<DrawableComponent*>& drawables = graphicsWorld->getDrawables();
-				for (const auto it : drawables)
-				{
-					ASSERT(it);
-
-					if (it->isA(MeshComponent::getStaticTypeInfo()))
-					{
-						// if we see mesh
-						const BoundingBox& aabb = it->getWorldBoundingBox();
-						if (!camera->getFrustum().isBoundingBoxInside(aabb))
-							continue;
-
-						// setup render context
-						RenderContext& renderCtx = RenderContext::getContext();
-						
-						TransformComponent* transformComponent = (TransformComponent*)g_componentCacheSystem->getComponent(it->getNode(), TransformComponent::getStaticTypeInfo());
-						if (transformComponent)
-						{
-							renderCtx.model = transformComponent->getWorldTranslation();
-						}
-						else
-						{
-							renderCtx.model = glm::mat4(1.0f);
-						}
-
-						RenderContext::setContext(renderCtx);
-			
-						// call render function
-						renderMesh(graphicsWorld.get(), view, dynamicCast<MeshComponent>(it));
-					}
-				}
-			}
-
-			if (m_showOctree)
-				world->getSpacePartition()->render();
-		}
-
-#endif
 
 		g_debugRender.renderFrame(view);
-
-		g_fontManager->flushPrimitives();
 	}
 
 	void Renderer::renderView(View* view)
@@ -391,15 +316,17 @@ namespace engine
 		renderWorld(view);
 
 		// post processing
-		//g_postFxManager.hdrPass(m_screenColorTexture);
+		g_postFxManager.hdrPass(m_screenColorTexture);
 
 		// reset to swap chain
-	//	setSwapChainRenderTarget();
+		setSwapChainRenderTarget();
 
-	//	g_stateManager->setDepthStencilState(g_depthStencilState_NoWrite, 0);
+		g_stateManager->setDepthStencilState(g_depthStencilState_NoWrite, 0);
 
 		// draw
-	//	ScreenQuad::render( m_screenColorTexture );
+//		ScreenQuad::render( m_screenColorTexture );
+
+		g_fontManager->flushPrimitives();
 
 		// draw debug renderer
 	//	g_debugRender.renderFrame(view);

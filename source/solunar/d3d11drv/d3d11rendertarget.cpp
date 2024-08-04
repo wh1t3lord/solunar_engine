@@ -137,7 +137,7 @@ void D3D11RenderTarget::bind(D3D11Device* device)
 	{
 		// #TODO: Hack with depth stencil installation
 		deviceContext->OMSetRenderTargets(1, &m_renderTargetViews[i], (i == 0) ? m_depthStencilView : nullptr);
-		deviceContext->PSSetShaderResources(i, 1, &m_shaderResourceViews[i]);
+	//	deviceContext->PSSetShaderResources(i, 1, &m_shaderResourceViews[i]);
 	}
 }
 
