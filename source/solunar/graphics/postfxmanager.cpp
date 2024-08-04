@@ -73,15 +73,17 @@ void PostFxManager::initHDR(View* view)
 
 void PostFxManager::initBlur(View* view)
 {
+	char buf[64];
+
 	// UE3 weights
-	float gaussianWeight1 = 0.54684f;
-	float gaussianWeight2 = 0.34047f;
-	float gaussianWeight3 = 0.11269f;
+	//float gaussianWeight1 = 0.54684f;
+	//float gaussianWeight2 = 0.34047f;
+	//float gaussianWeight3 = 0.11269f;
 
 	// my weights
-	//float gaussianWeight1 = 0.27407f;
-	//float gaussianWeight2 = 0.45186f;
-	//float gaussianWeight3 = 0.27407f;
+	float gaussianWeight1 = 0.27407f;
+	float gaussianWeight2 = 0.45186f;
+	float gaussianWeight3 = 0.27407f;
 
 	m_blurWeights.push_back(glm::vec4(glm::vec3(gaussianWeight1), 0.33333));
 	m_blurWeights.push_back(glm::vec4(glm::vec3(gaussianWeight2), 0.33333));
@@ -99,14 +101,14 @@ void PostFxManager::initBlur(View* view)
 	SubresourceDesc hdrPingPongTextureSubresourceDesc;
 	memset(&hdrPingPongTextureSubresourceDesc, 0, sizeof(hdrPingPongTextureSubresourceDesc));
 
-	for (unsigned int i = 0; i < 2; i++)
+	for (int i = 0; i < 2; i++)
 	{
 		// texture creation
-		m_hdrPinPingTextures[i] = g_renderDevice->createTexture2D(m_hdrPingPongTextureDesc, hdrPingPongTextureSubresourceDesc);
+		m_hdrPinPongTextures[i] = g_renderDevice->createTexture2D(m_hdrPingPongTextureDesc, hdrPingPongTextureSubresourceDesc);
 
 		// framebuffer creation
 		RenderTargetCreationDesc rtCreationDesc = {};
-		rtCreationDesc.m_textures2D[0] = m_hdrPinPingTextures[i];
+		rtCreationDesc.m_textures2D[0] = m_hdrPinPongTextures[i];
 		rtCreationDesc.m_textures2DCount = 1;
 
 		m_hdrPinPongRenderTargets[i] = g_renderDevice->createRenderTarget(rtCreationDesc);
@@ -114,7 +116,7 @@ void PostFxManager::initBlur(View* view)
 
 	SamplerDesc hdrPinPongSamplerDesc;
 	memset(&hdrPinPongSamplerDesc, 0, sizeof(hdrPinPongSamplerDesc));
-	hdrPinPongSamplerDesc.m_minFilter = TextureFilter::Linear;
+	hdrPinPongSamplerDesc.m_minFilter = TextureFilter::LinearMipmapLinear;
 	hdrPinPongSamplerDesc.m_magFilter = TextureFilter::Linear;
 	hdrPinPongSamplerDesc.m_wrapS = TextureWrap::ClampToEdge;
 	hdrPinPongSamplerDesc.m_wrapT = TextureWrap::ClampToEdge;
@@ -126,6 +128,13 @@ void PostFxManager::initBlur(View* view)
 		"quad.vsh", 
 		"hdr_blur.psh",
 		nullptr,
+		ScreenQuad::ms_inputLayout,
+		sizeof(ScreenQuad::ms_inputLayout) / sizeof(ScreenQuad::ms_inputLayout[0]));
+
+	m_blurPassHorizontalProgram = g_shaderManager->createShaderProgram(
+		"quad.vsh",
+		"hdr_blur.psh",
+		"BLUR_HORIZONTAL\n",
 		ScreenQuad::ms_inputLayout,
 		sizeof(ScreenQuad::ms_inputLayout) / sizeof(ScreenQuad::ms_inputLayout[0]));
 
@@ -152,8 +161,8 @@ void PostFxManager::shutdown()
 		mem_delete(m_hdrPinPongRenderTargets[i]);
 		m_hdrPinPongRenderTargets[i] = nullptr;
 
-		mem_delete(m_hdrPinPingTextures[i]);
-		m_hdrPinPingTextures[i] = nullptr;
+		mem_delete(m_hdrPinPongTextures[i]);
+		m_hdrPinPongTextures[i] = nullptr;
 	}
 
 	mem_delete(m_hdrRenderTarget);
@@ -170,19 +179,27 @@ void PostFxManager::hdrPass(ITexture2D* screenTexture)
 	// setup device state
 	g_renderDevice->setRenderTarget(m_hdrRenderTarget);
 
-	// run first pass
+	// run first pass (copy texture)
 	g_renderDevice->setTexture2D(0, screenTexture);
 	ScreenQuad::renderWithoutTextureBinding(m_hdrPassProgram);
 
-	// run second pass
+	// run second pass (blur)
 	blurPass(screenTexture);
 
-	// combine pass
+	// combine pass (combine)
 	combinePass(screenTexture);
 }
 
 void PostFxManager::blurPass(ITexture2D* screenTexture)
 {
+	// #TODO: REMOVE THIS SHIT
+	HDRConstants* pHDRConstants = (HDRConstants*)m_hdrconstants->map(BufferMapping::WriteOnly);
+	memcpy(pHDRConstants->weight, m_blurWeights.data(), m_blurWeights.size() * sizeof(glm::vec4));
+	pHDRConstants->texOffset = glm::vec4(m_texOffset, 0.0f, 0.0f);
+	m_hdrconstants->unmap();
+
+	g_renderDevice->setConstantBufferIndex(0, m_hdrconstants.get());
+
 	Viewport oldViewPort = g_renderDevice->getViewport();
 
 	Viewport blurPassViewport = { 0 };
@@ -199,28 +216,14 @@ void PostFxManager::blurPass(ITexture2D* screenTexture)
 	{
 		g_renderDevice->setRenderTarget(m_hdrPinPongRenderTargets[horizontal]);
 
-		//glClear(GL_COLOR_BUFFER_BIT);
-
-		g_shaderManager->setShaderProgram(m_blurPassProgram);
-
-		//m_blurPassProgram->setTextureSampler(0, "u_texture");
-		//m_blurPassProgram->setInteger("u_horizontal", horizontal);
-		//glUniform4fv(m_blurWeightsLoc, 3, (float*)m_blurWeights.data());
-		//m_blurPassProgram->setVector2("texOffset", m_texOffset);
-
-		// #TODO: REMOVE THIS SHIT
-		HDRConstants* pHDRConstants = (HDRConstants*)m_hdrconstants->map(BufferMapping::WriteOnly);
-		memcpy(pHDRConstants->weight, m_blurWeights.data(), m_blurWeights.size() * sizeof(glm::vec4));
-		pHDRConstants->texOffset = glm::vec4(m_texOffset, 0.0f, 0.0f);
-		m_hdrconstants->unmap();
-
-		g_renderDevice->setConstantBufferIndex(0, m_hdrconstants.get());
+		g_renderDevice->setTexture2D(0, first_iteration ? m_hdrTempTex : m_hdrPinPongTextures[!horizontal]);
 		g_renderDevice->setSampler(0, m_hdrPinPongSampler);
-		g_renderDevice->setTexture2D(0, first_iteration ? m_hdrTempTex : m_hdrPinPingTextures[!horizontal]);
 
-		ScreenQuad::renderWithoutTextureBinding(m_blurPassProgram);
+		IShaderProgram* shader = horizontal ? m_blurPassHorizontalProgram : m_blurPassProgram;
+		ScreenQuad::renderWithoutTextureBinding(shader);
 
 		horizontal = !horizontal;
+
 		if (first_iteration)
 			first_iteration = false;
 	}
@@ -232,20 +235,13 @@ void PostFxManager::combinePass(ITexture2D* screenTexture)
 {
 	g_renderer->setSwapChainRenderTarget();
 
-	// clear color
-	//graphicsDevice->clear(ClearRenderTarget | ClearDepth);
-
-	g_shaderManager->setShaderProgram(m_hdrCombineProgram);
-
 	// screen texture
-	g_renderDevice->setSampler(0, m_hdrPinPongSampler);
 	g_renderDevice->setTexture2D(0, screenTexture);
-	//m_hdrCombineProgram->setInteger("u_hdrTexture", 0);
+	g_renderDevice->setSampler(0, m_hdrPinPongSampler);
 
 	// bloom texture
+	g_renderDevice->setTexture2D(1, m_hdrPinPongTextures[0]);
 	g_renderDevice->setSampler(1, m_hdrPinPongSampler);
-	g_renderDevice->setTexture2D(1, m_hdrPinPingTextures[0]);
-	//m_hdrCombineProgram->setInteger("u_bloomTexture", 1);
 
 	// render screen quad
 	ScreenQuad::renderWithoutTextureBinding(m_hdrCombineProgram);

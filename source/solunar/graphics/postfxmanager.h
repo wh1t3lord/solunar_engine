@@ -34,7 +34,7 @@ private:
 	ITexture2D* m_hdrTempTex;
 	IRenderTarget* m_hdrRenderTarget;
 
-	ITexture2D* m_hdrPinPingTextures[2];
+	ITexture2D* m_hdrPinPongTextures[2];
 	IRenderTarget* m_hdrPinPongRenderTargets[2];
 
 	ISamplerState* m_hdrPinPongSampler;
@@ -46,6 +46,7 @@ private:
 
 	IShaderProgram* m_hdrPassProgram;
 	IShaderProgram* m_blurPassProgram;
+	IShaderProgram* m_blurPassHorizontalProgram;
 	IShaderProgram* m_hdrCombineProgram;
 
 	ConstantBufferProxy m_hdrconstants;

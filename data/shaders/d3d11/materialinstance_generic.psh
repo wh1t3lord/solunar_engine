@@ -76,6 +76,21 @@ float lightAttenuation(float3 lightPosition, float3 position, float radius)
 	return attenuation;
 }
 
+float3 gammaCorrectionRGB(float3 color)
+{
+	float gamma = 2.2;
+	return float3(pow(color.rgb, float3(gamma, gamma, gamma)));
+}
+
+float3 materialAlbedo(float2 texcoord)
+{
+	// sample texture
+	float3 albedo = g_albedoTexture.Sample(g_albedoSampler, texcoord).rgb;
+	
+	// apply gamma correction and return the sampled albedo texture
+	return gammaCorrectionRGB(albedo);
+}
+
 float4 PSMain(VSOutput input) : SV_Target
 {
 	//return float4(input.normal, 1.0f);
@@ -84,7 +99,8 @@ float4 PSMain(VSOutput input) : SV_Target
 	const float kSpecPower = 256.0f;
 
 	float3 ambientColor = g_DirLight_ambientColor.xyz;
-	float3 albedoColor = g_albedoTexture.Sample(g_albedoSampler, input.texcoord).rgb;
+	//float3 albedoColor = g_albedoTexture.Sample(g_albedoSampler, input.texcoord).rgb;
+	float3 albedoColor = materialAlbedo(input.texcoord);
 
 #ifdef UNLIT
 	return float4(albedoColor, 1.0f);

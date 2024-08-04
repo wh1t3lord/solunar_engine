@@ -13,43 +13,27 @@ float4 PSMain(float4 position : SV_POSITION, float2 texcoord : TEXCOORD) : SV_Ta
 	float4 fragColor = float4(0.f, 0.f, 0.f, 0.f);
 	
     // sampled texture
-    //float4 color = texture(u_texture, v_texcoord);
     float4 color = g_texture.Sample(g_sampler, texcoord);
     
     // how much current fragment is affect on frame
     float4 result = color * weight[0];
 
-    bool u_horizontal = texOffset.w >= 10.0f;
-
     // loop
 	const int sampleCount = 3;
-    if (u_horizontal)
+#ifdef BLUR_HORIZONTAL
+    for (int i = 0; i < sampleCount; ++i)
     {
-        for (int i = 0; i < sampleCount; ++i)
-        {
-			float2 positiveTexcoord = texcoord + float2(texOffset.x * i, 0.0);
-			float2 negativeTexcoord = texcoord - float2(texOffset.x * i, 0.0);
-			
-			#if 0
-            result += texture(u_texture, v_texcoord + vec2(texOffset.x * i, 0.0)) * weight[i];
-            result += texture(u_texture, v_texcoord - vec2(texOffset.x * i, 0.0)) * weight[i];
-			#endif
-        }
+        result += g_texture.Sample(g_sampler, texcoord + float2(texOffset.x * i, 0.0f)) * weight[i];
+        result += g_texture.Sample(g_sampler, texcoord - float2(texOffset.x * i, 0.0f)) * weight[i];
     }
-    else
+#else
+    for (int i = 0; i < sampleCount; ++i)
     {
-        for (int i = 0; i < sampleCount; ++i)
-        {
-			float2 positiveTexcoord = texcoord + float2(texOffset.x * i, 0.0);
-			float2 negativeTexcoord = texcoord - float2(texOffset.x * i, 0.0);
-			
-			#if 0
-            result += texture(u_texture, v_texcoord + vec2(0.0, texOffset.y * i)) * weight[i];
-            result += texture(u_texture, v_texcoord - vec2(0.0, texOffset.y * i)) * weight[i];
-			#endif
-        }
+        result += g_texture.Sample(g_sampler, texcoord + float2(0.0f, texOffset.y * i)) * weight[i];
+        result += g_texture.Sample(g_sampler, texcoord - float2(0.0f, texOffset.y * i)) * weight[i];
     }
-    
-    fragColor *= result * 0.5;
+#endif
+  
+    fragColor = result * 0.5;
 	return fragColor;
 }
