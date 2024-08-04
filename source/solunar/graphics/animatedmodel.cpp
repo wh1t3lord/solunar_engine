@@ -98,6 +98,10 @@ void AnimatedModel::registerObject()
 
 AnimatedModel::AnimatedModel()
 {
+	for (int i = 0; i < sizeof(m_bonesMatrices) / sizeof(m_bonesMatrices[0]); i++)
+	{
+		m_bonesMatrices[i] = glm::mat4(1.0f);
+	}
 }
 
 AnimatedModel::~AnimatedModel()
