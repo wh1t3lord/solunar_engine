@@ -111,6 +111,7 @@ namespace engine
 		memset(&colorTextureSubresourceDesc, 0, sizeof(colorTextureSubresourceDesc));
 
 		m_screenColorTexture = g_renderDevice->createTexture2D(colorTextureDesc, colorTextureSubresourceDesc);
+		m_screenColorTexture->setDebugName("Screen Color Texture");
 
 		TextureDesc depthTextureDesc;
 		memset(&depthTextureDesc, 0, sizeof(depthTextureDesc));
@@ -123,6 +124,7 @@ namespace engine
 		memset(&depthTextureSubresourceDesc, 0, sizeof(depthTextureSubresourceDesc));
 
 		m_screenDepthTexture = g_renderDevice->createTexture2D(depthTextureDesc, depthTextureSubresourceDesc);
+		m_screenDepthTexture->setDebugName("Screen Depth Texture");
 
 		RenderTargetCreationDesc renderTargetDesc;
 		memset(&renderTargetDesc, 0, sizeof(renderTargetDesc));
@@ -130,6 +132,7 @@ namespace engine
 		renderTargetDesc.m_textures2D[0] = m_screenColorTexture;
 		renderTargetDesc.m_textures2DCount = 1;
 		m_screenRenderTarget = g_renderDevice->createRenderTarget(renderTargetDesc);
+		m_screenRenderTarget->setDebugName("Screen Render Target");
 	}
 
 	void Renderer::init()

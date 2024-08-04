@@ -57,11 +57,13 @@ void PostFxManager::initHDR(View* view)
 	memset(&hdrTextureSubresourceDesc, 0, sizeof(hdrTextureSubresourceDesc));
 
 	m_hdrTempTex = g_renderDevice->createTexture2D(hdrTextureDesc, hdrTextureSubresourceDesc);
+	m_hdrTempTex->setDebugName("HDR Temp Texture");
 
 	RenderTargetCreationDesc rtCreationDesc = {};
 	rtCreationDesc.m_textures2D[0] = m_hdrTempTex;
 	rtCreationDesc.m_textures2DCount = 1;
 	m_hdrRenderTarget = g_renderDevice->createRenderTarget(rtCreationDesc);
+	m_hdrRenderTarget->setDebugName("HDR Render Target");
 
 	m_hdrPassProgram = g_shaderManager->createShaderProgram(
 		"quad.vsh", 
@@ -106,12 +108,18 @@ void PostFxManager::initBlur(View* view)
 		// texture creation
 		m_hdrPinPongTextures[i] = g_renderDevice->createTexture2D(m_hdrPingPongTextureDesc, hdrPingPongTextureSubresourceDesc);
 
+		snprintf(buf, sizeof(buf), "HDR Pin-Pong Texture %i", i);
+		m_hdrPinPongTextures[i]->setDebugName(buf);
+
 		// framebuffer creation
 		RenderTargetCreationDesc rtCreationDesc = {};
 		rtCreationDesc.m_textures2D[0] = m_hdrPinPongTextures[i];
 		rtCreationDesc.m_textures2DCount = 1;
 
 		m_hdrPinPongRenderTargets[i] = g_renderDevice->createRenderTarget(rtCreationDesc);
+
+		snprintf(buf, sizeof(buf), "HDR Pin-Pong Render Target %i", i);
+		m_hdrPinPongRenderTargets[i]->setDebugName(buf);
 	}
 
 	SamplerDesc hdrPinPongSamplerDesc;

@@ -57,6 +57,10 @@ namespace engine {
 		return m_handle;
 	}
 
+	void GLRenderTarget::setDebugName(const char* debugName)
+	{
+	}
+
 	void GLRenderTarget::attachTexture2D(int slot, ITexture2D* textureHandle)
 	{
 		GLTexture2D* glTex = reinterpret_cast<GLTexture2D*>(textureHandle);

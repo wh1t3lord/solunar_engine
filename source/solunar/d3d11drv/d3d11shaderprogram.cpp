@@ -298,4 +298,10 @@ void D3D11ShaderProgram::createInputLayout(D3D11Device* device, ID3DBlob* vertex
 	shaderReflection->Release();
 }
 
+void D3D11ShaderProgram::setDebugName(const char* vsname, const char* psname)
+{
+	D3D11_CHECK(m_vertexShader->SetPrivateData(WKPDID_D3DDebugObjectName, strlen(vsname), vsname));
+	D3D11_CHECK(m_pixelShader->SetPrivateData(WKPDID_D3DDebugObjectName, strlen(psname), psname));
+}
+
 }

@@ -407,6 +407,7 @@ namespace engine
 			m_albedoTextureFileName = "textures/system/notex.bmp";
 
 		m_albedoTexture = g_contentManager->loadObject<TextureMap>(m_albedoTextureFileName);
+		m_albedoTexture.lock()->getHWTexture()->setDebugName(m_albedoTextureFileName.c_str());
 
 		//m_albedoTexture = dynamicCastPtr< TextureMap >(g_contentManager->load(m_albedoTextureName, TextureMap::getStaticTypeInfo()));
 

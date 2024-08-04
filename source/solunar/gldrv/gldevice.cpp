@@ -50,7 +50,8 @@ ISamplerState* GLDevice::createSamplerState(const SamplerDesc& samplerDesc)
 
 void GLDevice::setRenderTarget(IRenderTarget* rt)
 {
-	glBindFramebuffer(GL_FRAMEBUFFER, rt ? rt->getHandle() : 0);
+	GLRenderTarget* glrt = (GLRenderTarget*)rt;
+	glBindFramebuffer(GL_FRAMEBUFFER, glrt ? glrt->getHandle() : 0);
 }
 
 void GLDevice::setVertexBuffer(IBufferBase* buffer, uint32_t stride, uint32_t offset)

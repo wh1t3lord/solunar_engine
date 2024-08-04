@@ -52,6 +52,10 @@ SurfaceDesc GLTexture2D::getSurfaceDesc()
 	return m_surfaceDesc;
 }
 
+void GLTexture2D::setDebugName(const char* debugName)
+{
+}
+
 void GLTexture2D::updateTexture(const void* data, int rowPitch, int depthPitch)
 {
 	Assert2(0, "Not implemented");

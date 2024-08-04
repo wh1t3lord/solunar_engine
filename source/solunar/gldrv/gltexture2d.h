@@ -21,6 +21,8 @@ public:
 
 	uint32_t getHandle() { return m_textureHandle; }
 
+	void setDebugName(const char* debugName) override;
+
 private:
 	SurfaceDesc m_surfaceDesc;
 	uint32_t m_textureHandle;

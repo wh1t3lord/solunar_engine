@@ -76,6 +76,7 @@ void D3D11RenderTarget::create(D3D11Device* device, const RenderTargetCreationDe
 
 		// Create shader resource view
 
+#if 0
 		D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 		memset(&shaderResourceViewDesc, 0, sizeof(shaderResourceViewDesc));
 		shaderResourceViewDesc.Format = getDxgiFormat(textureDesc.m_format);
@@ -86,6 +87,8 @@ void D3D11RenderTarget::create(D3D11Device* device, const RenderTargetCreationDe
 		D3D11_CHECK(device->getDevice()->CreateShaderResourceView(d3dTexture, &shaderResourceViewDesc, &shaderResourceView));
 		
 		m_shaderResourceViews[i] = shaderResourceView;
+#endif
+		m_shaderResourceViews[i] = texture2D->getTextureSRV();
 	}
 
 	// Create depth render target
@@ -110,11 +113,13 @@ void D3D11RenderTarget::create(D3D11Device* device, const RenderTargetCreationDe
 
 void D3D11RenderTarget::release()
 {
+#if 0
 	for (auto& it : m_shaderResourceViews)
 	{
 		if (it)
 			it->Release();
 	}
+#endif
 
 	for (auto& it : m_renderTargetViews)
 	{
@@ -126,6 +131,15 @@ void D3D11RenderTarget::release()
 	{
 		m_depthStencilView->Release();
 		m_depthStencilView = nullptr;
+	}
+}
+
+void D3D11RenderTarget::setDebugName(const char* debugName)
+{
+	for (auto it : m_renderTargetViews)
+	{
+		if (it)
+			it->SetPrivateData(WKPDID_D3DDebugObjectName, strlen(debugName), debugName);
 	}
 }
 

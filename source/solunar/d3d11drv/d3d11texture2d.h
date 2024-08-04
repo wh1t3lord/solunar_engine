@@ -18,6 +18,8 @@ public:
 
 	void updateTexture(const void* data, int rowPitch, int depthPitch) override;
 
+	void setDebugName(const char* debugName) override;
+
 	SurfaceDesc getSurfaceDesc() override { return m_surfaceDesc; }
 	TextureDesc getTextureDesc() { return m_textureDesc; }
 
