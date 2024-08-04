@@ -393,31 +393,28 @@ namespace engine
 		g_renderDevice->setConstantBufferIndex(CBBindings_DirectionalLight, g_directionalLightConstantBuffer.get());
 	}
 
-	void setupPointLight(GraphicsWorld* graphicsWorld)
+	void updatePointLightCB(GraphicsWorld* graphicsWorld)
 	{
 		LightManager* lightMgr = graphicsWorld->getLightManager();
 		
 		const std::vector<LightComponent*>& lights = lightMgr->getLights();
+		const std::vector<PointLightComponent*>& pointLights = lightMgr->getPointLights();
 
-		std::vector<PointLightComponent*> pointLights;
-		for (auto& it : lights)
+		if (!pointLights.empty())
 		{
-			if (it->isA(PointLightComponent::getStaticTypeInfo()))
-				pointLights.push_back(dynamicCast<PointLightComponent>(it));
-		}
+			PointLightCB* pointLightData = (PointLightCB*)g_pointLightConstantBuffer->map(BufferMapping::WriteOnly);
+			for (int i = 0; i < pointLights.size(); i++)
+			{
+				auto it = pointLights[i];
+				pointLightData->pointLights[i].color = glm::vec4(it->m_color, 1.0f);
+				pointLightData->pointLights[i].position = glm::vec4(it->getEntity()->getPosition(), 1.0f);
+				pointLightData->pointLights[i].specular = glm::vec4(it->m_specularColor, 1.0f);
+				pointLightData->pointLights[i].lightData.r = it->m_radius;
+			}
 
-		PointLightCB* globalData = (PointLightCB*)g_pointLightConstantBuffer->map(BufferMapping::WriteOnly);
-		for (int i = 0; i < pointLights.size(); i++)
-		{
-			auto it = pointLights[i];
-			globalData->pointLights[i].color = glm::vec4(it->m_color, 1.0f);
-			globalData->pointLights[i].position = glm::vec4(it->getEntity()->getPosition(), 1.0f);
-			globalData->pointLights[i].specular = glm::vec4(it->m_specularColor, 1.0f);
-			globalData->pointLights[i].lightData.r = it->m_radius;
+			g_pointLightConstantBuffer->unmap();
+			pointLightData = nullptr;
 		}
-
-		g_pointLightConstantBuffer->unmap();
-		globalData = nullptr;
 
 		LightGlobalDataCB* lightGlobalData = (LightGlobalDataCB*)g_lightDataConstantBuffer->map(BufferMapping::WriteOnly);
 		lightGlobalData->m_pointLightCount = (uint32_t)pointLights.size();
@@ -437,7 +434,7 @@ namespace engine
 		setupLightData();
 
 		setupDirectionalLight(lightMgr->getDirectionalLight());
-		setupPointLight(graphicsWorld);
+		updatePointLightCB(graphicsWorld);
 	}
 
 	void Renderer::endFrame()

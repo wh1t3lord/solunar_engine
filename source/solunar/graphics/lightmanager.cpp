@@ -11,22 +11,31 @@ namespace engine
 	{
 		Assert(light);
 		m_lights.push_back(light);
+
+		if (PointLightComponent* pointLight = dynamicCast<PointLightComponent>(light))
+			m_pointLights.push_back(pointLight);
 	}
 
 	void LightManager::removeLight(LightComponent* light)
 	{
 		Assert(light);
-		
-		typedef std::vector<LightComponent*>::iterator LT;
 
-		LT I = m_lights.begin();
-		LT E = m_lights.end();
+		auto it = std::find(m_lights.begin(), m_lights.end(), light);
+		if (it != m_lights.end())
+		{
+			m_lights.erase(it);
+		}
 
-		for (; I != E;)
-			if (*I == light)
-				break;
-
-		m_lights.erase(I);
+		// clean from point light array
+		if (PointLightComponent* pointLight = dynamicCast<PointLightComponent>(light))
+		{
+			// find in array
+			auto it2 = std::find(m_pointLights.begin(), m_pointLights.end(), pointLight);
+			if (it2 != m_pointLights.end())
+			{
+				m_pointLights.erase(it2);
+			}
+		}
 	}
 
 	DirectionalLightComponent* LightManager::getDirectionalLight()
