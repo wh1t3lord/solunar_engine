@@ -26,3 +26,9 @@ add_subdirectory(shockgame)
 
 # Entry point
 add_subdirectory(main)
+
+##########
+# Tools ##
+##########
+
+add_subdirectory(packer)

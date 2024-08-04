@@ -6,6 +6,7 @@
 #include "core/file/contentdevice.h"
 #include "core/file/filesystem.h"
 #include "core/file/filestream.h"
+#include "core/file/filesystem_pack.h"
 
 namespace engine
 {
@@ -29,6 +30,9 @@ DataStreamPtr ContentDevice::openStream(const std::string& filename)
 	std::string path = m_path;
 	path += "/";
 	path += filename;
+
+	if (g_fileSystemPack.exist(filename))
+		return g_fileSystemPack.openStream(filename, true);
 
 	if (!g_fileSystem->exist(path.c_str()))
 		return DataStreamPtr(nullptr);

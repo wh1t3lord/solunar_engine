@@ -3,6 +3,7 @@
 #include "core/utils/logger.h"
 #include "core/memory/memorymanager.h"
 #include "core/file/filesystem_win32.h"
+#include "core/file/filesystem_pack.h"
 #include "core/file/contentmanager.h"
 #include "core/object/typemanager.h"
 #include "core/object/object.h"
@@ -30,6 +31,8 @@ void Core::init()
 	// Allocate native filesystem
 	g_fileSystem = mem_new<FileSystem_Win32>();
 
+	g_fileSystemPack.initialize();
+
 	g_contentManager = mem_new<ContentManager>();
 	g_contentManager->init();
 
@@ -44,6 +47,8 @@ void Core::shutdown()
 		mem_delete(g_contentManager);
 		g_contentManager = nullptr;
 	}
+
+	g_fileSystemPack.shutdown();
 
 	if (g_fileSystem)
 	{
