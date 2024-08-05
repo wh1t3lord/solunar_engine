@@ -31,6 +31,7 @@ ShockPlayerController::ShockPlayerController() :
 	memset(&m_playerStats, 0, sizeof(m_playerStats));
 	m_playerStats.m_health = 100.0f;
 	m_playerStats.m_endurance = 25.0f;
+	m_weaponSwayAngles = glm::vec3(0.0f);
 }
 
 ShockPlayerController::~ShockPlayerController()
@@ -75,7 +76,7 @@ void ShockPlayerController::initializeCamera()
 	// m_camera = m_cameraNode->createComponentByType<CameraFirstPersonComponent>();
 
 	m_cameraEntity = getEntity()->createChild();
-	m_cameraEntity->setPosition(glm::vec3(0.0f, 0.5f, 0.0f));
+	m_cameraEntity->setPosition(glm::vec3(0.0f, -0.2f, 0.0f));
 
 	m_camera = m_cameraEntity->createComponent<CameraFirstPersonComponent>();
 	//m_camera = getEntity()->createComponent<CameraFirstPersonComponent>();
@@ -211,11 +212,24 @@ void ShockPlayerController::updateCamera(float dt)
 	 m_camera->updateFromMousePosition(deltaMousePos);
 	 input->resetDelta();
 #endif
-	 //getEntity()->setRotation(m_camera->getDirection());
-	 //m_weaponEntity->setRotation(m_camera->getDirection());
+
+#if 0
+	//getEntity()->setRotation(m_camera->getDirection());
+	//m_weaponEntity->setRotation(m_camera->getDirection());
+
+	glm::vec3 weaponSwayRotation = glm::vec3(glm::radians(m_camera->m_pitch), glm::radians(-m_camera->m_yaw), 0.0f);
+	m_weaponSwayAngles = glm::lerp(weaponSwayRotation, m_weaponSwayAngles, 12.0f * dt);
+
+	glm::quat rot = glm::eulerAngleYX(m_weaponSwayAngles.y, m_weaponSwayAngles.x);
+	m_weaponEntity->setRotation(rot);
+
+	//glm::quat rot = glm::eulerAngleYX(glm::radians(-m_camera->m_yaw), glm::radians(m_camera->m_pitch));
+	//m_weaponEntity->setRotation(glm::slerp(rot, m_weaponEntity->getRotation(), 55.0f * dt));
+	//m_weaponEntity->setRotation(rot);
+#endif
 
 	glm::quat rot = glm::eulerAngleYX(glm::radians(-m_camera->m_yaw), glm::radians(m_camera->m_pitch));
-	m_weaponEntity->setRotation(glm::slerp(rot, m_weaponEntity->getRotation(), 55.0f * dt));
+	m_weaponEntity->setRotation(rot);
 
 #if 0
 	 glm::vec3 cameraDirection = CameraProxy::getInstance()->getDirection();

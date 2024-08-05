@@ -88,6 +88,7 @@ namespace engine
 		m_selfillum = false;
 		m_clampToEdge = false;
 		m_skipmips = false;
+		m_pointFilter = false;
 		m_materialInstance = nullptr;
 		m_isFirstPersonWeapon = false;
 	}
@@ -160,6 +161,11 @@ namespace engine
 			const tinyxml2::XMLAttribute* clampToEdge = albedoTexture->FindAttribute("ClampToEdge");
 			if (clampToEdge) {
 				m_clampToEdge = clampToEdge->BoolValue();
+			}
+
+			const tinyxml2::XMLAttribute* pointFilter = albedoTexture->FindAttribute("PointFilter");
+			if (pointFilter) {
+				m_pointFilter = pointFilter->BoolValue();
 			}
 		} else {
 			m_albedoTextureFileName = "textures/notexture.png";
@@ -380,11 +386,22 @@ namespace engine
 			albedoSamplerDesc.m_magFilter = TextureFilter::Linear;
 		}
 
+		if (m_pointFilter)
+		{
+			albedoSamplerDesc.m_minFilter = TextureFilter::Nearest;
+			albedoSamplerDesc.m_magFilter = TextureFilter::Nearest;
+		}
+
 		// set anisotropy filter based on what we have in graphics options
 
 		int anisotropicQuality = g_graphicsOptions.m_anisotropicQuality;
 		if (anisotropicQuality <= 0)
 			anisotropicQuality = 1;
+
+		if (m_pointFilter)
+		{
+			anisotropicQuality = 1;
+		}
 
 		albedoSamplerDesc.m_anisotropyLevel = (float)anisotropicQuality;
 
@@ -407,7 +424,9 @@ namespace engine
 			m_albedoTextureFileName = "textures/system/notex.bmp";
 
 		m_albedoTexture = g_contentManager->loadObject<TextureMap>(m_albedoTextureFileName);
-		m_albedoTexture.lock()->getHWTexture()->setDebugName(m_albedoTextureFileName.c_str());
+
+		if (m_albedoTexture.lock())
+			m_albedoTexture.lock()->getHWTexture()->setDebugName(m_albedoTextureFileName.c_str());
 
 		//m_albedoTexture = dynamicCastPtr< TextureMap >(g_contentManager->load(m_albedoTextureName, TextureMap::getStaticTypeInfo()));
 

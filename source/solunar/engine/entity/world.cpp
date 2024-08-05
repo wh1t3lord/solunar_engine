@@ -8,6 +8,7 @@
 #include "engine/physics/physicsworld.h"
 #include "engine/physics/rigidbodycomponent.h"
 #include "engine/physics/shapescomponent.h"
+#include <imgui.h>
 
 namespace engine
 {

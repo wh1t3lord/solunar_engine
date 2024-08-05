@@ -246,7 +246,7 @@ namespace engine {
 		// Register properties #TODO: PLEASE MAKE IT MORE NORMAL
 		PropertyRegistrator::getInstance()->registerClasses();
 
-		exportClassesForEditor();
+	//	exportClassesForEditor();
 
 		if (g_commandLine.hasOption("-world"))
 		{
@@ -340,6 +340,9 @@ namespace engine {
 
 		// sound
 		AudioManager::getInstance()->update();
+
+		// set listener position #TODO: SHOULD THIS BE BEFORE AUDIOMANAGER UPDATE
+		AudioManager::getInstance()->setListenerPosition(CameraProxy::getInstance()->getPosition());
 
 		// install current view
 		g_renderer->setView(CameraProxy::getInstance()->getView());

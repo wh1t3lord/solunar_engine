@@ -23,6 +23,8 @@ namespace engine
 
 		virtual AudioSource* createSource(const std::string& filename);
 		virtual void deleteSource(AudioSource* source);
+
+		virtual void setListenerPosition(const glm::vec3& position);
 	};
 }
 

@@ -256,11 +256,9 @@ Component* Entity::getComponentByTypeInfo(const TypeInfo* typeinfo)
 	for (ComponentIt it = m_components.begin(); it != m_components.end(); ++it)
 	{
 		Component* component = *it;
-		if (component)
+		if (component && component->isA(typeinfo))
 		{
-			const TypeInfo* compTypeInfo = component->getTypeInfo();
-			if (compTypeInfo && compTypeInfo->isA(typeinfo))
-				return component;
+			return component;
 		}
 	}
 
@@ -288,33 +286,10 @@ void Entity::updateWorldTransform()
 		m_worldTransform = glm::scale(m_worldTransform, m_scale) * rotation * glm::translate(m_worldTransform, m_position);
 }
 
-BoundingBox Entity_TransformBox(const BoundingBox& box, const glm::mat4& m)
-{
-	// transform to center/extents box representation
-	glm::vec3 center = (box.m_max + box.m_min) * glm::vec3(0.5);
-	glm::vec3 extents = box.m_max - center;
-
-	// transform center
-	glm::vec3 t_center = glm::vec3(m * glm::vec4(center, 1.0));
-
-	// transform extents (take maximum)
-	glm::mat3 abs_mat = glm::mat3(abs(glm::vec3(m[0])), abs(glm::vec3(m[1])), abs(glm::vec3(m[2])));
-	glm::vec3 t_extents = abs_mat * extents;
-
-	// transform to min/max box representation
-	glm::vec3 tmin = t_center - t_extents;
-	glm::vec3 tmax = t_center + t_extents;
-
-	BoundingBox rbox;
-	rbox.setIdentity();
-	rbox.m_min = tmin;
-	rbox.m_max = tmax;
-	return rbox;
-}
-
 void Entity::transformBBox()
 {
-	m_worldBoundingBox = Entity_TransformBox(m_boundingBox, getWorldTranslation());
+	m_worldBoundingBox = m_boundingBox;
+	m_worldBoundingBox.transformAABB(getWorldTranslation());
 }
 
 void Entity::quaternionRotate(const glm::vec3& axis, float angle)

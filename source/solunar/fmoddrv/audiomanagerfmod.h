@@ -26,6 +26,8 @@ namespace engine
 		virtual AudioSource* createSource(const std::string& filename);
 		virtual void deleteSource(AudioSource* source);
 	
+		void setListenerPosition(const glm::vec3& position);
+
 		FMOD::System* getFMODSystem();
 
 		FMOD::Studio::System* getStudioSystem() { return m_studioSystem; }

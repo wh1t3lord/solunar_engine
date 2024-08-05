@@ -18,13 +18,26 @@
 	
 	<!-- Test animated model -->
 	<Entity>
-		<Position x="0" y="0" z="0"/>
+		<Position x="2" y="0" z="2"/>
 		<Rotation x="0" y="0" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		<AnimatedMeshComponent>
 			<Model filename="models/test_enemy.glb"/>
 		</AnimatedMeshComponent>
 		<TestAnimationComponent/>
+	</Entity> 
+	
+	<!-- Test point light -->
+	<Entity>
+		<Position x="0" y="1" z="0"/>
+		<Rotation x="0" y="0" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		<PointLightComponent>
+			<AmbientColor r="0.501" g="0.443" b="0.337"/>
+			<Color r="2.678" g="2.596" b="2.427"/>
+			<SpecularColor r="2.678" g="2.596" b="2.427"/>
+			<Radius value="12"/>
+		</PointLightComponent>
 	</Entity> 
 	
 	<!-- Test entity with skysphere -->
@@ -40,7 +53,7 @@
 	<!-- Test entity with directional light -->
 	<Entity>
 		<Position x="0" y="0" z="0"/>
-		<Rotation x="-90" y="0" z="0"/>
+		<Rotation x="0" y="20" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		
 		<DirectionalLightComponent>
@@ -51,7 +64,7 @@
 	
 	<!-- Player -->
 	<Entity>
-		<Position x="10" y="100" z="10"/>
+		<Position x="10" y="10" z="10"/>
 		<Rotation x="0" y="0" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		<ShockPlayerController/>

@@ -185,10 +185,13 @@ namespace engine
 		TypeManager::getInstance()->registerObject<ModelBase>();
 	}
 
-	unsigned int kAssimpFlags = aiProcess_Triangulate | 
-								aiProcess_PreTransformVertices | 
-								aiProcess_GenSmoothNormals | 
-								aiProcess_CalcTangentSpace;
+	unsigned int kAssimpFlags =                      // some optimizations and safety checks
+		aiProcess_OptimizeMeshes |                                   // minimize number of meshes
+		aiProcess_PreTransformVertices |                             // apply node matrices
+		aiProcess_Triangulate |
+		aiProcess_TransformUVCoords /*|*/ // apply UV transformations
+		/*aiProcess_FlipUVs*/
+		;
 
 	void ModelBase::load(const std::shared_ptr<DataStream>& dataStream)
 	{

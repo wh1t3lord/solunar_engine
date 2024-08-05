@@ -54,6 +54,8 @@ private:
 	Entity* m_weaponEntity;
 	AnimatedMeshComponent* m_weaponMesh;
 
+	glm::vec3 m_weaponSwayAngles;
+
 public:
 	bool m_flyCam;
 };

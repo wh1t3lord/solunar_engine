@@ -1,16 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <World>
-	<!-- Test entity with mesh -->
+	<!-- Level Geometry -->
 	<Entity>
 		<Position x="0" y="0" z="0"/>
-		<Rotation x="0" y="90" z="0"/>
+		<Rotation x="180" y="90" z="0"/>
 		<Scale x="1" y="1" z="1"/>
-		
 		<MeshComponent>
-			<Model filename="models/l01_street.dae"/>
+			<Model filename="models/common_floor.dae"/>
 		</MeshComponent>
-		
-		<!-- <TestRotatorComponent/>-->
+		<RigidBodyComponent>
+			<Static value="true"/>
+		</RigidBodyComponent>
+		<BoxShapeComponent>
+			<Size x="20" y="1" z="20"/>
+		</BoxShapeComponent>
 	</Entity>
 	
 	<!-- Test entity with directional light -->
@@ -33,7 +36,55 @@
 		<ShockPlayerController/>
 	</Entity>
 	
-	<!-- TEMP LEVEL COLLISION -->
+	<!-------------------------------------------------------------------->
+	<!-- TRAIDER -->
+	
+	<Entity>
+		<Position x="2" y="1.36" z="1.31"/>
+		<Rotation x="0" y="0" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		<PointLightComponent>
+			<AmbientColor r="0" g="0" b="0"/>
+			<Color r="1" g="1" b="1"/>
+			<SpecularColor r="1" g="1" b="1"/>
+			<Radius value="2"/>
+		</PointLightComponent>
+	</Entity> 
+	
+	<Entity>
+		<Position x="2" y="0" z="2"/>
+		<Rotation x="0" y="0" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		<MeshComponent>
+			<Model filename="models/stul_traider.dae"/>
+		</MeshComponent>
+	</Entity>
+	
+	<Entity>
+		<Position x="2" y="0" z="1.3"/>
+		<Rotation x="0" y="0" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		<MeshComponent>
+			<Model filename="models/stol_traider.dae"/>
+		</MeshComponent>
+	</Entity>
+	
+	<Entity>
+		<Position x="2" y="0" z="2"/>
+		<Rotation x="0" y="0" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		<AnimatedMeshComponent>
+			<Model filename="models/traider.glb"/>
+		</AnimatedMeshComponent>
+		<TestAnimationComponent>
+			<AnimationName name="idle"/>
+		</TestAnimationComponent>
+	</Entity>
+	
+	<!-------------------------------------------------------------------->
+	
+	
+	<!-- TEMP LEVEL COLLISION 
 	<Entity>
 		<Position x="0" y="-1.0" z="0"/>
 		<Rotation x="0" y="0" z="0"/>
@@ -47,9 +98,9 @@
 		<BoxShapeComponent>
 			<Size x="7.0" y="1.0" z="30.0"/>
 		</BoxShapeComponent>
-	</Entity>
+	</Entity> -->
 	<!-------------------------->
-	
+	<!--
 	<Entity>
 		<Position x="0" y="0" z="0"/>
 		<Rotation x="0" y="90" z="0"/>
@@ -57,5 +108,5 @@
 		<MeshComponent>
 			<Model filename="models/demo_sky.dae"/>
 		</MeshComponent>
-	</Entity>
+	</Entity> -->
 </World>

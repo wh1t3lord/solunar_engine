@@ -12,6 +12,8 @@ public:
 public:
 	void setIdentity();
 
+    BoundingBox& transformAABB(const glm::mat4& modelMatrix);
+
     //! Returns a bool whether the given point is inside the bounding volume.
     bool contains(const glm::vec3& pPoint) const
     {
@@ -32,26 +34,6 @@ public:
     float getExtend() const
     {
         return glm::length((m_max - m_min)) * 0.5f;
-    }
-
-    const glm::vec3 operator() (uint32_t pElem) const
-    {
-        if (pElem == 0)
-            return m_min;
-        else if (pElem == 1)
-            return m_max;
-
-        return glm::vec3(0.f);
-    }
-
-    glm::vec3 operator() (uint32_t pElem)
-    {
-        if (pElem == 0)
-            return m_min;
-        else if (pElem == 1)
-            return m_max;
-
-        return glm::vec3(0.f);
     }
 };
 	

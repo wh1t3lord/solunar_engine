@@ -40,4 +40,8 @@ namespace engine
 
 	}
 
+	void AudioManager::setListenerPosition(const glm::vec3& position)
+	{
+	}
+
 }

@@ -130,6 +130,7 @@ namespace engine
 		bool m_skipmips;
 		bool m_selfillum;
 		bool m_clampToEdge;
+		bool m_pointFilter;
 		bool m_isFirstPersonWeapon;
 
 		IRasterizerState* m_rasterizerDesc;

@@ -138,7 +138,7 @@ void TestAnimationComponent::loadXML(tinyxml2::XMLElement& element)
 	tinyxml2::XMLElement* animationNameElement = element.FirstChildElement("AnimationName");
 	if (animationNameElement)
 	{
-		const tinyxml2::XMLAttribute* animationNameAttribute = animationNameElement->FindAttribute("value");
+		const tinyxml2::XMLAttribute* animationNameAttribute = animationNameElement->FindAttribute("name");
 		if (animationNameAttribute)
 		{
 			m_animationName = animationNameAttribute->Value();
