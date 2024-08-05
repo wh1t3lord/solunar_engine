@@ -71,12 +71,14 @@ namespace engine
 		FMOD::Debug_Initialize(FMOD_DEBUG_LEVEL_LOG, FMOD_DEBUG_MODE_CALLBACK, &FMOD_LoggerCallback, nullptr);
 #endif // !NDEBUG
 
+		// Create the Studio System object.
 		FMOD_RESULT result = FMOD::Studio::System::create(&m_studioSystem);
 		if (result != FMOD_OK)
 		{
 			Core::error("Failed to create FMOD Studio. Error code:%s", FMOD_ErrorString(result));
 		}
 
+		// Initialize FMOD Studio, which will also initialize FMOD Core
 		result = m_studioSystem->initialize(512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, nullptr);
 		if (result != FMOD_OK)
 		{
@@ -85,6 +87,7 @@ namespace engine
 
 		Core::msg("[audio]: fmod initialized");
 
+		// Initialize music manager.
 		MusicManager::getInstance()->init();
 	}
 

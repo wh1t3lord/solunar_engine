@@ -139,6 +139,7 @@ namespace engine
 		// Setup orthographic projection matrix into our constant buffer
 		// Our visible imgui space lies from draw_data->DisplayPos (top left) to draw_data->DisplayPos+data_data->DisplaySize (bottom right). DisplayPos is (0,0) for single viewport apps.
 		{
+#if 1
 			VERTEX_CONSTANT_BUFFER_DX11* constant_buffer = (VERTEX_CONSTANT_BUFFER_DX11*)m_pVertexConstantBuffer->map(BufferMapping::WriteOnly);
 			float L = draw_data->DisplayPos.x;
 			float R = draw_data->DisplayPos.x + draw_data->DisplaySize.x;
@@ -153,6 +154,14 @@ namespace engine
 			};
 			memcpy(&constant_buffer->mvp, mvp, sizeof(mvp));
 			m_pVertexConstantBuffer->unmap();
+#else
+			// calculate ortho matrix based on current view
+			glm::mat4 proj = glm::ortho(0.0f, draw_data->DisplaySize.x, 0.0f, draw_data->DisplaySize.y, 0.1f, 100.0f);
+
+			VERTEX_CONSTANT_BUFFER_DX11* constant_buffer = (VERTEX_CONSTANT_BUFFER_DX11*)m_pVertexConstantBuffer->map(BufferMapping::WriteOnly);
+			memcpy(&constant_buffer->mvp, &proj[0], sizeof(proj));
+			m_pVertexConstantBuffer->unmap();
+#endif
 		}
 
 		// Setup desired DX state
