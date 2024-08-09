@@ -14,18 +14,30 @@ namespace engine
 struct IRasterizerState
 {
     RasterizerStateDesc m_desc;
+
+	IRasterizerState(const RasterizerStateDesc& desc) :
+		m_desc(desc)
+	{}
 };
 
 // implementation of IBlendState interface
 struct IBlendState
 {
     BlendStateDesc m_desc;
+
+	IBlendState(const BlendStateDesc& desc) :
+		m_desc(desc)
+	{}
 };
 
 // implementation of IDepthStencilState interface
 struct IDepthStencilState
 {
     DepthStencilDesc m_desc;
+
+	IDepthStencilState(const DepthStencilDesc& desc) :
+		m_desc(desc)
+	{}
 };
 
 template <typename T>
@@ -95,16 +107,10 @@ public:
 	void setDepthStencilState(IDepthStencilState* state, uint32_t stencilRef) override;
 
 private:
-	//std::map<RasterizerStateKey, IRasterizerState, AnyStructComparer<RasterizerStateKey>> m_rasterizerStates;
-	//std::map<SamplerStateKey, ISamplerState, AnyStructComparer<SamplerStateKey>> m_samplerStates;
-	//std::map<BlendStateKey, IBlendState, AnyStructComparer<BlendStateKey>> m_blendStates;
-	//std::map<DepthStencilKey, IDepthStencilState, AnyStructComparer<DepthStencilKey>> m_depthStencilStates;
-
-	std::vector<IRasterizerState> m_rasterizerStates;
+	std::map<RasterizerStateKey, IRasterizerState*, AnyStructComparer<RasterizerStateKey>> m_rasterizerStates;
 	std::map<SamplerStateKey, ISamplerState*, AnyStructComparer<SamplerStateKey>> m_samplerStates;
-	std::vector<IBlendState> m_blendStates;
-	std::vector<IDepthStencilState> m_depthStencilStates;
-	
+	std::map<BlendStateKey, IBlendState*, AnyStructComparer<BlendStateKey>> m_blendStates;
+	std::map<DepthStencilKey, IDepthStencilState*, AnyStructComparer<DepthStencilKey>> m_depthStencilStates;	
 };
 
 #define g_glStateManager ((GLStateManager*)g_stateManager)
