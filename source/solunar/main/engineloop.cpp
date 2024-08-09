@@ -355,7 +355,7 @@ namespace engine {
 
 #ifndef FINAL_BUILD
 		// Draw the engine debug overlay
-		engineDebugOverlay();
+		//engineDebugOverlay();
 #endif // !FINAL_BUILD
 		
 		// End and render ImGui

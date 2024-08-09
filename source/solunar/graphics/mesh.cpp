@@ -44,10 +44,6 @@ namespace engine {
 
 	void MeshComponent::render()
 	{
-#ifndef FINAL_BUILD
-		BoundingBox boundingBox = getEntity()->getBoundingBox();
-		g_debugRender.drawBoundingBox(boundingBox, glm::vec3(1.f));
-#endif // !FINAL_BUILD
 	}
 
 	void MeshComponent::loadModel(const std::string& filename)
