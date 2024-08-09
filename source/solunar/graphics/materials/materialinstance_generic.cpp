@@ -51,6 +51,16 @@ IShaderProgram* MaterialInstance_Generic::ms_pixelVariations[VertexFactory_Count
 
 MaterialInstance_Generic::MaterialInstance_Generic()
 {
+	// #TODO: MAKE NORMAL SHADER PRECACHE
+	static bool isInited = false;
+	if (!isInited)
+	{
+		getShaderProgramVariation(VertexFactory_StaticMesh, PixelVariation_Lit);
+		getShaderProgramVariation(VertexFactory_StaticMesh, PixelVariation_Unlit);
+		getShaderProgramVariation(VertexFactory_SkinnedMesh, PixelVariation_Lit);
+		getShaderProgramVariation(VertexFactory_SkinnedMesh, PixelVariation_Unlit);
+		isInited = true;
+	}
 }
 
 MaterialInstance_Generic::~MaterialInstance_Generic()
