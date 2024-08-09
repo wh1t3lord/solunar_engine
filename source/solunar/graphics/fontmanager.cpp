@@ -61,15 +61,15 @@ void FontManager::initPrivate()
 {
 	// create sampler state for font texture
 
-	SamplerDesc fontTextureSamplerDesc;
-	memset(&fontTextureSamplerDesc, 0, sizeof(fontTextureSamplerDesc));
-	fontTextureSamplerDesc.m_minFilter = TextureFilter::Nearest;
-	fontTextureSamplerDesc.m_magFilter = TextureFilter::Nearest;
-	fontTextureSamplerDesc.m_wrapS = TextureWrap::ClampToEdge;
-	fontTextureSamplerDesc.m_wrapT = TextureWrap::ClampToEdge;
-	fontTextureSamplerDesc.m_anisotropyLevel = 1.0f;
+	SamplerDesc fontSamplerDesc;
+	memset(&fontSamplerDesc, 0, sizeof(fontSamplerDesc));
+	fontSamplerDesc.m_minFilter = TextureFilter::Nearest;
+	fontSamplerDesc.m_magFilter = TextureFilter::Nearest;
+	fontSamplerDesc.m_wrapS = TextureWrap::ClampToEdge;
+	fontSamplerDesc.m_wrapT = TextureWrap::ClampToEdge;
+	fontSamplerDesc.m_anisotropyLevel = 1.0f;
 
-	m_textureSampler = g_renderDevice->createSamplerState(fontTextureSamplerDesc);
+	m_textureSampler = g_renderDevice->createSamplerState(fontSamplerDesc);
 
 	// create characters buffer
 
@@ -149,6 +149,9 @@ void FontManager::flushPrimitives()
 {
 	Assert2(g_renderer, "Called before renderer initialization.");
 	Assert(m_vertexBuffer);
+
+	if (m_drawStrings.empty())
+		return;
 
 	// bind texture and their sampler
 	g_renderDevice->setSampler(0, m_textureSampler);
