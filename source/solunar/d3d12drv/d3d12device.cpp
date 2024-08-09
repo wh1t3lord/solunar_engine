@@ -179,17 +179,32 @@ void D3D12Device::setConstantBufferIndex(int slot, IBufferBase* cb)
 
 void D3D12Device::setVertexBuffer(IBufferBase* buffer, uint32_t stride, uint32_t offset)
 {
-	//D3D12BufferImpl* bufferImpl = (D3D12BufferImpl*)buffer;
-	//ID3D12Buffer* pD3DBuffer = bufferImpl->getBuffer();
-	//m_deviceContext->IASetVertexBuffers(0, 1, &pD3DBuffer, &stride, &offset);
+	D3D12BufferImpl* bufferImpl = (D3D12BufferImpl*)buffer;
+	if (bufferImpl)
+	{
+		const D3D12_VERTEX_BUFFER_VIEW& bufferView = bufferImpl->getVertexBufferView();
+		m_commandList->IASetVertexBuffers(0, 1, &bufferView);
+	}
+	else
+	{
+		m_commandList->IASetVertexBuffers(0, 1, NULL);
+	}
 }
 
 void D3D12Device::setIndexBuffer(IBufferBase* buffer, bool use16bitsIndices)
 {
-	//D3D12BufferImpl* bufferImpl = (D3D12BufferImpl*)buffer;
-	//ID3D12Buffer* pD3DBuffer = bufferImpl->getBuffer();
-	//
-	//m_deviceContext->IASetIndexBuffer(pD3DBuffer, use16bitsIndices ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT, 0);
+	D3D12BufferImpl* bufferImpl = (D3D12BufferImpl*)buffer;
+	if (bufferImpl)
+	{
+		bufferImpl->setIndexFormat(use16bitsIndices);
+
+		const D3D12_INDEX_BUFFER_VIEW& bufferView = bufferImpl->getIndexBufferView();
+		m_commandList->IASetIndexBuffer(&bufferView);
+	}
+	else
+	{
+		m_commandList->IASetIndexBuffer(NULL);
+	}
 }
 
 void D3D12Device::setTexture2D(int slot, ITexture2D* texture)
@@ -225,6 +240,8 @@ void D3D12Device::setSampler(int slot, ISamplerState* sampler)
 		m_deviceContext->PSSetSamplers(slot, 0, nullptr);
 	}
 #endif
+
+	
 }
 
 void D3D12Device::setViewport(Viewport* viewport)
@@ -240,7 +257,7 @@ void D3D12Device::setViewport(Viewport* viewport)
 	vp.Height = viewport->m_height;
 	vp.MinDepth = 0.1f;
 	vp.MaxDepth = 1.0000f;
-//	m_deviceContext->RSSetViewports(1, &vp);
+	m_commandList->RSSetViewports(1, &vp);
 
 	// copy viewport to device
 	m_viewport = *viewport;
@@ -254,19 +271,19 @@ Viewport D3D12Device::getViewport()
 void D3D12Device::setScissors(float x, float y, float w, float h)
 {
 	D3D12_RECT rect = { static_cast<LONG>(x), static_cast<LONG>(y), static_cast<LONG>(w), static_cast<LONG>(h) };
-	//m_deviceContext->RSSetScissorRects(1, &rect);
+	m_commandList->RSSetScissorRects(1, &rect);
 }
 
 void D3D12Device::draw(PrimitiveMode primitiveMode, size_t verticesStart, size_t verticesCount)
 {
-	//m_deviceContext->IASetPrimitiveTopology(getD3D12PrimitiveTopology(primitiveMode));
-	//m_deviceContext->Draw(verticesCount, verticesStart);
+	m_commandList->IASetPrimitiveTopology(getD3D12PrimitiveTopology(primitiveMode));
+	m_commandList->DrawInstanced(verticesCount, 1, verticesStart, 0);
 }
 
 void D3D12Device::drawIndexed(PrimitiveMode primitiveMode, size_t indexStart, size_t indexCount, int baseVertexLocation)
 {
-	//m_deviceContext->IASetPrimitiveTopology(getD3D12PrimitiveTopology(primitiveMode));
-	//m_deviceContext->DrawIndexed(indexCount, indexStart, baseVertexLocation);
+	m_commandList->IASetPrimitiveTopology(getD3D12PrimitiveTopology(primitiveMode));
+	m_commandList->DrawIndexedInstanced(indexCount, 1, indexStart, baseVertexLocation, 0);
 }
 
 }
