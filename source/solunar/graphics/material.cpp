@@ -424,6 +424,7 @@ namespace engine
 			m_albedoTextureFileName = "textures/system/notex.bmp";
 
 		m_albedoTexture = g_contentManager->loadObject<TextureMap>(m_albedoTextureFileName);
+		m_albedoTexture.lock()->getHWTexture()->setDebugName(m_albedoTextureFileName.c_str());
 
 		if (m_albedoTexture.lock())
 			m_albedoTexture.lock()->getHWTexture()->setDebugName(m_albedoTextureFileName.c_str());

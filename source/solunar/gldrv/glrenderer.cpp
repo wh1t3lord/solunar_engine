@@ -545,6 +545,8 @@ namespace engine {
 				//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 				g_renderDevice->draw(PM_TriangleList, 0, submesh->getVerticesCount());
+				m_statistic.m_draw += submesh->getVerticesCount();
+
 				//	glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
 					//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
 
@@ -633,6 +635,8 @@ namespace engine {
 				//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 				g_renderDevice->drawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
+				m_statistic.m_drawIndexed += submesh->m_indicesCount;
+
 				//g_renderDevice->draw(PM_TriangleList, 0, submesh->m_verticesCount);
 				//	glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
 					//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);

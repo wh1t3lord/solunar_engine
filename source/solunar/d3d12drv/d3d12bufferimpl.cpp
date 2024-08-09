@@ -72,6 +72,9 @@ D3D12BufferImpl::D3D12BufferImpl(D3D12Device* device, const BufferDesc& bufferDe
 	m_device(nullptr),
 	m_bufferDesc(bufferDesc)
 {
+	memset(&m_vertexBufferView, 0, sizeof(m_vertexBufferView));
+	memset(&m_indexBufferView, 0, sizeof(m_indexBufferView));
+
 	create(device, bufferDesc, subresourceDesc);
 }
 
@@ -122,14 +125,22 @@ void D3D12BufferImpl::create(D3D12Device* device, const BufferDesc& bufferDesc, 
 	memcpy(pDataBegin, subresourceDesc.m_memory, bufferDesc.m_bufferMemorySize);
 	m_buffer->Unmap(0, nullptr);
 
-	m_bufferView.BufferLocation = m_buffer->GetGPUVirtualAddress();
-	m_bufferView.StrideInBytes = subresourceDesc.m_memoryPitch;
-	m_bufferView.SizeInBytes = bufferDesc.m_bufferMemorySize;
+	if (bufferDesc.m_bufferType == BufferType::VertexBuffer)
+	{
+		m_vertexBufferView.BufferLocation = m_buffer->GetGPUVirtualAddress();
+		m_vertexBufferView.StrideInBytes = subresourceDesc.m_memoryPitch;
+		m_vertexBufferView.SizeInBytes = bufferDesc.m_bufferMemorySize;
+	}
+	else if (bufferDesc.m_bufferType == BufferType::IndexBuffer)
+	{
+		m_indexBufferView.BufferLocation = m_buffer->GetGPUVirtualAddress();
+		m_indexBufferView.SizeInBytes = bufferDesc.m_bufferMemorySize;
+	}
 }
 
 void D3D12BufferImpl::destroy()
 {
-	memset(&m_bufferView, 0, sizeof(m_bufferView));
+	memset(&m_vertexBufferView, 0, sizeof(m_vertexBufferView));
 
 	if (m_buffer)
 	{
@@ -157,6 +168,11 @@ void D3D12BufferImpl::updateSubresource(void* data, size_t size)
 {
 	Assert2(0, "Implement please");
 //	m_device->getDeviceContext()->UpdateSubresource(m_buffer, 0, NULL, data, 0, 0);
+}
+
+void D3D12BufferImpl::setIndexFormat(bool is16BitIndices)
+{
+	m_indexBufferView.Format = is16BitIndices ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
 }
 
 }

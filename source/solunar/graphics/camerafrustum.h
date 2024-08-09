@@ -3,12 +3,29 @@
 
 #include "core/math/boundingbox.h"
 
+#define CAMERA_FRUSTUM_PLANE_COUNT 6
+
 namespace engine
 {
+	enum Halfspace
+	{
+		Halfspace_Negative = -1,
+		Halfspace_OnPlane = 0,
+		Halfspace_Positive = 1
+	};
+
 	struct Plane
 	{
 		float a, b, c;
 		float d;
+
+		void setIdentity();
+		
+		Plane& normalize();
+
+		float distanceToPoint(const glm::vec3& pt);
+
+		Halfspace classifyPoint(const glm::vec3& pt);
 	};
 
 	class CameraFrustum
@@ -19,7 +36,7 @@ namespace engine
 		bool isBoundingBoxInside(const BoundingBox& boundingBox);
 
 	private:
-		Plane m_plane[6];
+		Plane m_planes[CAMERA_FRUSTUM_PLANE_COUNT];
 	};
 }
 
