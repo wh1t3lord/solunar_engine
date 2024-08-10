@@ -38,7 +38,7 @@ namespace engine
 		}
 		else
 		{
-			Core::error("getMaterialType: Doesnt support old shader %s", shaderName);	
+			Core::error("getMaterialType: Doesnt support old shader %s", shaderName.c_str());	
 		}
 
 		return MaterialType::Null;

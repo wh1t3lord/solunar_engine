@@ -310,7 +310,7 @@ void Entity::transformBBox()
 void Entity::quaternionRotate(const glm::vec3& axis, float angle)
 {
 	float angleRad = glm::radians(angle);
-	auto& axisNorm = glm::normalize(axis);
+	auto axisNorm = glm::normalize(axis);
 
 	float w = glm::cos(angleRad / 2);
 	float v = glm::sin(angleRad / 2);
