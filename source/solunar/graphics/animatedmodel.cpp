@@ -96,7 +96,8 @@ void AnimatedModel::registerObject()
 	TypeManager::getInstance()->registerObject<AnimatedModel>();
 }
 
-AnimatedModel::AnimatedModel()
+AnimatedModel::AnimatedModel() :
+	m_animationId(-1)
 {
 	for (int i = 0; i < sizeof(m_bonesMatrices) / sizeof(m_bonesMatrices[0]); i++)
 	{
@@ -535,16 +536,38 @@ int AnimatedModel::getAnimationByName(const std::string& name)
 	return -1;
 }
 
+int AnimatedModel::getCurrentAnimationId()
+{
+	return m_animationId;
+}
+
 void AnimatedModel::setPlayAnimation(int index, bool looped)
 {
-	m_currentAnimation = &m_animations[index];
+	m_animationId = index;
+	m_currentAnimation = &m_animations[m_animationId];
 	m_playLooped = looped;
 	m_currentTime = 0.0f;
+	m_play = true;
 }
 
 void AnimatedModel::pauseAnimationPlay()
 {
 	m_speed = 0.0f;
+}
+
+Animation* AnimatedModel::getCurrentAnimation()
+{
+	return m_currentAnimation;
+}
+
+float AnimatedModel::getCurrentTime()
+{
+	return m_currentTime;
+}
+
+bool AnimatedModel::isStoped()
+{
+	return !m_play;
 }
 
 inline glm::quat samplerRotationToGlm(const glm::vec4& v)
@@ -554,6 +577,9 @@ inline glm::quat samplerRotationToGlm(const glm::vec4& v)
 
 void AnimatedModel::testPlay(float dt)
 {
+	if (!m_play)
+		return;
+
 	m_currentTime += m_speed * dt;
 	
 	bool updated = false;
@@ -561,6 +587,13 @@ void AnimatedModel::testPlay(float dt)
 
 	if (animation.m_startTime >= m_currentTime)
 		m_currentTime = animation.m_startTime;
+
+	if (m_currentTime >= animation.m_endTime && m_playLooped) {
+		m_currentTime = animation.m_startTime; // #TODO: handle animation end
+	} else if (m_currentTime >= animation.m_endTime) {
+		m_currentTime = 0.0f;
+		m_play = false;
+	}
 
 	float time = std::fmod(static_cast<float>(m_currentTime), animation.m_endTime - animation.m_startTime);
 	

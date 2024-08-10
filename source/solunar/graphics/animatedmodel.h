@@ -135,8 +135,12 @@ public:
 
 	/** Animation accessing */
 	int getAnimationByName(const std::string& name);
+	int getCurrentAnimationId();
 	void setPlayAnimation(int index, bool looped = false);
 	void pauseAnimationPlay();
+	Animation* getCurrentAnimation();
+	float getCurrentTime();
+	bool isStoped();
 
 	void testPlay(float dt);
 
@@ -160,10 +164,12 @@ private:
 	std::map<std::string, BoneInfo> m_bones;
 	Animation* m_currentAnimation;
 	bool m_playLooped = false;
+	bool m_play = false;
 	float m_currentTime = 0.0f;
 	float m_speed = 1.0f;
 	
 	int m_rootNodeId;
+	int m_animationId;
 
 	BoundingBox m_boundingBox;
 

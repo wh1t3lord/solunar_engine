@@ -9,7 +9,7 @@ namespace engine {
 	{
 		None,
 		Pistol,
-		MP5
+		Shotgun,
 	};
 	
 	class WeaponComponent : public LogicComponent
@@ -22,6 +22,11 @@ namespace engine {
 		static void registerObject();
 
 		virtual void update(float dt);
+
+	private:
+		bool m_inited;
+		int m_idleAni;
+		int m_fireAni;
 	};
 }
 #endif // ! WEAPONCOMPONENT_H

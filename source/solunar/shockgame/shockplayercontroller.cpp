@@ -5,10 +5,12 @@
 
 #include "graphics/imguimanager.h"
 #include "graphics/ifontmanager.h"
+#include "graphics/animatedmodel.h"
+
+#include "game/gamelogic/weapons/weaponcomponent.h"
 
 #include <numeric>
 #include <limits>
-#include "graphics/animatedmodel.h"
 
 namespace engine
 {
@@ -92,19 +94,21 @@ void ShockPlayerController::initializeCamera()
 	hackEntity->quaternionRotate(glm::vec3(0.0f, 1.0f, 0.0f), -90.0f);
 
 	m_weaponEntity = hackEntity->createChild();
-	m_weaponEntity->setPosition(glm::vec3(0.2f, -3.5f, -0.3f));
+	m_weaponEntity->setPosition(glm::vec3(0.2f, -0.25f, -0.3f));
 
 	// load model
 	m_weaponMesh = m_weaponEntity->createComponent<AnimatedMeshComponent>();
-	m_weaponMesh->loadModel("models/viewmodel_test.glb");
+	m_weaponMesh->loadModel("models/viewmodel_shotgun.glb");
+
+	m_weaponEntity->createComponent<WeaponComponent>();
 
 	std::weak_ptr<AnimatedModel> weaponModel = dynamicCastWeakPtr<AnimatedModel, ModelBase>(m_weaponMesh->getModel());
-	int rootNodeIndex = weaponModel.lock()->getNodeByName("Root Node");
-	weaponModel.lock()->setNodeScale(rootNodeIndex, glm::vec3(0.1f));
+	//int rootNodeIndex = weaponModel.lock()->getNodeByName("Root Node");
+	//weaponModel.lock()->setNodeScale(rootNodeIndex, glm::vec3(0.1f));
 
 	// little hack #TODO: please remove ViewmodelAnimationController from shockgame.cpp
-	Component* viewmodelComponent = (Component*)TypeManager::getInstance()->createObjectByName("ViewmodelAnimationController");
-	m_weaponEntity->addComponent(viewmodelComponent);
+	//Component* viewmodelComponent = (Component*)TypeManager::getInstance()->createObjectByName("ViewmodelAnimationController");
+	//m_weaponEntity->addComponent(viewmodelComponent);
 }
 
 void ShockPlayerController::initializeComponents()
@@ -124,7 +128,7 @@ void ShockPlayerController::update(float dt)
 	// }
 
 	if (!s_font)
-		s_font = g_fontManager->createFont("textures/ui/RobotoMono-Bold.ttf", 32.0f);
+		s_font = g_fontManager->createFont("textures/ui/ArchivoBlack-Regular.ttf", 32.0f);
 
 	g_engineData.m_shouldCaptureMouse = true;
 	//g_engineData.m_shouldHideMouse = false;
@@ -343,6 +347,8 @@ void ShockPlayerController::updateMovement(float dt)
 
 void ShockPlayerController::debugUpdate(float dt)
 {
+	return;
+
 	if (!m_rigidBody)
 		return;
 

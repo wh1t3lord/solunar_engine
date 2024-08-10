@@ -28,6 +28,7 @@
 #include "graphics/fontmanager.h"
 #include "graphics/imguimanager.h"
 #include "graphics/debugrenderer.h"
+#include "graphics/fontmanager.h"
 
 #undef min
 #undef max
@@ -182,6 +183,8 @@ ViewmodelAnimationController::~ViewmodelAnimationController()
 {
 }
 
+static char g_viewmodelDebugBuf[1024];
+
 void ViewmodelAnimationController::update(float dt)
 {
 	AnimatedMeshComponent* animatedMeshComponent = getEntity()->getComponent<AnimatedMeshComponent>();
@@ -189,13 +192,15 @@ void ViewmodelAnimationController::update(float dt)
 	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
 	if (animatedModel) {
 		if (m_animationIndex == -1) {
-			m_animationIndex = animatedModel->getAnimationByName("Armature|Armature|Hide");
+			m_animationIndex = animatedModel->getAnimationByName("idle");
 			animatedModel->setPlayAnimation(m_animationIndex, true);
-			animatedModel->pauseAnimationPlay();
+			//animatedModel->pauseAnimationPlay();
 		}
 	}
 
 	animatedModel->testPlay(dt);
+
+
 }
 
 // More beautiful way to register classes
