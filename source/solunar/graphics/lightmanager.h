@@ -1,7 +1,7 @@
 #ifndef LIGHTCONTROLLER_H
 #define LIGHTCONTROLLER_H
 
-namespace engine
+namespace solunar
 {
 	class LightComponent;
 	class PointLightComponent;

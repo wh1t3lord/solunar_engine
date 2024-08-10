@@ -1,7 +1,7 @@
 #include "miniaudiodrv_pch.h"
 #include "miniaudiodrv/miniaudiosource.h"
 
-namespace engine
+namespace solunar
 {
 
 MiniAudioSource::MiniAudioSource()

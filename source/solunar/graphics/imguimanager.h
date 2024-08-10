@@ -3,7 +3,7 @@
 
 #include <imgui.h>
 
-namespace engine
+namespace solunar
 {
 	struct IBufferBase;
 	class IShaderProgram;

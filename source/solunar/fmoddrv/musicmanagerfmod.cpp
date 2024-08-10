@@ -3,7 +3,7 @@
 #include "fmoddrv/audiomanagerfmod.h"
 #include "fmoddrv/audiosourcefmod.h"
 
-namespace engine
+namespace solunar
 {
 	MusicManagerFMOD::MusicManagerFMOD()
 	{

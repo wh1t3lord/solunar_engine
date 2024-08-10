@@ -6,7 +6,7 @@
 
 //#define CREATE_INPUT_LAYOUT_FROM_REFLECT
 
-namespace engine
+namespace solunar
 {
 
 extern DXGI_FORMAT getDxgiFormat(ImageFormat format);

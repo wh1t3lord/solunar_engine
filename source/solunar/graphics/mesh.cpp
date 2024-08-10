@@ -4,7 +4,7 @@
 #include "graphics/renderer.h"
 #include "graphics/animatedmodel.h"
 
-namespace engine {
+namespace solunar {
 
 	void MeshComponent::registerObject()
 	{

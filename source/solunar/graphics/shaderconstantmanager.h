@@ -8,7 +8,7 @@
 #include "graphics/rendercontext.h"
 #include "graphics/graphicsworld.h"
 
-namespace engine
+namespace solunar
 {
 	enum class ShaderConstantType
 	{

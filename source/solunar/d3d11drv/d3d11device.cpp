@@ -9,7 +9,7 @@
 #pragma comment(lib, "d3dcompiler.lib")
 #pragma comment(lib, "dxguid.lib")
 
-namespace engine
+namespace solunar
 {
 
 D3D11_PRIMITIVE_TOPOLOGY getD3D11PrimitiveTopology(PrimitiveMode primitiveMode)

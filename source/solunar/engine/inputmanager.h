@@ -1,7 +1,7 @@
 #ifndef INPUTMANAGER_H
 #define INPUTMANAGER_H
 
-namespace engine
+namespace solunar
 {
 	enum KeyboardKeys
 	{

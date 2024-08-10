@@ -10,7 +10,7 @@
 #define GET_ADDITIONAL_ARGS(fmt, buff) \
 	do { va_list p; va_start(p, fmt); vsnprintf(buff, sizeof(buff), fmt, p); va_end(p); } while (0)
 
-namespace engine
+namespace solunar
 {
 
 class Debug
@@ -40,22 +40,22 @@ private:
 #ifndef FINAL_BUILD
 #define Assert(EXPR) \
 	if ( !(EXPR) ) \
-		engine::Debug::assertionFailed(#EXPR, DEBUG_INFO, "assertion failed")
+		solunar::Debug::assertionFailed(#EXPR, DEBUG_INFO, "assertion failed")
 
 #define Assert2(EXPR, ARG1) \
 	if ( !(EXPR) ) \
-		engine::Debug::assertionFailed(#EXPR, DEBUG_INFO, "assertion failed", ARG1)
+		solunar::Debug::assertionFailed(#EXPR, DEBUG_INFO, "assertion failed", ARG1)
 
 #define Assert3(EXPR, ARG1, ARG2) \
 	if ( !(EXPR) ) \
-		engine::Debug::assertionFailed(#EXPR, DEBUG_INFO, "assertion failed", ARG1, ARG2)
+		solunar::Debug::assertionFailed(#EXPR, DEBUG_INFO, "assertion failed", ARG1, ARG2)
 
 #define Assert4(EXPR, ARG1, ARG2, ARG3) \
 	if ( !(EXPR) ) \
-		engine::Debug::assertionFailed(#EXPR, DEBUG_INFO, "assertion failed", ARG1, ARG2, ARG3)
+		solunar::Debug::assertionFailed(#EXPR, DEBUG_INFO, "assertion failed", ARG1, ARG2, ARG3)
 
 #define Fatal(fmt, ...) \
-	engine::Debug::fatal(DEBUG_INFO, fmt, __VA_ARGS__)
+	solunar::Debug::fatal(DEBUG_INFO, fmt, __VA_ARGS__)
 
 #ifdef assert
 #undef assert

@@ -5,7 +5,7 @@
 #include "graphics/lightmanager.h"
 #include "graphics/graphicsworld.h"
 
-namespace engine
+namespace solunar
 {
 	BeginPropertyRegister(LightComponent)
 	{

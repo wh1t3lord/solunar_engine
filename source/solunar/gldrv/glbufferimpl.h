@@ -1,7 +1,7 @@
 #ifndef GRAPHICS_GL_GLBUFFERIMPL_H
 #define GRAPHICS_GL_GLBUFFERIMPL_H
 
-namespace engine
+namespace solunar
 {
 
 class GLBufferImpl : public IBufferBase

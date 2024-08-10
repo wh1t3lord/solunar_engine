@@ -5,7 +5,7 @@
 #include "graphics/core/statemanager.h"
 #include "graphics/core/texture.h"
 
-namespace engine
+namespace solunar
 {
 
 // proximity objects for state manager

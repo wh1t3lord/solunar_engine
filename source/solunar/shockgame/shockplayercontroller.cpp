@@ -10,7 +10,7 @@
 #include <limits>
 #include "graphics/animatedmodel.h"
 
-namespace engine
+namespace solunar
 {
 
 BeginPropertyRegister(ShockPlayerController)

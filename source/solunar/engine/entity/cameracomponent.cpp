@@ -1,7 +1,7 @@
 #include "enginepch.h"
 #include "engine/entity/cameracomponent.h"
 
-namespace engine
+namespace solunar
 {
 
 CameraComponent::CameraComponent()

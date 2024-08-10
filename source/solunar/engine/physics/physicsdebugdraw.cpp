@@ -2,7 +2,7 @@
 #include "engine/physics/physicsdebugdraw.h"
 #include "graphics/debugrenderer.h"
 
-namespace engine {
+namespace solunar {
 
 PhysicsDebugDraw g_physicsDebugDraw;
 

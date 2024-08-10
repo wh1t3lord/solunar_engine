@@ -3,7 +3,7 @@
 
 #include "core/file/filesystem.h"
 
-namespace engine
+namespace solunar
 {
 
 class FileSystem_Posix : public FileSystem

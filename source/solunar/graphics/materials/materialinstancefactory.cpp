@@ -6,7 +6,7 @@
 
 #include "graphics/material.h"
 
-namespace engine
+namespace solunar
 {
 
 MaterialInstanceFactory* MaterialInstanceFactory::ms_instance = nullptr;

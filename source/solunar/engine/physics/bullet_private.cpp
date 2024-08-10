@@ -1,7 +1,7 @@
 #include "enginepch.h"
 #include "physics/bullet_private.h"
 
-namespace engine {
+namespace solunar {
 
 glm::vec3 btVectorToGlm(const btVector3& vec)
 {

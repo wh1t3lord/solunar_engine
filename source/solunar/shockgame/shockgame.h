@@ -3,7 +3,7 @@
 
 #include "engine/gameinterface.h"
 
-namespace engine
+namespace solunar
 {
 
 class ShockGameInterface : public IGameInterface

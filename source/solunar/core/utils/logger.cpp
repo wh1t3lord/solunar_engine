@@ -9,7 +9,7 @@
 #include <memory.h>
 #include <time.h>
 
-namespace engine
+namespace solunar
 {
 	namespace
 	{

@@ -29,7 +29,7 @@
 #	endif
 #endif // _MSC_VER
 
-namespace engine
+namespace solunar
 {
 	inline static glm::mat4 Assimp2Glm(const aiMatrix4x4& from)
 	{

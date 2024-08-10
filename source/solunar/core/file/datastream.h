@@ -5,7 +5,7 @@
 
 #include <memory>
 
-namespace engine
+namespace solunar
 {
 	class DataStream
 	{

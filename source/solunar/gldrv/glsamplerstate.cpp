@@ -1,7 +1,7 @@
 #include "gldrv_pch.h"
 #include "gldrv/glsamplerstate.h"
 
-namespace engine
+namespace solunar
 {
 
 extern GLint getGlWrap(TextureWrap wrap);

@@ -2,7 +2,7 @@
 #include "d3d11drv/d3d11statemanager.h"
 #include "d3d11drv/d3d11device.h"
 
-namespace engine
+namespace solunar
 {
 
 inline D3D11_FILL_MODE getD3DFillMode(FillMode fillmode)

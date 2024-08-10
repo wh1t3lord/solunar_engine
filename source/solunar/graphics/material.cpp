@@ -24,7 +24,7 @@
 
 #include <sstream>
 
-namespace engine
+namespace solunar
 {
 	MaterialType getMaterialTypeFromName(const std::string& shaderName)
 	{

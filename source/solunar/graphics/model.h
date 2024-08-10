@@ -4,7 +4,7 @@
 #include "core/math/boundingbox.h"
 #include "graphics/graphicsobject.h"
 
-namespace engine
+namespace solunar
 {
 	struct Vertex
 	{

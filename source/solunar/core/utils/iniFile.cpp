@@ -32,7 +32,7 @@ using namespace std;
 #define iniEOL '\r' << endl
 #endif
 
-using engine::CIniFile;
+using solunar::CIniFile;
 
 CIniFile::CIniFile(string const iniPath)
 {

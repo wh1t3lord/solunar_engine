@@ -32,7 +32,7 @@
 
 #pragma comment(lib, "d3d9.lib")
 
-namespace engine
+namespace solunar
 {
 
 void createRenderer()

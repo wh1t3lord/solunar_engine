@@ -7,7 +7,7 @@
 #include "core/object/serializableobject.h"
 #include "core/object/typemanager.h"
 
-namespace engine
+namespace solunar
 {
 
 ContentManager* g_contentManager = nullptr;

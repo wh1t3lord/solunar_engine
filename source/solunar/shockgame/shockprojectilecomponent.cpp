@@ -6,7 +6,7 @@
 
 #include "graphics/debugrenderer.h"
 
-namespace engine
+namespace solunar
 {
 
 BeginPropertyRegister(ShockProjectileComponent)

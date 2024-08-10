@@ -6,7 +6,7 @@
 #include "graphics/mesh.h"
 #include "game/gamelogic/player/playercontrollercomponent.h"
 
-namespace engine
+namespace solunar
 {
 
 class CameraFirstPersonComponent;

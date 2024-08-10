@@ -1,7 +1,7 @@
 #include "core/platform/core_platform.h"
 #include "core/timer.h"
 
-namespace engine
+namespace solunar
 {
 
 Timer* Timer::getInstance()

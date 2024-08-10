@@ -8,7 +8,7 @@
 #include <string>
 #include <functional>
 
-namespace engine
+namespace solunar
 {
 	TypeInfo::TypeInfo(const char* name, StaticConstructor_t staticConstructor, size_t classSize, size_t classAlign, const TypeInfo* baseInfo)
 	{

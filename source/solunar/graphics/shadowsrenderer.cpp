@@ -15,7 +15,7 @@
 #include "graphics/light.h"
 #include "graphics/lightmanager.h"
 
-namespace engine
+namespace solunar
 {
 	ShadowsRenderer ShadowsRenderer::ms_instance;
 

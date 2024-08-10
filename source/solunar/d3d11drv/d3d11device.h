@@ -3,7 +3,7 @@
 
 #include "graphics/core/device.h"
 
-namespace engine
+namespace solunar
 {
 
 class D3D11Device : public IRenderDevice

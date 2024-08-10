@@ -1,7 +1,7 @@
 #include "graphicspch.h"
 #include "graphics/camerafrustum.h"
 
-namespace engine
+namespace solunar
 {
 	// PLANE IMPLEMENTATION
 

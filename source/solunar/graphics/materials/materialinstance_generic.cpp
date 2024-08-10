@@ -4,7 +4,7 @@
 #include "graphics/model.h"
 #include "graphics/animatedmodel.h"
 
-namespace engine
+namespace solunar
 {
 
 static InputLayoutDesc s_vertexInputLayout[] =

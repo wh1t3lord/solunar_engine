@@ -3,7 +3,7 @@
 #include "engine/entity/component.h"
 #include "engine/entity/world.h"
 
-namespace engine
+namespace solunar
 {
 
 BeginPropertyRegister(Entity)

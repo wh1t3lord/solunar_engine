@@ -3,7 +3,7 @@
 
 #include "core/file/filesystem.h"
 
-namespace engine
+namespace solunar
 {
 
 // not good but normal for our needs

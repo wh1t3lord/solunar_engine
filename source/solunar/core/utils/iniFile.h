@@ -27,7 +27,7 @@
 
 using namespace std;
 
-namespace engine
+namespace solunar
 {
 
 class CIniFile

@@ -1,7 +1,7 @@
 #include "core/platform/core_platform.h"
 #include "core/utils/sysevent.h"
 
-namespace engine {
+namespace solunar {
 
 #ifdef WIN32
 	SysEvent::SysEvent(bool manualReset /*= false*/)

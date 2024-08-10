@@ -3,7 +3,7 @@
 #include "graphics/mesh.h"
 #include "engine/camera.h"
 
-namespace engine {
+namespace solunar {
 
 
 	GraphicsWorld::GraphicsWorld()

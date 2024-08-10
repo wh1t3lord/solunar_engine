@@ -11,7 +11,7 @@
 #include "engine/physics/rigidbodycomponent.h"
 #include "engine/physics/trianglemeshshape.h"
 
-namespace engine
+namespace solunar
 {
 
 	//void registerEngineObjects()

@@ -1,7 +1,7 @@
 #include "d3d11drv_pch.h"
 #include "d3d11drv/d3d11bufferimpl.h"
 
-namespace engine
+namespace solunar
 {
 
 UINT getD3D11BindFlags(const BufferDesc& bufferDesc)

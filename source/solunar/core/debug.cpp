@@ -1,7 +1,7 @@
 #include "core/core.h"
 #include "core/debug.h"
 
-using namespace engine;
+using namespace solunar;
 
 #ifdef _MSC_VER
 #include <Windows.h>
@@ -119,9 +119,9 @@ void Debug::fatal(const char* file, int line, const char* function, const char* 
 
 void Debug::assertionFailedBackend(const char* buf)
 {
-	engine::Core::msg("===================================");
-	engine::Core::msg("%s", buf);
-	engine::Core::msg("===================================");
+	solunar::Core::msg("===================================");
+	solunar::Core::msg("%s", buf);
+	solunar::Core::msg("===================================");
 
 #ifdef WIN32
 	int result = MessageBoxA(0, buf, "Fatal Error!", MB_CANCELTRYCONTINUE | MB_ICONERROR);

@@ -1,7 +1,7 @@
 #ifndef CORE_STATEMANAGER_H
 #define CORE_STATEMANAGER_H
 
-namespace engine
+namespace solunar
 {
 
 //class IRasterizerState

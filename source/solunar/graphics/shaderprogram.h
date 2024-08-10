@@ -1,7 +1,7 @@
 #ifndef SHADERPROGRAM_H
 #define SHADERPROGRAM_H
 
-namespace engine
+namespace solunar
 {
 	
 class ShaderProgramManager;

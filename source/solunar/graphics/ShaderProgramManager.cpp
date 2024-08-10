@@ -2,7 +2,7 @@
 #include "graphics/shaderprogram.h"
 #include "graphics/ShaderProgramManager.h"
 
-namespace engine
+namespace solunar
 {
 
 ShaderProgramManager* g_shaderManager = nullptr;

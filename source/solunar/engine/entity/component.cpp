@@ -1,7 +1,7 @@
 #include "enginepch.h"
 #include "engine/entity/component.h"
 
-namespace engine
+namespace solunar
 {
 
 BeginPropertyRegister(Component)

@@ -3,7 +3,7 @@
 
 #include "graphics/ShaderProgramManager.h"
 
-namespace engine
+namespace solunar
 {
 
 class GLShaderProgramManager : public ShaderProgramManager

@@ -7,7 +7,7 @@
 #include "core/file/datastream.h"
 #include "core/object/object.h"
 
-namespace engine
+namespace solunar
 {
 	class SerializableObject : public Object
 	{

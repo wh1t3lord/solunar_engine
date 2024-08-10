@@ -3,7 +3,7 @@
 
 #include "engine/physics/bullet_private.h"
 
-namespace engine {
+namespace solunar {
 	
 	class PhysicsManager;
 	class PhysicsWorld;

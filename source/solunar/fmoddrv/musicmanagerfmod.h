@@ -3,7 +3,7 @@
 
 #include "engine/audio/musicmanager.h"
 
-namespace engine
+namespace solunar
 {
 	class AudioSource;
 

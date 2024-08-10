@@ -5,7 +5,7 @@
 #include <memory>
 #include "core/file/datastream.h"
 
-namespace engine
+namespace solunar
 {
 	DataStream::DataStream()
 	{

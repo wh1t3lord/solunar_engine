@@ -10,7 +10,7 @@
 
 #define MAX_LINES_IN_VB 2048
 
-namespace engine {
+namespace solunar {
 
 DebugRender g_debugRender;
 

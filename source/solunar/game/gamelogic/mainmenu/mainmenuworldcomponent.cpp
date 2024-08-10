@@ -3,7 +3,7 @@
 
 #include "engine/entity/world.h"
 
-namespace engine {
+namespace solunar {
 	
 	void MainMenuWorldComponent::registerObject()
 	{

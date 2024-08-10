@@ -1,7 +1,7 @@
 #ifndef MUSICMANAGER_H
 #define MUSICMANAGER_H
 
-namespace engine
+namespace solunar
 {
 	class AudioSource;
 

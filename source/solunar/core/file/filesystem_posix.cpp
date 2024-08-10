@@ -3,7 +3,7 @@
 #include "core/platform/core_platform.h"
 #include "core/file/filesystem_posix.h"
 
-namespace engine
+namespace solunar
 {
 
 static int s_stdioSeekDir[] = { SEEK_SET, SEEK_CUR, SEEK_END };

@@ -1,7 +1,7 @@
 #include "gamepch.h"
 #include "weaponautocomponent.h"
 
-namespace engine
+namespace solunar
 {
 
 void WeaponAutoComponent::registerObject()

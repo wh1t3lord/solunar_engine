@@ -5,7 +5,7 @@
 
 #include "graphics/fontmanager.h"
 
-namespace engine
+namespace solunar
 {
 
 BeginPropertyRegister(ShockAIComponent)

@@ -2,7 +2,7 @@
 #include "gldrv/GLShaderProgramManager.h"
 #include "gldrv/glshaderprogram.h"
 #include <glad/glad.h>
-namespace engine
+namespace solunar
 {
 
 size_t g_vertexAttribsSizeTable[(size_t)ImageFormat::LAST] =

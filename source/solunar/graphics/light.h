@@ -4,7 +4,7 @@
 #include "engine/entity/component.h"
 #include "graphics/lightmanager.h"
 
-namespace engine
+namespace solunar
 {
 	#define MAX_POINT_LIGHTS 32
 

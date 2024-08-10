@@ -3,7 +3,7 @@
 #include "engine/entity/entity.h"
 #include "engine/entity/cameracomponent.h"
 
-namespace engine
+namespace solunar
 {
 	CameraProxy CameraProxy::ms_cameraProxy;
 

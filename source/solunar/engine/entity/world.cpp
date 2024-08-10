@@ -9,7 +9,7 @@
 #include "engine/physics/rigidbodycomponent.h"
 #include "engine/physics/shapescomponent.h"
 
-namespace engine
+namespace solunar
 {
 	World::World() :
 		m_physicsWorld(nullptr), m_graphicsWorld(nullptr)

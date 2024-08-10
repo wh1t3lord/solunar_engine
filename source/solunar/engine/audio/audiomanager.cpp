@@ -1,7 +1,7 @@
 #include "enginepch.h"
 #include "engine/audio/audiomanager.h"
 
-namespace engine
+namespace solunar
 {
 	AudioManager* AudioManager::ms_pInstance = nullptr;
 

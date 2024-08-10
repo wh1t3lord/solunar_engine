@@ -6,7 +6,7 @@
 #include "core/utils/singleton.h"
 #include "core/file/datastream.h"
 
-namespace engine
+namespace solunar
 {
 
 class ContentDevice

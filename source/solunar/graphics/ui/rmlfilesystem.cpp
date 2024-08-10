@@ -7,7 +7,7 @@
 
 #include "engine/content/contentmanager.h"
 
-namespace engine
+namespace solunar
 {
 
 struct RmlFileHandle

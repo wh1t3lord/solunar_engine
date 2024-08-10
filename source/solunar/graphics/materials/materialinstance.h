@@ -1,7 +1,7 @@
 #ifndef GRAPHICS_MATERIALS_MATERIALINSTANCE_H
 #define GRAPHICS_MATERIALS_MATERIALINSTANCE_H
 
-namespace engine
+namespace solunar
 {
 
 enum VertexFactory

@@ -14,7 +14,7 @@
 #include "graphics/graphicsworld.h"
 #include "graphics/light.h"
 
-namespace engine
+namespace solunar
 {
 	ConstantBufferProxy g_staticMeshConstantBuffer;
 	ConstantBufferProxy g_directionalLightConstantBuffer;

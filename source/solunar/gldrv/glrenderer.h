@@ -5,7 +5,7 @@
 
 #include "graphics/shaderconstantmanager.h"
 
-namespace engine {
+namespace solunar {
 
 struct RendererSingletonStorer
 {
@@ -55,7 +55,7 @@ private:
 	bool m_makeScreenshot;
 
 
-	// Унаследовано через Renderer
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ Renderer
 	virtual void clearScreen() override;
 
 

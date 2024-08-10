@@ -20,7 +20,7 @@
 #endif // !NDEBUG
 #endif
 
-namespace engine
+namespace solunar
 {
 
 	static FMOD_RESULT FMOD_LoggerCallback(

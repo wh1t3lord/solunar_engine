@@ -1,7 +1,7 @@
 #include "gamepch.h"
 #include "game/gamelogic/player/weaponchaincomponent.h"
 
-namespace engine
+namespace solunar
 {
 
 void WeaponChainComponent::registerObject()

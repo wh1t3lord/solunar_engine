@@ -1,7 +1,7 @@
 #include "gamepch.h"
 #include "game/gamelogic/player/playercontrollercomponent.h"
 
-namespace engine {
+namespace solunar {
 	
 	void PlayerControllerComponent::registerObject()
 	{

@@ -3,7 +3,7 @@
 
 #include "engine/physics/shapescomponent.h"
 
-namespace engine
+namespace solunar
 {
 
 #define CM_MAGIC	"CollisionFile"

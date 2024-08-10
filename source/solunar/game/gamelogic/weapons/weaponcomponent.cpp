@@ -1,7 +1,7 @@
 #include "gamepch.h"
 #include "weaponcomponent.h"
 
-namespace engine
+namespace solunar
 {
 	WeaponComponent::WeaponComponent()
 	{

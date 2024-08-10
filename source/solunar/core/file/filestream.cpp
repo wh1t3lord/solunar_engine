@@ -4,7 +4,7 @@
 
 #include <string>
 
-namespace engine
+namespace solunar
 {
 	FileStream::FileStream(const std::string& filename) :
 		m_fileHandle(nullptr)

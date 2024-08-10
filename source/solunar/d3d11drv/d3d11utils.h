@@ -1,7 +1,7 @@
 #ifndef D3D11UTILS_H
 #define D3D11UTILS_H
 
-namespace engine
+namespace solunar
 {
 	bool d3d11ErrorBackend(HRESULT hr, const char* expression, const char* filename, int line, const char* function);
 }

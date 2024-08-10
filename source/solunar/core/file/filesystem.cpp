@@ -1,6 +1,6 @@
 #include "core/file/filesystem.h"
 
-namespace engine
+namespace solunar
 {
 	FileSystem* g_fileSystem = nullptr;
 }

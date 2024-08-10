@@ -1,7 +1,7 @@
 #ifndef AUDIOMANAGER_H
 #define AUDIOMANAGER_H
 
-namespace engine
+namespace solunar
 {
 	class AudioSource;
 	

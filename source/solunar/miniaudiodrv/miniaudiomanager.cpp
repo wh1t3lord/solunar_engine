@@ -2,7 +2,7 @@
 #include "miniaudiodrv/miniaudiomanager.h"
 #include "miniaudiodrv/miniaudiosource.h"
 
-namespace engine
+namespace solunar
 {
 
 // Singleton creation

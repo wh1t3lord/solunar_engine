@@ -9,7 +9,7 @@
 #include "core/file/datastream.h"
 #include "core/object/serializableobject.h"
 
-namespace engine
+namespace solunar
 {
 
 class ContentManager : public Singleton<ContentManager>

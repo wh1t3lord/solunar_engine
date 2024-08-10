@@ -3,7 +3,7 @@
 
 #include "core/core.h"
 
-namespace engine
+namespace solunar
 {
 
 #ifdef WIN32

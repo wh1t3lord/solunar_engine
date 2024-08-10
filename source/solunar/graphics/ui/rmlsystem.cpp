@@ -15,7 +15,7 @@
 
 #include <GLFW/glfw3.h>
 
-namespace engine
+namespace solunar
 {
 
 	// #TODO: !!! REMOVE !!!

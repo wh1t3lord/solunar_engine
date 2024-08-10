@@ -11,7 +11,7 @@
 
 #include "graphics/renderer.h"
 
-namespace engine
+namespace solunar
 {
 
 void registerGraphicsObjects()

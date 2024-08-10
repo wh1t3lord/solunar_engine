@@ -1,7 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-namespace engine {
+namespace solunar {
 	class View;
 
 	void appInit(int argc, char** argv);

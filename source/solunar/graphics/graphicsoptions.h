@@ -1,7 +1,7 @@
 #ifndef GRAPHICSSETTINGS_H
 #define GRAPHICSSETTINGS_H
 
-namespace engine
+namespace solunar
 {
 	class GraphicsOptions
 	{

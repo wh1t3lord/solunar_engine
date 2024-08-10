@@ -1,7 +1,7 @@
 #ifndef ENGINELOOP_H
 #define ENGINELOOP_H
 
-namespace engine {
+namespace solunar {
 
 	class EngineLoop
 	{

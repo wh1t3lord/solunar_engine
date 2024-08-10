@@ -3,7 +3,7 @@
 
 #include "graphics/gfxcommon.h"
 
-namespace engine
+namespace solunar
 {
 	class IRenderTarget;
 	class IRenderTarget;

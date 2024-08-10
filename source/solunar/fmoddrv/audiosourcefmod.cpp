@@ -6,7 +6,7 @@
 
 #include "fmoddrv/audiosourcefmod.h"
 
-namespace engine
+namespace solunar
 {
 	AudioSourceFMOD::AudioSourceFMOD(const std::string& filename, FMOD::System* system)
 	{

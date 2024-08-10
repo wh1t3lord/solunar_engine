@@ -2,7 +2,7 @@
 #include "gldrv/glshaderprogram.h"
 #include "core/file/contentmanager.h"
 
-namespace engine
+namespace solunar
 {
 
 GLuint createShader(GLenum target, const char* filename, const char* defines = nullptr)

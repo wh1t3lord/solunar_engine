@@ -1,7 +1,7 @@
 #include "graphicspch.h"
 #include "graphics/core/device.h"
 
-namespace engine {
+namespace solunar {
 
 	IRenderDevice* g_renderDevice = nullptr;
 

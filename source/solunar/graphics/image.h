@@ -3,7 +3,7 @@
 
 #include "graphics/gfxcommon.h"
 
-namespace engine
+namespace solunar
 {
 	// wrapper on image loading and other stuff
 	class Image

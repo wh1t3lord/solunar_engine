@@ -3,7 +3,7 @@
 
 #include "LinearMath/btIDebugDraw.h"
 
-namespace engine {
+namespace solunar {
 
 class PhysicsDebugDraw : public btIDebugDraw
 {

@@ -1,7 +1,7 @@
 #ifndef SINGLETON_H
 #define SINGLETON_H
 
-namespace engine
+namespace solunar
 {
 
 template <typename T>

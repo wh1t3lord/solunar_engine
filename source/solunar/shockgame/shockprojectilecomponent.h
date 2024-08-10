@@ -3,7 +3,7 @@
 
 #include <array>
 
-namespace engine
+namespace solunar
 {
 
 enum ShockProjectileType

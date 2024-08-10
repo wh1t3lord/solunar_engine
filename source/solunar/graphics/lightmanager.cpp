@@ -5,7 +5,7 @@
 
 #include <imgui.h>
 
-namespace engine
+namespace solunar
 {
 	void LightManager::addLight(LightComponent* light)
 	{

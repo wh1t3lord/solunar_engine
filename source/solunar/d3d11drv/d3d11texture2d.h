@@ -4,7 +4,7 @@
 #include "graphics/core/texture.h"
 #include "d3d11drv/d3d11device.h"
 
-namespace engine
+namespace solunar
 {
 
 class D3D11Texture2D : public ITexture2D

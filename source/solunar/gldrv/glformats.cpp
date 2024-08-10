@@ -1,7 +1,7 @@
 #include "gldrv_pch.h"
 #include "glad/glad.h"
 
-namespace engine
+namespace solunar
 {
 
 GLenum getBufferAccess(BufferAccess access)

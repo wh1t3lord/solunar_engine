@@ -4,7 +4,7 @@
 #if 0
 #include <RmlUi/Core/FileInterface.h>
 
-namespace engine
+namespace solunar
 {
 
 class RmlFileSystem : public Rml::FileInterface

@@ -6,7 +6,7 @@
 #include "gldrv/glbufferimpl.h"
 #include "gldrv/glsamplerstate.h"
 
-namespace engine {
+namespace solunar {
 
 GLDevice::GLDevice()
 {

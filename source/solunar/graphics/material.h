@@ -6,7 +6,7 @@
 #include "graphics/texturemap.h"
 #include "graphics/graphicsobject.h"
 
-namespace engine
+namespace solunar
 {
 	enum MAT_TEX
 	{

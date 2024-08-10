@@ -3,7 +3,7 @@
 
 #include "engine/entity/logiccomponent.h"
 
-namespace engine {
+namespace solunar {
 
 	enum class WeaponsType
 	{

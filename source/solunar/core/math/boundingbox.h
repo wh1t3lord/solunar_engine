@@ -1,7 +1,7 @@
 #ifndef BOUNDINGBOX_H
 #define BOUNDINGBOX_H
 
-namespace engine {
+namespace solunar {
 	
 class BoundingBox
 {

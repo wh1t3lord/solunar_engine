@@ -1,7 +1,7 @@
 #ifndef GAMEINTERFACE_H
 #define GAMEINTERFACE_H
 
-namespace engine
+namespace solunar
 {
 
 class IGameInterface

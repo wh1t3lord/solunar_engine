@@ -1,7 +1,7 @@
 #ifndef ENGINE_ENTITY_COMPONENT_H
 #define ENGINE_ENTITY_COMPONENT_H
 
-namespace engine
+namespace solunar
 {
 
 class Entity;

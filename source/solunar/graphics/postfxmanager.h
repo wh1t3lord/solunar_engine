@@ -3,7 +3,7 @@
 
 #include "graphics/shaderconstantmanager.h"
 
-namespace engine
+namespace solunar
 {
 
 class View;

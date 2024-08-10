@@ -1,7 +1,7 @@
 #include "gamepch.h"
 #include "game/gamelogic/camera/cameramanager.h"
 
-namespace engine {
+namespace solunar {
 	
 CameraManager CameraManager::ms_instance;
 	

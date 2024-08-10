@@ -2,7 +2,7 @@
 #include "gldrv/glstatemanager.h"
 #include "gldrv/gldevice.h"
 
-namespace engine
+namespace solunar
 {
 
 inline GLenum getGLFillMode(FillMode fillmode)
@@ -87,15 +87,15 @@ inline GLenum getD3DBlendOp(BlendOp blendop)
     
     switch (blendop)
     {
-    case engine::BLEND_OP_ADD:
+    case BLEND_OP_ADD:
         break;
-    case engine::BLEND_OP_SUBTRACT:
+    case BLEND_OP_SUBTRACT:
         break;
-    case engine::BLEND_OP_REV_SUBTRACT:
+    case BLEND_OP_REV_SUBTRACT:
         break;
-    case engine::BLEND_OP_MIN:
+    case BLEND_OP_MIN:
         break;
-    case engine::BLEND_OP_MAX:
+    case BLEND_OP_MAX:
         break;
     default:
         break;

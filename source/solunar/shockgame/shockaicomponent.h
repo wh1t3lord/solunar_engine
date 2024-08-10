@@ -1,7 +1,7 @@
 #ifndef SHOCKAICOMPONENT_H
 #define SHOCKAICOMPONENT_H
 
-namespace engine
+namespace solunar
 {
 
 enum ShockAIType
