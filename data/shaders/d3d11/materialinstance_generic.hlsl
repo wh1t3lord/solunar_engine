@@ -2,9 +2,24 @@
 //
 
 // C++ defines:
-//	UNLIT
+//	SKINNED (Vertex Factory)
+//	UNLIT (Pixel Variation)
 
+#include "common.h"
 #include "cbuffers.h"
+
+struct VSInput
+{
+	float3 position		: POSITION;
+	float3 normal		: NORMAL;
+	float2 texcoord		: TEXCOORD;
+	float3 tangent		: TANGENT;
+	float3 bitangent	: BINORMAL;
+#ifdef SKINNED
+	float4 weights		: BLENDWEIGHT;
+	float4 boneIds		: BLENDINDICES;
+#endif
+};
 
 struct VSOutput
 {
@@ -21,6 +36,48 @@ SamplerState		g_albedoSampler : register(s0);
 Texture2D 			g_normalTexture : register(t1);
 SamplerState		g_normalSampler : register(s1);
 
+// Vertex shader
+VSOutput VSMain(VSInput input)
+{
+	VSOutput output = (VSOutput)0;
+
+#ifdef SKINNED
+	// calculate bone transform
+	row_major float4x4 skinMatrix = input.weights.x * g_bonesMatrices[int(input.boneIds.x)]
+		+ input.weights.y * g_bonesMatrices[int(input.boneIds.y)]
+		+ input.weights.z * g_bonesMatrices[int(input.boneIds.z)]
+		+ input.weights.w * g_bonesMatrices[int(input.boneIds.w)];
+
+	// World position
+	output.worldPos = mul(float4(input.position, 1.0f), skinMatrix);
+	output.worldPos = mul(float4(output.worldPos, 1.0f), g_modelMatrix);
+#else
+	// World position
+	output.worldPos = mul(float4(input.position, 1.0f), g_modelMatrix);
+#endif
+
+	// #TODO: multiply output.worldPos by g_viewProjection matrix.
+
+	// Position
+	output.position = mul(float4(output.worldPos, 1.0f), g_viewMatrix);
+	output.position = mul(output.position, g_projectionMatrix);
+
+	// texcoord
+	output.texcoord = input.texcoord;
+
+#ifdef SKINNED
+	// normal
+	output.normal = normalize(mul(float4(input.normal, 0.0f), skinMatrix));
+	output.normal = mul(float4(output.normal, 0.0f), g_modelMatrix);
+#else
+	// normal
+	output.normal = mul(float4(input.normal, 0.0f), g_modelMatrix);
+#endif
+	
+	return output;
+}
+
+// Pixel Shader
 float4 PSMain(VSOutput input) : SV_Target
 {
 	//return float4(input.normal, 1.0f);
@@ -29,8 +86,7 @@ float4 PSMain(VSOutput input) : SV_Target
 	const float kSpecPower = 256.0f;
 
 	float3 ambientColor = g_DirLight_ambientColor.xyz;
-	//float3 albedoColor = g_albedoTexture.Sample(g_albedoSampler, input.texcoord).rgb;
-	float3 albedoColor = materialAlbedo(input.texcoord);
+	float3 albedoColor = materialAlbedo(g_albedoTexture, g_albedoSampler, input.texcoord);
 
 #ifdef UNLIT
 	return float4(albedoColor, 1.0f);
