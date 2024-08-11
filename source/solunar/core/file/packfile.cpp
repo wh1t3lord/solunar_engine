@@ -6,7 +6,7 @@
 
 #include <lz4.h>
 
-namespace engine
+namespace solunar
 {
 	class PackFileStream : public DataStream
 	{

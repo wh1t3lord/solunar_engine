@@ -4,7 +4,7 @@
 #include "core/memory/memorymanager.h"
 #include "core/file/filesystem_pack.h"
 
-namespace engine
+namespace solunar
 {
 
 FileSystemPack g_fileSystemPack;
