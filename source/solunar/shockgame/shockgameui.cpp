@@ -14,6 +14,9 @@
 
 #include "main/main.h"
 
+#include <dxgi.h>
+#pragma comment(lib, "dxgi.lib")
+
 namespace solunar
 {
 
@@ -92,14 +95,82 @@ public:
 	static std::vector<VideoMode> ms_vidModes;
 public:
 	static void init();
+	static void apply(int idx);
 };
 
-bool                                     VideoModeManager::ms_inited = false;
-int                                      VideoModeManager::ms_currentVidMode = 0;
-std::vector<VideoModeManager::VideoMode>          VideoModeManager::ms_vidModes;
+bool												VideoModeManager::ms_inited = false;
+int													VideoModeManager::ms_currentVidMode = 0;
+std::vector<VideoModeManager::VideoMode>			VideoModeManager::ms_vidModes;
 
 void VideoModeManager::init()
 {
+	IDXGIFactory* pFactory = nullptr;
+	CreateDXGIFactory(__uuidof(IDXGIFactory), (void**)&pFactory);
+
+	SIZE_T maxDedicatedVideoMemory = 0;
+	SIZE_T adapterId = 0;
+	IDXGIAdapter* pAdapter = nullptr;
+	for (int i = 0; pFactory->EnumAdapters(i, &pAdapter) != DXGI_ERROR_NOT_FOUND; ++i)
+	{
+		DXGI_ADAPTER_DESC adapterDesc;
+		pAdapter->GetDesc(&adapterDesc);
+
+		if (adapterDesc.DedicatedVideoMemory > maxDedicatedVideoMemory)
+		{
+			maxDedicatedVideoMemory = adapterDesc.DedicatedVideoMemory;
+			break;
+		}
+	}
+
+	pAdapter->Release();
+	pFactory->EnumAdapters(adapterId, &pAdapter);
+
+	IDXGIOutput* pOutput = NULL;
+	HRESULT hr = pAdapter->EnumOutputs(0, &pOutput);
+
+	UINT numModes = 0;
+	DXGI_MODE_DESC* displayModes = NULL;
+	DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM;
+
+	// Get the number of elements
+	hr = pOutput->GetDisplayModeList(format, 0, &numModes, NULL);
+
+	displayModes = new DXGI_MODE_DESC[numModes];
+
+	// Get the list
+	hr = pOutput->GetDisplayModeList(format, 0, &numModes, displayModes);
+
+	for (int i = 0; i < numModes; i++)
+	{
+#if 0
+		if (displayModes[i].RefreshRate.Numerator > 60)
+			continue;
+#else
+		if (displayModes[i].RefreshRate.Numerator != 60)
+			continue;
+#endif
+
+		VideoMode videoMode;
+		videoMode.width = displayModes[i].Width;
+		videoMode.height = displayModes[i].Height;
+		videoMode.refreshRate = displayModes[i].RefreshRate.Numerator;
+
+		char buf[64];
+		snprintf(buf, sizeof(buf), "%ix%i (%i)", videoMode.width, videoMode.height, videoMode.refreshRate);
+		videoMode.name = buf;
+
+		ms_vidModes.push_back(videoMode);
+	}
+
+	// delete allocated display mode list
+	delete[] displayModes;
+
+	// release dxgi stuff
+	pOutput->Release();
+	pAdapter->Release();
+	pFactory->Release();
+
+#if 0
 	VideoMode videoMode;
 	videoMode.width = g_graphicsOptions.m_width;
 	videoMode.height = g_graphicsOptions.m_height;
@@ -110,6 +181,7 @@ void VideoModeManager::init()
 	videoMode.name = buf;
 
 	ms_vidModes.push_back(videoMode);
+#endif
 
 	//GLFWmonitor* primaryMonitor = glfwGetPrimaryMonitor();
 	//const GLFWvidmode* videoModes = glfwGetVideoModes(primaryMonitor, &ms_vidModeCount);
@@ -153,10 +225,22 @@ void VideoModeManager::init()
 	ms_inited = true;
 }
 
+void VideoModeManager::apply(int idx)
+{
+	VideoMode mode = ms_vidModes[idx];
+	GraphicsOptions* opts = &g_graphicsOptions;
+	opts->m_width = mode.width;
+	opts->m_height = mode.height;
+	opts->m_refreshRate == mode.refreshRate;
+	g_graphicsOptions.saveSettings("GameSettings.ini");
+}
+
 static bool s_showSettingsMenu = false;
 
 void showSettingsMenu()
 {
+	static bool s_showApplyWindow = false;
+
 	ImGui::Begin("Settings", &s_showSettingsMenu);
 
 	ImGuiTabBarFlags tab_bar_flags = ImGuiTabBarFlags_None;
@@ -173,7 +257,6 @@ void showSettingsMenu()
 			{
 				for (int i = 0; i < VideoModeManager::ms_vidModes.size(); i++)
 				{
-
 					const bool is_selected = (item_current_idx == i);
 					if (ImGui::Selectable(VideoModeManager::ms_vidModes[i].name.c_str(), is_selected))
 						item_current_idx = i;
@@ -187,6 +270,12 @@ void showSettingsMenu()
 			}
 
 			ImGui::EndTabItem();
+
+			if (ImGui::Button("Apply"))
+			{
+				VideoModeManager::apply(item_current_idx);
+				s_showApplyWindow = true;
+			}
 		}
 		if (ImGui::BeginTabItem("Graphics"))
 		{
@@ -209,6 +298,15 @@ void showSettingsMenu()
 	}
 
 	ImGui::End();
+
+	if (s_showApplyWindow)
+	{
+		ImGui::Begin("Warning!", &s_showApplyWindow);
+		ImGui::Text("To apply the settings,\nyou need to restart the application.");
+		if (ImGui::Button("OK"))
+			s_showApplyWindow = false;
+		ImGui::End();
+	}
 }
 
 DemoGameMainMenuComponent::DemoGameMainMenuComponent()
@@ -243,7 +341,10 @@ void DemoGameMainMenuComponent::update(float dt)
 
 	CameraProxy* camera = CameraProxy::getInstance();
 
-	ImGui::SetNextWindowPos(ImVec2(100, 550));
+	int posX = (camera->getView()->m_width / 2) - 550;
+	int posY = (camera->getView()->m_height / 2) + 150;
+
+	ImGui::SetNextWindowPos(ImVec2(posX, posY));
 	ImGui::SetNextWindowSize(ImVec2(camera->getView()->m_width / 2, camera->getView()->m_height / 2));
 
 	ImGui::Begin("Main Menu", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
