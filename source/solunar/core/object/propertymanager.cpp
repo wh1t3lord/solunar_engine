@@ -3,7 +3,7 @@
 #include "core/memory/memorymanager.h"
 #include "core/object/propertymanager.h"
 
-namespace engine
+namespace solunar
 {
 
 // Global instance

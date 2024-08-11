@@ -5,7 +5,7 @@
 
 #include "core/file/filesystem.h"
 #include "core/file/contentmanager.h"
-namespace engine
+namespace solunar
 {
 
 std::string loadShaderText(const std::string& filename)

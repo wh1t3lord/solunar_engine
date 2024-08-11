@@ -1,7 +1,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-namespace engine
+namespace solunar
 {
 	class View;
 	class GraphicsDevice;

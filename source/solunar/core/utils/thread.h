@@ -1,7 +1,7 @@
 #ifndef THREAD_H
 #define THREAD_H
 
-namespace engine
+namespace solunar
 {
 
 #ifdef _WIN32

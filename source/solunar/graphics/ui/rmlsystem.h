@@ -10,7 +10,7 @@
 #include <RmlUi/Core.h>
 #include <RmlUi/Debugger.h>
 
-namespace engine
+namespace solunar
 {
 
 class RmlSystem : public Singleton<RmlSystem>

@@ -3,7 +3,7 @@
 
 #include "graphics/renderer.h"
 
-namespace engine
+namespace solunar
 {
 
 class D3D12Renderer : public Renderer

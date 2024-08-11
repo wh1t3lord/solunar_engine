@@ -5,7 +5,7 @@
 #include "graphics/graphicsoptions.h"
 
 
-namespace engine
+namespace solunar
 {
 	TextureMap::TextureMap() :
 		m_bManualCreated(false)

@@ -15,7 +15,7 @@
 
 #include "graphics/renderer.h"
 
-namespace engine
+namespace solunar
 {
 
 struct HDRConstants

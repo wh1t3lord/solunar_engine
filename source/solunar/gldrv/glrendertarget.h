@@ -3,7 +3,7 @@
 
 #include "graphics/core/rendertarget.h"
 
-namespace engine {
+namespace solunar {
 
 //! OpenGL implementation of IRenderTarget
 class GLRenderTarget : public IRenderTarget

@@ -14,7 +14,7 @@
 
 #include "main/main.h"
 
-namespace engine
+namespace solunar
 {
 
 static std::weak_ptr<TextureMap> g_mainMenuBackground;

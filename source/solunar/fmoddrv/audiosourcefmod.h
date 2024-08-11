@@ -3,7 +3,7 @@
 
 #include "engine/audio/audiosource.h"
 
-namespace engine
+namespace solunar
 {
 	class AudioSourceFMOD : public AudioSource
 	{

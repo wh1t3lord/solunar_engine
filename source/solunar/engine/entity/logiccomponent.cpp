@@ -1,7 +1,7 @@
 #include "enginepch.h"
 #include "engine/entity/logiccomponent.h"
 
-namespace engine
+namespace solunar
 {
 	LogicComponent::LogicComponent()
 	{

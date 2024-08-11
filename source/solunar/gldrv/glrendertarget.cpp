@@ -2,7 +2,7 @@
 #include "gldrv/glrendertarget.h"
 #include "gldrv/gltexture2d.h"
 
-namespace engine {
+namespace solunar {
 
 	GLRenderTarget::GLRenderTarget(const RenderTargetCreationDesc& renderTargetDesc)
 	{

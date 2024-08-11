@@ -5,7 +5,7 @@
 
 #include "miniaudiodrv/miniaudio_shared.h"
 
-namespace engine
+namespace solunar
 {
 
 class MiniAudioSource : public AudioSource

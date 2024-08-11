@@ -8,7 +8,7 @@
 #include "core/file/filestream.h"
 #include "core/file/filesystem_pack.h"
 
-namespace engine
+namespace solunar
 {
 
 ContentDevice* g_contentDevice = nullptr;

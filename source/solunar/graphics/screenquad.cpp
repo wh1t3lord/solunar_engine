@@ -5,7 +5,7 @@
 #include "graphics/ShaderProgramManager.h"
 #include "graphics/renderer.h"
 
-namespace engine
+namespace solunar
 {
 	IBufferBase* ScreenQuad::ms_vertexBuffer;
 	IShaderProgram* ScreenQuad::ms_screenQuadShader;

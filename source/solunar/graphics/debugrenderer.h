@@ -4,7 +4,7 @@
 #include "shaderprogram.h"
 #include "core/math/boundingbox.h"
 
-namespace engine {
+namespace solunar {
 	
 class IShaderProgram;
 class View;

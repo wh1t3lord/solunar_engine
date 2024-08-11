@@ -1,6 +1,6 @@
 #include "core/object/serializableobject.h"
 
-namespace engine
+namespace solunar
 {
 	SerializableObject::SerializableObject()
 	{

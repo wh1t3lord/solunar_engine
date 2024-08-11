@@ -1,7 +1,7 @@
 #include "graphicspch.h"
 #include "graphics/view.h"
 
-namespace engine
+namespace solunar
 {
 	void View::updateInternalValues()
 	{

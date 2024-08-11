@@ -3,7 +3,7 @@
 
 #include "graphics/model.h"
 
-namespace engine {
+namespace solunar {
 
 	//class MeshResource : public Content
 	//{

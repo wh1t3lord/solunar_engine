@@ -3,7 +3,7 @@
 #include "core/file/filesystem.h"
 #include "core/file/contentdevice.h"
 
-namespace engine
+namespace solunar
 {
     IShaderProgram::~IShaderProgram()
     {

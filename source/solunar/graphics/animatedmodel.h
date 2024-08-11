@@ -4,7 +4,7 @@
 #include "graphics/model.h"
 #include "graphics/material.h"
 
-namespace engine
+namespace solunar
 {
 
 // the upper limit for joint palette size is 256 (because the mesh joint indices

@@ -4,7 +4,7 @@
 #include "engine/entity/entitymanager.h"
 #include "graphics/graphicsworld.h"
 
-namespace engine
+namespace solunar
 {
 	class PhysicsWorld;
 

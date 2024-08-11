@@ -1,4 +1,5 @@
 #include "enginepch.h"
+#include "core/timer.h"
 #include "core/file/contentmanager.h"
 #include "engine/engine.h"
 #include "engine/entity/entity.h"
@@ -11,9 +12,7 @@
 #include "engine/physics/rigidbodycomponent.h"
 #include "engine/physics/trianglemeshshape.h"
 
-#include "core/timer.h"
-
-namespace engine
+namespace solunar
 {
 
 	//void registerEngineObjects()

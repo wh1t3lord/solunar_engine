@@ -3,7 +3,7 @@
 
 #include "game/gamelogic/weapons/weaponcomponent.h"
 
-namespace engine
+namespace solunar
 {
 
 // Компонент цепи оружия

@@ -2,7 +2,7 @@
 #include "core/memory/memorymanager.h"
 #include "core/memory/mallocallocator.h"
 
-namespace engine
+namespace solunar
 {
 	
 IAllocator* MemoryManager::ms_pDefaultAllocator = nullptr;

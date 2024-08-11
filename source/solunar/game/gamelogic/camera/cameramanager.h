@@ -3,7 +3,7 @@
 
 #include "engine/camera.h"
 
-namespace engine {
+namespace solunar {
 	
 
 class CameraManager : public Singleton<CameraManager>

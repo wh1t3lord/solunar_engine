@@ -6,7 +6,7 @@
 #include "engine/physics/bullet_private.h"
 #include "engine/physics/physicsworld.h"
 
-namespace engine {
+namespace solunar {
 
 	void ShapeComponent::registerObject()
 	{

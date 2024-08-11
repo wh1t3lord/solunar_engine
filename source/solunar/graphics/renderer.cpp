@@ -37,7 +37,7 @@
 #include "engine/entity/entitymanager.h"
 #include "engine/entity/entity.h"
 
-namespace engine
+namespace solunar
 {
 	Renderer* g_renderer = nullptr;
 

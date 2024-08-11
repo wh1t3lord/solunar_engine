@@ -5,7 +5,7 @@
 
 #include <typeinfo>
 
-namespace engine
+namespace solunar
 {
 
 //! Template wrapper on COM objects.

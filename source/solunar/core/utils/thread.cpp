@@ -34,7 +34,7 @@ void SetThreadName(DWORD dwThreadID, const char* threadName)
 #pragma warning(pop)
 }
 
-namespace engine
+namespace solunar
 {
 
 void setCurrentThreadName(const char* name)

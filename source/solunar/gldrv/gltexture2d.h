@@ -3,7 +3,7 @@
 
 #include "graphics/core/texture.h"
 
-namespace engine
+namespace solunar
 {
 
 class GLTexture2D : public ITexture2D

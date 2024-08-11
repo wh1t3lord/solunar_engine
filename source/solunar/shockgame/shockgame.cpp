@@ -44,7 +44,7 @@
 
 #include "core/object/propertymanager.h"
 
-namespace engine
+namespace solunar
 {
 
 // implemetation for IGameInterface

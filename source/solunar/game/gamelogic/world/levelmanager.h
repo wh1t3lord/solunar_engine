@@ -1,7 +1,7 @@
 #ifndef GAMELOGIC_LEVELMANAGER_H
 #define GAMELOGIC_LEVELMANAGER_H
 
-namespace engine
+namespace solunar
 {
 	
 class LevelManagerComponent : public Component

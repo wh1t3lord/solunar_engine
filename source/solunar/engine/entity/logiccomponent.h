@@ -3,7 +3,7 @@
 
 #include "engine/entity/component.h"
 
-namespace engine
+namespace solunar
 {
 	// Logic component for node (run update function once at game frame)
 	class LogicComponent : public Component

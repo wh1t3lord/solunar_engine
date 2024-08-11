@@ -2,7 +2,7 @@
 
 #include <malloc.h>
 
-namespace engine
+namespace solunar
 {
 
 void* MallocAllocator::allocate(size_t size, size_t align)

@@ -1,7 +1,7 @@
 #include "core/math/math_types.h"
 #include "core/math/boundingbox.h"
 
-namespace engine {
+namespace solunar {
 
 void BoundingBox::setIdentity()
 {

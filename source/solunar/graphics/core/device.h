@@ -4,7 +4,7 @@
 // need for RenderTargetCreationDesc
 #include "graphics/core/rendertarget.h"
 
-namespace engine {
+namespace solunar {
 
 	class IRenderTarget;
 	class ITexture2D;

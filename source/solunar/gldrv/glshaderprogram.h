@@ -5,7 +5,7 @@
 
 #include <array>
 
-namespace engine
+namespace solunar
 {
 	
 class GLShaderProgram : public IShaderProgram

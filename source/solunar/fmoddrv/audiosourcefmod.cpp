@@ -6,7 +6,7 @@
 
 #include "fmoddrv/audiosourcefmod.h"
 
-namespace engine
+namespace solunar
 {
 	AudioSourceFMOD::AudioSourceFMOD(const std::string& filename, FMOD::System* system)
 	{
@@ -66,7 +66,8 @@ namespace engine
 			result = m_system->playSound(m_sound, 0, false, &m_soundChannel);
 			if (result != FMOD_OK)
 			{
-				Core::error("[audio]: failed to play sound! [audio]: FMOD ERROR: %s", getStringFromFMODResult(result));
+				Core::error("[audio]: failed to play sound! [audio]: FMOD ERROR: %s", 
+				getStringFromFMODResult(result).c_str());
 			}
 		}
 
@@ -78,7 +79,8 @@ namespace engine
 			result = m_system->playSound(m_sound, 0, false, &m_soundChannel);
 			if (result != FMOD_OK)
 			{
-				Core::error("[audio]: failed to play sound![audio]: FMOD ERROR: %s", getStringFromFMODResult(result));
+				Core::error("[audio]: failed to play sound![audio]: FMOD ERROR: %s", 
+				getStringFromFMODResult(result).c_str());
 			}
 		}
 	}
@@ -96,7 +98,8 @@ namespace engine
 			result = m_system->playSound(m_sound, channelGroup, false, &m_soundChannel);
 			if (result != FMOD_OK)
 			{
-				Core::error("[audio]: failed to play sound! [audio]: FMOD ERROR: %s", getStringFromFMODResult(result));
+				Core::error("[audio]: failed to play sound! [audio]: FMOD ERROR: %s", 
+				getStringFromFMODResult(result).c_str());
 			}
 
 			m_soundChannel->setLoopCount(-1);
@@ -110,7 +113,8 @@ namespace engine
 			result = m_system->playSound(m_sound, channelGroup, false, &m_soundChannel);
 			if (result != FMOD_OK)
 			{
-				Core::error("[audio]: failed to play sound![audio]: FMOD ERROR: %s", getStringFromFMODResult(result));
+				Core::error("[audio]: failed to play sound![audio]: FMOD ERROR: %s", 
+				getStringFromFMODResult(result).c_str());
 			}
 		}
 	}

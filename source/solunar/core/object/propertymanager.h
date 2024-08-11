@@ -10,7 +10,7 @@
 #include "core/math/boundingbox.h"
 #include "core/object/object.h"
 
-namespace engine
+namespace solunar
 {
 
 enum PropertyType

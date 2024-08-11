@@ -6,7 +6,7 @@
 // #include "graphics/shaderconstantmanager.h"
 #include "d3d11drv/d3d11device.h"
 
-namespace engine
+namespace solunar
 {
 
 struct RendererSingletonStorer

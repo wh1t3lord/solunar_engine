@@ -1,7 +1,7 @@
 #include "graphicspch.h"
 #include "graphics/materials/materialinstance_masked.h"
 
-namespace engine
+namespace solunar
 {
 
 MaterialInstance_Masked::MaterialInstance_Masked()

@@ -3,7 +3,7 @@
 
 #include "core/platform/core_platform.h"
 
-namespace engine
+namespace solunar
 {
 	class Core
 	{

@@ -4,7 +4,7 @@
 // File system
 #include "core/file/filesystem.h"
 
-namespace engine {
+namespace solunar {
 
 #define SAVEFILE_MAGIC (('E' << 24) + ('V' << 16) + ('A' << 8) + 'S')
 #define SAVEFILE_VERSION 1

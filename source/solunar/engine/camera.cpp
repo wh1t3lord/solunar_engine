@@ -3,7 +3,7 @@
 #include "engine/entity/entity.h"
 #include "engine/entity/cameracomponent.h"
 
-namespace engine
+namespace solunar
 {
 	CameraProxy CameraProxy::ms_cameraProxy;
 
@@ -12,7 +12,8 @@ namespace engine
 		m_view->m_view = getViewMatrix();
 		m_view->updateInternalValues();
 
-		m_frustum.update(m_view->m_projection * m_view->m_view);
+		glm::mat4 viewProjection = m_view->m_projection * m_view->m_view;
+		m_frustum.update(viewProjection);
 	}
 
 	glm::vec3 Camera::getScreenRay(float x, float y)
@@ -31,7 +32,8 @@ namespace engine
 		m_view->m_view = getViewMatrix();
 		m_view->updateInternalValues();
 
-		m_frustum.update(m_view->m_projection * m_view->m_view);
+		glm::mat4 viewProjection = m_view->m_projection * m_view->m_view;
+		m_frustum.update(viewProjection);
 	}
 
 	glm::mat4 Camera::getViewMatrix()

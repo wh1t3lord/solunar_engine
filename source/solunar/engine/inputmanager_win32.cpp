@@ -2,7 +2,7 @@
 #include "main/main.h"
 #include "engine/inputmanager_win32.h"
 
-namespace engine
+namespace solunar
 {
 	InputManager_Win32 InputManager_Win32::ms_inputManager;
 

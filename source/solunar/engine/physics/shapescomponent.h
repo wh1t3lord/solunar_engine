@@ -4,7 +4,7 @@
 #include "engine/physics/bullet_private.h"
 #include "engine/physics/rigidbodycomponent.h"
 
-namespace engine {
+namespace solunar {
 
 	//! Enumeration of shape types.
 	enum class ShapeType

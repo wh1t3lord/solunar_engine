@@ -7,7 +7,7 @@
 
 #include "core/timer.h"
 
-namespace engine {
+namespace solunar {
 
 	BeginPropertyRegister(RigidBodyComponent)
 	{

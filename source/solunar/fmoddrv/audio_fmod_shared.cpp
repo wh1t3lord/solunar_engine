@@ -1,7 +1,7 @@
 #include "fmoddrv_pch.h"
 #include "fmoddrv/audio_fmod_shared.h"
 
-namespace engine
+namespace solunar
 {
 	std::string getStringFromFMODResult(FMOD_RESULT result)
 	{

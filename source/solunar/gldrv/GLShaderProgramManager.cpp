@@ -2,7 +2,7 @@
 #include "gldrv/GLShaderProgramManager.h"
 #include "gldrv/glshaderprogram.h"
 #include <glad/glad.h>
-namespace engine
+namespace solunar
 {
 
 size_t g_vertexAttribsSizeTable[(size_t)ImageFormat::LAST] =
@@ -11,8 +11,8 @@ size_t g_vertexAttribsSizeTable[(size_t)ImageFormat::LAST] =
 	4, // RGBA16
 	3, // RGB32
 	4, // RGBA32
-	-1,// DEPTH24 NOT USED
-	-1,// DEPTH32 NOT USED
+	SIZE_MAX,// DEPTH24 NOT USED
+	SIZE_MAX,// DEPTH32 NOT USED
 	1, // R32
 	1, // R32F
 	3, // RGB16F
@@ -20,7 +20,7 @@ size_t g_vertexAttribsSizeTable[(size_t)ImageFormat::LAST] =
 	2, // RG32F
 	3, // RGB32F
 	4, // RGBA32F
-	-1,// DEPTH32F NOT USED
+	SIZE_MAX,// DEPTH32F NOT USED
 	4, // RGBA32_UNORM
 };
 

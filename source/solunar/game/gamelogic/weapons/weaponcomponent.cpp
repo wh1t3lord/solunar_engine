@@ -8,7 +8,7 @@
 #include "graphics/mesh.h"
 #include "graphics/ifontmanager.h"
 
-namespace engine
+namespace solunar
 {
 	WeaponComponent::WeaponComponent() :
 		m_inited(false)
@@ -72,7 +72,4 @@ namespace engine
 		g_fontManager->drawSystemFontShadowed(buf, (float)view->m_width - 300.0f, 140.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 #endif
 	}
-
-
-
 }

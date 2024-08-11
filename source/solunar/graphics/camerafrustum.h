@@ -5,7 +5,7 @@
 
 #define CAMERA_FRUSTUM_PLANE_COUNT 6
 
-namespace engine
+namespace solunar
 {
 	enum Halfspace
 	{

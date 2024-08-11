@@ -5,7 +5,7 @@
 
 #include "core/object/object.h"
 
-namespace engine
+namespace solunar
 {
 
 class TypeInfo;

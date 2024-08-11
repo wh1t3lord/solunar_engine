@@ -1,7 +1,7 @@
 #ifndef GRAPHICS_GRAPHICSOBJECT_H
 #define GRAPHICS_GRAPHICSOBJECT_H
 
-namespace engine
+namespace solunar
 {
 
 enum GraphicsObjectType

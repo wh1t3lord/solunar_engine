@@ -2,7 +2,7 @@
 #include "engine/entity/entity.h"
 #include "engine/entity/entitymanager.h"
 
-namespace engine
+namespace solunar
 {
 
 EntityManager::EntityManager()

@@ -1,7 +1,7 @@
 #ifndef SCREENQUAD_H
 #define SCREENQUAD_H
 
-namespace engine
+namespace solunar
 {
 	class ITexture2D;
 	class IShaderProgram;

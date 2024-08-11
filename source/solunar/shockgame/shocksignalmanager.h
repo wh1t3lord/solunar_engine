@@ -1,7 +1,7 @@
 #ifndef SHOCKSIGNALMANAGER_H
 #define SHOCKSIGNALMANAGER_H
 
-namespace engine
+namespace solunar
 {
 
 class ShockSignal : public Object

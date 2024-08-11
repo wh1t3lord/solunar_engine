@@ -1,7 +1,7 @@
 #ifndef GRAPHICS_CORE_TEXTURE_H
 #define GRAPHICS_CORE_TEXTURE_H
 
-namespace engine
+namespace solunar
 {
 
 class ITexture

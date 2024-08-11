@@ -14,7 +14,7 @@
 
 #include "glad/glad.h"
 
-namespace engine
+namespace solunar
 {
 
 struct GLHDRConstantBuffer

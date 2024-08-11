@@ -3,7 +3,7 @@
 
 #include "graphics/lightmanager.h"
 
-namespace engine {
+namespace solunar {
 	
 	class DrawableComponent;
 	

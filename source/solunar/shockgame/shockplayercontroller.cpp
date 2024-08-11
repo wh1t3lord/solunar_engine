@@ -12,7 +12,7 @@
 #include <numeric>
 #include <limits>
 
-namespace engine
+namespace solunar
 {
 
 BeginPropertyRegister(ShockPlayerController)

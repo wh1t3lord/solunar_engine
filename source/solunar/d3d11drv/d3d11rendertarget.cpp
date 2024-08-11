@@ -2,7 +2,7 @@
 #include "d3d11drv/d3d11rendertarget.h"
 #include "d3d11drv/d3d11texture2d.h"
 
-namespace engine
+namespace solunar
 {
 
 extern DXGI_FORMAT getDxgiFormat(ImageFormat format);

@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "main/main.h"
 
-namespace engine
+namespace solunar
 {
 
 CommandLine g_commandLine;

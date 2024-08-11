@@ -29,7 +29,7 @@
 
 #include <dxgidebug.h>
 
-namespace engine
+namespace solunar
 {
 
 void createD3D12Renderer()

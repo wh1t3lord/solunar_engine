@@ -12,7 +12,7 @@
 #define STB_IMAGE_RESIZE_IMPLEMENTATION
 #include "stb_image_resize2.h"
 
-namespace engine
+namespace solunar
 {
 	static void stbi_write_callback(void* context, void* data, int size)
 	{

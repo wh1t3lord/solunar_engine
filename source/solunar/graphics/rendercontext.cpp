@@ -1,7 +1,7 @@
 #include "graphicspch.h"
 #include "graphics/rendercontext.h"
 
-namespace engine
+namespace solunar
 {
 	RenderContext* RenderContext::ms_instance = nullptr;
 

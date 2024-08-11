@@ -1,7 +1,7 @@
 #ifndef AUDIOSOURCE_H
 #define AUDIOSOURCE_H
 
-namespace engine
+namespace solunar
 {
 	class AudioSource
 	{

@@ -8,7 +8,7 @@
 #include "BulletCollision/CollisionDispatch/btGhostObject.h"
 #include "BulletDynamics/Character/btKinematicCharacterController.h"
 
-namespace engine {
+namespace solunar {
 
 glm::vec3 btVectorToGlm(const btVector3& vec);
 btVector3 glmVectorToBt(const glm::vec3& vec);

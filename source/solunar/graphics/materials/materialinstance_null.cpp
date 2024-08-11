@@ -1,7 +1,7 @@
 #include "graphicspch.h"
 #include "graphics/materials/materialinstance_null.h"
 
-namespace engine
+namespace solunar
 {
 
 MaterialInstance_Null::MaterialInstance_Null()

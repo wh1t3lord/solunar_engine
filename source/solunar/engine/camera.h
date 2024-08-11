@@ -4,7 +4,7 @@
 #include "graphics/view.h"
 #include "graphics/camerafrustum.h"
 
-namespace engine
+namespace solunar
 {
 	class Camera
 	{

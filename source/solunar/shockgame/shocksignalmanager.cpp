@@ -1,7 +1,7 @@
 #include "shockgamepch.h"
 #include "shockgame/shocksignalmanager.h"
 
-namespace engine
+namespace solunar
 {
 
 ShockSignalManager* ShockSignalManager::ms_instance = nullptr;

@@ -5,7 +5,7 @@
 
 #include <RmlUi/Core/RenderInterface.h>
 
-namespace engine
+namespace solunar
 {
 
 class IShaderProgram;

@@ -34,7 +34,7 @@
 
 #include "GL/wglext.h"
 
-namespace engine {
+namespace solunar {
 
 	// this is interface for platform indepented context class.
 	class GLPlatformContext : public Object

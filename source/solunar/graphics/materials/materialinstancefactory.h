@@ -3,7 +3,7 @@
 
 #include "graphics/material.h"
 
-namespace engine
+namespace solunar
 {
 
 class Material;

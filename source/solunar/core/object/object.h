@@ -3,7 +3,7 @@
 
 #include <memory>
 
-namespace engine
+namespace solunar
 {
 	typedef void (*StaticConstructor_t)(void* ptr);
 

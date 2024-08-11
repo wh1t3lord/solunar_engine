@@ -4,7 +4,7 @@
 #include "graphics/model.h"
 #include "graphics/animatedmodel.h"
 
-namespace engine
+namespace solunar
 {
 
 static InputLayoutDesc s_vertexInputLayout[] =
@@ -85,8 +85,8 @@ IShaderProgram* MaterialInstance_Generic::getShaderProgramVariation(VertexFactor
 	{
 	case VertexFactory_StaticMesh:
 		shaderProgram = g_shaderManager->createShaderProgram(
-			"materialinstance_generic.vsh",
-			"materialinstance_generic.psh",
+			"materialinstance_generic.hlsl",
+			"materialinstance_generic.hlsl",
 			defines.c_str(),
 			s_vertexInputLayout,
 			sizeof(s_vertexInputLayout) / sizeof(s_vertexInputLayout[0]));
@@ -95,8 +95,8 @@ IShaderProgram* MaterialInstance_Generic::getShaderProgramVariation(VertexFactor
 		defines += "SKINNED\n";
 
 		shaderProgram = g_shaderManager->createShaderProgram(
-			"materialinstance_generic.vsh",
-			"materialinstance_generic.psh",
+			"materialinstance_generic.hlsl",
+			"materialinstance_generic.hlsl",
 			defines.c_str(),
 			s_animatedVertexInputLayout,
 			sizeof(s_animatedVertexInputLayout) / sizeof(s_animatedVertexInputLayout[0]));

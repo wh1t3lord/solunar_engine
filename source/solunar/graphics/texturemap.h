@@ -5,7 +5,7 @@
 #include "graphics/image.h"
 #include "graphics/graphicsobject.h"
 
-namespace engine
+namespace solunar
 {
 	class TextureMap : public GraphicsObject
 	{

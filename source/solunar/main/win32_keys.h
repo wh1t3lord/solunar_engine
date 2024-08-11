@@ -165,7 +165,7 @@ namespace Win32Keys
 	};
 }
 
-namespace engine
+namespace solunar
 {
 
 	inline KeyboardKeys getKeyFromWin32(Win32Keys::Keys key)

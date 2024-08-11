@@ -1,7 +1,7 @@
 #ifndef GRAPHICS_IFONTMANAGER_H
 #define GRAPHICS_IFONTMANAGER_H
 
-namespace engine
+namespace solunar
 {
 
 class IFont

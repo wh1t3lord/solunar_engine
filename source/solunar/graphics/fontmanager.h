@@ -5,7 +5,7 @@
 
 #include "stb_truetype.h"
 
-namespace engine
+namespace solunar
 {
 
 class ITexture2D;

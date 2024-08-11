@@ -1,7 +1,7 @@
 #ifndef GRAPHICS_GL_GLPOSTPROCESSING_H
 #define GRAPHICS_GL_GLPOSTPROCESSING_H
 
-namespace engine
+namespace solunar
 {
 
 class View;

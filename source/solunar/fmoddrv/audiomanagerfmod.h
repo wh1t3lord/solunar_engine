@@ -5,7 +5,7 @@
 
 #include "fmoddrv/musicmanagerfmod.h"
 
-namespace engine
+namespace solunar
 {
 	struct FMODDrvSingletonStorer
 	{

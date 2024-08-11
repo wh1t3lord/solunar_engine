@@ -2,7 +2,7 @@
 #include "game/gamelogic/world/levelmanager.h"
 #include "levelmanager.h"
 
-namespace engine
+namespace solunar
 {
 
 LevelManagerComponent::LevelManagerComponent()

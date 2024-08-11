@@ -1,7 +1,7 @@
 #include "enginepch.h"
 #include "engine/inputmanager.h"
 
-namespace engine
+namespace solunar
 {
 
 InputManager::InputManager() :

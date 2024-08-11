@@ -1,7 +1,7 @@
 #ifndef GRAPHICS_CORE_RENDERTARGET_H
 #define GRAPHICS_CORE_RENDERTARGET_H
 
-namespace engine {
+namespace solunar {
 
 	class ITexture2D;
 

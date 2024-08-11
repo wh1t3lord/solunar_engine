@@ -5,7 +5,7 @@
 
 #include <string.h>
 
-namespace engine
+namespace solunar
 {
 
 static TypeManager s_typeManager;

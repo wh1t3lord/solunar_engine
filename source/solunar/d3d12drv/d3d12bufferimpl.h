@@ -3,7 +3,7 @@
 
 #include "d3d12drv/d3d12device.h"
 
-namespace engine
+namespace solunar
 {
 
 class D3D12BufferImpl : public IBufferBase

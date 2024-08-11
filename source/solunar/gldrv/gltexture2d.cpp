@@ -1,7 +1,7 @@
 #include "gldrv_pch.h"
 #include "gldrv/gltexture2d.h"
 
-namespace engine
+namespace solunar
 {
 
 extern GLenum GetGLFormat(ImageFormat format);

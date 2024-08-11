@@ -3,7 +3,7 @@
 
 #include "engine/inputmanager.h"
 
-namespace engine
+namespace solunar
 {
 	class InputManager_Win32 : public InputManager
 	{

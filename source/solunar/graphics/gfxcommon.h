@@ -1,7 +1,7 @@
 #ifndef GFXCOMMON_H
 #define GFXCOMMON_H
 
-namespace engine
+namespace solunar
 {
 	enum class ImageFormat
 	{

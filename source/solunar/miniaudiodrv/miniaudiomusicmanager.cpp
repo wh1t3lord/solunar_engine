@@ -3,7 +3,7 @@
 #include "miniaudiodrv/miniaudiomanager.h"
 #include "miniaudiodrv/miniaudiomusicmanager.h"
 
-namespace engine
+namespace solunar
 {
 
 MiniAudioMusicManager::MiniAudioMusicManager() :

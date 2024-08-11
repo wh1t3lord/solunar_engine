@@ -1,7 +1,7 @@
 #ifndef ENGINE_H
 #define ENGINE_H
 
-namespace engine
+namespace solunar
 {
 	class World;
 	class IGameInterface;

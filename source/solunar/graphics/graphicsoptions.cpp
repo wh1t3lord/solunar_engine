@@ -3,7 +3,7 @@
 
 #include "core/utils/iniFile.h"
 
-namespace engine
+namespace solunar
 {
 	GraphicsOptions g_graphicsOptions;
 

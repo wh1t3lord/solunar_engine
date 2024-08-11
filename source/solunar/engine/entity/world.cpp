@@ -10,7 +10,7 @@
 #include "engine/physics/shapescomponent.h"
 #include <imgui.h>
 
-namespace engine
+namespace solunar
 {
 	World::World() :
 		m_physicsWorld(nullptr), m_graphicsWorld(nullptr)

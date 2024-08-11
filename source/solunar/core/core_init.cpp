@@ -10,7 +10,7 @@
 #include "core/object/serializableobject.h"
 #include "core/object/propertymanager.h"
 
-namespace engine
+namespace solunar
 {
 	
 void registerCoreTypes()

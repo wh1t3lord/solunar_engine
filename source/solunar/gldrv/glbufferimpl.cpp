@@ -1,7 +1,7 @@
 #include "gldrv_pch.h"
 #include "gldrv/glbufferimpl.h"
 
-namespace engine
+namespace solunar
 {
 	
 extern GLenum getBufferAccess(BufferAccess access);

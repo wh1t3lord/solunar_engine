@@ -6,7 +6,7 @@
 #include "miniaudiodrv/miniaudio_shared.h"
 #include "miniaudiodrv/miniaudiomusicmanager.h"
 
-namespace engine
+namespace solunar
 {
 
 struct MiniAudioSingletonStorer

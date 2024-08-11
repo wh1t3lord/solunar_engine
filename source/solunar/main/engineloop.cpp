@@ -26,7 +26,7 @@
 #include "shockgame/shockgame.h"
 #include "shockgame/shockplayercontroller.h"
 
-namespace engine {
+namespace solunar {
 
 	extern void graphicsShowConstantBuffers(bool* open);
 

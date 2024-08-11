@@ -9,7 +9,7 @@
 #include <BulletDynamics/ConstraintSolver/btSequentialImpulseConstraintSolver.h>
 #include <BulletDynamics/Dynamics/btDiscreteDynamicsWorld.h>
 
-namespace engine
+namespace solunar
 {
 	static void internalTickCallback(btDynamicsWorld* world, btScalar timeStep)
 	{

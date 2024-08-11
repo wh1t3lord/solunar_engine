@@ -3,7 +3,7 @@
 
 #include "engine/entity/component.h"
 
-namespace engine
+namespace solunar
 {
 
 class CameraComponent : public Component

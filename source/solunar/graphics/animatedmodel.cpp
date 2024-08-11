@@ -20,7 +20,7 @@
 #define CGLTF_IMPLEMENTATION
 #include <cgltf.h>
 
-namespace engine
+namespace solunar
 {
 
 // UnpackValue

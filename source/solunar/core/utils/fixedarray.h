@@ -3,7 +3,7 @@
 
 #include <array>
 
-namespace engine
+namespace solunar
 {
     //! Fixed array with std::vector like interface
     template <typename T, const size_t N>

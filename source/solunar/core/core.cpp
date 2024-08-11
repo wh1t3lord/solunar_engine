@@ -5,7 +5,7 @@
 #include <thread>
 #include <mutex>
 
-namespace engine
+namespace solunar
 {
 	void error_backend(const char* txt)
 	{
