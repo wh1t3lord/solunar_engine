@@ -19,7 +19,7 @@ public:
 	~ComAutoPtr();
 
 	void addRef();
-	void release();
+	void Release();
 
 	T* get() { return m_instance; }
 	T** getDoublePointer() { return &m_instance; }
@@ -30,7 +30,7 @@ public:
 
 	//ComAutoPtr& operator=(std::nullptr_t)
 	//{
-	//	release();
+	//	Release();
 	//	return *this;
 	//}
 
@@ -78,7 +78,7 @@ inline ComAutoPtr<T>::ComAutoPtr(T* instance)
 template<typename T>
 inline ComAutoPtr<T>::~ComAutoPtr()
 {
-	release();
+	Release();
 }
 
 template<typename T>
@@ -89,13 +89,13 @@ inline void ComAutoPtr<T>::addRef()
 }
 
 template<typename T>
-inline void ComAutoPtr<T>::release()
+inline void ComAutoPtr<T>::Release()
 {
 	if (m_instance)
 	{
 		ULONG refCount = m_instance->Release();
 
-		Core::msg("[%s] releasing with ref count %ul", typeid(this).name(), refCount);
+		Core::Msg("[%s] releasing with ref count %ul", typeid(this).name(), refCount);
 		
 		m_instance = nullptr;
 	}

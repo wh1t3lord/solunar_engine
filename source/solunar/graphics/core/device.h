@@ -20,50 +20,50 @@ namespace solunar {
 		virtual ~IRenderDevice() {}
 
 		//! Create render target.
-		virtual IRenderTarget* createRenderTarget(const RenderTargetCreationDesc& renderTargetDesc) = 0;
+		virtual IRenderTarget* CreateRenderTarget(const RenderTargetCreationDesc& renderTargetDesc) = 0;
 
 		//! Create buffer (vertex, index, constant and e.x.)
-		virtual IBufferBase* createBuffer(const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc) = 0;
+		virtual IBufferBase* CreateBuffer(const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc) = 0;
 
 		//! Create texture 2d.
-		virtual ITexture2D* createTexture2D(const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc) = 0;
+		virtual ITexture2D* CreateTexture2D(const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc) = 0;
 
 		//! Create texture sampler state.
-		virtual ISamplerState* createSamplerState(const SamplerDesc& samplerDesc) = 0;
+		virtual ISamplerState* CreateSamplerState(const SamplerDesc& samplerDesc) = 0;
 
 		//! Set render target.
-		virtual void setRenderTarget(IRenderTarget* rt) = 0;
+		virtual void SetRenderTarget(IRenderTarget* rt) = 0;
 
 		//! Set constant buffer.
-		virtual void setConstantBuffer(IBufferBase* cb) = 0;
-		virtual void setConstantBufferIndex(int slot, IBufferBase* cb) = 0;
+		virtual void SetConstantBuffer(IBufferBase* cb) = 0;
+		virtual void SetConstantBufferIndex(int slot, IBufferBase* cb) = 0;
 
 		//! Set vertex buffer.
-		virtual void setVertexBuffer(IBufferBase* buffer, uint32_t stride, uint32_t offset) = 0;
+		virtual void SetVertexBuffer(IBufferBase* buffer, uint32_t stride, uint32_t offset) = 0;
 
 		//! Set Index buffer.
-		virtual void setIndexBuffer(IBufferBase* buffer, bool use16bitsIndices) = 0;
+		virtual void SetIndexBuffer(IBufferBase* buffer, bool use16bitsIndices) = 0;
 
 		//! Set texture 2d.
-		virtual void setTexture2D(int slot, ITexture2D* texture) = 0;
+		virtual void SetTexture2D(int slot, ITexture2D* texture) = 0;
 
 		//! set sampler desc.
-		virtual void setSampler(int slot, ISamplerState* sampler) = 0;
+		virtual void SetSamplerState(int slot, ISamplerState* sampler) = 0;
 
 		//! Set viewport
-		virtual void setViewport(Viewport* viewport) = 0;
+		virtual void SetViewport(Viewport* viewport) = 0;
 
 		//! Get current viewport
-		virtual Viewport getViewport() = 0;
+		virtual Viewport GetViewport() = 0;
 
 		//! Set scissors
-		virtual void setScissors(float x, float y, float w, float h) = 0;
+		virtual void SetScissors(float x, float y, float w, float h) = 0;
 
 		//! Draw non indexed primitives
-		virtual void draw(PrimitiveMode primitiveMode, size_t verticesStart, size_t verticesCount) = 0;
+		virtual void Draw(PrimitiveMode primitiveMode, size_t verticesStart, size_t verticesCount) = 0;
 
 		//! Draw indexed primitives
-		virtual void drawIndexed(PrimitiveMode primitiveMode, size_t indexStart, size_t indexCount, int baseVertexLocation) = 0;
+		virtual void DrawIndexed(PrimitiveMode primitiveMode, size_t indexStart, size_t indexCount, int baseVertexLocation) = 0;
 
 	};
 

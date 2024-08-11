@@ -12,17 +12,17 @@ namespace solunar
 		static World* ms_world;
 
 	public:
-		static void init();
-		static void shutdown();
+		static void Init();
+		static void Shutdown();
 
-		static void loadWorld(const std::string& filename);
+		static void LoadWorld(const std::string& filename);
 
-		static void loadEmptyWorld();
+		static void LoadEmptyWorld();
 
-		static void update();
+		static void Update();
 
-		static void setGameInterface(IGameInterface* gameInterface);
-		static IGameInterface* getGameInterface();
+		static void SetGameInterface(IGameInterface* gameInterface);
+		static IGameInterface* GetGameInterface();
 	};
 
 	enum class EngineState : uint16_t
@@ -40,13 +40,13 @@ namespace solunar
 		EngineStateManager();
 		~EngineStateManager();
 
-		void loadWorld(const std::string& filename);
-		void loadEmptyWorld();
+		void LoadWorld(const std::string& filename);
+		void LoadEmptyWorld();
 	
-		void update();
+		void Update();
 
 	private:
-		void onStateSwitch();
+		void OnStateSwitch();
 
 	private:
 		std::string m_worldName;

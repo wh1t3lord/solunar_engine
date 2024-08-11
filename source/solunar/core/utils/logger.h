@@ -6,9 +6,9 @@ namespace solunar
 	class Logger
 	{
 	public:
-		static void init();
-		static void shutdown();
-		static void logPrint(const char* msg, ...);
+		static void Init();
+		static void Shutdown();
+		static void LogPrint(const char* Msg, ...);
 	};
 
 }

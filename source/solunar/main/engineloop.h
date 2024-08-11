@@ -6,10 +6,10 @@ namespace solunar {
 	class EngineLoop
 	{
 	public:
-		void initialize();
-		void shutdown();
+		void Initialize();
+		void Shutdown();
 
-		bool update();
+		bool Update();
 	};
 
 }

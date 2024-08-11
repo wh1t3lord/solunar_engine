@@ -12,8 +12,8 @@ public:
 	GLTexture2D(const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc);
 	~GLTexture2D();
 
-	void create(const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc);
-	void destroy();
+	void Create(const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc);
+	void Destroy();
 
 	void updateTexture(const void* data, int rowPitch, int depthPitch) override;
 

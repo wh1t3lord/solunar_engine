@@ -3,17 +3,17 @@
 
 namespace solunar
 {
-	bool AudioSource::isPlaying()
+	bool AudioSource::IsPlaying()
 	{
 		return false;
 	}
 
-	void AudioSource::play()
+	void AudioSource::Play()
 	{
 
 	}
 
-	void AudioSource::stop()
+	void AudioSource::Stop()
 	{
 
 	}

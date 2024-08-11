@@ -13,22 +13,22 @@ public:
 	~FileSystem_Win32();
 
 	//! Open file.
-	FileHandle open(const char* filename);
+	FileHandle Open(const char* filename);
 
 	//! Create file.
-	FileHandle create(const char* filename);
+	FileHandle Create(const char* filename);
 
 	//! Close file
-	void close(FileHandle handle);
+	void Close(FileHandle handle);
 
 	//! File exist.
-	bool exist(const char* filename);
+	bool Exist(const char* filename);
 
-	size_t tell(FileHandle handle);
-	void seek(FileHandle handle, SeekWay seekway, long offset);
+	size_t Tell(FileHandle handle);
+	void Seek(FileHandle handle, SeekWay seekway, long offset);
 
-	size_t read(FileHandle handle, void* data, size_t size);
-	size_t write(FileHandle handle, const void* data, size_t size);
+	size_t Read(FileHandle handle, void* data, size_t size);
+	size_t Write(FileHandle handle, const void* data, size_t size);
 };
 
 }

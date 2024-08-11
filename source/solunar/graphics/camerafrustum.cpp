@@ -5,7 +5,7 @@ namespace solunar
 {
 	// PLANE IMPLEMENTATION
 
-	void Plane::setIdentity()
+	void Plane::SetIdentity()
 	{
 		a = 0.0;
 		b = 0.0f;
@@ -38,7 +38,7 @@ namespace solunar
 
 	// CAMERAFRUSTUM IMPLEMENTATION
 
-	void CameraFrustum::update(glm::mat4& vp)
+	void CameraFrustum::Update(glm::mat4& vp)
 	{
 		// extracting frustum from combined matrix ( proj * view )
 		//glm::mat4 comboMatrix = glm::transpose(vp);

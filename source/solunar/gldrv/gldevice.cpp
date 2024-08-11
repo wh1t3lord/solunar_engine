@@ -10,51 +10,51 @@ namespace solunar {
 
 GLDevice::GLDevice()
 {
-	create();
+	Create();
 }
 
 GLDevice::~GLDevice()
 {
-	destroy();
+	Destroy();
 }
 
-void GLDevice::create()
+void GLDevice::Create()
 {
 
 }
 
-void GLDevice::destroy()
+void GLDevice::Destroy()
 {
 
 }
 
-IRenderTarget* GLDevice::createRenderTarget(const RenderTargetCreationDesc& renderTargetDesc)
+IRenderTarget* GLDevice::CreateRenderTarget(const RenderTargetCreationDesc& renderTargetDesc)
 {
 	return (IRenderTarget*)mem_new<GLRenderTarget>(renderTargetDesc);
 }
 
-IBufferBase* GLDevice::createBuffer(const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc)
+IBufferBase* GLDevice::CreateBuffer(const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc)
 {
 	return (IBufferBase*)mem_new<GLBufferImpl>(bufferDesc, subresourceDesc);
 }
 
-ITexture2D* GLDevice::createTexture2D(const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc)
+ITexture2D* GLDevice::CreateTexture2D(const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc)
 {
 	return (ITexture2D*)mem_new<GLTexture2D>(textureDesc, subresourceDesc);
 }
 
-ISamplerState* GLDevice::createSamplerState(const SamplerDesc& samplerDesc)
+ISamplerState* GLDevice::CreateSamplerState(const SamplerDesc& samplerDesc)
 {
 	return (ISamplerState*)mem_new<GLSamplerState>(samplerDesc);
 }
 
-void GLDevice::setRenderTarget(IRenderTarget* rt)
+void GLDevice::SetRenderTarget(IRenderTarget* rt)
 {
 	GLRenderTarget* glrt = (GLRenderTarget*)rt;
 	glBindFramebuffer(GL_FRAMEBUFFER, glrt ? glrt->getHandle() : 0);
 }
 
-void GLDevice::setVertexBuffer(IBufferBase* buffer, uint32_t stride, uint32_t offset)
+void GLDevice::SetVertexBuffer(IBufferBase* buffer, uint32_t stride, uint32_t offset)
 {
 	//ASSERT(buffer->getBufferDesc().m_bufferType != BufferType::VertexBuffer);
 
@@ -62,7 +62,7 @@ void GLDevice::setVertexBuffer(IBufferBase* buffer, uint32_t stride, uint32_t of
 	glBindBuffer(GL_ARRAY_BUFFER, bufferImpl ? bufferImpl->getHandle() : 0);
 }
 
-void GLDevice::setIndexBuffer(IBufferBase* buffer, bool use16bitsIndices)
+void GLDevice::SetIndexBuffer(IBufferBase* buffer, bool use16bitsIndices)
 {
 	//ASSERT(buffer->getBufferDesc().m_bufferType != BufferType::IndexBuffer);
 
@@ -70,7 +70,7 @@ void GLDevice::setIndexBuffer(IBufferBase* buffer, bool use16bitsIndices)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, bufferImpl ? bufferImpl->getHandle() : 0);
 }
 
-void GLDevice::setTexture2D(int slot, ITexture2D* texture)
+void GLDevice::SetTexture2D(int slot, ITexture2D* texture)
 {
 	GLTexture2D* nativeTexture = reinterpret_cast<GLTexture2D*>(texture);
 
@@ -80,15 +80,15 @@ void GLDevice::setTexture2D(int slot, ITexture2D* texture)
 	//glBindMultiTextureEXT(GL_TEXTURE0 + slot, GL_TEXTURE_2D, nativeTexture ? nativeTexture->getHandle() : 0);
 }
 
-void GLDevice::setSampler(int slot, ISamplerState* sampler)
+void GLDevice::SetSamplerState(int slot, ISamplerState* sampler)
 {
 	GLSamplerState* samplerImpl = reinterpret_cast<GLSamplerState*>(sampler);
 	glBindSampler(slot, samplerImpl ? samplerImpl->getHandle() : 0);
 }
 
-void GLDevice::setConstantBuffer(IBufferBase* cb)
+void GLDevice::SetConstantBuffer(IBufferBase* cb)
 {
-	Assert2(0, "GLDevice::setConstantBuffer is obsolote. Please use setConstantBufferIndex");
+	Assert2(0, "GLDevice::SetConstantBuffer is obsolote. Please use SetConstantBufferIndex");
 
 	//ASSERT(cb->getBufferDesc().m_bufferType != BufferType::ConstantBuffer);
 
@@ -96,7 +96,7 @@ void GLDevice::setConstantBuffer(IBufferBase* cb)
 	glBindBuffer(GL_UNIFORM_BUFFER, bufferImpl ? bufferImpl->getHandle() : 0);
 }
 
-void GLDevice::setConstantBufferIndex(int slot, IBufferBase* cb)
+void GLDevice::SetConstantBufferIndex(int slot, IBufferBase* cb)
 {
 	//ASSERT(cb->getBufferDesc().m_bufferType != BufferType::ConstantBuffer);
 
@@ -126,19 +126,19 @@ void GLDevice::setConstantBufferIndex(int slot, IBufferBase* cb)
 //	}
 //}
 
-void GLDevice::setViewport(Viewport* viewport)
+void GLDevice::SetViewport(Viewport* viewport)
 {
 	Assert(viewport);
 	m_viewport = *viewport;
 	glViewport(m_viewport.m_x, m_viewport.m_y, m_viewport.m_width, m_viewport.m_height);
 }
 
-Viewport GLDevice::getViewport()
+Viewport GLDevice::GetViewport()
 {
 	return m_viewport;
 }
 
-void GLDevice::setScissors(float x, float y, float w, float h)
+void GLDevice::SetScissors(float x, float y, float w, float h)
 {
 	glScissor((int)x, (int)y, (int)w, (int)h);
 }
@@ -151,12 +151,12 @@ static GLenum s_glPrimiviteMode[PM_UNUSED_COUNT] =
 	GL_TRIANGLE_STRIP,	// PM_TriangleStrip
 };
 
-void GLDevice::draw(PrimitiveMode primitiveMode, size_t verticesStart, size_t verticesCount)
+void GLDevice::Draw(PrimitiveMode primitiveMode, size_t verticesStart, size_t verticesCount)
 {
 	glDrawArrays(s_glPrimiviteMode[primitiveMode], verticesStart, verticesCount);
 }
 
-void GLDevice::drawIndexed(PrimitiveMode primitiveMode, size_t indexStart, size_t indexCount, int baseVertexLocation)
+void GLDevice::DrawIndexed(PrimitiveMode primitiveMode, size_t indexStart, size_t indexCount, int baseVertexLocation)
 {
 	glDrawElements(s_glPrimiviteMode[primitiveMode], indexCount, GL_UNSIGNED_INT, NULL);
 }

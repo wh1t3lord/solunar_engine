@@ -19,7 +19,7 @@ public:
 	bool start();
 	void setThreadName(const char* name);
 
-	void stop();
+	void Stop();
 
 	virtual void execute() = 0;
 

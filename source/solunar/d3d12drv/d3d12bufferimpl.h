@@ -12,11 +12,11 @@ public:
 	D3D12BufferImpl(D3D12Device* device, const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc);
 	~D3D12BufferImpl();
 
-	void create(D3D12Device* device, const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc);
-	void destroy();
+	void Create(D3D12Device* device, const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc);
+	void Destroy();
 
-	void* map(BufferMapping mapping) override;
-	void unmap() override;
+	void* Map(BufferMapping mapping) override;
+	void Unmap() override;
 
 	void updateSubresource(void * data, size_t size) override;
 

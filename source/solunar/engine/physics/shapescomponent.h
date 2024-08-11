@@ -22,21 +22,21 @@ namespace solunar {
 	//! Interface class for any type of rigid body shapes.
 	class ShapeComponent : public Component
 	{
-		ImplementObject(ShapeComponent, Component);
+		IMPLEMENT_OBJECT(ShapeComponent, Component);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 
 	public:
 		ShapeComponent();
 		virtual ~ShapeComponent();
 
-		void onEntitySet(Entity* entity) override;
-		void onEntityRemove() override;
-		void onWorldSet(World* world) override;
+		void OnEntitySet(Entity* entity) override;
+		void OnEntityRemove() override;
+		void OnWorldSet(World* world) override;
 
 		// serialization
-		virtual void loadXML(tinyxml2::XMLElement& element);
-		virtual void saveXML(tinyxml2::XMLElement& element);
+		virtual void LoadXML(tinyxml2::XMLElement& element);
+		virtual void SaveXML(tinyxml2::XMLElement& element);
 
 		//! Public initialization of shape
 		void initializeShape();
@@ -73,16 +73,16 @@ namespace solunar {
 
 	class BoxShapeComponent : public ShapeComponent
 	{
-		ImplementObject(BoxShapeComponent, ShapeComponent);
+		IMPLEMENT_OBJECT(BoxShapeComponent, ShapeComponent);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 
 	public:
 		BoxShapeComponent();
 		~BoxShapeComponent();
 
-		void loadXML(tinyxml2::XMLElement& element) override;
-		void saveXML(tinyxml2::XMLElement& element) override;
+		void LoadXML(tinyxml2::XMLElement& element) override;
+		void SaveXML(tinyxml2::XMLElement& element) override;
 
 		void createShape(const glm::vec3& size);
 
@@ -95,16 +95,16 @@ namespace solunar {
 
 	class SphereShapeComponent : public ShapeComponent
 	{
-		ImplementObject(SphereShapeComponent, ShapeComponent);
+		IMPLEMENT_OBJECT(SphereShapeComponent, ShapeComponent);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 
 	public:
 		SphereShapeComponent();
 		~SphereShapeComponent();
 
-		void loadXML(tinyxml2::XMLElement& element) override;
-		void saveXML(tinyxml2::XMLElement& element) override;
+		void LoadXML(tinyxml2::XMLElement& element) override;
+		void SaveXML(tinyxml2::XMLElement& element) override;
 
 	private:
 		void createShapeInternal() override;
@@ -116,16 +116,16 @@ namespace solunar {
 
 	class CylinderShapeComponent : public ShapeComponent
 	{
-		ImplementObject(CylinderShapeComponent, ShapeComponent);
+		IMPLEMENT_OBJECT(CylinderShapeComponent, ShapeComponent);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 
 	public:
 		CylinderShapeComponent();
 		~CylinderShapeComponent();
 
-		void loadXML(tinyxml2::XMLElement& element) override;
-		void saveXML(tinyxml2::XMLElement& element) override;
+		void LoadXML(tinyxml2::XMLElement& element) override;
+		void SaveXML(tinyxml2::XMLElement& element) override;
 
 	private:
 		void createShapeInternal() override;
@@ -137,9 +137,9 @@ namespace solunar {
 
 	class CapsuleShapeComponent : public ShapeComponent
 	{
-		ImplementObject(CapsuleShapeComponent, ShapeComponent);
+		IMPLEMENT_OBJECT(CapsuleShapeComponent, ShapeComponent);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 
 	public:
 		CapsuleShapeComponent();
@@ -147,8 +147,8 @@ namespace solunar {
 
 		void createCapsule(float _fRadius, float _fHeight);
 
-		void loadXML(tinyxml2::XMLElement& element) override;
-		void saveXML(tinyxml2::XMLElement& element) override;
+		void LoadXML(tinyxml2::XMLElement& element) override;
+		void SaveXML(tinyxml2::XMLElement& element) override;
 
 	private:
 		void createShapeInternal() override;

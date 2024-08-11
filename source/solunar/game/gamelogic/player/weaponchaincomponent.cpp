@@ -4,9 +4,9 @@
 namespace solunar
 {
 
-void WeaponChainComponent::registerObject()
+void WeaponChainComponent::RegisterObject()
 {
-	g_typeManager->registerObject<WeaponChainComponent>();
+	g_typeManager->RegisterObject<WeaponChainComponent>();
 }
 
 WeaponChainComponent::WeaponChainComponent() :

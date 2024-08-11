@@ -20,14 +20,14 @@ public:
 	RmlSystem();
 	~RmlSystem();
 
-	void init();
-	void shutdown();
+	void Init();
+	void Shutdown();
 
 	void createContext(int width, int height);
 
 	void render();
 
-	Rml::Context* getContext();
+	Rml::Context* GetContext();
 
 private:
 	// Backend

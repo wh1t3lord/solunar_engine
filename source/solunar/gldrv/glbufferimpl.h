@@ -10,13 +10,13 @@ public:
 	GLBufferImpl(const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc);
 	~GLBufferImpl();
 
-	void create(const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc);
-	void destroy();
+	void Create(const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc);
+	void Destroy();
 
 	uint32_t getHandle() { return m_handle; }
 
-	void* map(BufferMapping mapping) override;
-	void  unmap() override;
+	void* Map(BufferMapping mapping) override;
+	void  Unmap() override;
 
 	void updateSubresource(void* data, size_t size) override;
 

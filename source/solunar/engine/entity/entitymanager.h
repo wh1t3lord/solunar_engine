@@ -12,26 +12,26 @@ public:
 	EntityManager();
 	~EntityManager();
 
-	void deleteEntities();
+	void Destroy();
 
-	Entity* createEntity();
-	Entity* createEntityEx(const TypeInfo* typeInfo);
+	Entity* CreateEntity();
+	Entity* CreateEntityEx(const TypeInfo* typeInfo);
 
-	const std::vector<Entity*>& getEntities() { return m_entities; }
+	const std::vector<Entity*>& GetEntities() { return m_entities; }
 
-	std::vector<Entity*> getEntitiesWithComponentTypeInfo(const TypeInfo* typeInfo);
+	std::vector<Entity*> GetEntitiesWithComponentTypeInfo(const TypeInfo* typeInfo);
 
 	template <typename T>
-	std::vector<Entity*> getEntitiesWithComponent();
+	std::vector<Entity*> GetEntitiesWithComponent();
 
 private:
 	std::vector<Entity*> m_entities;
 };
 
 template<typename T>
-inline std::vector<Entity*> EntityManager::getEntitiesWithComponent()
+inline std::vector<Entity*> EntityManager::GetEntitiesWithComponent()
 {
-	return getEntitiesWithComponentTypeInfo(T::getStaticTypeInfo());
+	return GetEntitiesWithComponentTypeInfo(T::GetStaticTypeInfo());
 }
 
 }

@@ -108,14 +108,14 @@ GLStateManager::GLStateManager()
 
 GLStateManager::~GLStateManager()
 {
-    shutdown();
+    Shutdown();
 }
 
-void GLStateManager::init()
+void GLStateManager::Init()
 {
 }
 
-void GLStateManager::shutdown()
+void GLStateManager::Shutdown()
 {
     for (auto it : m_blendStates)
     {
@@ -185,7 +185,7 @@ void GLStateManager::setRasterizerState(IRasterizerState* rasterizerState)
     }
 }
 
-ISamplerState* GLStateManager::createSamplerState(const SamplerDesc& samplerDesc)
+ISamplerState* GLStateManager::CreateSamplerState(const SamplerDesc& samplerDesc)
 {
     // Find already created ISamplerState
     auto it = m_samplerStates.find(samplerDesc);
@@ -194,7 +194,7 @@ ISamplerState* GLStateManager::createSamplerState(const SamplerDesc& samplerDesc
         return (*it).second;
     }
 
-    ISamplerState* samplerState = g_renderDevice->createSamplerState(samplerDesc);
+    ISamplerState* samplerState = g_renderDevice->CreateSamplerState(samplerDesc);
     m_samplerStates.emplace(samplerDesc, samplerState);
     return samplerState;
 }
@@ -252,7 +252,7 @@ void GLStateManager::destroyDepthStencilState(IDepthStencilState* state)
     mem_delete(state);
 }
 
-void GLStateManager::setDepthStencilState(IDepthStencilState* state, uint32_t stencilRef)
+void GLStateManager::SetDepthStencilState(IDepthStencilState* state, uint32_t stencilRef)
 {
     static IDepthStencilState* previousDepthStencilState = nullptr;
     if (previousDepthStencilState != state) {

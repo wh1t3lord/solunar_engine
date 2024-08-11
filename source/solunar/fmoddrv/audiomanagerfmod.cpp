@@ -34,12 +34,12 @@ namespace solunar
 		std::string messageString = message;
 		messageString[messageString.size() - 1] = ' ';
 
-		Core::msg("[fmod]: %s: %s", func, messageString.c_str());
+		Core::Msg("[fmod]: %s: %s", func, messageString.c_str());
 
 		return FMOD_OK;
 	}
 
-	AudioManager* AudioManager::createInstance()
+	AudioManager* AudioManager::CreateInstance()
 	{
 		if (!ms_pInstance)
 			ms_pInstance = mem_new<AudioManagerFMOD>();
@@ -47,7 +47,7 @@ namespace solunar
 		return ms_pInstance;
 	}
 
-	void AudioManager::destroyInstance()
+	void AudioManager::DestroyInstance()
 	{
 		if (ms_pInstance)
 		{
@@ -65,7 +65,7 @@ namespace solunar
 	{
 	}
 
-	void AudioManagerFMOD::init()
+	void AudioManagerFMOD::Init()
 	{
 #ifndef NDEBUG
 		FMOD::Debug_Initialize(FMOD_DEBUG_LEVEL_LOG, FMOD_DEBUG_MODE_CALLBACK, &FMOD_LoggerCallback, nullptr);
@@ -75,53 +75,53 @@ namespace solunar
 		FMOD_RESULT result = FMOD::Studio::System::create(&m_studioSystem);
 		if (result != FMOD_OK)
 		{
-			Core::error("Failed to create FMOD Studio. Error code:%s", FMOD_ErrorString(result));
+			Core::Error("Failed to create FMOD Studio. Error code:%s", FMOD_ErrorString(result));
 		}
 
-		// Initialize FMOD Studio, which will also initialize FMOD Core
+		// Initialize FMOD Studio, which will also Initialize FMOD Core
 		result = m_studioSystem->initialize(512, FMOD_STUDIO_INIT_NORMAL, FMOD_INIT_NORMAL, nullptr);
 		if (result != FMOD_OK)
 		{
-			Core::error("Failed to initialize FMOD Studio. Error code:%s", FMOD_ErrorString(result));
+			Core::Error("Failed to Initialize FMOD Studio. Error code:%s", FMOD_ErrorString(result));
 		}
 
-		Core::msg("[audio]: fmod initialized");
+		Core::Msg("[audio]: fmod initialized");
 
 		// Initialize music manager.
-		MusicManager::getInstance()->init();
+		MusicManager::GetInstance()->Init();
 	}
 
-	void AudioManagerFMOD::shutdown()
+	void AudioManagerFMOD::Shutdown()
 	{
-		MusicManager::getInstance()->shutdown();
+		MusicManager::GetInstance()->Shutdown();
 
 		//m_fmodSystem->close();
 		//m_fmodSystem->release();
 		//m_fmodSystem = nullptr;
 	}
 
-	void AudioManagerFMOD::update()
+	void AudioManagerFMOD::Update()
 	{
 		//m_fmodSystem->update();
 	}
 
-	AudioSource* AudioManagerFMOD::createSource(const std::string& filename)
+	AudioSource* AudioManagerFMOD::CreateSource(const std::string& filename)
 	{
-		return (AudioSource*)mem_new<AudioSourceFMOD>(filename, getFMODSystem());
+		return (AudioSource*)mem_new<AudioSourceFMOD>(filename, GetFMODSystem());
 	}
 
-	void AudioManagerFMOD::deleteSource(AudioSource* source)
+	void AudioManagerFMOD::DeleteSource(AudioSource* source)
 	{
 		if (source)
 		{
-			if (source->isPlaying())
-				source->stop();
+			if (source->IsPlaying())
+				source->Stop();
 
 			mem_delete(source);
 		}
 	}
 
-	FMOD::System* AudioManagerFMOD::getFMODSystem()
+	FMOD::System* AudioManagerFMOD::GetFMODSystem()
 	{
 		FMOD::System* coreSystem = nullptr;
 		m_studioSystem->getCoreSystem(&coreSystem);

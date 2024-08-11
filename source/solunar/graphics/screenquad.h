@@ -22,8 +22,8 @@ namespace solunar
 		static IShaderProgram* ms_screenQuadShader;
 
 	public:
-		static void init();
-		static void shutdown();
+		static void Init();
+		static void Shutdown();
 
 		static void render(ITexture2D* texture);
 

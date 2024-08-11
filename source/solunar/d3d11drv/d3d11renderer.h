@@ -20,17 +20,17 @@ public:
 	D3D11Renderer();
 	~D3D11Renderer();
 
-	void init() override;
-	void shutdown() override;
+	void Init() override;
+	void Shutdown() override;
 
-	void endFrame() override;
+	void EndFrame() override;
 
 	void bindMaterialForMesh(MeshComponent* mesh, Material* material, IMaterialInstance* materialInstance) override;
 
 	void renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh) override;
 	void renderShadows(View* view) override;
 
-	void takeScreenshot() override;
+	void TakeScreenshot() override;
 
 private:
 	void createSwapChain();

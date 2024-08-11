@@ -191,14 +191,14 @@ public:
 	D3D11StateManager();
 	~D3D11StateManager();
 
-	void init();
-	void shutdown();
+	void Init();
+	void Shutdown();
 
 	IRasterizerState* createRasterizerState(const RasterizerStateDesc& rasterizerDesc) override;
 	void destroyRasterizerState(IRasterizerState* rasterizerState) override;
 	void setRasterizerState(IRasterizerState* rasterizerState) override;
 
-	ISamplerState* createSamplerState(const SamplerDesc& samplerDesc) override;
+	ISamplerState* CreateSamplerState(const SamplerDesc& samplerDesc) override;
 	void destroySamplerState(ISamplerState* samplerState) override;
 
 	IBlendState* createBlendState(const BlendStateDesc& blendStateDesc) override;
@@ -207,7 +207,7 @@ public:
 
 	IDepthStencilState* createDepthStencilState(const DepthStencilDesc& desc) override;
 	void destroyDepthStencilState(IDepthStencilState* state) override;
-	void setDepthStencilState(IDepthStencilState* state, uint32_t stencilRef) override;
+	void SetDepthStencilState(IDepthStencilState* state, uint32_t stencilRef) override;
 
 private:
 	std::map<RasterizerStateKey, IRasterizerState*, AnyStructComparer<RasterizerStateKey>> m_rasterizerStates;

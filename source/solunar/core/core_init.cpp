@@ -12,32 +12,32 @@
 namespace solunar
 {
 	
-void registerCoreTypes()
+void RegisterCoreTypes()
 {
-	TypeManager::getInstance()->registerObject<Object>();
-	TypeManager::getInstance()->registerObject<SerializableObject>();
+	TypeManager::GetInstance()->RegisterObject<Object>();
+	TypeManager::GetInstance()->RegisterObject<SerializableObject>();
 }
 
-void Core::init()
+void Core::Init()
 {
-	Logger::init();
-	Logger::logPrint("Core builted at %s %s", __TIME__, __DATE__);
+	Logger::Init();
+	Logger::LogPrint("Core builted at %s %s", __TIME__, __DATE__);
 
-	MemoryManager::initialize();
+	MemoryManager::Initialize();
 
-	Timer::getInstance()->init();
+	Timer::GetInstance()->Init();
 
 	// Allocate native filesystem
 	g_fileSystem = mem_new<FileSystem_Win32>();
 
 	g_contentManager = mem_new<ContentManager>();
-	g_contentManager->init();
+	g_contentManager->Init();
 
 	// register core types
-	registerCoreTypes();
+	RegisterCoreTypes();
 }
 
-void Core::shutdown()
+void Core::Shutdown()
 {
 	if (g_contentManager)
 	{
@@ -51,11 +51,11 @@ void Core::shutdown()
 		g_fileSystem = nullptr;
 	}
 
-	PropertyManager::getInstance()->shutdown();
+	PropertyManager::GetInstance()->Shutdown();
 
-	MemoryManager::shutdown();
+	MemoryManager::Shutdown();
 
-	Logger::shutdown();
+	Logger::Shutdown();
 }
 
 }

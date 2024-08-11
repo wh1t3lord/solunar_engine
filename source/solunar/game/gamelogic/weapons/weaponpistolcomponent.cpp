@@ -12,9 +12,9 @@ WeaponPistolComponent::~WeaponPistolComponent()
 {
 }
 
-void WeaponPistolComponent::registerObject()
+void WeaponPistolComponent::RegisterObject()
 {
-    g_typeManager->registerObject<WeaponPistolComponent>();
+    g_typeManager->RegisterObject<WeaponPistolComponent>();
 }
     
 }

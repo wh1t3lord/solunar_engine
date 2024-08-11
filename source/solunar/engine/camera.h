@@ -9,20 +9,20 @@ namespace solunar
 	class Camera
 	{
 	public:
-		void  setView(View* view) { m_view = view; m_view->updateInternalValues(); }
-		View* getView() { return m_view; }
+		void  SetView(View* view) { m_view = view; m_view->updateInternalValues(); }
+		View* GetView() { return m_view; }
 
-		glm::vec3& getPosition() { return m_position; }
+		glm::vec3& GetPosition() { return m_position; }
 
-		void update();
+		void Update();
 
-		CameraFrustum& getFrustum() { return m_frustum; }
+		CameraFrustum& GetFrustum() { return m_frustum; }
 
-		glm::vec3 getScreenRay(float x, float y);
+		glm::vec3 GetScreenRay(float x, float y);
 
-		void updateInternal();
+		void UpdateInternal();
 
-		const glm::vec3 getDirection() const { return m_direction; }
+		const glm::vec3 GetDirection() const { return m_direction; }
 
 	private:
 		glm::mat4 getViewMatrix();
@@ -47,10 +47,10 @@ namespace solunar
 		static CameraProxy ms_cameraProxy;
 
 	public:
-		void updateProxy();
+		void UpdateProxy();
 
-		void setCameraComponent(CameraComponent* cameraComp);
-		CameraComponent* getCameraComponent();
+		void SetCameraComponent(CameraComponent* cameraComp);
+		CameraComponent* GetCameraComponent();
 
 	private:
 		CameraComponent* m_cameraComponent;

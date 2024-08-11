@@ -67,8 +67,8 @@ namespace solunar
 
 	void PhysicsWorld::addRigidBody(RigidBodyComponent* body)
 	{
-		Assert2(body->getSDKBody(), "RigidBodyComponent is not properly initialized");
-		m_world->addRigidBody(body->getSDKBody());
+		Assert2(body->GetSDKBody(), "RigidBodyComponent is not properly initialized");
+		m_world->addRigidBody(body->GetSDKBody());
 	}
 
 	void PhysicsWorld::step(float delta)
@@ -114,7 +114,7 @@ namespace solunar
 		m_world->debugDrawWorld();*/
 	}
 
-	void PhysicsWorld::toggleDebugDraw()
+	void PhysicsWorld::ToggleDebugDraw()
 	{
 		m_debugDraw = !m_debugDraw;
 	}

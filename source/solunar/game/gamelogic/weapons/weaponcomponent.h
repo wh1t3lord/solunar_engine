@@ -14,14 +14,14 @@ namespace solunar {
 	
 	class WeaponComponent : public LogicComponent
 	{
-		ImplementObject(WeaponComponent, LogicComponent);
+		IMPLEMENT_OBJECT(WeaponComponent, LogicComponent);
 	public:
 		WeaponComponent();
 		virtual ~WeaponComponent();
 
-		static void registerObject();
+		static void RegisterObject();
 
-		virtual void update(float dt);
+		virtual void Update(float dt);
 	};
 }
 #endif // ! WEAPONCOMPONENT_H

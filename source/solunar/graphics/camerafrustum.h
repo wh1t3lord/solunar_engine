@@ -19,7 +19,7 @@ namespace solunar
 		float a, b, c;
 		float d;
 
-		void setIdentity();
+		void SetIdentity();
 		
 		Plane& normalize();
 
@@ -31,7 +31,7 @@ namespace solunar
 	class CameraFrustum
 	{
 	public:
-		void update(glm::mat4& vp);
+		void Update(glm::mat4& vp);
 
 		bool isBoundingBoxInside(const BoundingBox& boundingBox);
 

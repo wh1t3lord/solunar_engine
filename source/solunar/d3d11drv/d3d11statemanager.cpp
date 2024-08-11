@@ -110,11 +110,11 @@ D3D11StateManager::~D3D11StateManager()
 {
 }
 
-void D3D11StateManager::init()
+void D3D11StateManager::Init()
 {
 }
 
-void D3D11StateManager::shutdown()
+void D3D11StateManager::Shutdown()
 {
     for (auto it : m_blendStates)
     {
@@ -187,7 +187,7 @@ void D3D11StateManager::setRasterizerState(IRasterizerState* rasterizerState)
     g_d3d11Device->getDeviceContext()->RSSetState(d3drasterizerState);
 }
 
-ISamplerState* D3D11StateManager::createSamplerState(const SamplerDesc& samplerDesc)
+ISamplerState* D3D11StateManager::CreateSamplerState(const SamplerDesc& samplerDesc)
 {
     // Find already created ISamplerState
     auto it = m_samplerStates.find(samplerDesc);
@@ -196,7 +196,7 @@ ISamplerState* D3D11StateManager::createSamplerState(const SamplerDesc& samplerD
         return (*it).second;
     }
 
-    ISamplerState* samplerState = g_renderDevice->createSamplerState(samplerDesc);
+    ISamplerState* samplerState = g_renderDevice->CreateSamplerState(samplerDesc);
 
     m_samplerStates.emplace(samplerDesc, samplerState);
 
@@ -294,7 +294,7 @@ void D3D11StateManager::destroyDepthStencilState(IDepthStencilState* state)
     d3dDSState->Release();
 }
 
-void D3D11StateManager::setDepthStencilState(IDepthStencilState* state, uint32_t stencilRef)
+void D3D11StateManager::SetDepthStencilState(IDepthStencilState* state, uint32_t stencilRef)
 {
     ID3D11DepthStencilState* d3dDSState = (ID3D11DepthStencilState*)state;
     g_d3d11Device->getDeviceContext()->OMSetDepthStencilState(d3dDSState, stencilRef);

@@ -19,8 +19,8 @@ public:
 	D3D11RenderTarget(D3D11Device* device, const RenderTargetCreationDesc& renderTargetDesc);
 	~D3D11RenderTarget();
 
-	void create(D3D11Device* device, const RenderTargetCreationDesc& renderTargetDesc);
-	void release() override;
+	void Create(D3D11Device* device, const RenderTargetCreationDesc& renderTargetDesc);
+	void Release() override;
 
 	void setDebugName(const char* debugName) override;
 

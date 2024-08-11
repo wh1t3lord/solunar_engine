@@ -15,36 +15,36 @@ MiniAudioMusicManager::~MiniAudioMusicManager()
 {
 }
 
-void MiniAudioMusicManager::init()
+void MiniAudioMusicManager::Init()
 {
 }
 
-void MiniAudioMusicManager::shutdown()
+void MiniAudioMusicManager::Shutdown()
 {
 }
 
-void MiniAudioMusicManager::play(const std::string& filename, bool looped)
+void MiniAudioMusicManager::Play(const std::string& filename, bool looped)
 {
 	if (m_musicSource)
-		AudioManager::getInstance()->deleteSource(m_musicSource);
-	m_musicSource = AudioManager::getInstance()->createSource(filename);
-	reinterpret_cast<MiniAudioSource*>(m_musicSource)->play();
+		AudioManager::GetInstance()->DeleteSource(m_musicSource);
+	m_musicSource = AudioManager::GetInstance()->CreateSource(filename);
+	reinterpret_cast<MiniAudioSource*>(m_musicSource)->Play();
 }
 
-void MiniAudioMusicManager::stop()
+void MiniAudioMusicManager::Stop()
 {
 	if (m_musicSource)
 	{
-		m_musicSource->stop();
-		AudioManager::getInstance()->deleteSource(m_musicSource);
+		m_musicSource->Stop();
+		AudioManager::GetInstance()->DeleteSource(m_musicSource);
 		m_musicSource = nullptr;
 	}
 }
 
-bool MiniAudioMusicManager::isPlaying()
+bool MiniAudioMusicManager::IsPlaying()
 {
 	if (m_musicSource)
-		return m_musicSource->isPlaying();
+		return m_musicSource->IsPlaying();
 
 	return false;
 }

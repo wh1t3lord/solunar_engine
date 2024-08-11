@@ -11,7 +11,7 @@ namespace solunar {
 	void appPresent();
 	void appFireExit();
 
-	void createEngineView();
+	void CreateEngineView();
 
 	int main(int argc, char* argv[]);
 
@@ -19,8 +19,8 @@ namespace solunar {
 	class CommandLine
 	{
 	public:
-		void init(int argc, char* argv[]);
-		void init(const char* str);
+		void Init(int argc, char* argv[]);
+		void Init(const char* str);
 
 		bool hasOption(const char* name);
 

@@ -9,12 +9,12 @@
 namespace solunar
 {
 
-BeginPropertyRegister(ShockProjectileComponent)
+BEGIN_PROPERTY_REGISTER(ShockProjectileComponent)
 {
-	RegisterProperty(ShockProjectileComponent, PropertyVector3, m_direction);
-	RegisterProperty(ShockProjectileComponent, PropertyFloat, m_speed);
+	REGISTER_PROPERTY(ShockProjectileComponent, PropertyVector3, m_direction);
+	REGISTER_PROPERTY(ShockProjectileComponent, PropertyFloat, m_speed);
 }
-EndPropertyRegister(ShockProjectileComponent)
+END_PROPERTY_REGISTER(ShockProjectileComponent)
 
 ShockProjectileComponent::ShockProjectileComponent() :
 	m_direction(0.0f),
@@ -31,42 +31,42 @@ void ShockProjectileComponent::onSpawn(const glm::vec3& velocity, const glm::vec
 {
 #if 0
 	// create rigid body
-	BoxShapeComponent* boxShape = getEntity()->createComponent<BoxShapeComponent>();
+	BoxShapeComponent* boxShape = GetEntity()->CreateComponent<BoxShapeComponent>();
 	boxShape->createShape(glm::vec3(0.1f));
 
-	RigidBodyComponent* rigidBody = getEntity()->createComponent<RigidBodyComponent>();
-	rigidBody->attachShape(boxShape);
-	rigidBody->setMass(0.02f);
-	rigidBody->setLinearVelocity(velocity);
+	RigidBodyComponent* rigidBody = GetEntity()->CreateComponent<RigidBodyComponent>();
+	rigidBody->AttachShape(boxShape);
+	rigidBody->SetMass(0.02f);
+	rigidBody->SetLinearVelocity(velocity);
 #endif
 
 	m_direction = velocity;
 }
 
-void ShockProjectileComponent::onEntitySet(Entity* entity)
+void ShockProjectileComponent::OnEntitySet(Entity* entity)
 {
-	Component::onEntitySet(entity);
+	Component::OnEntitySet(entity);
 
-	Assert2(!entity->getComponent<RigidBodyComponent>(), "Projectile cannot' have already attached rigid body!");
+	Assert2(!entity->GetComponent<RigidBodyComponent>(), "Projectile cannot' have already attached rigid body!");
 }
 
-void ShockProjectileComponent::update(float dt)
+void ShockProjectileComponent::Update(float dt)
 {
-	g_debugRender.drawBoundingBox(getEntity()->getBoundingBox(), glm::vec3(1.0f, 0.0, 0.0f));
+	g_debugRender.drawBoundingBox(GetEntity()->GetBoundingBox(), glm::vec3(1.0f, 0.0, 0.0f));
 
 	const float kSpeed = 1.2f;
 
-	glm::vec3 position = getEntity()->getPosition();
+	glm::vec3 position = GetEntity()->GetPosition();
 	position = glm::lerp(position, m_direction, kSpeed * dt);
-	getEntity()->setPosition(position);
+	GetEntity()->SetPosition(position);
 
 	// find player
-	std::vector<Entity*> players = getWorld()->getEntityManager().getEntitiesWithComponent<ShockPlayerController>();
+	std::vector<Entity*> players = GetWorld()->GetEntityManager().GetEntitiesWithComponent<ShockPlayerController>();
 	Entity* player = players[0];
 
-	if (getEntity()->getBoundingBox().contains(player->getPosition())) // we shot!
+	if (GetEntity()->GetBoundingBox().Contains(player->GetPosition())) // we shot!
 	{
-		//ShockPlayerController* playerController = player->getComponent<ShockPlayerController>();
+		//ShockPlayerController* playerController = player->GetComponent<ShockPlayerController>();
 		//playerController->doHit(25.0f);
 	}
 }
@@ -91,7 +91,7 @@ Entity* ShockProjectilePool::createProjectile(ShockProjectileType projectileType
 	Assert2(m_poolCount > 256, "Reached maximum of the pool");
 
 	Entity* entity = m_pool[m_poolCount++];
-	entity->setPosition(position);
+	entity->SetPosition(position);
 
 	return entity;
 }

@@ -23,7 +23,7 @@ namespace solunar
 
 	static std::mutex g_loggerMutex;
 
-	void Core::msg(const char* msg, ...)
+	void Core::Msg(const char* msg, ...)
 	{
 		std::lock_guard<std::mutex> lockGuard(g_loggerMutex);
 
@@ -34,10 +34,10 @@ namespace solunar
 		vsnprintf(buf, sizeof(buf), msg, args);
 		va_end(args);
 
-		Logger::logPrint("%s", buf);
+		Logger::LogPrint("%s", buf);
 	}
 
-	void Core::error(const char* msg, ...)
+	void Core::Error(const char* msg, ...)
 	{
 		std::lock_guard<std::mutex> lockGuard(g_loggerMutex);
 
@@ -49,7 +49,7 @@ namespace solunar
 		va_end(args);
 
 #ifndef MASTER_GOLD_BUILD
-		Logger::logPrint("!!! ERROR: %s", buf);
+		Logger::LogPrint("!!! ERROR: %s", buf);
 		error_backend(buf);
 		std::terminate();
 #else
@@ -63,7 +63,7 @@ namespace solunar
 #endif
 	}
 
-	void Core::warning(const char* msg, ...)
+	void Core::Warning(const char* msg, ...)
 	{
 		static char buf[2048 * 2];
 		va_list args;
@@ -72,7 +72,7 @@ namespace solunar
 		vsnprintf(buf, sizeof(buf), msg, args);
 		va_end(args);
 
-		Logger::logPrint("Warning: %s", buf);
+		Logger::LogPrint("Warning: %s", buf);
 
 #ifndef MASTER_GOLD_BUILD
 		warning_backend(buf);

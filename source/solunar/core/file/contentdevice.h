@@ -15,9 +15,9 @@ public:
 	ContentDevice(const std::string& path);
 	~ContentDevice();
 
-	DataStreamPtr openStream(const std::string& filename);
+	DataStreamPtr OpenStream(const std::string& filename);
 
-	const std::string& getPath() { return m_path; }
+	const std::string& GetPath() { return m_path; }
 
 private:
 	std::string m_path;

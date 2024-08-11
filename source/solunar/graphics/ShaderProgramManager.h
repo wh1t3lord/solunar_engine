@@ -11,8 +11,8 @@ class ShaderProgramManager
 public:
 	virtual ~ShaderProgramManager() {}
 
-	void init(const char* shaderPath);
-	void shutdown();
+	void Init(const char* shaderPath);
+	void Shutdown();
 
 	std::string getShaderPath();
 

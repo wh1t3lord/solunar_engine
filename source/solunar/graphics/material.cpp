@@ -38,7 +38,7 @@ namespace solunar
 		}
 		else
 		{
-			Core::error("getMaterialType: Doesnt support old shader %s", shaderName.c_str());	
+			Core::Error("getMaterialType: Doesnt support old shader %s", shaderName.c_str());	
 		}
 
 		return MaterialType::Null;
@@ -52,17 +52,17 @@ namespace solunar
 		materiaName += name;
 		materiaName += ".xml";
 
-		//File* file = FileDevice::getInstance()->openFile(materiaName, FileAccess::Write);
-		FileHandle file = g_fileSystem->create(materiaName.c_str());
+		//File* file = FileDevice::GetInstance()->openFile(materiaName, FileAccess::Write);
+		FileHandle file = g_fileSystem->Create(materiaName.c_str());
 
 		tinyxml2::XMLDocument doc;
 		tinyxml2::XMLElement* rootElement = doc.NewElement("Material");
 
-		Material* materialToWrite = TypeManager::getInstance()->createObject<Material>();
+		Material* materialToWrite = TypeManager::GetInstance()->CreateObject<Material>();
 		materialToWrite->m_albedoTextureFileName = diffuseName;
 		materialToWrite->m_normalTextureName = normalName;
 		
-		materialToWrite->saveXML(*rootElement);;
+		materialToWrite->SaveXML(*rootElement);;
 
 		doc.InsertFirstChild(rootElement);
 
@@ -72,12 +72,12 @@ namespace solunar
 		std::string text = visitor.CStr();
 		text += '\0';
 
-		g_fileSystem->write(file, (void*)text.data(), text.size());
+		g_fileSystem->Write(file, (void*)text.data(), text.size());
 
 		mem_delete(materialToWrite);
 		materialToWrite = nullptr;
 
-		g_fileSystem->close(file);
+		g_fileSystem->Close(file);
 	}
 
 	Material::Material()
@@ -109,14 +109,14 @@ namespace solunar
 		m_albedoSampler = nullptr;
 	}
 
-	void Material::load(const std::shared_ptr<DataStream>& dataStream)
+	void Material::Load(const std::shared_ptr<DataStream>& dataStream)
 	{
-		dataStream->seek(Seek_End, 0);
-		size_t length = dataStream->tell();
-		dataStream->seek(Seek_Begin, 0);
+		dataStream->Seek(Seek_End, 0);
+		size_t length = dataStream->Tell();
+		dataStream->Seek(Seek_Begin, 0);
 
 		char* data = new char[length + 1];
-		dataStream->read((void*)data, length);
+		dataStream->Read((void*)data, length);
 		data[length] = '\0';
 
 		//parse(data, length);
@@ -125,15 +125,15 @@ namespace solunar
 		doc.Parse(data, length);
 
 		tinyxml2::XMLElement* materialElement = doc.FirstChildElement("Material");
-		loadXML(*materialElement);
+		LoadXML(*materialElement);
 
 		delete[] data;
 	}
 
-	void Material::loadXML(tinyxml2::XMLElement& element)
+	void Material::LoadXML(tinyxml2::XMLElement& element)
 	{
 		if (strcmp(element.Name(), "Material") != 0) {
-			Core::error("Material::loadXML: failed to load material. XMLElement is not a \"Material\".");
+			Core::Error("Material::LoadXML: failed to load material. XMLElement is not a \"Material\".");
 		}
 
 		tinyxml2::XMLElement* shaderElement = element.FirstChildElement("Shader");
@@ -141,7 +141,7 @@ namespace solunar
 			m_materialType = getMaterialTypeFromName(shaderElement->GetText());
 			
 		} else {
-			Core::error("Material::loadXML: failed to load material. Doesnt exist \"Shader\" element.");
+			Core::Error("Material::LoadXML: failed to load material. Doesnt exist \"Shader\" element.");
 		}
 
 		// Albedo texture
@@ -218,7 +218,7 @@ namespace solunar
 				} else if (strcmp(depthWriteAttribute->Value(), "false") == 0) {
 					m_depthWrite = false;
 				} else {
-					Core::error("Material::loadXML: failed to load material. Wrong value in the \"DepthWrite\" element. Possible only true/false.");
+					Core::Error("Material::LoadXML: failed to load material. Wrong value in the \"DepthWrite\" element. Possible only true/false.");
 				}
 			}
 
@@ -232,17 +232,17 @@ namespace solunar
 					m_selfillum = false;
 				}
 				else {
-					Core::error("Material::loadXML: failed to load material. Wrong value in the \"SelfIllumination\" element. Possible only true/false.");
+					Core::Error("Material::LoadXML: failed to load material. Wrong value in the \"SelfIllumination\" element. Possible only true/false.");
 				}
 			}
 		} else {
-			Core::error("Material::loadXML: failed to load material. Doesnt exist \"RenderState\" element.");
+			Core::Error("Material::LoadXML: failed to load material. Doesnt exist \"RenderState\" element.");
 		}
 
 		createHw();
 	}
 
-	void Material::saveXML(tinyxml2::XMLElement& element)
+	void Material::SaveXML(tinyxml2::XMLElement& element)
 	{
 		// Shader
 		tinyxml2::XMLElement* shaderElement = element.InsertNewChildElement("Shader"); //doc.NewElement("Shader");
@@ -282,13 +282,13 @@ namespace solunar
 	{
 		/*if (!g_fileSystem->exist(path))
 		{
-			Core::msg("[content]: not found %s, using notexture ...", path.c_str());
-			return ContentManager::getInstance()->loadTexture("textures/notexture.png");
+			Core::Msg("[content]: not found %s, using notexture ...", path.c_str());
+			return ContentManager::GetInstance()->LoadTexture("textures/notexture.png");
 		}
 
-		return ContentManager::getInstance()->loadTexture(path);*/
+		return ContentManager::GetInstance()->LoadTexture(path);*/
 
-		return dynamicCastPtr< TextureMap >(g_contentManager->load("textures/notexture.png", TextureMap::getStaticTypeInfo()));
+		return dynamicCastPtr< TextureMap >(g_contentManager->Load("textures/notexture.png", TextureMap::GetStaticTypeInfo()));
 	}
 
 	void Material::bindSamplers()
@@ -297,10 +297,10 @@ namespace solunar
 		if (std::shared_ptr<TextureMap> albedoTexture = m_albedoTexture.lock())
 		{
 			// bind texture slot 0 sampler
-			g_renderDevice->setSampler(0, m_albedoSampler);
+			g_renderDevice->SetSamplerState(0, m_albedoSampler);
 
 			// activate diffuse texture as 0
-			g_renderDevice->setTexture2D(0, albedoTexture->getHWTexture());
+			g_renderDevice->SetTexture2D(0, albedoTexture->getHWTexture());
 
 		}
 
@@ -308,18 +308,18 @@ namespace solunar
 		if (std::shared_ptr<TextureMap> normalTexture = m_normalTexture.lock())
 		{
 			// #TODO: HACK
-			g_renderDevice->setSampler(1, m_albedoSampler);
+			g_renderDevice->SetSamplerState(1, m_albedoSampler);
 
-			g_renderDevice->setTexture2D(1, normalTexture->getHWTexture());
+			g_renderDevice->SetTexture2D(1, normalTexture->getHWTexture());
 		}
 
 		// Set up specular texture as 2
 		if (std::shared_ptr<TextureMap> specularTexture = m_specularTexture.lock())
 		{
 			// #TODO: HACK
-			g_renderDevice->setSampler(2, m_albedoSampler);
+			g_renderDevice->SetSamplerState(2, m_albedoSampler);
 
-			g_renderDevice->setTexture2D(2, specularTexture->getHWTexture());
+			g_renderDevice->SetTexture2D(2, specularTexture->getHWTexture());
 		}
 	}
 
@@ -349,7 +349,7 @@ namespace solunar
 	{
 		//initializeShader();
 
-		m_materialInstance = MaterialInstanceFactory::getInstance()->createMaterialInstance(this);
+		m_materialInstance = MaterialInstanceFactory::GetInstance()->createMaterialInstance(this);
 
 		SamplerDesc albedoSamplerDesc;
 		memset(&albedoSamplerDesc, 0, sizeof(albedoSamplerDesc));
@@ -388,28 +388,28 @@ namespace solunar
 
 		albedoSamplerDesc.m_anisotropyLevel = (float)anisotropicQuality;
 
-		m_albedoSampler = g_stateManager->createSamplerState(albedoSamplerDesc); //g_renderDevice->createSamplerState(albedoSamplerDesc);
+		m_albedoSampler = g_stateManager->CreateSamplerState(albedoSamplerDesc); //g_renderDevice->CreateSamplerState(albedoSamplerDesc);
 
-		//ContentManager* contentManager = ContentManager::getInstance();
+		//ContentManager* contentManager = ContentManager::GetInstance();
 
 		//if (!g_fileSystem->exist(m_albedoTextureName))
 		//{
-		//	Core::msg("[content]: not found %s, using notexture ...", m_albedoTextureName.c_str());
-		//	m_albedoTexture = contentManager->loadTexture("textures/notexture.png");
+		//	Core::Msg("[content]: not found %s, using notexture ...", m_albedoTextureName.c_str());
+		//	m_albedoTexture = contentManager->LoadTexture("textures/notexture.png");
 		//}
 		//else
 		//{
-		//	m_albedoTexture = contentManager->loadTexture(m_albedoTextureName);
+		//	m_albedoTexture = contentManager->LoadTexture(m_albedoTextureName);
 		//}
 
 		// TODO: Return default texture if TextureMap is not exist
 		if (m_albedoTextureFileName.empty())
 			m_albedoTextureFileName = "textures/system/notex.bmp";
 
-		m_albedoTexture = g_contentManager->loadObject<TextureMap>(m_albedoTextureFileName);
+		m_albedoTexture = g_contentManager->LoadObject<TextureMap>(m_albedoTextureFileName);
 		m_albedoTexture.lock()->getHWTexture()->setDebugName(m_albedoTextureFileName.c_str());
 
-		//m_albedoTexture = dynamicCastPtr< TextureMap >(g_contentManager->load(m_albedoTextureName, TextureMap::getStaticTypeInfo()));
+		//m_albedoTexture = dynamicCastPtr< TextureMap >(g_contentManager->Load(m_albedoTextureName, TextureMap::GetStaticTypeInfo()));
 
 		// REWRITE TO SAMPLER !!!
 
@@ -422,7 +422,7 @@ namespace solunar
 		}
 
 		if (!m_normalTextureName.empty())
-			m_normalTexture = ContentManager::getInstance()->loadTexture(m_normalTextureName);
+			m_normalTexture = ContentManager::GetInstance()->LoadTexture(m_normalTextureName);
 
 		// if we dont skip mip mapping in the albedo texture when generate them
 		if (!m_skipmips && m_normalTexture)
@@ -432,7 +432,7 @@ namespace solunar
 		}
 
 		if (!m_specularTextureName.empty())
-			m_specularTexture = ContentManager::getInstance()->loadTexture(m_specularTextureName);
+			m_specularTexture = ContentManager::GetInstance()->LoadTexture(m_specularTextureName);
 
 		// if we dont skip mip mapping in the albedo texture when generate them
 		if (!m_skipmips && m_specularTexture)
@@ -443,7 +443,7 @@ namespace solunar
 #endif
 	}
 
-	void Material::releaseHw()
+	void Material::ReleaseHw()
 	{
 		if (m_albedoSampler)
 		{
@@ -464,9 +464,9 @@ namespace solunar
 	{
 	}
 
-	void GenericMaterial::registerObject()
+	void GenericMaterial::RegisterObject()
 	{
-		TypeManager::getInstance()->registerObject<GenericMaterial>();
+		TypeManager::GetInstance()->RegisterObject<GenericMaterial>();
 	}
 
 	///////////////////////////////////////////////////////
@@ -482,9 +482,9 @@ namespace solunar
 	{
 	}
 
-	void LayeredMaskedMaterial::registerObject()
+	void LayeredMaskedMaterial::RegisterObject()
 	{
-		TypeManager::getInstance()->registerObject<LayeredMaskedMaterial>();
+		TypeManager::GetInstance()->RegisterObject<LayeredMaskedMaterial>();
 	}
 
 	///////////////////////////////////////////////////////
@@ -499,8 +499,8 @@ namespace solunar
 	{
 	}
 
-	void NullMaterial::registerObject()
+	void NullMaterial::RegisterObject()
 	{
-		TypeManager::getInstance()->registerObject<NullMaterial>();
+		TypeManager::GetInstance()->RegisterObject<NullMaterial>();
 	}
 }

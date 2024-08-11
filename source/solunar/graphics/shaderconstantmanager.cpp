@@ -75,21 +75,21 @@ namespace solunar
 	{
 	}
 
-	void ShaderConstantManager::init()
+	void ShaderConstantManager::Init()
 	{
-		Core::msg("ShaderConstantManager: initialize constant buffers ...");
+		Core::Msg("ShaderConstantManager: Initialize constant buffers ...");
 
-		g_staticMeshConstantBuffer = create<StaticMeshGlobalData>("StaticMeshGlobalData");
-		g_directionalLightConstantBuffer = create<DirectionalLightCB>("DirectionalLightCB");
-		g_pointLightConstantBuffer = create<PointLightCB>("PointLightCB");
-		g_lightDataConstantBuffer = create<LightGlobalDataCB>("LightGlobalDataCB");
+		g_staticMeshConstantBuffer = Create<StaticMeshGlobalData>("StaticMeshGlobalData");
+		g_directionalLightConstantBuffer = Create<DirectionalLightCB>("DirectionalLightCB");
+		g_pointLightConstantBuffer = Create<PointLightCB>("PointLightCB");
+		g_lightDataConstantBuffer = Create<LightGlobalDataCB>("LightGlobalDataCB");
 	}
 
-	void ShaderConstantManager::shutdown()
+	void ShaderConstantManager::Shutdown()
 	{
 		for (auto it : m_constantBuffers)
 		{
-			Core::msg("ShaderConstantManager: releasing constant buffer %s", it.first.c_str());
+			Core::Msg("ShaderConstantManager: releasing constant buffer %s", it.first.c_str());
 			mem_delete(it.second);
 		}
 
@@ -112,7 +112,7 @@ namespace solunar
 	{
 		// OPTICK_EVENT("ShaderConstantManager::setStaticMeshGlobalData");
 
-		StaticMeshGlobalData* globalData = (StaticMeshGlobalData*)g_staticMeshConstantBuffer->map(BufferMapping::WriteOnly);
+		StaticMeshGlobalData* globalData = (StaticMeshGlobalData*)g_staticMeshConstantBuffer->Map(BufferMapping::WriteOnly);
 		globalData->m_modelMatrix = renderContext.model;
 		globalData->m_viewMatrix = renderContext.view;
 		globalData->m_projectionMatrix = renderContext.proj;
@@ -122,12 +122,12 @@ namespace solunar
 
 		globalData->m_modelViewProjection = modelViewProjection;
 
-		Camera* camera = CameraProxy::getInstance();
-		globalData->m_viewPos = glm::vec4(camera->getPosition(), 0.0f);
-		globalData->m_viewDir = glm::vec4(camera->getDirection(), 0.0f);
+		Camera* camera = CameraProxy::GetInstance();
+		globalData->m_viewPos = glm::vec4(camera->GetPosition(), 0.0f);
+		globalData->m_viewDir = glm::vec4(camera->GetDirection(), 0.0f);
 
-		g_staticMeshConstantBuffer->unmap();
-		g_renderDevice->setConstantBufferIndex(0, g_staticMeshConstantBuffer.get());
+		g_staticMeshConstantBuffer->Unmap();
+		g_renderDevice->SetConstantBufferIndex(0, g_staticMeshConstantBuffer.get());
 	}
 
 	void ShaderConstantManager::getConstantBuffers(std::unordered_map<std::string, IBufferBase*>& map)
@@ -140,7 +140,7 @@ namespace solunar
 		if (ImGui::Begin("Constant Buffer Tracker", open))
 		{
 			std::unordered_map<std::string, IBufferBase*> constantBufferTable;
-			ShaderConstantManager::getInstance()->getConstantBuffers(constantBufferTable);
+			ShaderConstantManager::GetInstance()->getConstantBuffers(constantBufferTable);
 	
 				//HelpMarker(
 				//	"Here we activate ScrollY, which will create a child window container to allow hosting scrollable contents.\n\n"

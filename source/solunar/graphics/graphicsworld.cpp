@@ -14,7 +14,7 @@ namespace solunar {
 	{
 	}
 
-	void GraphicsWorld::onWorldSet(World* world)
+	void GraphicsWorld::OnWorldSet(World* world)
 	{
 	}
 	
@@ -38,12 +38,12 @@ namespace solunar {
 
 	void GraphicsWorld::updateDrawables()
 	{
-		//Camera* camera = CameraProxy::getInstance();
+		//Camera* camera = CameraProxy::GetInstance();
 
 		//std::sort(m_drawables.begin(), m_drawables.end(), [camera](DrawableComponent* dc1, DrawableComponent* dc2)
 		//{
-		//	if (!dc1->isA(MeshComponent::getStaticTypeInfo()) ||
-		//		!dc2->isA(MeshComponent::getStaticTypeInfo()))
+		//	if (!dc1->IsA(MeshComponent::GetStaticTypeInfo()) ||
+		//		!dc2->IsA(MeshComponent::GetStaticTypeInfo()))
 		//		return false;
 
 

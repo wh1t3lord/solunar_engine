@@ -2,25 +2,25 @@ namespace solunar
 {
 
 template<typename T>
-inline T* Entity::createComponent()
+inline T* Entity::CreateComponent()
 {
-	return (T*)createComponentByTypeInfo(T::getStaticTypeInfo());
+	return (T*)CreateComponentByTypeInfo(T::GetStaticTypeInfo());
 }
 
 template<typename T>
-inline T* Entity::getComponent()
+inline T* Entity::GetComponent()
 {
-	return (T*)getComponentByTypeInfo(T::getStaticTypeInfo());
+	return (T*)GetComponentByTypeInfo(T::GetStaticTypeInfo());
 }
 
 template<typename T>
-inline std::vector<T*> Entity::getComponents()
+inline std::vector<T*> Entity::GetComponents()
 {
 	std::vector<T*> components;
 
 	for (auto it : m_components)
 	{
-		if (it->isA(T::getStaticTypeInfo()))
+		if (it->IsA(T::GetStaticTypeInfo()))
 			components.push_back(static_cast<T*>(it));
 	}
 

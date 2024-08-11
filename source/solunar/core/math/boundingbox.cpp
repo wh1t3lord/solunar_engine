@@ -3,7 +3,7 @@
 
 namespace solunar {
 
-void BoundingBox::setIdentity()
+void BoundingBox::SetIdentity()
 {
 	m_min = glm::vec3(-1.0f);
 	m_max = glm::vec3(1.0f);

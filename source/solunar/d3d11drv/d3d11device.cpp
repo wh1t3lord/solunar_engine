@@ -44,10 +44,10 @@ D3D11Device::D3D11Device() :
 
 D3D11Device::~D3D11Device()
 {
-	destroy();
+	Destroy();
 }
 
-void D3D11Device::create()
+void D3D11Device::Create()
 {
 	// lock feature level at shader model 4.0 (NVidia Geforce 8400+ hardware)
 	D3D_FEATURE_LEVEL needFeatureLevel = D3D_FEATURE_LEVEL_11_0;
@@ -75,25 +75,25 @@ void D3D11Device::create()
 			stringBuffer, kStringBufferSize, NULL);
 
 #ifdef MASTER_GOLD_BUILD
-		Core::error("Failed to create DirectX 11 Device. Error: %s\nMake sure you has install DirectX 11 Runtime already\nand you video card drivers\nare up to date.",
+		Core::Error("Failed to create DirectX 11 Device. Error: %s\nMake sure you has install DirectX 11 Runtime already\nand you video card drivers\nare up to date.",
 			stringBuffer);
 #else
-		Core::error("Failed to create D3D11 Device. 0x%08X %s", hr, stringBuffer);
+		Core::Error("Failed to create D3D11 Device. 0x%08X %s", hr, stringBuffer);
 #endif
 	}
 
 #ifdef MASTER_GOLD_BUILD
 	// Ok, device created but feature level is low to us
 	if (featureLevel < D3D_FEATURE_LEVEL_10_0)
-		Core::error("Missing DirectX 11 features level.\nPlease sure you'r video card drivers is up to date\nor support DirectX 10.");
+		Core::Error("Missing DirectX 11 features level.\nPlease sure you'r video card drivers is up to date\nor support DirectX 10.");
 #else
 	if (featureLevel < D3D_FEATURE_LEVEL_10_0)
-		Core::error("Missing D3D_FEATURE_LEVEL_10_0 support.");
+		Core::Error("Missing D3D_FEATURE_LEVEL_10_0 support.");
 #endif
 
 }
 
-void D3D11Device::destroy()
+void D3D11Device::Destroy()
 {
 	if (m_deviceContext)
 	{
@@ -108,27 +108,27 @@ void D3D11Device::destroy()
 	}
 }
 
-IRenderTarget* D3D11Device::createRenderTarget(const RenderTargetCreationDesc& renderTargetDesc)
+IRenderTarget* D3D11Device::CreateRenderTarget(const RenderTargetCreationDesc& renderTargetDesc)
 {
 	return mem_new<D3D11RenderTarget>(this, renderTargetDesc);
 }
 
-IBufferBase* D3D11Device::createBuffer(const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc)
+IBufferBase* D3D11Device::CreateBuffer(const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc)
 {
 	return mem_new<D3D11BufferImpl>(this, bufferDesc, subresourceDesc);
 }
 
-ITexture2D* D3D11Device::createTexture2D(const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc)
+ITexture2D* D3D11Device::CreateTexture2D(const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc)
 {
 	return mem_new<D3D11Texture2D>(this, textureDesc, subresourceDesc);
 }
 
-ISamplerState* D3D11Device::createSamplerState(const SamplerDesc& samplerDesc)
+ISamplerState* D3D11Device::CreateSamplerState(const SamplerDesc& samplerDesc)
 {
 	return mem_new<D3D11SamplerState>(this, samplerDesc);
 }
 
-void D3D11Device::setRenderTarget(IRenderTarget* rt)
+void D3D11Device::SetRenderTarget(IRenderTarget* rt)
 {
 	if (rt)
 	{
@@ -158,13 +158,13 @@ void D3D11Device::setRenderTarget(IRenderTarget* rt)
 	//}
 }
 
-void D3D11Device::setConstantBuffer(IBufferBase* cb)
+void D3D11Device::SetConstantBuffer(IBufferBase* cb)
 {
-	Assert2(0, "D3D11Device::setConstantBuffer is obsolote. Please use setConstantBufferIndex");
-	setConstantBufferIndex(0, cb);
+	Assert2(0, "D3D11Device::SetConstantBuffer is obsolote. Please use SetConstantBufferIndex");
+	SetConstantBufferIndex(0, cb);
 }
 
-void D3D11Device::setConstantBufferIndex(int slot, IBufferBase* cb)
+void D3D11Device::SetConstantBufferIndex(int slot, IBufferBase* cb)
 {
 	D3D11BufferImpl* bufferImpl = (D3D11BufferImpl*)cb;
 	ID3D11Buffer* pD3DBuffer = bufferImpl->getBuffer();
@@ -173,14 +173,14 @@ void D3D11Device::setConstantBufferIndex(int slot, IBufferBase* cb)
 	m_deviceContext->PSSetConstantBuffers(slot, 1, &pD3DBuffer);
 }
 
-void D3D11Device::setVertexBuffer(IBufferBase* buffer, uint32_t stride, uint32_t offset)
+void D3D11Device::SetVertexBuffer(IBufferBase* buffer, uint32_t stride, uint32_t offset)
 {
 	D3D11BufferImpl* bufferImpl = (D3D11BufferImpl*)buffer;
 	ID3D11Buffer* pD3DBuffer = bufferImpl->getBuffer();
 	m_deviceContext->IASetVertexBuffers(0, 1, &pD3DBuffer, &stride, &offset);
 }
 
-void D3D11Device::setIndexBuffer(IBufferBase* buffer, bool use16bitsIndices)
+void D3D11Device::SetIndexBuffer(IBufferBase* buffer, bool use16bitsIndices)
 {
 	D3D11BufferImpl* bufferImpl = (D3D11BufferImpl*)buffer;
 	ID3D11Buffer* pD3DBuffer = bufferImpl->getBuffer();
@@ -188,7 +188,7 @@ void D3D11Device::setIndexBuffer(IBufferBase* buffer, bool use16bitsIndices)
 	m_deviceContext->IASetIndexBuffer(pD3DBuffer, use16bitsIndices ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT, 0);
 }
 
-void D3D11Device::setTexture2D(int slot, ITexture2D* texture)
+void D3D11Device::SetTexture2D(int slot, ITexture2D* texture)
 {
 	D3D11Texture2D* nativeTexture = (D3D11Texture2D*)texture;
 	if (nativeTexture)
@@ -205,7 +205,7 @@ void D3D11Device::setTexture2D(int slot, ITexture2D* texture)
 	}
 }
 
-void D3D11Device::setSampler(int slot, ISamplerState* sampler)
+void D3D11Device::SetSamplerState(int slot, ISamplerState* sampler)
 {
 	D3D11SamplerState* samplerImpl = (D3D11SamplerState*)sampler;
 	if (samplerImpl)
@@ -219,7 +219,7 @@ void D3D11Device::setSampler(int slot, ISamplerState* sampler)
 	}
 }
 
-void D3D11Device::setViewport(Viewport* viewport)
+void D3D11Device::SetViewport(Viewport* viewport)
 {
 	Assert(viewport);
 
@@ -238,24 +238,24 @@ void D3D11Device::setViewport(Viewport* viewport)
 	m_viewport = *viewport;
 }
 
-Viewport D3D11Device::getViewport()
+Viewport D3D11Device::GetViewport()
 {
 	return m_viewport;
 }
 
-void D3D11Device::setScissors(float x, float y, float w, float h)
+void D3D11Device::SetScissors(float x, float y, float w, float h)
 {
 	D3D11_RECT rect = { static_cast<LONG>(x), static_cast<LONG>(y), static_cast<LONG>(w), static_cast<LONG>(h) };
 	m_deviceContext->RSSetScissorRects(1, &rect);
 }
 
-void D3D11Device::draw(PrimitiveMode primitiveMode, size_t verticesStart, size_t verticesCount)
+void D3D11Device::Draw(PrimitiveMode primitiveMode, size_t verticesStart, size_t verticesCount)
 {
 	m_deviceContext->IASetPrimitiveTopology(getD3D11PrimitiveTopology(primitiveMode));
 	m_deviceContext->Draw(verticesCount, verticesStart);
 }
 
-void D3D11Device::drawIndexed(PrimitiveMode primitiveMode, size_t indexStart, size_t indexCount, int baseVertexLocation)
+void D3D11Device::DrawIndexed(PrimitiveMode primitiveMode, size_t indexStart, size_t indexCount, int baseVertexLocation)
 {
 	m_deviceContext->IASetPrimitiveTopology(getD3D11PrimitiveTopology(primitiveMode));
 	m_deviceContext->DrawIndexed(indexCount, indexStart, baseVertexLocation);

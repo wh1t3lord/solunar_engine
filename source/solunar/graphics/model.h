@@ -33,7 +33,7 @@ namespace solunar
 
 		~SubMesh();
 
-		void destroy();
+		void Destroy();
 
 		void render();
 
@@ -66,22 +66,22 @@ namespace solunar
 
 	class ModelBase : public GraphicsObject
 	{
-		ImplementObject(ModelBase, GraphicsObject);
+		IMPLEMENT_OBJECT(ModelBase, GraphicsObject);
 	public:
 		ModelBase();
 		ModelBase(const std::string& name);
 		~ModelBase();
 
-		static void registerObject();
+		static void RegisterObject();
 
-		virtual void load(const std::shared_ptr<DataStream>& dataStream);
+		virtual void Load(const std::shared_ptr<DataStream>& dataStream);
 		
-		virtual void destroy();
+		virtual void Destroy();
 
 		virtual void renderObjects();
 
 		virtual void createHw() override;
-		virtual void releaseHw() override;
+		virtual void ReleaseHw() override;
 
 		void saveBinary(const std::string& filename);
 
@@ -124,16 +124,16 @@ namespace solunar
 	//! Model submesh class
 	class ModelSubmesh : public GraphicsObject
 	{
-		ImplementObject(ModelSubmesh, GraphicsObject);
+		IMPLEMENT_OBJECT(ModelSubmesh, GraphicsObject);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 
 		//! NOTE: The file pointer must be set before any ModelFileSubmeshData entries!
 		void load(DataStreamPtr stream);
-		void save(DataStreamPtr stream);
+		void Save(DataStreamPtr stream);
 
 		void createHw() override;
-		void releaseHw() override;
+		void ReleaseHw() override;
 
 		// Accessors
 		IBufferBase* getVerticesBuffer() const { return m_verticesBuffer; }
@@ -161,19 +161,19 @@ namespace solunar
 	//! Model class
 	class Model : public GraphicsObject
 	{
-		ImplementObject(Model, GraphicsObject);
+		IMPLEMENT_OBJECT(Model, GraphicsObject);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 		
 	public:
 		Model();
 		~Model();
 
-		void load(const std::shared_ptr<DataStream>& stream) override;
-		void save(const std::shared_ptr<DataStream>& stream) override;
+		void Load(const std::shared_ptr<DataStream>& stream) override;
+		void Save(const std::shared_ptr<DataStream>& stream) override;
 
 		void createHw() override;
-		void releaseHw() override;
+		void ReleaseHw() override;
 
 	private:
 		std::vector<std::shared_ptr<ModelSubmesh>> m_submeshes;

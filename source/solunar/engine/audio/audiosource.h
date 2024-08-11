@@ -8,10 +8,10 @@ namespace solunar
 	public:
 		virtual ~AudioSource() {}
 
-		virtual bool isPlaying();
+		virtual bool IsPlaying();
 
-		virtual void play();
-		virtual void stop();
+		virtual void Play();
+		virtual void Stop();
 	};
 }
 

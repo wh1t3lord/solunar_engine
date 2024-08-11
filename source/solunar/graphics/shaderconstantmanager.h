@@ -67,11 +67,11 @@ namespace solunar
 		ShaderConstantManager();
 		~ShaderConstantManager();
 
-		void init();
-		void shutdown();
+		void Init();
+		void Shutdown();
 
 		template <typename BufferStructureData>
-		ConstantBufferProxy create(const std::string& name);
+		ConstantBufferProxy Create(const std::string& name);
 	
 		ConstantBufferProxy get(const std::string& name);
 
@@ -84,7 +84,7 @@ namespace solunar
 	};
 
 	template<typename BufferStructureData>
-	inline ConstantBufferProxy ShaderConstantManager::create(const std::string& name)
+	inline ConstantBufferProxy ShaderConstantManager::Create(const std::string& name)
 	{
 		// Create constant buffer
 
@@ -95,11 +95,11 @@ namespace solunar
 
 		SubresourceDesc subresourceDesc = {};
 
-		IBufferBase* buffer = g_renderDevice->createBuffer(bufferDesc, subresourceDesc);
+		IBufferBase* buffer = g_renderDevice->CreateBuffer(bufferDesc, subresourceDesc);
 
 		m_constantBuffers.emplace(name, buffer);
 
-		Core::msg("ShaderConstantManager: created constant buffer %s (%i bytes)", name.c_str(), bufferDesc.m_bufferMemorySize);
+		Core::Msg("ShaderConstantManager: created constant buffer %s (%i bytes)", name.c_str(), bufferDesc.m_bufferMemorySize);
 
 		return ConstantBufferProxy(buffer);
 	}

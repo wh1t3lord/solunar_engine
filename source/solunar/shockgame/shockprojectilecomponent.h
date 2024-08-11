@@ -18,8 +18,8 @@ enum ShockProjectileType
 
 class ShockProjectileComponent : public LogicComponent
 {
-	ImplementObject(ShockProjectileComponent, LogicComponent);
-	DeclarePropertyRegister(ShockProjectileComponent);
+	IMPLEMENT_OBJECT(ShockProjectileComponent, LogicComponent);
+	DECLARE_PROPERTY_REGISTER(ShockProjectileComponent);
 public:
 	ShockProjectileComponent();
 	~ShockProjectileComponent();
@@ -28,9 +28,9 @@ public:
 	void onSpawn(const glm::vec3& velocity, const glm::vec3& direction,
 		const std::string& visualFilename);
 
-	void onEntitySet(Entity* entity) override;
+	void OnEntitySet(Entity* entity) override;
 
-	void update(float dt) override;
+	void Update(float dt) override;
 
 private:
 	glm::vec3 m_direction;

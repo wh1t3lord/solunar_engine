@@ -12,50 +12,51 @@ namespace solunar {
 	//! Rigid body component
 	class RigidBodyComponent : public Component
 	{
-		ImplementObject(RigidBodyComponent, Component);
-		DeclarePropertyRegister(RigidBodyComponent);
+		IMPLEMENT_OBJECT(RigidBodyComponent, Component);
+		DECLARE_PROPERTY_REGISTER(RigidBodyComponent);
 	public:
 		RigidBodyComponent();
 		~RigidBodyComponent();
 		
-		static void registerObject();
+		static void RegisterObject();
 		
-		virtual void onEntitySet(Entity* entity) override;
-		virtual void onWorldSet(World* world) override;
+		virtual void OnEntitySet(Entity* entity) override;
+		virtual void OnWorldSet(World* world) override;
 
-		virtual void onEntityRemove() override;
+		virtual void OnEntityRemove() override;
 		
-		void loadXML(tinyxml2::XMLElement& element) override;
-		void saveXML(tinyxml2::XMLElement& element) override;
+		void LoadXML(tinyxml2::XMLElement& element) override;
+		void SaveXML(tinyxml2::XMLElement& element) override;
 
-		void updateEntityTranslationDirty();
-		void updateBodyTranslationDirty();
+		void UpdateEntityTranslationDirty();
+		void UpdateBodyTranslationDirty();
 
 		// Setter's and getter's
-		const float getMass() { return m_mass; } 
-		void setMass(float value) { m_mass = value; }
+		const float GetMass() { return m_mass; } 
+		void SetMass(float value) { m_mass = value; }
 
-		btRigidBody* getSDKBody() { return m_rigidBody; }
-		btCompoundShape* getCompoundShape() { return m_compoundShape; }
-		PhysicsWorld* getPhysicsWorld() { return m_physicsWorld; }
+		btRigidBody* GetSDKBody() { return m_rigidBody; }
+		btCompoundShape* GetCompoundShape() { return m_compoundShape; }
+		PhysicsWorld* GetPhysicsWorld() { return m_physicsWorld; }
 
 		//void getWorldTransform(btTransform& worldTrans) const override;
 		//void setWorldTransform(const btTransform& worldTrans) override;
 
-		void disableCollide();
-		void enableCollide();
+		void DisableCollide();
+		void EnableCollide();
 
-		void attachShape(ShapeComponent* shape);
-		void dettachShape(ShapeComponent* shape);
+		void AttachShape(ShapeComponent* shape);
+		void DettachShape(ShapeComponent* shape);
 
-		void applyImpulse(const glm::vec3& impulse);
+		void ApplyImpulse(const glm::vec3& impulse);
 
-		void setLinearVelocity(const glm::vec3& velocity);
+		void SetLinearVelocity(const glm::vec3& velocity);
 
 	private:
-		void createBody();
-		void destroyBody();
-		void updateBodyProperties();
+		void CreateBody();
+		void DestroyBody();
+		void UpdateBodyProperties();
+
 	private:
 		btRigidBody* m_rigidBody;
 		btCompoundShape* m_compoundShape;
@@ -73,25 +74,25 @@ namespace solunar {
 	//! Hack due support btCharacterController in the physics system.
 	class RigidBodyProxyComponent : public RigidBodyComponent
 	{
-		ImplementObject(RigidBodyProxyComponent, RigidBodyComponent);
+		IMPLEMENT_OBJECT(RigidBodyProxyComponent, RigidBodyComponent);
 	public:
 		RigidBodyProxyComponent();
 		~RigidBodyProxyComponent();
 
-		static void registerObject();
+		static void RegisterObject();
 
-		void onEntitySet(Entity* entity) override;
-		void onWorldSet(World* world) override;
+		void OnEntitySet(Entity* entity) override;
+		void OnWorldSet(World* world) override;
 
-		void onEntityRemove() override;
+		void OnEntityRemove() override;
 
-		void createPlayerController();
-		void update(float dt);
-		void setDirection(const glm::vec3& direction);
-		void setPositionForce(const glm::vec3& position);
+		void CreatePlayerController();
+		void Update(float dt);
+		void SetDirection(const glm::vec3& direction);
+		void SetPositionForce(const glm::vec3& position);
 
-		btKinematicCharacterController* getCharacterController() { return m_characterController; }
-		btGhostObject* getGhostObject() { return m_ghostObject; }
+		btKinematicCharacterController* GetCharacterController() { return m_characterController; }
+		btGhostObject* GetGhostObject() { return m_ghostObject; }
 
 	private:
 		btKinematicCharacterController* m_characterController;

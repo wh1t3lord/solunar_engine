@@ -14,13 +14,13 @@ public:
 	MiniAudioMusicManager();
 	~MiniAudioMusicManager();
 
-	void init();
-	void shutdown();
+	void Init();
+	void Shutdown();
 
-	void play(const std::string& filename, bool looped = false);
-	void stop();
+	void Play(const std::string& filename, bool looped = false);
+	void Stop();
 
-	bool isPlaying();
+	bool IsPlaying();
 
 private:
 	AudioSource* m_musicSource;

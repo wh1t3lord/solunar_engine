@@ -165,15 +165,15 @@ D3D11Texture2D::D3D11Texture2D(D3D11Device* device, const TextureDesc& textureDe
 	m_texture(nullptr),
 	m_textureSRV(nullptr)
 {
-	create(device, textureDesc, subresourceDesc);
+	Create(device, textureDesc, subresourceDesc);
 }
 
 D3D11Texture2D::~D3D11Texture2D()
 {
-	destroy();
+	Destroy();
 }
 
-void D3D11Texture2D::create(D3D11Device* device, const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc)
+void D3D11Texture2D::Create(D3D11Device* device, const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc)
 {
 	Assert2(device, "Failed to create texture without initialized device.");
 
@@ -240,7 +240,7 @@ void D3D11Texture2D::create(D3D11Device* device, const TextureDesc& textureDesc,
 	}
 }
 
-void D3D11Texture2D::destroy()
+void D3D11Texture2D::Destroy()
 {
 	if (m_textureSRV)
 	{

@@ -6,16 +6,16 @@
 namespace solunar
 {
 
-BeginPropertyRegister(Entity)
+BEGIN_PROPERTY_REGISTER(Entity)
 {
-	RegisterProperty(Entity, PropertyMatrix4, m_worldTransform);
-	RegisterProperty(Entity, PropertyBoundingBox, m_boundingBox);
-	RegisterProperty(Entity, PropertyBoundingBox, m_worldBoundingBox);
-	RegisterProperty(Entity, PropertyVector3, m_position);
-	RegisterProperty(Entity, PropertyQuaternion, m_rotation);
-	RegisterProperty(Entity, PropertyVector3, m_scale);
+	REGISTER_PROPERTY(Entity, PropertyMatrix4, m_worldTransform);
+	REGISTER_PROPERTY(Entity, PropertyBoundingBox, m_boundingBox);
+	REGISTER_PROPERTY(Entity, PropertyBoundingBox, m_worldBoundingBox);
+	REGISTER_PROPERTY(Entity, PropertyVector3, m_position);
+	REGISTER_PROPERTY(Entity, PropertyQuaternion, m_rotation);
+	REGISTER_PROPERTY(Entity, PropertyVector3, m_scale);
 }
-EndPropertyRegister(Entity)
+END_PROPERTY_REGISTER(Entity)
 
 Entity::Entity() :
 	m_world(nullptr),
@@ -25,15 +25,15 @@ Entity::Entity() :
 	m_rotation( glm::identity<glm::quat>() ),
 	m_scale(1.0f, 1.0f, 1.0f)
 {
-	m_boundingBox.setIdentity();
-	m_worldBoundingBox.setIdentity();
+	m_boundingBox.SetIdentity();
+	m_worldBoundingBox.SetIdentity();
 }
 
 Entity::~Entity()
 {
 	for (auto& it : m_components)
 	{
-		it->onEntityRemove();
+		it->OnEntityRemove();
 		mem_delete(it);
 		it = nullptr;
 	}
@@ -47,10 +47,10 @@ Entity::~Entity()
 	m_rootEntity = nullptr;
 }
 
-void Entity::loadXML(tinyxml2::XMLElement& element)
+void Entity::LoadXML(tinyxml2::XMLElement& element)
 {
 	if (strcmp(element.Name(), "Entity") != 0)
-		Core::error("Entity::loadXML: '%s' is not a entity element.", element.Name());
+		Core::Error("Entity::LoadXML: '%s' is not a entity element.", element.Name());
 
 	const tinyxml2::XMLAttribute* entityName = element.FindAttribute("name");
 	if (entityName)
@@ -58,14 +58,14 @@ void Entity::loadXML(tinyxml2::XMLElement& element)
 
 	for (tinyxml2::XMLElement* entity = element.FirstChildElement(); entity; entity = entity->NextSiblingElement()) {
 		if (strcmp(entity->Name(), "Position") == 0) {
-			m_position = getVector3FromXMLElement(*entity);
+			m_position = GetVector3FromXMLElement(*entity);
 		}
 		else if (strcmp(entity->Name(), "Rotation") == 0) {
-			glm::vec3 rotation = getVector3FromXMLElement(*entity);
-			setEulerRotation( glm::radians( rotation));
+			glm::vec3 rotation = GetVector3FromXMLElement(*entity);
+			SetEulerRotation( glm::radians( rotation));
 		}
 		else if (strcmp(entity->Name(), "Scale") == 0) {
-			m_scale = getVector3FromXMLElement(*entity);
+			m_scale = GetVector3FromXMLElement(*entity);
 		}
 		else if (strcmp(entity->Name(), "BoundingBox") == 0) {
 			tinyxml2::XMLElement* bboxMin = entity->FirstChildElement("Min");
@@ -79,36 +79,36 @@ void Entity::loadXML(tinyxml2::XMLElement& element)
 			bboxMax->QueryFloatAttribute("z", &m_boundingBox.m_max.z);
 		}
 		else if (strcmp(entity->Name(), "Entity") != 0) { // components
-			const TypeInfo* typeInfo = g_typeManager->getTypeInfoByName(entity->Name());
+			const TypeInfo* typeInfo = g_typeManager->GetTypeInfoByName(entity->Name());
 			if (typeInfo) {
-				Component* component = createComponentByTypeInfo(typeInfo);
-				component->loadXML(*entity);
+				Component* component = CreateComponentByTypeInfo(typeInfo);
+				component->LoadXML(*entity);
 			}
 			else {
-				Core::error("Entity::loadXML: unknowed component! name=%s", entity->Name());
+				Core::Error("Entity::LoadXML: unknowed component! name=%s", entity->Name());
 			}
 		}
 	}
 
-	// load childs
+	// Load childs
 	tinyxml2::XMLElement* childElement = element.FirstChildElement("Entity");
 	while (childElement)
 	{
-		const TypeInfo* entityTypeInfo = Entity::getStaticTypeInfo();
+		const TypeInfo* entityTypeInfo = Entity::GetStaticTypeInfo();
 
 		// if classid
 		if (const tinyxml2::XMLAttribute* nodeClassId = childElement->FindAttribute("classId"))
 		{
-			entityTypeInfo = g_typeManager->getTypeInfoById(nodeClassId->IntValue());
+			entityTypeInfo = g_typeManager->GetTypeInfoById(nodeClassId->IntValue());
 		}
 		// if classname
 		else if (const tinyxml2::XMLAttribute* nodeClassName = childElement->FindAttribute("className"))
 		{
-			entityTypeInfo = g_typeManager->getTypeInfoByName(nodeClassId->Value());
+			entityTypeInfo = g_typeManager->GetTypeInfoByName(nodeClassId->Value());
 		}
 
-		Entity* entity = createChildEx(entityTypeInfo);
-		entity->loadXML(*childElement);
+		Entity* entity = CreateChildEx(entityTypeInfo);
+		entity->LoadXML(*childElement);
 
 		// m_world->postInitializeNode(node);
 
@@ -116,7 +116,7 @@ void Entity::loadXML(tinyxml2::XMLElement& element)
 	}
 }
 
-void Entity::saveXML(tinyxml2::XMLElement& element)
+void Entity::SaveXML(tinyxml2::XMLElement& element)
 {
 	if (!m_name.empty())
 		element.SetAttribute("name", m_name.c_str());
@@ -163,93 +163,93 @@ void Entity::saveXML(tinyxml2::XMLElement& element)
 	// save components
 	for (auto it : m_components)
 	{
-		if (it->isSerializable())
+		if (it->IsSerializable())
 		{
-			const TypeInfo* typeInfo = it->getTypeInfo();
+			const TypeInfo* typeInfo = it->GetTypeInfo();
 			tinyxml2::XMLElement* compElem = element.InsertNewChildElement(typeInfo->m_name);
-			it->saveXML(*compElem);
+			it->SaveXML(*compElem);
 		}
 	}
 }
 
-void Entity::setEulerRotation(const glm::vec3& rot)
+void Entity::SetEulerRotation(const glm::vec3& rot)
 {
 	m_rotation = glm::quat_cast(glm::yawPitchRoll(rot.x, rot.y, rot.z));
 }
 
-glm::mat4 Entity::getWorldTranslation()
+glm::mat4 Entity::GetWorldTranslation()
 {
-//	updateWorldTransform();
+//	UpdateWorldTransform();
 	return m_worldTransform;
 }
 
-glm::mat4 Entity::getLocalTranslation()
+glm::mat4 Entity::GetLocalTranslation()
 {
 	glm::mat4 tranlation = glm::mat4(1.0f);
 	tranlation = tranlation * glm::mat4_cast(m_rotation) * glm::scale(tranlation, m_scale);
 	return tranlation;
 }
 
-void Entity::setBoundingBox(const BoundingBox& boundingBox)
+void Entity::SetBoundingBox(const BoundingBox& boundingBox)
 {
 	m_boundingBox = boundingBox;
 }
 
-const BoundingBox& Entity::getLocalBoundingBox()
+const BoundingBox& Entity::GetLocalBoundingBox()
 {
 	return m_boundingBox;
 }
 
-const BoundingBox& Entity::getBoundingBox()
+const BoundingBox& Entity::GetBoundingBox()
 {
 	return m_worldBoundingBox;
 }
 
-void Entity::setRootEntity(Entity* Entity)
+void Entity::SetRootEntity(Entity* Entity)
 {
 	m_rootEntity = Entity;
 }
 
-void Entity::onWorldSet(World* world)
+void Entity::OnWorldSet(World* world)
 {
 	m_world = world;
 }
 
-Entity* Entity::createChild()
+Entity* Entity::CreateChild()
 {
-	Entity* entity = m_world->createEntity();
-	entity->setRootEntity(this);
+	Entity* entity = m_world->CreateEntity();
+	entity->SetRootEntity(this);
 	m_children.push_back(entity);
 	return entity;
 }
 
-Entity* Entity::createChildEx(const TypeInfo* typeInfo)
+Entity* Entity::CreateChildEx(const TypeInfo* typeInfo)
 {
-	Entity* entity = m_world->createEntityEx(typeInfo);
-	entity->setRootEntity(this);
+	Entity* entity = m_world->CreateEntityEx(typeInfo);
+	entity->SetRootEntity(this);
 	m_children.push_back(entity);
 	return entity;
 }
 
-Component* Entity::createComponentByTypeInfo(const TypeInfo* typeinfo)
+Component* Entity::CreateComponentByTypeInfo(const TypeInfo* typeinfo)
 {
-	Component* component = (Component*)g_typeManager->createObjectByTypeInfo(typeinfo);
+	Component* component = (Component*)g_typeManager->CreateObjectByTypeInfo(typeinfo);
 	m_components.push_back(component);
-	if (m_world) component->onWorldSet(m_world);
-	component->onEntitySet(this);
+	if (m_world) component->OnWorldSet(m_world);
+	component->OnEntitySet(this);
 
 	return component;
 }
 
-Component* Entity::getComponentByTypeInfo(const TypeInfo* typeinfo)
+Component* Entity::GetComponentByTypeInfo(const TypeInfo* typeinfo)
 {
 	for (ComponentIt it = m_components.begin(); it != m_components.end(); ++it)
 	{
 		Component* component = *it;
 		if (component)
 		{
-			const TypeInfo* compTypeInfo = component->getTypeInfo();
-			if (compTypeInfo && compTypeInfo->isA(typeinfo))
+			const TypeInfo* compTypeInfo = component->GetTypeInfo();
+			if (compTypeInfo && compTypeInfo->IsA(typeinfo))
 				return component;
 		}
 	}
@@ -257,15 +257,15 @@ Component* Entity::getComponentByTypeInfo(const TypeInfo* typeinfo)
 	return nullptr;
 }
 
-void Entity::addComponent(Component* component)
+void Entity::AddComponent(Component* component)
 {
 	Assert(component);
 	m_components.push_back(component);
-	if (m_world) component->onWorldSet(m_world);
-	component->onEntitySet(this);
+	if (m_world) component->OnWorldSet(m_world);
+	component->OnEntitySet(this);
 }
 
-void Entity::updateWorldTransform()
+void Entity::UpdateWorldTransform()
 {
 	m_worldTransform = glm::identity<glm::mat4>();
 
@@ -273,7 +273,7 @@ void Entity::updateWorldTransform()
 	glm::mat4 rotation = glm::mat4_cast(m_rotation);
 
 	if (m_rootEntity)
-		m_worldTransform = m_rootEntity->getWorldTranslation() * glm::scale(m_worldTransform, m_scale) * rotation * glm::translate(m_worldTransform, m_position);
+		m_worldTransform = m_rootEntity->GetWorldTranslation() * glm::scale(m_worldTransform, m_scale) * rotation * glm::translate(m_worldTransform, m_position);
 	else
 		m_worldTransform = glm::scale(m_worldTransform, m_scale) * rotation * glm::translate(m_worldTransform, m_position);
 }
@@ -296,18 +296,18 @@ BoundingBox Entity_TransformBox(const BoundingBox& box, const glm::mat4& m)
 	glm::vec3 tmax = t_center + t_extents;
 
 	BoundingBox rbox;
-	rbox.setIdentity();
+	rbox.SetIdentity();
 	rbox.m_min = tmin;
 	rbox.m_max = tmax;
 	return rbox;
 }
 
-void Entity::transformBBox()
+void Entity::TransformBBox()
 {
-	m_worldBoundingBox = Entity_TransformBox(m_boundingBox, getWorldTranslation());
+	m_worldBoundingBox = Entity_TransformBox(m_boundingBox, GetWorldTranslation());
 }
 
-void Entity::quaternionRotate(const glm::vec3& axis, float angle)
+void Entity::QuaternionRotate(const glm::vec3& axis, float angle)
 {
 	float angleRad = glm::radians(angle);
 	auto axisNorm = glm::normalize(axis);

@@ -20,13 +20,13 @@ public:
 	MiniAudioManager();
 	~MiniAudioManager();
 
-	void init() override;
-	void shutdown() override;
+	void Init() override;
+	void Shutdown() override;
 
-	void update() override;
+	void Update() override;
 
-	AudioSource* createSource(const std::string& filename) override;
-	void deleteSource(AudioSource* source) override;
+	AudioSource* CreateSource(const std::string& filename) override;
+	void DeleteSource(AudioSource* source) override;
 
 private:
 	MiniAudioSingletonStorer m_singletonStorer;

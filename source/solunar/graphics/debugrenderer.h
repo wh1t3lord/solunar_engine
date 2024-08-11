@@ -22,11 +22,11 @@ public:
 	DebugRender();
 	~DebugRender();
 
-	void initialize();
-	void shutdown();
+	void Initialize();
+	void Shutdown();
 
 	void drawAxis(const glm::vec3& vec);
-	void drawLine(const glm::vec3& from, const glm::vec3& to, const glm::vec3& color);
+	void DrawLine(const glm::vec3& from, const glm::vec3& to, const glm::vec3& color);
 	void drawBoundingBox(const BoundingBox& box, const glm::vec3& color);
 	void drawArc(const glm::vec3& center, const glm::vec3& normal, const glm::vec3& axis, float radiusA, float radiusB, float minAngle, float maxAngle,
 		const glm::vec3& color, bool drawSect, float stepDegrees = float(10.f));
@@ -34,10 +34,10 @@ public:
 	void drawCone(float radius, float height, int upAxis, const glm::vec3& transform, const glm::vec3& color);
 	
 
-	void renderFrame(View* view);
+	void RenderFrame(View* view);
 
-	void pushModelMatrix(const glm::mat4& model);
-	void popModelMatrix();
+	void PushModelMatrix(const glm::mat4& model);
+	void PopModelMatrix();
 
 private:
 	void beginDraw();

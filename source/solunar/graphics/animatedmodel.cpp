@@ -28,14 +28,14 @@ template <typename T>
 bool gltfUnpackValues(const cgltf_primitive& primitive, int64_t index, int64_t vtxCount, std::vector<T>& data)
 {
 	if (index == -1) {
-		Core::msg("gltfUnpackValue: Invalid index %i", index);
+		Core::Msg("gltfUnpackValue: Invalid index %i", index);
 		return false;
 	}
 
 	const auto& Attributes = primitive.attributes[index];
 	const size_t NumComponents = cgltf_num_components(Attributes.data->type);
 	if (NumComponents != (sizeof(T) / sizeof(float))) {
-		Core::msg("gltfUnpackValue: Mesh doesn't contain invalid attribute %s information.", Attributes.name);
+		Core::Msg("gltfUnpackValue: Mesh doesn't contain invalid attribute %s information.", Attributes.name);
 		return false;
 	}
 
@@ -91,9 +91,9 @@ inline AnimationPathType getAnimationPathType(cgltf_animation_path_type type)
 }
 
 // Object registering
-void AnimatedModel::registerObject()
+void AnimatedModel::RegisterObject()
 {
-	TypeManager::getInstance()->registerObject<AnimatedModel>();
+	TypeManager::GetInstance()->RegisterObject<AnimatedModel>();
 }
 
 AnimatedModel::AnimatedModel()
@@ -106,36 +106,36 @@ AnimatedModel::AnimatedModel()
 
 AnimatedModel::~AnimatedModel()
 {
-	releaseHw();
+	ReleaseHw();
 }
 
-void AnimatedModel::load(const std::shared_ptr<DataStream>& stream)
+void AnimatedModel::Load(const std::shared_ptr<DataStream>& stream)
 {
 	load_GLTF(stream);
 }
 
 void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 {
-	stream->seek(Seek_End, 0);
-	size_t filesize = stream->tell();
-	stream->seek(Seek_Begin, 0);
+	stream->Seek(Seek_End, 0);
+	size_t filesize = stream->Tell();
+	stream->Seek(Seek_Begin, 0);
 
 	uint8_t* fileData = (uint8_t*)malloc(filesize);
-	stream->read(fileData, filesize);
+	stream->Read(fileData, filesize);
 
 	cgltf_data* data = NULL;
 	cgltf_options options = {};
 	cgltf_result result = cgltf_parse(&options, fileData, filesize, &data);
 
 	if (result != cgltf_result_success) {
-		Core::msg("AnimatedModel: Failed to parse GLTF asset.");
+		Core::Msg("AnimatedModel: Failed to parse GLTF asset.");
 		return;
 	}
 
 	result = cgltf_load_buffers(&options, data, nullptr);
 	if (result != cgltf_result_success) {
 		cgltf_free(data);
-		Core::msg("AnimatedModel: Failed to load buffers for GLTF asset .");
+		Core::Msg("AnimatedModel: Failed to load buffers for GLTF asset .");
 		return;
 	}
 
@@ -159,7 +159,7 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 			const auto& attribute = primitive.attributes[j];
 			std::string name = std::string(attribute.name);
 			if (attribute.data->count != vtxCount) {
-				Core::msg("AnimatedModel: Invalid attribute count in mesh %s for attribute %i.", mesh.name, (int)attribute.type);
+				Core::Msg("AnimatedModel: Invalid attribute count in mesh %s for attribute %i.", mesh.name, (int)attribute.type);
 				return;
 			}
 
@@ -214,7 +214,7 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 		// Bounding box calculation
 
 		BoundingBox AABB;
-		AABB.setIdentity();
+		AABB.SetIdentity();
 
 		for (size_t o = 0; o < vtxCount; o++) {
 			//positions[o].z = -positions[o].z;  // Sparkle uses LH Y+
@@ -271,10 +271,10 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 
 #if 0
 		if (data->materials_count != data->meshes_count)
-			Core::msg("AnimatedModel::load_GLTF: wrong material count! using default ...");
+			Core::Msg("AnimatedModel::load_GLTF: wrong material count! using default ...");
 
 		if (data->materials_count < data->meshes_count)
-			Core::msg("AnimatedModel::load_GLTF: material count less than mesh count (%i < %i)! using default ...",
+			Core::Msg("AnimatedModel::load_GLTF: material count less than mesh count (%i < %i)! using default ...",
 				data->materials_count, data->meshes_count);
 
 		// #TODO: This shit should be rewritten !!!
@@ -282,7 +282,7 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 		if (i < data->materials_count)
 		{
 			if (data->materials[i].name && strlen(data->materials[i].name) <= 0)
-				Core::msg("AnimatedModel::load_GLTF: material name on mesh %i are empty! using default ...", i);
+				Core::Msg("AnimatedModel::load_GLTF: material name on mesh %i are empty! using default ...", i);
 			else if (data->materials[i].name && strlen(data->materials[i].name) > 0)
 				materialname = std::string("materials/models/") + std::string(data->materials[i].name) + ".xml"; // #TODO: SHIT !!!!
 		}
@@ -356,7 +356,7 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 			animationChannel.m_samplerId = (int)cgltf_animation_sampler_index(&gltf_animation, gltf_animationChannel.sampler);
 		}
 
-		Core::msg("AnimatedModel: animation %s channels %i", gltf_animation.name, gltf_animation.channels_count);
+		Core::Msg("AnimatedModel: animation %s channels %i", gltf_animation.name, gltf_animation.channels_count);
 	}
 
 	// loading model skin
@@ -372,7 +372,7 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 
 		skin.m_joints.resize(gltf_skin.joints_count);
 
-		// load joint too
+		// Load joint too
 		for (int j = 0; j < gltf_skin.joints_count; j++) {
 			const cgltf_node* joint = gltf_skin.joints[j];
 
@@ -409,7 +409,7 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 #endif	
 		}
 
-		// load the inverse bind matrices
+		// Load the inverse bind matrices
 		size_t inverseBindMatricesCount = gltf_skin.inverse_bind_matrices->count;
 		skin.m_inverseBindMatrices.resize(inverseBindMatricesCount);
 		cgltf_accessor_unpack_floats(gltf_skin.inverse_bind_matrices, (float*)skin.m_inverseBindMatrices.data(), inverseBindMatricesCount * 16);
@@ -504,13 +504,13 @@ void AnimatedModel::createHw()
 {
 	for (int i = 0; i < m_subMeshes.size(); i++)
 	{
-		m_subMeshes[i]->create();
+		m_subMeshes[i]->Create();
 		//AnimatedSubMesh* submesh = m_subMeshes[i];
 		
 	}
 }
 
-void AnimatedModel::releaseHw()
+void AnimatedModel::ReleaseHw()
 {
 	for (int i = 0; i < m_subMeshes.size(); i++)
 	{
@@ -661,12 +661,12 @@ glm::mat4 AnimatedModel::getNodeMatrix(int nodeId)
 	return node.m_matrix;
 }
 
-const BoundingBox& AnimatedModel::getBoundingBox()
+const BoundingBox& AnimatedModel::GetBoundingBox()
 {
 	return m_boundingBox;
 }
 
-int AnimatedModel::getNodeByName(const std::string& name)
+int AnimatedModel::GetNodeByName(const std::string& name)
 {
 	for (int i = 0; i < m_nodes.size(); i++)
 		if (m_nodes[i].m_name == name)
@@ -675,7 +675,7 @@ int AnimatedModel::getNodeByName(const std::string& name)
 	return -1;
 }
 
-void AnimatedModel::setNodeScale(int nodeid, const glm::vec3& scale)
+void AnimatedModel::SetNodeScale(int nodeid, const glm::vec3& scale)
 {
 	Assert(nodeid != -1);
 	m_nodes[nodeid].m_scale = scale;
@@ -703,9 +703,9 @@ AnimatedModelRenderer::~AnimatedModelRenderer()
 {
 }
 
-void AnimatedModelRenderer::init()
+void AnimatedModelRenderer::Init()
 {
-	g_bonesConstantBuffer = ShaderConstantManager::getInstance()->create<BonesCB>("BonesCB");
+	g_bonesConstantBuffer = ShaderConstantManager::GetInstance()->Create<BonesCB>("BonesCB");
 
 #if 0
 	// create a dynamic joint-palette texture and sampler
@@ -723,7 +723,7 @@ void AnimatedModelRenderer::init()
 	memset(&subresourceDesc, 0, sizeof(subresourceDesc));
 	subresourceDesc.m_memoryPitch = textureDesc.m_width * 4;
 
-	m_jointTexture = g_renderDevice->createTexture2D(textureDesc, subresourceDesc);
+	m_jointTexture = g_renderDevice->CreateTexture2D(textureDesc, subresourceDesc);
 
 	SamplerDesc samplerDesc;
 	memset(&samplerDesc, 0, sizeof(samplerDesc));
@@ -733,11 +733,11 @@ void AnimatedModelRenderer::init()
 	samplerDesc.m_wrapT = TextureWrap::ClampToEdge;
 	samplerDesc.m_anisotropyLevel = 1.0f;
 
-	m_jointSampler = g_renderDevice->createSamplerState(samplerDesc);
+	m_jointSampler = g_renderDevice->CreateSamplerState(samplerDesc);
 #endif
 }
 
-void AnimatedModelRenderer::shutdown()
+void AnimatedModelRenderer::Shutdown()
 {
 #if 0
 	if (m_jointSampler)
@@ -759,18 +759,18 @@ void AnimatedModelRenderer::render(AnimatedMeshComponent* model)
 	std::shared_ptr<ModelBase> modelBase = model->lockModel();
 	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
 
-	glm::mat4* data = (glm::mat4*)g_bonesConstantBuffer->map(BufferMapping::WriteOnly);
+	glm::mat4* data = (glm::mat4*)g_bonesConstantBuffer->Map(BufferMapping::WriteOnly);
 	memcpy(data, animatedModel->m_bonesMatrices, sizeof(animatedModel->m_bonesMatrices));
-	g_bonesConstantBuffer->unmap();
+	g_bonesConstantBuffer->Unmap();
 
-	g_renderDevice->setConstantBufferIndex(ConstantBufferBindings_Skinning, g_bonesConstantBuffer.get());
+	g_renderDevice->SetConstantBufferIndex(ConstantBufferBindings_Skinning, g_bonesConstantBuffer.get());
 
 #if 0
-	glm::mat4* data = (glm::mat4*)g_bonesConstantBuffer->map(BufferMapping::WriteOnly);
+	glm::mat4* data = (glm::mat4*)g_bonesConstantBuffer->Map(BufferMapping::WriteOnly);
 	memcpy(data, s_boneInfoTest, sizeof(s_boneInfoTest));
-	g_bonesConstantBuffer->unmap();
+	g_bonesConstantBuffer->Unmap();
 
-	g_renderDevice->setConstantBufferIndex(ConstantBufferBindings_Skinning, g_bonesConstantBuffer.get());
+	g_renderDevice->SetConstantBufferIndex(ConstantBufferBindings_Skinning, g_bonesConstantBuffer.get());
 #endif
 
 #if 0
@@ -785,7 +785,7 @@ void AnimatedModelRenderer::render(AnimatedMeshComponent* model)
 #endif
 }
 
-void AnimatedSubMesh::create()
+void AnimatedSubMesh::Create()
 {
 	BufferDesc bufferDesc;
 	memset(&bufferDesc, 0, sizeof(bufferDesc));
@@ -798,7 +798,7 @@ void AnimatedSubMesh::create()
 	subresourceDesc.m_memory = m_vertices.data();
 	subresourceDesc.m_memoryPitch = sizeof(AnimatedVertex);
 
-	m_vertexBuffer = g_renderDevice->createBuffer(bufferDesc, subresourceDesc);
+	m_vertexBuffer = g_renderDevice->CreateBuffer(bufferDesc, subresourceDesc);
 	m_vertices.clear();
 
 	memset(&bufferDesc, 0, sizeof(bufferDesc));
@@ -810,12 +810,12 @@ void AnimatedSubMesh::create()
 	subresourceDesc.m_memory = m_indices.data();
 	subresourceDesc.m_memoryPitch = sizeof(uint32_t);
 
-	m_indexBuffer = g_renderDevice->createBuffer(bufferDesc, subresourceDesc);
+	m_indexBuffer = g_renderDevice->CreateBuffer(bufferDesc, subresourceDesc);
 	m_indices.clear();
 
-	m_material = g_contentManager->loadObject<Material>(m_materialName);
+	m_material = g_contentManager->LoadObject<Material>(m_materialName);
 	if (m_material.expired())
-		m_material = getDefaultMaterial();
+		m_material = GetDefaultMaterial();
 }
 
 }

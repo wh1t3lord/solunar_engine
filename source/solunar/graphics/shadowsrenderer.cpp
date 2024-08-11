@@ -33,7 +33,7 @@ namespace solunar
 
 	const int kShadowMapSize = 1024;
 
-	void ShadowsRenderer::init()
+	void ShadowsRenderer::Init()
 	{
 		TextureDesc textureDesc;
 		memset(&textureDesc, 0, sizeof(textureDesc));
@@ -47,20 +47,20 @@ namespace solunar
 		memset(&subresourceDesc, 0, sizeof(subresourceDesc));
 
 		// Create shadow map texture
-		m_shadowMap = g_renderDevice->createTexture2D(textureDesc, subresourceDesc);
+		m_shadowMap = g_renderDevice->CreateTexture2D(textureDesc, subresourceDesc);
 
 		RenderTargetCreationDesc renderTargetDesc;
 		memset(&renderTargetDesc, 0, sizeof(renderTargetDesc));
 		renderTargetDesc.m_depthTexture2D = m_shadowMap;
 
 		// Create render target view
-		m_shadowFbo = g_renderDevice->createRenderTarget(renderTargetDesc);
+		m_shadowFbo = g_renderDevice->CreateRenderTarget(renderTargetDesc);
 
 		// Create shader for static mesh
 		m_shadowShader_StaticMesh = g_shaderManager->createShaderProgram("shadowmap.hlsl", "shadowmap.hlsl");
 	}
 
-	void ShadowsRenderer::shutdown()
+	void ShadowsRenderer::Shutdown()
 	{
 		if (m_shadowMap)
 		{
@@ -77,31 +77,31 @@ namespace solunar
 
 	void ShadowsRenderer::beginRender()
 	{
-		m_originalViewport = g_renderDevice->getViewport();
+		m_originalViewport = g_renderDevice->GetViewport();
 
 		// set framebuffer
-		g_renderDevice->setRenderTarget(m_shadowFbo);
+		g_renderDevice->SetRenderTarget(m_shadowFbo);
 
 		// install shadowmap viewport
 		Viewport vp;
 		vp.m_x = 0;
 		vp.m_y = 0;
 		vp.m_width = vp.m_height = kShadowMapSize;
-		g_renderDevice->setViewport(&vp);
+		g_renderDevice->SetViewport(&vp);
 	}
 
 	void ShadowsRenderer::renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
 	{
-		LightManager* lightManager = graphicsWorld->getLightManager();
+		LightManager* lightManager = graphicsWorld->GetLightManager();
 		Assert(lightManager); // uninitialized light manager, critical error
 
 		// Get directional light
-		DirectionalLightComponent* directionalLight = lightManager->getDirectionalLight();
+		DirectionalLightComponent* directionalLight = lightManager->GetDirectionalLight();
 		if (!directionalLight)
 			return;
 
 		// Get directional light entity
-		Entity* directionalLightEntity = directionalLight->getEntity();
+		Entity* directionalLightEntity = directionalLight->GetEntity();
 		if (!directionalLightEntity)
 			return;
 
@@ -112,10 +112,10 @@ namespace solunar
 	void ShadowsRenderer::endRender()
 	{
 		// set framebuffer
-		g_renderDevice->setRenderTarget(g_renderer->getSwapChainRenderTarget());
+		g_renderDevice->SetRenderTarget(g_renderer->getSwapChainRenderTarget());
 
 		// restore viewport
-		g_renderDevice->setViewport(&m_originalViewport);
+		g_renderDevice->SetViewport(&m_originalViewport);
 	}
 
 }

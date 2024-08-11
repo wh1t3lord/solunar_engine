@@ -27,16 +27,16 @@ ShockGameMainMenuComponent::~ShockGameMainMenuComponent()
 {
 }
 
-void ShockGameMainMenuComponent::onWorldSet(World* world)
+void ShockGameMainMenuComponent::OnWorldSet(World* world)
 {
-	Component::onWorldSet(world);
+	Component::OnWorldSet(world);
 	 
-	g_mainMenuBackground = g_contentManager->loadObject<TextureMap>("textures/ui/ui_menu_background.png");
+	g_mainMenuBackground = g_contentManager->LoadObject<TextureMap>("textures/ui/ui_menu_background.png");
 
-	MusicManager::getInstance()->play("sounds/music/temp_mainmenu.mp3", true);
+	MusicManager::GetInstance()->Play("sounds/music/temp_mainmenu.mp3", true);
 }
 
-void ShockGameMainMenuComponent::update(float dt)
+void ShockGameMainMenuComponent::Update(float dt)
 {
 	// begin menu window
 
@@ -49,10 +49,10 @@ void ShockGameMainMenuComponent::update(float dt)
 		ImGui::End();
 	}
 
-	CameraProxy* camera = CameraProxy::getInstance();
+	CameraProxy* camera = CameraProxy::GetInstance();
 
 	ImGui::SetNextWindowPos(ImVec2(100, 550));
-	ImGui::SetNextWindowSize(ImVec2(camera->getView()->m_width / 2, camera->getView()->m_height / 2));
+	ImGui::SetNextWindowSize(ImVec2(camera->GetView()->m_width / 2, camera->GetView()->m_height / 2));
 
 	ImGui::Begin("Main Menu", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
 
@@ -62,8 +62,8 @@ void ShockGameMainMenuComponent::update(float dt)
 	{
 	//	loadLevel("env_test");
 
-		MusicManager::getInstance()->stop();
-		EngineStateManager::getInstance()->loadWorld("worlds/env_test.xml");
+		MusicManager::GetInstance()->Stop();
+		EngineStateManager::GetInstance()->LoadWorld("worlds/env_test.xml");
 	}
 
 	if (ImGui::Button("Quit", kButtonSize))
@@ -91,14 +91,14 @@ public:
 	static int ms_currentVidMode;
 	static std::vector<VideoMode> ms_vidModes;
 public:
-	static void init();
+	static void Init();
 };
 
 bool                                     VideoModeManager::ms_inited = false;
 int                                      VideoModeManager::ms_currentVidMode = 0;
 std::vector<VideoModeManager::VideoMode>          VideoModeManager::ms_vidModes;
 
-void VideoModeManager::init()
+void VideoModeManager::Init()
 {
 	VideoMode videoMode;
 	videoMode.width = g_graphicsOptions.m_width;
@@ -165,7 +165,7 @@ void showSettingsMenu()
 		if (ImGui::BeginTabItem("Video"))
 		{
 			if (!VideoModeManager::ms_inited)
-				VideoModeManager::init();
+				VideoModeManager::Init();
 
 			static int item_current_idx = VideoModeManager::ms_currentVidMode; // Here we store our selection data as an index.
 			const char* combo_preview_value = VideoModeManager::ms_vidModes[item_current_idx].name.c_str();
@@ -219,16 +219,16 @@ DemoGameMainMenuComponent::~DemoGameMainMenuComponent()
 {
 }
 
-void DemoGameMainMenuComponent::onWorldSet(World* world)
+void DemoGameMainMenuComponent::OnWorldSet(World* world)
 {
-	Component::onWorldSet(world);
+	Component::OnWorldSet(world);
 
-	g_mainMenuBackground = g_contentManager->loadObject<TextureMap>("textures/ui/ui_menu_background.png");
+	g_mainMenuBackground = g_contentManager->LoadObject<TextureMap>("textures/ui/ui_menu_background.png");
 
-	//MusicManager::getInstance()->play("sounds/music/temp_mainmenu.mp3", true);
+	//MusicManager::GetInstance()->play("sounds/music/temp_mainmenu.mp3", true);
 }
 
-void DemoGameMainMenuComponent::update(float dt)
+void DemoGameMainMenuComponent::Update(float dt)
 {
 	// begin menu window
 
@@ -241,10 +241,10 @@ void DemoGameMainMenuComponent::update(float dt)
 		ImGui::End();
 	}
 
-	CameraProxy* camera = CameraProxy::getInstance();
+	CameraProxy* camera = CameraProxy::GetInstance();
 
 	ImGui::SetNextWindowPos(ImVec2(100, 550));
-	ImGui::SetNextWindowSize(ImVec2(camera->getView()->m_width / 2, camera->getView()->m_height / 2));
+	ImGui::SetNextWindowSize(ImVec2(camera->GetView()->m_width / 2, camera->GetView()->m_height / 2));
 
 	ImGui::Begin("Main Menu", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
 
@@ -252,8 +252,8 @@ void DemoGameMainMenuComponent::update(float dt)
 
 	if (ImGui::Button("New Game", kButtonSize))
 	{
-		MusicManager::getInstance()->stop();
-		EngineStateManager::getInstance()->loadWorld("worlds/env_test.xml");
+		MusicManager::GetInstance()->Stop();
+		EngineStateManager::GetInstance()->LoadWorld("worlds/env_test.xml");
 	}
 
 	if (ImGui::Button("Settings", kButtonSize))

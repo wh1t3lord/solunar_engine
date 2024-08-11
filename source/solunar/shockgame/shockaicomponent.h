@@ -12,18 +12,18 @@ enum ShockAIType
 
 class ShockAIComponent : public LogicComponent
 {
-	ImplementObject(ShockAIComponent, LogicComponent);
-	DeclarePropertyRegister(ShockAIComponent);
+	IMPLEMENT_OBJECT(ShockAIComponent, LogicComponent);
+	DECLARE_PROPERTY_REGISTER(ShockAIComponent);
 public:
 	ShockAIComponent();
 	~ShockAIComponent();
 
-	void update(float dt) override;
+	void Update(float dt) override;
 	void updateAICamera(float dt);
 	void updateFire(float dt);
 
-	void loadXML(tinyxml2::XMLElement& element) override;
-	void saveXML(tinyxml2::XMLElement& element) override;
+	void LoadXML(tinyxml2::XMLElement& element) override;
+	void SaveXML(tinyxml2::XMLElement& element) override;
 
 private:
 	ShockAIType m_aiType;

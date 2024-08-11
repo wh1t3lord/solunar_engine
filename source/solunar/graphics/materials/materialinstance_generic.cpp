@@ -75,7 +75,7 @@ IShaderProgram* MaterialInstance_Generic::getShaderProgramVariation(VertexFactor
 		return ms_pixelVariations[vertexFactory][pixelVariation];
 
 	std::string variationName = getPixelVariationName("materialinstance_generic", pixelVariation);
-	Core::msg("Graphics: Generation variation '%s' for MaterialInstance_Generic", variationName.c_str());
+	Core::Msg("Graphics: Generation variation '%s' for MaterialInstance_Generic", variationName.c_str());
 
 	std::string defines = getPixelVariationDefine(pixelVariation);
 

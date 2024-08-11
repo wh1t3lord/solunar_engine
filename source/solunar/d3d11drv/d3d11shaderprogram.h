@@ -14,8 +14,8 @@ public:
 	D3D11ShaderProgram(D3D11Device* device, const char* vstext, const char* pstext, const char* defines = nullptr, InputLayoutDesc* inputLayout = nullptr, int inputLayoutCount = 0);
 	~D3D11ShaderProgram();
 
-	void create(D3D11Device* device, const char* vstext, const char* pstext, const char* defines = nullptr, InputLayoutDesc* inputLayout = nullptr, int inputLayoutCount = 0);
-	void destroy();
+	void Create(D3D11Device* device, const char* vstext, const char* pstext, const char* defines = nullptr, InputLayoutDesc* inputLayout = nullptr, int inputLayoutCount = 0);
+	void Destroy();
 
 	void createInputLayout(D3D11Device* device, ID3DBlob* vertexShaderBlob);
 

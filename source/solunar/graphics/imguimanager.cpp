@@ -52,7 +52,7 @@ namespace solunar
 	{
 	}
 
-	void ImGuiRenderer::init()
+	void ImGuiRenderer::Init()
 	{
 		ImGuiIO& io = ImGui::GetIO();
 		IM_ASSERT(io.BackendRendererUserData == nullptr && "Already initialized a renderer backend!");
@@ -64,7 +64,7 @@ namespace solunar
 		io.BackendFlags |= ImGuiBackendFlags_RendererHasVtxOffset;  // We can honor the ImDrawCmd::VtxOffset field, allowing for large meshes.
 	}
 
-	void ImGuiRenderer::shutdown()
+	void ImGuiRenderer::Shutdown()
 	{
 		invalidateDeviceObjects();
 
@@ -103,7 +103,7 @@ namespace solunar
 
 			SubresourceDesc subResource = {};
 			
-			m_pVB = g_renderDevice->createBuffer(desc, subResource);
+			m_pVB = g_renderDevice->CreateBuffer(desc, subResource);
 		}
 		
 		if (!m_pIB || m_IndexBufferSize < draw_data->TotalIdxCount)
@@ -119,12 +119,12 @@ namespace solunar
 
 			SubresourceDesc subResource = {};
 			
-			m_pIB = g_renderDevice->createBuffer(desc, subResource);
+			m_pIB = g_renderDevice->CreateBuffer(desc, subResource);
 		}
 
 		// Upload vertex/index data into a single contiguous GPU buffer
-		ImDrawVert* vtx_dst = (ImDrawVert*)m_pVB->map(BufferMapping::WriteOnly);
-		ImDrawIdx* idx_dst = (ImDrawIdx*)m_pIB->map(BufferMapping::WriteOnly);
+		ImDrawVert* vtx_dst = (ImDrawVert*)m_pVB->Map(BufferMapping::WriteOnly);
+		ImDrawIdx* idx_dst = (ImDrawIdx*)m_pIB->Map(BufferMapping::WriteOnly);
 		for (int n = 0; n < draw_data->CmdListsCount; n++)
 		{
 			const ImDrawList* cmd_list = draw_data->CmdLists[n];
@@ -133,14 +133,14 @@ namespace solunar
 			vtx_dst += cmd_list->VtxBuffer.Size;
 			idx_dst += cmd_list->IdxBuffer.Size;
 		}
-		m_pIB->unmap();
-		m_pVB->unmap();
+		m_pIB->Unmap();
+		m_pVB->Unmap();
 		
 		// Setup orthographic projection matrix into our constant buffer
 		// Our visible imgui space lies from draw_data->DisplayPos (top left) to draw_data->DisplayPos+data_data->DisplaySize (bottom right). DisplayPos is (0,0) for single viewport apps.
 		{
 #if 1
-			VERTEX_CONSTANT_BUFFER_DX11* constant_buffer = (VERTEX_CONSTANT_BUFFER_DX11*)m_pVertexConstantBuffer->map(BufferMapping::WriteOnly);
+			VERTEX_CONSTANT_BUFFER_DX11* constant_buffer = (VERTEX_CONSTANT_BUFFER_DX11*)m_pVertexConstantBuffer->Map(BufferMapping::WriteOnly);
 			float L = draw_data->DisplayPos.x;
 			float R = draw_data->DisplayPos.x + draw_data->DisplaySize.x;
 			float T = draw_data->DisplayPos.y;
@@ -153,14 +153,14 @@ namespace solunar
 				{ (R+L)/(L-R),  (T+B)/(B-T),    0.5f,       1.0f },
 			};
 			memcpy(&constant_buffer->mvp, mvp, sizeof(mvp));
-			m_pVertexConstantBuffer->unmap();
+			m_pVertexConstantBuffer->Unmap();
 #else
 			// calculate ortho matrix based on current view
 			glm::mat4 proj = glm::ortho(0.0f, draw_data->DisplaySize.x, 0.0f, draw_data->DisplaySize.y, 0.1f, 100.0f);
 
-			VERTEX_CONSTANT_BUFFER_DX11* constant_buffer = (VERTEX_CONSTANT_BUFFER_DX11*)m_pVertexConstantBuffer->map(BufferMapping::WriteOnly);
+			VERTEX_CONSTANT_BUFFER_DX11* constant_buffer = (VERTEX_CONSTANT_BUFFER_DX11*)m_pVertexConstantBuffer->Map(BufferMapping::WriteOnly);
 			memcpy(&constant_buffer->mvp, &proj[0], sizeof(proj));
-			m_pVertexConstantBuffer->unmap();
+			m_pVertexConstantBuffer->Unmap();
 #endif
 		}
 
@@ -196,13 +196,13 @@ namespace solunar
 						continue;
 
 					// Apply scissor/clipping rectangle
-					g_renderDevice->setScissors(clip_min.x, clip_min.y, clip_max.x, clip_max.y);
+					g_renderDevice->SetScissors(clip_min.x, clip_min.y, clip_max.x, clip_max.y);
 
 					// Bind texture, Draw
 					ITexture2D* texture = (ITexture2D*)pcmd->GetTexID();
-					g_renderDevice->setTexture2D(0, texture);
-					g_renderDevice->setSampler(0, m_pFontSampler); // #TODO: THIS IS SHIT
-					g_renderDevice->drawIndexed(PM_TriangleList,  pcmd->IdxOffset + global_idx_offset, pcmd->ElemCount, pcmd->VtxOffset + global_vtx_offset);
+					g_renderDevice->SetTexture2D(0, texture);
+					g_renderDevice->SetSamplerState(0, m_pFontSampler); // #TODO: THIS IS SHIT
+					g_renderDevice->DrawIndexed(PM_TriangleList,  pcmd->IdxOffset + global_idx_offset, pcmd->ElemCount, pcmd->VtxOffset + global_vtx_offset);
 
 				}
 			}
@@ -234,7 +234,7 @@ namespace solunar
 			subResource.m_memoryPitch = desc.m_width * 4;
 			subResource.m_memorySlicePitch = 0;
 
-			m_pFontTexture = g_renderDevice->createTexture2D(desc, subResource);
+			m_pFontTexture = g_renderDevice->CreateTexture2D(desc, subResource);
 		}
 
 		// Store our identifier
@@ -251,7 +251,7 @@ namespace solunar
 			desc.m_wrapRepeat = TextureWrap::Repeat;
 			desc.m_anisotropyLevel = 1.0f;
 
-			m_pFontSampler = g_stateManager->createSamplerState(desc);
+			m_pFontSampler = g_stateManager->CreateSamplerState(desc);
 		}
 	}
 
@@ -280,7 +280,7 @@ namespace solunar
 			desc.m_bufferType = BufferType::ConstantBuffer;
 
 			SubresourceDesc subResource = {};
-			m_pVertexConstantBuffer = g_renderDevice->createBuffer(desc, subResource);
+			m_pVertexConstantBuffer = g_renderDevice->CreateBuffer(desc, subResource);
 		}
 
 		// Create the blending setup
@@ -353,20 +353,20 @@ namespace solunar
 		vp.m_width = (int)draw_data->DisplaySize.x;
 		vp.m_height = (int)draw_data->DisplaySize.y;
 		vp.m_x = vp.m_y = 0;
-		g_renderDevice->setViewport(&vp);
+		g_renderDevice->SetViewport(&vp);
 
 		// Setup shader and vertex buffers
 		unsigned int stride = sizeof(ImDrawVert);
 		unsigned int offset = 0;
-		g_renderDevice->setVertexBuffer(m_pVB, stride, offset);
-		g_renderDevice->setIndexBuffer(m_pIB, sizeof(ImDrawIdx) == 2 ? true : false);
-		g_renderDevice->setConstantBufferIndex(0, m_pVertexConstantBuffer);
+		g_renderDevice->SetVertexBuffer(m_pVB, stride, offset);
+		g_renderDevice->SetIndexBuffer(m_pIB, sizeof(ImDrawIdx) == 2 ? true : false);
+		g_renderDevice->SetConstantBufferIndex(0, m_pVertexConstantBuffer);
 		g_shaderManager->setShaderProgram(m_pShaderProgram);
 
 		// Setup blend state
 		const float blend_factor[4] = { 0.f, 0.f, 0.f, 0.f };
 		g_stateManager->setBlendState(m_pBlendState, blend_factor, 0xffffffff);
-		g_stateManager->setDepthStencilState(m_pDepthStencilState, 0);
+		g_stateManager->SetDepthStencilState(m_pDepthStencilState, 0);
 		g_stateManager->setRasterizerState(m_pRasterizerState);
 	}
 
@@ -579,7 +579,7 @@ namespace solunar
 		io.Fonts->AddFontFromFileTTF("data/textures/ui/system.ttf", 16.0f);
 	}
 
-	void ImGuiManager::init()
+	void ImGuiManager::Init()
 	{
 		IMGUI_CHECKVERSION();
 		ImGui::CreateContext();
@@ -596,12 +596,12 @@ namespace solunar
 		ImGui_ImplWin32_Init(appGetWindow());
 #endif // _WIN32
 
-		m_ImGuiRenderer.init();
+		m_ImGuiRenderer.Init();
 	}
 
-	void ImGuiManager::shutdown()
+	void ImGuiManager::Shutdown()
 	{
-		m_ImGuiRenderer.shutdown();
+		m_ImGuiRenderer.Shutdown();
 
 #ifdef _WIN32
 		ImGui_ImplWin32_Shutdown();
@@ -610,7 +610,7 @@ namespace solunar
 		ImGui::DestroyContext();
 	}
 
-	void ImGuiManager::beginFrame()
+	void ImGuiManager::BeginFrame()
 	{
 #ifdef _WIN32
 		ImGui_ImplWin32_NewFrame();
@@ -621,12 +621,12 @@ namespace solunar
 		ImGui::NewFrame();
 	}
 
-	void ImGuiManager::endFrame()
+	void ImGuiManager::EndFrame()
 	{
-		draw();
+		Draw();
 	}
 
-	void ImGuiManager::draw()
+	void ImGuiManager::Draw()
 	{
 		ImGui::Render();
 		m_ImGuiRenderer.renderDrawData(ImGui::GetDrawData());

@@ -11,11 +11,11 @@ namespace solunar
 		AudioSourceFMOD(const std::string& filename, FMOD::System* system);
 		~AudioSourceFMOD();
 
-		bool isPlaying() override;
+		bool IsPlaying() override;
 
-		void play() override;
-		void play(FMOD::ChannelGroup* channelGroup, bool looped = false);
-		void stop() override;
+		void Play() override;
+		void Play(FMOD::ChannelGroup* channelGroup, bool looped = false);
+		void Stop() override;
 
 		FMOD::Sound* getSound() { return m_sound; }
 		FMOD::Channel* getSoundChannel() { return m_soundChannel; }

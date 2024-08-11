@@ -9,15 +9,15 @@ extern GLenum getBufferMapping(BufferMapping mapping);
 
 GLBufferImpl::GLBufferImpl(const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc)
 {
-	create(bufferDesc, subresourceDesc);
+	Create(bufferDesc, subresourceDesc);
 }
 
 GLBufferImpl::~GLBufferImpl()
 {
-	destroy();
+	Destroy();
 }
 
-void GLBufferImpl::create(const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc)
+void GLBufferImpl::Create(const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc)
 {
 	Assert(bufferDesc.m_bufferMemorySize != 0);
 
@@ -28,18 +28,18 @@ void GLBufferImpl::create(const BufferDesc& bufferDesc, const SubresourceDesc& s
 		subresourceDesc.m_memory, getBufferAccess(bufferDesc.m_bufferAccess));
 }
 
-void GLBufferImpl::destroy()
+void GLBufferImpl::Destroy()
 {
 	glDeleteBuffers(1, &m_handle);
 }
 
-void* GLBufferImpl::map(BufferMapping mapping)
+void* GLBufferImpl::Map(BufferMapping mapping)
 {
 	void* ret = glMapNamedBufferEXT(m_handle, getBufferMapping(mapping));
 	return ret;
 }
 
-void GLBufferImpl::unmap()
+void GLBufferImpl::Unmap()
 {
 	glUnmapNamedBufferEXT(m_handle);
 }

@@ -7,9 +7,9 @@ namespace solunar {
 
 	//class MeshResource : public Content
 	//{
-	//	ImplementObject(MeshResource, Content);
+	//	IMPLEMENT_OBJECT(MeshResource, Content);
 	//public:
-	//	static void registerObject();
+	//	static void RegisterObject();
 
 	//public:
 	//	MeshResource();
@@ -18,17 +18,17 @@ namespace solunar {
 
 	class MeshComponent : public Component
 	{
-		ImplementObject(MeshComponent, Component);
+		IMPLEMENT_OBJECT(MeshComponent, Component);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 
 	public:
 		MeshComponent();
 		~MeshComponent();
 
-		virtual void loadXML(tinyxml2::XMLElement& element) override;
-		virtual void saveXML(tinyxml2::XMLElement& element) override;
-		void loadModel(const std::string& filename);
+		virtual void LoadXML(tinyxml2::XMLElement& element) override;
+		virtual void SaveXML(tinyxml2::XMLElement& element) override;
+		void LoadModel(const std::string& filename);
 
 		virtual void render();
 
@@ -41,13 +41,13 @@ namespace solunar {
 
 	class AnimatedMeshComponent : public MeshComponent
 	{
-		ImplementObject(AnimatedMeshComponent, MeshComponent);
+		IMPLEMENT_OBJECT(AnimatedMeshComponent, MeshComponent);
 	public:
 		AnimatedMeshComponent();
 		~AnimatedMeshComponent();
 
-		void loadXML(tinyxml2::XMLElement& element) override;
-		void loadModel(const std::string& filename);
+		void LoadXML(tinyxml2::XMLElement& element) override;
+		void LoadModel(const std::string& filename);
 	};
 
 }

@@ -7,16 +7,16 @@ namespace solunar {
 	
 	class MainMenuWorldComponent : public LogicComponent
 	{
-		ImplementObject(MainMenuWorldComponent, LogicComponent);
+		IMPLEMENT_OBJECT(MainMenuWorldComponent, LogicComponent);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 		
 	public:
 		MainMenuWorldComponent();
 		~MainMenuWorldComponent();
 		
 		// Component inheritance
-		void onWorldSet(World* world);
+		void OnWorldSet(World* world);
 	};
 	
 }

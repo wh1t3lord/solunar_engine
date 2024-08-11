@@ -23,11 +23,11 @@ public:
 	RmlRenderer();
 	~RmlRenderer();
 
-	void init();
-	void shutdown();
+	void Init();
+	void Shutdown();
 
-	void beginFrame();
-	void endFrame();
+	void BeginFrame();
+	void EndFrame();
 
 	// Rml::RenderInterface interface
 

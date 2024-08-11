@@ -91,8 +91,8 @@ namespace solunar
 	{
 		virtual ~IBufferBase() {}
 
-		virtual void* map(BufferMapping mapping) = 0;
-		virtual void  unmap() = 0;
+		virtual void* Map(BufferMapping mapping) = 0;
+		virtual void  Unmap() = 0;
 
 		virtual void updateSubresource(void* data, size_t size) = 0;
 

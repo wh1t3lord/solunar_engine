@@ -17,11 +17,11 @@ namespace solunar
 
 		void step(float delta);
 
-		btDynamicsWorld* getWorld() { return m_world; }
+		btDynamicsWorld* GetWorld() { return m_world; }
 
 		float getFixedTimeStep() { return m_stepTime; }
 
-		void toggleDebugDraw();
+		void ToggleDebugDraw();
 
 		void internalTick();
 

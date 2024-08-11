@@ -12,8 +12,8 @@ public:
 	ShockGameInterface();
 	~ShockGameInterface();
 
-	void initialize() override;
-	void shutdown() override;
+	void Initialize() override;
+	void Shutdown() override;
 };
 
 ShockGameInterface* getShockGameInterface();

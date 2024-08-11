@@ -16,7 +16,7 @@ namespace solunar
 class Debug
 {
 public:
-	static void initialize();
+	static void Initialize();
 
 	static void assertionFailed(
 		const char*,

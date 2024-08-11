@@ -17,7 +17,7 @@ PropertyManager::~PropertyManager()
 {
 }
 
-void PropertyManager::shutdown()
+void PropertyManager::Shutdown()
 {
 	for (auto it : m_properies) {
 		for (auto prop : it.second) {
@@ -28,50 +28,50 @@ void PropertyManager::shutdown()
 	m_properies.clear();
 }
 
-void PropertyManager::registerProperty(const TypeInfo* typeInfo, IProperty* propertyInstance)
+void PropertyManager::RegisterProperty(const TypeInfo* typeInfo, IProperty* propertyInstance)
 {
 	Assert(typeInfo);
 	Assert(propertyInstance);
 
 	// try to find vector
-	auto it = m_properies.find(typeInfo->getStringHash());
+	auto it = m_properies.find(typeInfo->GetStringHash());
 	if (it == m_properies.end())
 	{
 		std::vector<IProperty*> properties;
 		properties.push_back(propertyInstance);
-		m_properies.emplace(typeInfo->getStringHash(), properties);
+		m_properies.emplace(typeInfo->GetStringHash(), properties);
 	}
 	else
 	{
-		m_properies.find(typeInfo->getStringHash())->second.push_back(propertyInstance);
+		m_properies.find(typeInfo->GetStringHash())->second.push_back(propertyInstance);
 	}
 
-	Core::msg("PropertyManager: registered property %s for type %s", propertyInstance->getName(), typeInfo->getClassName());
+	Core::Msg("PropertyManager: registered property %s for type %s", propertyInstance->GetName(), typeInfo->GetClassName());
 }
 
-IProperty* PropertyManager::findProperty(const TypeInfo* typeInfo, const char* name)
+IProperty* PropertyManager::FindProperty(const TypeInfo* typeInfo, const char* name)
 {
-	Assert(m_properies.find(typeInfo->getStringHash()) != m_properies.end());
+	Assert(m_properies.find(typeInfo->GetStringHash()) != m_properies.end());
 
-	auto it = m_properies.find(typeInfo->getStringHash());
+	auto it = m_properies.find(typeInfo->GetStringHash());
 	for (auto prop : it->second)
 	{
-		if (strcmp(prop->getName(), name) == 0)
+		if (strcmp(prop->GetName(), name) == 0)
 			return prop;
 	}
 
 	return nullptr;
 }
 
-void PropertyManager::getTypeProperties(const TypeInfo* typeInfo, std::vector<IProperty*>& properties)
+void PropertyManager::GetTypeProperties(const TypeInfo* typeInfo, std::vector<IProperty*>& properties)
 {
-	auto it = m_properies.find(typeInfo->getStringHash());
+	auto it = m_properies.find(typeInfo->GetStringHash());
 	if (it != m_properies.end()) {
 		properties = it->second;
 	}
 }
 
-PropertyRegistrator* PropertyRegistrator::getInstance()
+PropertyRegistrator* PropertyRegistrator::GetInstance()
 {
 	static PropertyRegistrator s_propertyRegistrator;
 	return &s_propertyRegistrator;
@@ -85,12 +85,12 @@ PropertyRegistrator::~PropertyRegistrator()
 {
 }
 
-void PropertyRegistrator::addFunc(RegisterPropertiesFunc func)
+void PropertyRegistrator::AddFunc(RegisterPropertiesFunc func)
 {
 	m_funcs.push_back(func);
 }
 
-void PropertyRegistrator::registerClasses()
+void PropertyRegistrator::RegisterClasses()
 {
 	for (auto it : m_funcs)
 		it();

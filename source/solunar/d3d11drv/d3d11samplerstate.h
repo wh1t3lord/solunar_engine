@@ -13,8 +13,8 @@ public:
 	D3D11SamplerState(D3D11Device* device, const SamplerDesc& samplerDesc);
 	~D3D11SamplerState();
 
-	void create(D3D11Device* device, const SamplerDesc& samplerDesc);
-	void destroy();
+	void Create(D3D11Device* device, const SamplerDesc& samplerDesc);
+	void Destroy();
 
 	uint32_t getHandle() { return m_handle; }
 

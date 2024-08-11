@@ -9,20 +9,20 @@ namespace solunar {
 	
 	class GraphicsWorld : public Object
 	{
-		ImplementObject(GraphicsWorld, Object);
+		IMPLEMENT_OBJECT(GraphicsWorld, Object);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 		
 	public:
 		GraphicsWorld();
 		~GraphicsWorld();
 
-		void onWorldSet(World* world);
+		void OnWorldSet(World* world);
 
 		void addDrawable(DrawableComponent* drawable);
 		void removeDrawable(DrawableComponent* drawable);
 
-		LightManager* getLightManager() { return &m_lightManager; }
+		LightManager* GetLightManager() { return &m_lightManager; }
 
 		const std::vector<DrawableComponent*>& getDrawables() { return m_drawables; }
 

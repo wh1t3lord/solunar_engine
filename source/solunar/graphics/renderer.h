@@ -41,29 +41,29 @@ namespace solunar
 		void initFramebuffer(View* view);
 		void initInplaceResources();
 
-		virtual void init();
-		virtual void shutdown();
+		virtual void Init();
+		virtual void Shutdown();
 
 	//	void initForView(View* view);
 	
-		void setView(View* view) { m_view = view; }
-		View* getView() { return m_view; }
+		void SetView(View* view) { m_view = view; }
+		View* GetView() { return m_view; }
 
-		virtual void beginFrame();
-		virtual void endFrame();
+		virtual void BeginFrame();
+		virtual void EndFrame();
 
-		void renderWorld(View* view);
+		void RenderWorld(View* view);
 
-		void renderView(View* view);
-		void renderSky(View* view, SkyMeshComponent* skyMesh);
-		void setupLights(GraphicsWorld* graphicsWorld);
+		void RenderView(View* view);
+		void RenderSky(View* view, SkyMeshComponent* skyMesh);
+		void SetupLights(GraphicsWorld* graphicsWorld);
 	
 		virtual void bindMaterialForMesh(MeshComponent* mesh, Material* material, IMaterialInstance* materialInstance) = 0;
 
 		virtual void renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh) = 0;
 		virtual void renderShadows(View* view) = 0;
 
-		virtual void takeScreenshot() = 0;
+		virtual void TakeScreenshot() = 0;
 		
 		virtual void clearScreen() = 0;
 		virtual void clearRenderTarget( IRenderTarget* renderTarget ) = 0;
@@ -74,12 +74,12 @@ namespace solunar
 		void setRenderMode(RendererViewMode mode) { m_currentViewMode = mode; }
 		RendererViewMode getRenderMode() { return m_currentViewMode; }
 
-		void toggleShowingWireframe();
-		void toggleShowOctree();
+		void ToggleShowingWireframe();
+		void ToggleShowOctree();
 
 		IRenderTarget* getSwapChainRenderTarget() { return m_swapChainRenderTarget; }
 
-		void renderLoadscreen();
+		void RenderLoadscreen();
 
 	protected:
 		ITexture2D* m_screenColorTexture;
@@ -101,7 +101,7 @@ namespace solunar
 	void createRenderer();
 	void destroyRenderer();
 
-	std::weak_ptr<Material> getDefaultMaterial();
+	std::weak_ptr<Material> GetDefaultMaterial();
 
 	class ISamplerState;
 	extern ISamplerState* g_defaultSampler;

@@ -20,13 +20,13 @@ public:
 	GLRenderer();
 	~GLRenderer();
 
-	void init() override;
-	void shutdown() override;
+	void Init() override;
+	void Shutdown() override;
 
-	void beginFrame() override;
-	void endFrame() override;
+	void BeginFrame() override;
+	void EndFrame() override;
 	
-	void takeScreenshot() override;
+	void TakeScreenshot() override;
 
 	void bindMaterialForMesh(MeshComponent* mesh, Material* material, IMaterialInstance* materialInstance);
 

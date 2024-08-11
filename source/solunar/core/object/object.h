@@ -13,26 +13,26 @@ namespace solunar
 		TypeInfo(const char* name, StaticConstructor_t staticConstructor, size_t classSize, size_t classAlign, const TypeInfo* baseInfo);
 		~TypeInfo();
 
-		const char* getClassName() const { return m_name; }
-		const size_t getStringHash() const { return m_stringHash; }
+		const char* GetClassName() const { return m_name; }
+		const size_t GetStringHash() const { return m_stringHash; }
 
-		const StaticConstructor_t getStaticConstructor() const { return m_staticConstructor; }
-		const size_t getClassSize() const { return  m_classSize; }
-		const size_t getClassAlign() const { return  m_classAlign; }
+		const StaticConstructor_t GetStaticConstructor() const { return m_staticConstructor; }
+		const size_t GetClassSize() const { return  m_classSize; }
+		const size_t GetClassAlign() const { return  m_classAlign; }
 
-		const bool isA(const TypeInfo* typeInfo) const;
-		const bool isExactly(const TypeInfo* typeInfo) const;
+		const bool IsA(const TypeInfo* typeInfo) const;
+		const bool IsExactly(const TypeInfo* typeInfo) const;
 
 		template <typename T>
-		const bool isA() const
+		const bool IsA() const
 		{
-			return isA(T::getStaticTypeInfo());
+			return IsA(T::GetStaticTypeInfo());
 		}
 
 		template <typename T>
-		const bool isExactly() const
+		const bool IsExactly() const
 		{
-			return isExactly(T::getStaticTypeInfo());
+			return IsExactly(T::GetStaticTypeInfo());
 		}
 
 	public:
@@ -47,63 +47,64 @@ namespace solunar
 	};
 
 
-#define ImplementRootObject(typeName) \
+#define IMPLEMENT_ROOT_OBJECT(typeName) \
 	public: \
-		static void staticConstructor(void* ptr) { reinterpret_cast<typeName*>(ptr)->typeName::typeName(); } \
-		static const TypeInfo* getStaticTypeInfo() { static const TypeInfo s_typeInfo(#typeName, typeName::staticConstructor, sizeof(typeName), alignof(typeName), nullptr); return &s_typeInfo; } \
-		virtual const TypeInfo* getTypeInfo() { return getStaticTypeInfo();  }
+		static void StaticConstructor(void* ptr) { reinterpret_cast<typeName*>(ptr)->typeName::typeName(); } \
+		static const TypeInfo* GetStaticTypeInfo() { static const TypeInfo s_typeInfo(#typeName, typeName::StaticConstructor, sizeof(typeName), alignof(typeName), nullptr); return &s_typeInfo; } \
+		virtual const TypeInfo* GetTypeInfo() { return GetStaticTypeInfo();  }
 
-#define ImplementObject(typeName, baseTypeName) \
+#define IMPLEMENT_OBJECT(typeName, baseTypeName) \
 	public: \
-		static void staticConstructor(void* ptr) { reinterpret_cast<typeName*>(ptr)->typeName::typeName(); } \
-		static const TypeInfo* getStaticTypeInfo() { static const TypeInfo s_typeInfo(#typeName, typeName::staticConstructor, sizeof(typeName), alignof(typeName), baseTypeName::getStaticTypeInfo()); return &s_typeInfo; } \
-		virtual const TypeInfo* getTypeInfo() { return getStaticTypeInfo();  }
+		static void StaticConstructor(void* ptr) { reinterpret_cast<typeName*>(ptr)->typeName::typeName(); } \
+		static const TypeInfo* GetStaticTypeInfo() { static const TypeInfo s_typeInfo(#typeName, typeName::StaticConstructor, sizeof(typeName), alignof(typeName), baseTypeName::GetStaticTypeInfo()); return &s_typeInfo; } \
+		virtual const TypeInfo* GetTypeInfo() { return GetStaticTypeInfo();  }
 	
-#define ObjectGetTypeInfo(typeName) \
-	typeName::getStaticTypeInfo()
+#define OBJECT_GET_TYPEINFO(typeName) \
+	typeName::GetStaticTypeInfo()
 
 	class Object
 	{
-		ImplementRootObject(Object);
+		IMPLEMENT_ROOT_OBJECT(Object);
 	public:
 		Object();
 		virtual ~Object();
 
-		template <typename T>
-		bool isExactly()
+		bool IsExactly(const TypeInfo* classTypeInfo)
 		{
-			return (getTypeInfo()->getStringHash() == T::getStaticTypeInfo()->getStringHash());
+			return (GetTypeInfo()->GetStringHash() == classTypeInfo->GetStringHash());
 		}
 
-		bool isExactly(const TypeInfo* classTypeInfo)
+		bool IsA(const TypeInfo* classTypeInfo)
 		{
-			return (getTypeInfo()->getStringHash() == classTypeInfo->getStringHash());
-		}
-
-		template <typename T>
-		bool isA()
-		{
-			for (const TypeInfo* typeInfo = getTypeInfo(); typeInfo != nullptr; typeInfo = typeInfo->m_baseInfo)
-				if (typeInfo->m_stringHash == T::getStaticTypeInfo()->m_stringHash)
-					return true;
-
-			return false;
-		}
-
-		bool isA(const TypeInfo* classTypeInfo)
-		{
-			for (const TypeInfo* typeInfo = getTypeInfo(); typeInfo != nullptr; typeInfo = typeInfo->m_baseInfo)
+			for (const TypeInfo* typeInfo = GetTypeInfo(); typeInfo != nullptr; typeInfo = typeInfo->m_baseInfo)
 				if (typeInfo->m_stringHash == classTypeInfo->m_stringHash)
 					return true;
 
 			return false;
 		}
+
+		template <typename T>
+		bool IsExactly()
+		{
+			return (GetTypeInfo()->GetStringHash() == T::GetStaticTypeInfo()->GetStringHash());
+		}
+
+		template <typename T>
+		bool IsA()
+		{
+			for (const TypeInfo* typeInfo = GetTypeInfo(); typeInfo != nullptr; typeInfo = typeInfo->m_baseInfo)
+				if (typeInfo->m_stringHash == T::GetStaticTypeInfo()->m_stringHash)
+					return true;
+
+			return false;
+		}
+
 	};
 	
 	template <typename T>
 	T* dynamicCast(Object* object)
 	{
-		if (object->isA<T>())
+		if (object->IsA<T>())
 			return (T*)object;
 		
 		return nullptr;
@@ -112,7 +113,7 @@ namespace solunar
 	template <typename T>
 	std::shared_ptr<T> dynamicCastPtr(const std::shared_ptr<Object>& object)
 	{
-		if (object->isA<T>())
+		if (object->IsA<T>())
 			return std::static_pointer_cast<T>(object);
 		
 		return std::shared_ptr<T>();
@@ -121,7 +122,7 @@ namespace solunar
 	template <typename T>
 	std::weak_ptr<T> dynamicCastPtr(const std::shared_ptr<Object>& object)
 	{
-		if (object->isA<T>())
+		if (object->IsA<T>())
 			return std::static_pointer_cast<T>(object);
 
 		return std::weak_ptr<T>();
@@ -133,7 +134,7 @@ namespace solunar
 	{
 		if (std::shared_ptr<Object> objectPtr = object.lock())
 		{
-			if (objectPtr->isA<T>())
+			if (objectPtr->IsA<T>())
 			{		
 				return std::static_pointer_cast<T>(objectPtr);
 			}
@@ -147,7 +148,7 @@ namespace solunar
 	{
 		if (std::shared_ptr<U> objectPtr = object.lock())
 		{
-			if (objectPtr->isA<T>())
+			if (objectPtr->IsA<T>())
 			{
 				return std::static_pointer_cast<T>(objectPtr);
 			}
@@ -156,7 +157,7 @@ namespace solunar
 		return std::weak_ptr<T>();
 	}
 
-	void objectDeleter(Object* p);
+	void ObjectDeleter(Object* p);
 }
 
 #endif // !OBJECT_H

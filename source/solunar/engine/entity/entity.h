@@ -13,60 +13,58 @@ class Entity : public SerializableObject
 {
 	friend class World;
 public:
-	ImplementObject(Entity, SerializableObject);
-	DeclarePropertyRegister(Entity);
+	IMPLEMENT_OBJECT(Entity, SerializableObject);
+	DECLARE_PROPERTY_REGISTER(Entity);
 
 public:
 	Entity();
 	~Entity();
 
-	virtual void loadXML(tinyxml2::XMLElement& element);
-	virtual void saveXML(tinyxml2::XMLElement& element);
+	virtual void LoadXML(tinyxml2::XMLElement& element);
+	virtual void SaveXML(tinyxml2::XMLElement& element);
 
-	virtual void onWorldSet(World* world);
+	virtual void OnWorldSet(World* world);
 
-	void setRootEntity(Entity* node);
+	void SetRootEntity(Entity* node);
 
-	glm::vec3 getPosition()	const	{ return m_position; }
-	glm::quat getRotation()	const	{ return m_rotation; }
-	glm::vec3 getScale()	const	{ return m_scale; }
+	glm::vec3 GetPosition()	const	{ return m_position; }
+	glm::quat GetRotation()	const	{ return m_rotation; }
+	glm::vec3 GetScale()	const	{ return m_scale; }
 
-	void setPosition(const glm::vec3& pos) { m_position = pos; }
-	void setRotation(const glm::quat& rot) { m_rotation = rot; }
-	void setEulerRotation(const glm::vec3& rot);
-	void setScale(const glm::vec3& scale) { m_scale = scale; }
+	void SetPosition(const glm::vec3& pos) { m_position = pos; }
+	void SetRotation(const glm::quat& rot) { m_rotation = rot; }
+	void SetEulerRotation(const glm::vec3& rot);
+	void SetScale(const glm::vec3& scale) { m_scale = scale; }
 
-	void quaternionRotate(const glm::vec3& axis, float angle);
+	void QuaternionRotate(const glm::vec3& axis, float angle);
 
-	glm::mat4 getWorldTranslation();
-	glm::mat4 getLocalTranslation();
+	glm::mat4 GetWorldTranslation();
+	glm::mat4 GetLocalTranslation();
 
-	void setBoundingBox(const BoundingBox& boundingBox);
-	const BoundingBox& getLocalBoundingBox();
-	const BoundingBox& getBoundingBox();
+	void SetBoundingBox(const BoundingBox& boundingBox);
+	const BoundingBox& GetLocalBoundingBox();
+	const BoundingBox& GetBoundingBox();
 
-	Entity* createChild();
-	Entity* createChildEx(const TypeInfo* typeInfo);
+	Entity* CreateChild();
+	Entity* CreateChildEx(const TypeInfo* typeInfo);
 
-	Component* createComponentByTypeInfo(const TypeInfo* typeinfo);
+	Component* CreateComponentByTypeInfo(const TypeInfo* typeinfo);
+	Component* GetComponentByTypeInfo(const TypeInfo* typeinfo);
 
-	template <typename T>
-	T* createComponent();
-
-	Component* getComponentByTypeInfo(const TypeInfo* typeinfo);
-
-	template <typename T>
-	T* getComponent();
+	void AddComponent(Component* component);
+	void UpdateWorldTransform();
 
 	template <typename T>
-	inline std::vector<T*> getComponents();
+	T* CreateComponent();
 
-	void addComponent(Component* component);
+	template <typename T>
+	T* GetComponent();
 
-	void updateWorldTransform();
+	template <typename T>
+	inline std::vector<T*> GetComponents();
 
 private:
-	void transformBBox();
+	void TransformBBox();
 
 private:
 	typedef std::vector<Component*>::iterator ComponentIt;

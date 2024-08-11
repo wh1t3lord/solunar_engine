@@ -33,19 +33,19 @@ STDMETHODIMP D3D11Include::Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, 
 	includeFilename += "/";
 	includeFilename += pFileName;
 
-	DataStreamPtr stream = g_contentManager->openStream(includeFilename);
+	DataStreamPtr stream = g_contentManager->OpenStream(includeFilename);
 	if (!stream)
 		return E_FAIL;
 
-	stream->seek(Seek_End, 0);
-	long length = stream->tell();
-	stream->seek(Seek_Begin, 0);
+	stream->Seek(Seek_End, 0);
+	long length = stream->Tell();
+	stream->Seek(Seek_Begin, 0);
 
 	if (!length)
 		return E_FAIL;
 
 	void* fileBuffer = malloc(length);
-	stream->read(fileBuffer, length);
+	stream->Read(fileBuffer, length);
 
 	*ppData = fileBuffer;
 	*pBytes = (UINT)length;
@@ -86,7 +86,7 @@ ID3DBlob* createShaderFromText(const char* text, ShaderType shaderType, const ch
 		size_t iterator = definesStr.find_first_of('\n');
 		while (iterator != std::string::npos) {
 			std::string exactDefineStr = definesStr.substr(0, iterator);
-			Core::msg("createShaderFromText: %s", exactDefineStr.c_str());
+			Core::Msg("createShaderFromText: %s", exactDefineStr.c_str());
 			shderMacroStrings.push_back(exactDefineStr);
 			iterator = definesStr.find_first_of('\n', iterator);
 		}*/
@@ -125,7 +125,7 @@ ID3DBlob* createShaderFromText(const char* text, ShaderType shaderType, const ch
 			errorText += " ";
 		}
 
-		Core::msg("createShaderFromText: %s", errorText.c_str());
+		Core::Msg("createShaderFromText: %s", errorText.c_str());
 
 		//std::terminate();
 		//DebugBreak();
@@ -150,15 +150,15 @@ D3D11ShaderProgram::D3D11ShaderProgram(D3D11Device* device,
 	m_vertexShader(nullptr),
 	m_pixelShader(nullptr)
 {
-	create(device, vstext, pstext, defines, inputLayout, inputLayoutCount);
+	Create(device, vstext, pstext, defines, inputLayout, inputLayoutCount);
 }
 
 D3D11ShaderProgram::~D3D11ShaderProgram()
 {
-	destroy();
+	Destroy();
 }
 
-void D3D11ShaderProgram::create(D3D11Device* device, const char* vstext, const char* pstext, const char* defines /*= nullptr*/, InputLayoutDesc* inputLayout /*= nullptr*/, int inputLayoutCount /*= 0*/)
+void D3D11ShaderProgram::Create(D3D11Device* device, const char* vstext, const char* pstext, const char* defines /*= nullptr*/, InputLayoutDesc* inputLayout /*= nullptr*/, int inputLayoutCount /*= 0*/)
 {
 	ID3DBlob* vertexShaderBlob = createShaderFromText(vstext, ShaderType_Vertex, defines);
 	device->getDevice()->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), NULL, &m_vertexShader);
@@ -205,7 +205,7 @@ void D3D11ShaderProgram::create(D3D11Device* device, const char* vstext, const c
 	pixelShaderBlob = nullptr;
 }
 
-void D3D11ShaderProgram::destroy()
+void D3D11ShaderProgram::Destroy()
 {
 	if (m_pixelShader)
 	{
