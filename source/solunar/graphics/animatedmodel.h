@@ -62,7 +62,7 @@ struct AnimatedSubMesh
 	uint32_t m_verticesCount;
 	uint32_t m_indicesCount;
 
-	void create();
+	void Create();
 };
 
 struct AnimationSampler
@@ -118,18 +118,18 @@ struct BoneInfo
 
 class AnimatedModel : public ModelBase
 {
-	ImplementObject(AnimatedModel, ModelBase);
+	IMPLEMENT_OBJECT(AnimatedModel, ModelBase);
 public:
 	AnimatedModel();
 	~AnimatedModel();
 
-	static void registerObject();
+	static void RegisterObject();
 
-	void load(const std::shared_ptr<DataStream>& dataStream) override;
+	void Load(const std::shared_ptr<DataStream>& dataStream) override;
 	void load_GLTF(const std::shared_ptr<DataStream>& dataStream);
 
 	void createHw() override;
-	void releaseHw() override;
+	void ReleaseHw() override;
 
 	std::vector<AnimatedSubMesh*>& getAnimatedSubmehes() { return m_subMeshes; }
 
@@ -149,11 +149,11 @@ public:
 
 	glm::mat4 getNodeMatrix(int nodeId);
 
-	const BoundingBox& getBoundingBox();
+	const BoundingBox& GetBoundingBox();
 
 	/** Node accessing */
-	int getNodeByName(const std::string& name);
-	void setNodeScale(int nodeid, const glm::vec3& scale);
+	int GetNodeByName(const std::string& name);
+	void SetNodeScale(int nodeid, const glm::vec3& scale);
 
 private:
 	std::vector<AnimatedSubMesh*> m_subMeshes;
@@ -188,8 +188,8 @@ public:
 	AnimatedModelRenderer();
 	~AnimatedModelRenderer();
 
-	void init();
-	void shutdown();
+	void Init();
+	void Shutdown();
 
 	void render(AnimatedMeshComponent* model);
 

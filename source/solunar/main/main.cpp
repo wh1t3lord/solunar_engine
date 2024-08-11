@@ -18,7 +18,7 @@
 #include "backends/imgui_impl_win32.h"
 #include <engine/inputmanager_win32.h>
 
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
 namespace solunar
 {
@@ -38,15 +38,15 @@ namespace solunar
 
 	void appInit(int argc, char** argv)
 	{
-		g_commandLine.init(argc, argv);
+		g_commandLine.Init(argc, argv);
 
-		Core::init();
+		Core::Init();
 
 		// create game content device
 		g_gameContentDevice = mem_new<ContentDevice>("data");
 
 		// mount game content device
-		g_contentManager->mountDevice(g_gameContentDevice, "game");
+		g_contentManager->MountDevice(g_gameContentDevice, "game");
 	}
 
 	void appShutdown()
@@ -65,7 +65,7 @@ namespace solunar
 
 		UnregisterClassA("EngineWindowClass", NULL);
 
-		g_contentManager->unountDevice("game");
+		g_contentManager->UnmountDevice("game");
 
 		if (g_gameContentDevice)
 		{
@@ -73,7 +73,7 @@ namespace solunar
 			g_gameContentDevice = nullptr;
 		}
 
-		Core::shutdown();
+		Core::Shutdown();
 	}
 
 	BOOL g_fMouseInClient;
@@ -81,26 +81,26 @@ namespace solunar
 
 	void onLostFocus()
 	{
-		InputManager::getInstance()->setCursorCapture(false);
-		InputManager::getInstance()->setCursorHiding(false);
+		InputManager::GetInstance()->SetCursorCapture(false);
+		InputManager::GetInstance()->SetCursorHiding(false);
 
 		g_fGainedFocus = false;
 	}
 
-	void onGainedFocus()
+	void OnGainedFocus()
 	{
 		g_fGainedFocus = true;
 
 		if (g_engineData.m_shouldCaptureMouse)
-			InputManager::getInstance()->setCursorCapture(true);
+			InputManager::GetInstance()->SetCursorCapture(true);
 
 		if (g_engineData.m_shouldHideMouse)
-			InputManager::getInstance()->setCursorHiding(true);
+			InputManager::GetInstance()->SetCursorHiding(true);
 	}
 
 	LRESULT CALLBACK wndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	{
-		InputManager_Win32* inputManager = (InputManager_Win32*)InputManager::getInstance();
+		InputManager_Win32* inputManager = (InputManager_Win32*)InputManager::GetInstance();
 
 		switch (Msg)
 		{
@@ -111,14 +111,14 @@ namespace solunar
 		case WM_KEYDOWN:
 		{
 			Win32Keys::Keys key = static_cast<Win32Keys::Keys>(wParam);
-			inputManager->keyboardAction(static_cast<int>(getKeyFromWin32(key)), true);
+			inputManager->KeyboardAction(static_cast<int>(getKeyFromWin32(key)), true);
 			break;
 		}
 
 		case WM_KEYUP:
 		{
 			Win32Keys::Keys key = static_cast<Win32Keys::Keys>(wParam);
-			inputManager->keyboardAction(static_cast<int>(getKeyFromWin32(key)), false);
+			inputManager->KeyboardAction(static_cast<int>(getKeyFromWin32(key)), false);
 			break;
 		}
 
@@ -148,7 +148,7 @@ namespace solunar
 		}
 
 		//case WM_KILLFOCUS:
-		//	InputManager::getInstance()->setCursorCapture(false);
+		//	InputManager::GetInstance()->setCursorCapture(false);
 		//	break;
 
 		case WM_ACTIVATE:
@@ -156,7 +156,7 @@ namespace solunar
 			if (LOWORD(wParam) == WA_INACTIVE)
 				onLostFocus();
 			else
-				onGainedFocus();
+				OnGainedFocus();
 			
 			break;
 		}
@@ -170,25 +170,25 @@ namespace solunar
 		return DefWindowProcA(hWnd, Msg, wParam, lParam);
 	}
 
-	void inputUpdate()
+	void InputUpdate()
 	{
 		if (g_fGainedFocus)
 		{
 			if (g_engineData.m_shouldCaptureMouse)
-				InputManager::getInstance()->setCursorCapture(true);
+				InputManager::GetInstance()->SetCursorCapture(true);
 
 			if (g_engineData.m_shouldHideMouse)
-				InputManager::getInstance()->setCursorHiding(true);
+				InputManager::GetInstance()->SetCursorHiding(true);
 		}
 	}
 
-	void createEngineView()
+	void CreateEngineView()
 	{
 		std::string optionsFilename = "GameSettings.ini";
 		if (!g_graphicsOptions.loadSettings(optionsFilename))
 		{
 			g_graphicsOptions.applyDefaultOptions();
-			g_graphicsOptions.saveSettings(optionsFilename);
+			g_graphicsOptions.SaveSettings(optionsFilename);
 		}
 
 		// create window
@@ -222,7 +222,7 @@ namespace solunar
 		g_engineView->m_zfar = 10000.0f;
 		g_engineView->updateInternalValues();
 
-		CameraProxy::getInstance()->setView(g_engineView);
+		CameraProxy::GetInstance()->SetView(g_engineView);
 	}
 
 	void appPresent()
@@ -240,21 +240,21 @@ namespace solunar
 		return g_engineView;
 	}
 
-	void mainLoop(EngineLoop* engineLoop)
+	void MainLoop(EngineLoop* engineLoop)
 	{
-		MSG msg = {};
-		while (msg.message != WM_QUIT)
+		MSG Msg = {};
+		while (Msg.message != WM_QUIT)
 		{
-			if (PeekMessageA(&msg, 0, 0, 0, PM_REMOVE))
+			if (PeekMessageA(&Msg, 0, 0, 0, PM_REMOVE))
 			{
-				TranslateMessage(&msg);
-				DispatchMessageA(&msg);
+				TranslateMessage(&Msg);
+				DispatchMessageA(&Msg);
 			}
 			else
 			{
-				inputUpdate();
+				InputUpdate();
 
-				if (!engineLoop->update())
+				if (!engineLoop->Update())
 					break;
 			}
 		}
@@ -270,9 +270,9 @@ namespace solunar
 		appInit(argc, argv);
 		
 		EngineLoop engineLoop;
-		engineLoop.initialize();
+		engineLoop.Initialize();
 
-		mainLoop(&engineLoop);
+		MainLoop(&engineLoop);
 #if 0
 		/*while (!glfwWindowShouldClose(g_engineWindow))
 		{
@@ -283,9 +283,9 @@ namespace solunar
 		}*/
 #endif
 
-		Core::msg("Quiting from engine loop ...");
+		Core::Msg("Quiting from engine loop ...");
 
-		engineLoop.shutdown();
+		engineLoop.Shutdown();
 		
 		appShutdown();
 

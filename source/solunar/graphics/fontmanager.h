@@ -36,11 +36,11 @@ public:
 	FontImpl();
 	~FontImpl();
 
-	void create(const char* filename, float size);
-	void destroy();
+	void Create(const char* filename, float size);
+	void Destroy();
 
 	// Inherited via IFont
-	void drawText(const char* text, float x, float y, const glm::vec4& color) override;
+	void DrawText(const char* text, float x, float y, const glm::vec4& color) override;
 
 private:
 	stbtt_bakedchar m_fontChars[96];
@@ -53,19 +53,18 @@ public:
 	FontManager();
 	~FontManager();
 	
-	void initialize() override;
-	void shutdown() override;
+	void Initialize() override;
+	void Shutdown() override;
 
-	IFont* createFont(const char* filename, float size) override;
+	IFont* CreateFont(const char* filename, float size) override;
 
-	void drawFontText(IFont* font, const char* text, float x, float y, const glm::vec4& color) override;
+	void DrawFontText(IFont* font, const char* text, float x, float y, const glm::vec4& color) override;
+	void DrawSystemFont(const char* text, float x, float y, const glm::vec4& color) override;
 
-	void drawSystemFont(const char* text, float x, float y, const glm::vec4& color) override;
-
-	void flushPrimitives() override;
+	void FlushPrimitives() override;
 
 private:
-	void initPrivate();
+	void InitPrivate();
 
 private:
 	struct StringDrawInfo

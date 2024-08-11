@@ -42,19 +42,19 @@ namespace solunar
 
 	class LightComponent : public Component
 	{
-		ImplementObject(LightComponent, Component);
-		DeclarePropertyRegister(LightComponent);
+		IMPLEMENT_OBJECT(LightComponent, Component);
+		DECLARE_PROPERTY_REGISTER(LightComponent);
 	public:
 		LightComponent();
 		~LightComponent();
 
-		static void registerObject();
+		static void RegisterObject();
 		
-		void onEntitySet(Entity* entity) override;
-		void onEntityRemove() override;
+		void OnEntitySet(Entity* entity) override;
+		void OnEntityRemove() override;
 
-		virtual void loadXML(tinyxml2::XMLElement& element);
-		virtual void saveXML(tinyxml2::XMLElement& element);
+		virtual void LoadXML(tinyxml2::XMLElement& element);
+		virtual void SaveXML(tinyxml2::XMLElement& element);
 
 		glm::vec3 m_color;
 		glm::vec3 m_ambientColor;
@@ -67,20 +67,20 @@ namespace solunar
 
 	class PointLightComponent : public LightComponent
 	{
-		ImplementObject(PointLightComponent, LightComponent);
+		IMPLEMENT_OBJECT(PointLightComponent, LightComponent);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 
-		void loadXML(tinyxml2::XMLElement& element) override;
-		void saveXML(tinyxml2::XMLElement& element) override;
+		void LoadXML(tinyxml2::XMLElement& element) override;
+		void SaveXML(tinyxml2::XMLElement& element) override;
 	};
 
 	class DirectionalLightComponent : public LightComponent
 	{
-		ImplementObject(DirectionalLightComponent, LightComponent);
-		DeclarePropertyRegister(DirectionalLightComponent);
+		IMPLEMENT_OBJECT(DirectionalLightComponent, LightComponent);
+		DECLARE_PROPERTY_REGISTER(DirectionalLightComponent);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 
 		glm::vec3 m_direction;
 	};

@@ -21,7 +21,7 @@ namespace solunar {
 		virtual ~IRenderTarget() {}
 
 		//! Release the render target.
-		virtual void release() = 0;
+		virtual void Release() = 0;
 
 		//! Set debug name.
 		virtual void setDebugName(const char* debugName) = 0;

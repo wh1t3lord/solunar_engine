@@ -15,9 +15,9 @@ namespace solunar
 	{
 	}
 
-	void InputManager_Win32::update()
+	void InputManager_Win32::Update()
 	{
-		InputManager::update();
+		InputManager::Update();
 
 		if (m_lastCursorHiding != m_hideCursor)
 		{
@@ -43,7 +43,7 @@ namespace solunar
 			int halfHeight = height / 2;
 
 			POINT pt = {};
-			GetCursorPos(&pt);
+			::GetCursorPos(&pt);
 			
 			SetCursorPos(halfWidth, halfHeight);
 
@@ -68,17 +68,17 @@ namespace solunar
 #if 0
 			char buf[256];
 			snprintf(buf, sizeof(buf), "%i %i", pt.x, pt.y);
-			g_fontManager->drawSystemFontShadowed(buf, 300, 300, glm::vec4(1.0f, 1.0f,1.0f, 1.0f));
+			g_fontManager->DrawSystemFontShadowed(buf, 300, 300, glm::vec4(1.0f, 1.0f,1.0f, 1.0f));
 #endif
 		}
 		else
 		{
-			resetDelta();
+			ResetDelta();
 		//	ShowCursor(TRUE);
 		}
 	}
 
-	void InputManager_Win32::keyboardAction(uint32_t keyId, bool state)
+	void InputManager_Win32::KeyboardAction(uint32_t keyId, bool state)
 	{
 		if (keyId >= 420)
 			return;

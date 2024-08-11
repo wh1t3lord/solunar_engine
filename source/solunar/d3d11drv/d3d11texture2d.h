@@ -13,8 +13,8 @@ public:
 	D3D11Texture2D(D3D11Device* device, const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc);
 	~D3D11Texture2D();
 
-	void create(D3D11Device* device, const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc);
-	void destroy();
+	void Create(D3D11Device* device, const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc);
+	void Destroy();
 
 	void updateTexture(const void* data, int rowPitch, int depthPitch) override;
 

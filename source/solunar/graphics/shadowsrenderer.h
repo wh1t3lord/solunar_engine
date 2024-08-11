@@ -17,8 +17,8 @@ namespace solunar
 		ShadowsRenderer();
 		~ShadowsRenderer();
 
-		void init();
-		void shutdown();
+		void Init();
+		void Shutdown();
 
 		void beginRender();
 		void renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh);

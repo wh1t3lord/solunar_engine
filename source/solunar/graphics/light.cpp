@@ -7,14 +7,14 @@
 
 namespace solunar
 {
-	BeginPropertyRegister(LightComponent)
+	BEGIN_PROPERTY_REGISTER(LightComponent)
 	{
-		RegisterProperty(LightComponent, PropertyVector3, m_color);
-		RegisterProperty(LightComponent, PropertyVector3, m_ambientColor);
-		RegisterProperty(LightComponent, PropertyVector3, m_specularColor);
-		RegisterProperty(LightComponent, PropertyFloat, m_radius);
+		REGISTER_PROPERTY(LightComponent, PropertyVector3, m_color);
+		REGISTER_PROPERTY(LightComponent, PropertyVector3, m_ambientColor);
+		REGISTER_PROPERTY(LightComponent, PropertyVector3, m_specularColor);
+		REGISTER_PROPERTY(LightComponent, PropertyFloat, m_radius);
 	}
-	EndPropertyRegister(LightComponent)
+	END_PROPERTY_REGISTER(LightComponent)
 
 	LightComponent::LightComponent()
 	{
@@ -29,42 +29,42 @@ namespace solunar
 	{
 	}
 
-	void LightComponent::registerObject()
+	void LightComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<LightComponent>();
+		g_typeManager->RegisterObject<LightComponent>();
 	}
 
-	void LightComponent::onEntitySet(Entity* entity)
+	void LightComponent::OnEntitySet(Entity* entity)
 	{
-		Component::onEntitySet(entity);
+		Component::OnEntitySet(entity);
 
-		World* world = getWorld();
+		World* world = GetWorld();
 		if (world)
 		{
-			if (GraphicsWorld* gfxWorld = world->getGraphicsWorld())
+			if (GraphicsWorld* gfxWorld = world->GetGraphicsWorld())
 			{
-				gfxWorld->getLightManager()->addLight(this);
+				gfxWorld->GetLightManager()->addLight(this);
 			}
 		}
 	}
 
-	void LightComponent::onEntityRemove()
+	void LightComponent::OnEntityRemove()
 	{
-		World* world = getWorld();
+		World* world = GetWorld();
 		if (world)
 		{
-			if (GraphicsWorld* gfxWorld = world->getGraphicsWorld())
+			if (GraphicsWorld* gfxWorld = world->GetGraphicsWorld())
 			{
-				gfxWorld->getLightManager()->removeLight(this);
+				gfxWorld->GetLightManager()->removeLight(this);
 			}
 		}
 		
-		Component::onEntityRemove();
+		Component::OnEntityRemove();
 	}
 
-	void LightComponent::loadXML(tinyxml2::XMLElement& element)
+	void LightComponent::LoadXML(tinyxml2::XMLElement& element)
 	{
-		Component::loadXML(element);
+		Component::LoadXML(element);
 
 		tinyxml2::XMLElement* ambientColorElement = element.FirstChildElement("AmbientColor");
 		if (ambientColorElement)
@@ -104,18 +104,18 @@ namespace solunar
 		}
 	}
 
-	void LightComponent::saveXML(tinyxml2::XMLElement& element)
+	void LightComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
 	}
 
-	void PointLightComponent::registerObject()
+	void PointLightComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<PointLightComponent>();
+		g_typeManager->RegisterObject<PointLightComponent>();
 	}
 
-	void PointLightComponent::loadXML(tinyxml2::XMLElement& element)
+	void PointLightComponent::LoadXML(tinyxml2::XMLElement& element)
 	{
-		LightComponent::loadXML(element);
+		LightComponent::LoadXML(element);
 
 		tinyxml2::XMLElement* radiusElement = element.FirstChildElement("Radius");
 		Assert(radiusElement && "Point light require radius element!");
@@ -126,19 +126,19 @@ namespace solunar
 		m_radius = radiusValue->FloatValue();
 	}
 
-	void PointLightComponent::saveXML(tinyxml2::XMLElement& element)
+	void PointLightComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
 	}
 
-	BeginPropertyRegister(DirectionalLightComponent)
+	BEGIN_PROPERTY_REGISTER(DirectionalLightComponent)
 	{
-		RegisterProperty(DirectionalLightComponent, PropertyVector3, m_direction);
+		REGISTER_PROPERTY(DirectionalLightComponent, PropertyVector3, m_direction);
 	}
-	EndPropertyRegister(DirectionalLightComponent)
+	END_PROPERTY_REGISTER(DirectionalLightComponent)
 
-	void DirectionalLightComponent::registerObject()
+	void DirectionalLightComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<DirectionalLightComponent>();
+		g_typeManager->RegisterObject<DirectionalLightComponent>();
 	}
 
 }

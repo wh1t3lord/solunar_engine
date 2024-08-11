@@ -16,7 +16,7 @@ namespace solunar
 {
 	static void stbi_write_callback(void* context, void* data, int size)
 	{
-		g_fileSystem->write(static_cast<FileHandle>(context), data, size);
+		g_fileSystem->Write(static_cast<FileHandle>(context), data, size);
 	}
 
 	void Image::freeImageData(void* data)
@@ -49,15 +49,15 @@ namespace solunar
 	{
 		stbi_set_flip_vertically_on_load(false);
 
-		FileHandle file = g_fileSystem->open(filename.c_str());
-		g_fileSystem->seek(file, Seek_End, 0);
-		size_t fileSize = g_fileSystem->tell(file);
-		g_fileSystem->seek(file, Seek_Begin, 0);
+		FileHandle file = g_fileSystem->Open(filename.c_str());
+		g_fileSystem->Seek(file, Seek_End, 0);
+		size_t fileSize = g_fileSystem->Tell(file);
+		g_fileSystem->Seek(file, Seek_Begin, 0);
 
 		uint8_t* fileData = mem_array<uint8_t>(static_cast<size_t>(fileSize));
 		Assert2(fileData, "Failed to allocate memory for texture data. Not enough space?");
 
-		g_fileSystem->read(file, fileData, fileSize);
+		g_fileSystem->Read(file, fileData, fileSize);
 
 		m_data = stbi_load_from_memory(static_cast<stbi_uc*>(fileData), static_cast<int>(fileSize),
 			&m_width, &m_height, &m_channels, STBI_rgb_alpha);
@@ -70,14 +70,14 @@ namespace solunar
 	{
 		stbi_set_flip_vertically_on_load(true);
 
-		stream->seek(Seek_End, 0);
-		size_t fileSize = stream->tell();
-		stream->seek(Seek_Begin, 0);
+		stream->Seek(Seek_End, 0);
+		size_t fileSize = stream->Tell();
+		stream->Seek(Seek_Begin, 0);
 
 		uint8_t* fileData = mem_array<uint8_t>(static_cast<size_t>(fileSize));
 		Assert2(fileData, "Failed to allocate memory for texture data. Not enough space?");
 
-		stream->read(fileData, fileSize);
+		stream->Read(fileData, fileSize);
 
 		m_data = stbi_load_from_memory(static_cast<stbi_uc*>(fileData), static_cast<int>(fileSize),
 			&m_width, &m_height, &m_channels, STBI_rgb_alpha);
@@ -90,14 +90,14 @@ namespace solunar
 	{
 		Assert2(0, "DDS Loading is not implemented.");
 
-		stream->seek(Seek_End, 0);
-		size_t fileSize = stream->tell();
-		stream->seek(Seek_Begin, 0);
+		stream->Seek(Seek_End, 0);
+		size_t fileSize = stream->Tell();
+		stream->Seek(Seek_Begin, 0);
 
 		uint8_t* fileData = mem_array<uint8_t>(static_cast<size_t>(fileSize));
 		Assert2(fileData, "Failed to allocate memory for texture data. Not enough space?");
 
-		stream->read(fileData, fileSize);
+		stream->Read(fileData, fileSize);
 
 		//m_data = stbi_load_from_memory(static_cast<stbi_uc*>(fileData), static_cast<int>(fileSize),
 		//	&m_width, &m_height, &m_channels, STBI_rgb_alpha);
@@ -111,9 +111,9 @@ namespace solunar
 	//{
 	//	stbi_set_flip_vertically_on_load(true);
 
-	//	stream->seek(FileSeek::End, 0);
+	//	stream->Seek(FileSeek::End, 0);
 	//	long fileSize = stream->tell();
-	//	stream->seek(FileSeek::Begin, 0);
+	//	stream->Seek(FileSeek::Begin, 0);
 
 	//	uint8_t* fileData = mem_array<uint8_t>(static_cast<size_t>(fileSize));
 	//	ASSERT(fileData && "Failed to allocate memory for texture data. Not enough space?");
@@ -135,9 +135,9 @@ namespace solunar
 		m_channels = channels;
 	}
 
-	void Image::save(const std::string& filename)
+	void Image::Save(const std::string& filename)
 	{
-		FileHandle file = g_fileSystem->create(filename.c_str());
+		FileHandle file = g_fileSystem->Create(filename.c_str());
 
 		stbi_flip_vertically_on_write(m_flip);
 
@@ -151,9 +151,9 @@ namespace solunar
 		else if (ext == "jpg")
 			stbi_write_jpg_to_func(stbi_write_callback, (void*)file, m_width, m_height, m_channels, m_data, 90);
 		else
-			throw std::logic_error("Image::save: unknowed format to save!");
+			throw std::logic_error("Image::Save: unknowed format to Save!");
 
-		g_fileSystem->close(file);
+		g_fileSystem->Close(file);
 	}
 
 	//void Image::save(const std::shared_ptr<DataStream>& stream)

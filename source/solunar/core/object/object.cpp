@@ -26,21 +26,21 @@ namespace solunar
 		m_name = nullptr;
 	}
 
-	const bool TypeInfo::isA(const TypeInfo* typeInfo) const
+	const bool TypeInfo::IsA(const TypeInfo* typeInfo) const
 	{
 		Assert(typeInfo);
 
 		for (const TypeInfo* it = this; it != nullptr; it = it->m_baseInfo)
-			if (it->getStringHash() == typeInfo->getStringHash())
+			if (it->GetStringHash() == typeInfo->GetStringHash())
 				return true;
 
 		return false;
 	}
 
-	const bool TypeInfo::isExactly(const TypeInfo* typeInfo) const
+	const bool TypeInfo::IsExactly(const TypeInfo* typeInfo) const
 	{
 		Assert(typeInfo);
-		return (getStringHash() == typeInfo->getStringHash());
+		return (GetStringHash() == typeInfo->GetStringHash());
 	}
 
 
@@ -52,7 +52,7 @@ namespace solunar
 	{
 	}
 
-	void objectDeleter(Object* p)
+	void ObjectDeleter(Object* p)
 	{
 		mem_delete(p);
 		p = nullptr;

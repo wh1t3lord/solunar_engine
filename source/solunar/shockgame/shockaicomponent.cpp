@@ -8,13 +8,13 @@
 namespace solunar
 {
 
-BeginPropertyRegister(ShockAIComponent)
+BEGIN_PROPERTY_REGISTER(ShockAIComponent)
 {
-	RegisterProperty(ShockAIComponent, PropertyInt, m_aiType);
-	RegisterProperty(ShockAIComponent, PropertyBool, m_fire);
-	RegisterProperty(ShockAIComponent, PropertyBool, m_disable);
+	REGISTER_PROPERTY(ShockAIComponent, PropertyInt, m_aiType);
+	REGISTER_PROPERTY(ShockAIComponent, PropertyBool, m_fire);
+	REGISTER_PROPERTY(ShockAIComponent, PropertyBool, m_disable);
 }
-EndPropertyRegister(ShockAIComponent)
+END_PROPERTY_REGISTER(ShockAIComponent)
 
 ShockAIComponent::ShockAIComponent() :
 	m_aiType(ShockAIType_None),
@@ -27,7 +27,7 @@ ShockAIComponent::~ShockAIComponent()
 {
 }
 
-void ShockAIComponent::update(float dt)
+void ShockAIComponent::Update(float dt)
 {
 	if (m_aiType == ShockAIType_Camera)
 	{
@@ -38,21 +38,21 @@ void ShockAIComponent::update(float dt)
 void ShockAIComponent::updateAICamera(float dt)
 {
 	// find player
-	std::vector<Entity*> players = getWorld()->getEntityManager().getEntitiesWithComponent<ShockPlayerController>();
+	std::vector<Entity*> players = GetWorld()->GetEntityManager().GetEntitiesWithComponent<ShockPlayerController>();
 
 	Entity* player = players[0];
 
 	// check distance to the camera
-	glm::vec3 distance = player->getPosition() - getEntity()->getPosition();
+	glm::vec3 distance = player->GetPosition() - GetEntity()->GetPosition();
 
 	char aiDebugText[64];
 	snprintf(aiDebugText, sizeof(aiDebugText), "distance %.2f %.2f %.2f",
 		distance.x, distance.y, distance.z);
 
-	g_fontManager->drawSystemFontShadowed(aiDebugText, 0, 100, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	g_fontManager->DrawSystemFontShadowed(aiDebugText, 0, 100, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 	snprintf(aiDebugText, sizeof(aiDebugText), "length %.2f", glm::length(distance));
-	g_fontManager->drawSystemFontShadowed(aiDebugText, 0, 120, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+	g_fontManager->DrawSystemFontShadowed(aiDebugText, 0, 120, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 
 	if (glm::length(distance) < 8.0f)
@@ -62,20 +62,20 @@ void ShockAIComponent::updateAICamera(float dt)
 
 	if (m_fire && !m_disable)
 	{
-		Entity* projectile = Engine::ms_world->createEntity();
-		projectile->setPosition(getEntity()->getPosition());
+		Entity* projectile = Engine::ms_world->CreateEntity();
+		projectile->SetPosition(GetEntity()->GetPosition());
 
-		ShockProjectileComponent* projectileComponent = projectile->createComponent<ShockProjectileComponent>();
+		ShockProjectileComponent* projectileComponent = projectile->CreateComponent<ShockProjectileComponent>();
 		//projectileComponent->onSpawn(glm::normalize(player->getPosition()), glm::vec3(1.0f), "test");
-		projectileComponent->onSpawn(player->getPosition(), glm::vec3(1.0f), "test");
+		projectileComponent->onSpawn(player->GetPosition(), glm::vec3(1.0f), "test");
 
 		m_fire = false;
 		m_disable = true;
 	}
 
 	// rotate camera torwads to player
-	glm::quat rotation = glm::quatLookAt(glm::normalize(player->getPosition() - getEntity()->getPosition()), glm::vec3(0.0f, 1.0f, 0.0f));
-	getEntity()->setRotation(glm::slerp(getEntity()->getRotation(), rotation, dt * 0.8f));
+	glm::quat rotation = glm::quatLookAt(glm::normalize(player->GetPosition() - GetEntity()->GetPosition()), glm::vec3(0.0f, 1.0f, 0.0f));
+	GetEntity()->SetRotation(glm::slerp(GetEntity()->GetRotation(), rotation, dt * 0.8f));
 }
 
 void ShockAIComponent::updateFire(float dt)
@@ -83,7 +83,7 @@ void ShockAIComponent::updateFire(float dt)
 
 }
 
-void ShockAIComponent::loadXML(tinyxml2::XMLElement& element)
+void ShockAIComponent::LoadXML(tinyxml2::XMLElement& element)
 {
 	const tinyxml2::XMLElement* aitypeElement = element.FirstChildElement("AIType");
 
@@ -94,7 +94,7 @@ void ShockAIComponent::loadXML(tinyxml2::XMLElement& element)
 		m_aiType = getShockAITypeFromString(aitypeString);
 }
 
-void ShockAIComponent::saveXML(tinyxml2::XMLElement& element)
+void ShockAIComponent::SaveXML(tinyxml2::XMLElement& element)
 {
 	std::string aitypeString = shockAITypeToString(m_aiType);
 

@@ -8,8 +8,8 @@ namespace solunar {
 class PhysicsDebugDraw : public btIDebugDraw
 {
 public:
-	void init();
-	void shutdown();
+	void Init();
+	void Shutdown();
 
 	// btIDebugDraw inherit
 	void drawLine(const btVector3& from, const btVector3& to, const btVector3& color) override;

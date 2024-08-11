@@ -75,15 +75,15 @@ D3D12BufferImpl::D3D12BufferImpl(D3D12Device* device, const BufferDesc& bufferDe
 	memset(&m_vertexBufferView, 0, sizeof(m_vertexBufferView));
 	memset(&m_indexBufferView, 0, sizeof(m_indexBufferView));
 
-	create(device, bufferDesc, subresourceDesc);
+	Create(device, bufferDesc, subresourceDesc);
 }
 
 D3D12BufferImpl::~D3D12BufferImpl()
 {
-	destroy();
+	Destroy();
 }
 
-void D3D12BufferImpl::create(D3D12Device* device, const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc)
+void D3D12BufferImpl::Create(D3D12Device* device, const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc)
 {
 	Assert2(device, "Failed to create buffer without initialized device.");
 	m_device = device;
@@ -138,7 +138,7 @@ void D3D12BufferImpl::create(D3D12Device* device, const BufferDesc& bufferDesc, 
 	}
 }
 
-void D3D12BufferImpl::destroy()
+void D3D12BufferImpl::Destroy()
 {
 	memset(&m_vertexBufferView, 0, sizeof(m_vertexBufferView));
 
@@ -151,7 +151,7 @@ void D3D12BufferImpl::destroy()
 	m_device = nullptr;
 }
 
-void* D3D12BufferImpl::map(BufferMapping mapping)
+void* D3D12BufferImpl::Map(BufferMapping mapping)
 {
 	UINT8* data = nullptr;
 	D3D12_RANGE readRange = { 0, 0 };        // We do not intend to read from this resource on the CPU.
@@ -159,7 +159,7 @@ void* D3D12BufferImpl::map(BufferMapping mapping)
 	return data;
 }
 
-void D3D12BufferImpl::unmap()
+void D3D12BufferImpl::Unmap()
 {
 	m_buffer->Unmap(0, nullptr);
 }

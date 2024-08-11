@@ -41,7 +41,7 @@ namespace solunar {
 	bool g_modelConvert = false;
 	std::string g_modelConvertName;
 
-	void initEngineCommandLine()
+	void InitEngineCommandLine()
 	{
 		if (g_commandLine.hasOption("-quit"))
 			g_quitAtStart = true;
@@ -71,7 +71,7 @@ namespace solunar {
 		g_forceQuit = true;
 	}
 
-	void exportClassesForEditor()
+	void ExportClassesForEditor()
 	{
 		tinyxml2::XMLDocument doc;
 
@@ -79,23 +79,23 @@ namespace solunar {
 		doc.InsertFirstChild(pRoot);
 
 		std::vector<const TypeInfo*> registeredTypes;
-		TypeManager::getInstance()->getRegisteredTypes(registeredTypes);
+		TypeManager::GetInstance()->GetRegisteredTypes(registeredTypes);
 
 		for (auto it : registeredTypes)
 		{
-			if (!it->isA<Component>())
+			if (!it->IsA<Component>())
 				continue;
 
 			tinyxml2::XMLElement* component = doc.NewElement("Class");
-			component->SetAttribute("classname", it->getClassName());
+			component->SetAttribute("classname", it->GetClassName());
 			
 			if (it->m_baseInfo)
-				component->SetAttribute("baseClassname", it->m_baseInfo->getClassName());
+				component->SetAttribute("baseClassname", it->m_baseInfo->GetClassName());
 			
 			pRoot->InsertFirstChild(component);
 
 			std::vector<IProperty*> properties;
-			PropertyManager::getInstance()->getTypeProperties(it, properties);
+			PropertyManager::GetInstance()->GetTypeProperties(it, properties);
 			if (!properties.empty())
 			{
 				tinyxml2::XMLElement* propertiesElement = doc.NewElement("Properties");
@@ -106,9 +106,9 @@ namespace solunar {
 					tinyxml2::XMLElement* propertyElement = doc.NewElement("Property");
 					propertiesElement->InsertFirstChild(propertyElement);
 
-					propertyElement->SetAttribute("name", prop->getName());
+					propertyElement->SetAttribute("name", prop->GetName());
 
-					PropertyType propertyType = prop->getType();
+					PropertyType propertyType = prop->GetType();
 					switch (propertyType)
 					{
 					case PropertyType_Bool:
@@ -152,13 +152,13 @@ namespace solunar {
 		doc.SaveFile("editor_classes.xml");
 	}
 
-	void engineDebugOverlay()
+	void ShowEngineDebugOverlay()
 	{
 		if (ImGui::BeginMainMenuBar())
 		{
 			if (ImGui::BeginMenu("Engine"))
 			{
-				if (ImGui::MenuItem("Toggle Physics Debug Draw")) { if (Engine::ms_world) Engine::ms_world->togglePhysicsDebugDraw(); }
+				if (ImGui::MenuItem("Toggle Physics Debug Draw")) { if (Engine::ms_world) Engine::ms_world->TogglePhysicsDebugDraw(); }
 				if (ImGui::MenuItem("Entity list")) { g_showEntityList = !g_showEntityList; }
 				if (ImGui::MenuItem("Quit")) { g_forceQuit = true; }
 
@@ -200,7 +200,7 @@ namespace solunar {
 
 	static std::string g_startWorldFilename;
 
-	void loadEnvironmentConfig()
+	void LoadEnvironmentConfig()
 	{
 		CIniFile environment("environment.ini");
 		if (!environment.ReadFile())
@@ -209,107 +209,107 @@ namespace solunar {
 		g_startWorldFilename = environment.GetValue("Global_PC", "StartWorld");
 	}
 
-	void EngineLoop::initialize()
+	void EngineLoop::Initialize()
 	{
-		initEngineCommandLine();
+		InitEngineCommandLine();
 
 		//appInit2();
 
 		// create engine view
-		createEngineView();
+		CreateEngineView();
 		//appInitInput();
 
-		// initialize engine
-		Engine::init();
+		// Initialize engine
+		Engine::Init();
 		
 		graphicsInit();
 		
-		// initialize audio manager
-		AudioManager* audioManager = AudioManager::createInstance();
-		audioManager->init();
+		// Initialize audio manager
+		AudioManager* audioManager = AudioManager::CreateInstance();
+		audioManager->Init();
 
 		// game init
-		//Game::init();
+		//Game::Init();
 
 		// Game interface init
-		g_gameInterface->initialize();
+		g_gameInterface->Initialize();
 
 		//if (g_commandLine.hasOption("-saveClassIds"))
 		//	saveClassIds();
 
 		//if (g_modelConvert)
 		//{
-		//	std::shared_ptr<ModelBase> model = g_contentManager->loadModelOld(g_modelConvertName);
+		//	std::shared_ptr<ModelBase> model = g_contentManager->LoadModelOld(g_modelConvertName);
 		//	model->saveBinary(g_modelConvertName);
 		//}
 
 		// Register properties #TODO: PLEASE MAKE IT MORE NORMAL
-		PropertyRegistrator::getInstance()->registerClasses();
+		PropertyRegistrator::GetInstance()->RegisterClasses();
 
-	//	exportClassesForEditor();
+		//ExportClassesForEditor();
 
 		if (g_commandLine.hasOption("-world"))
 		{
 			const char* worldFileName = g_commandLine.getOptionParameter("-world");
 			char stringBuffer[256];
 			snprintf(stringBuffer, sizeof(stringBuffer), "worlds/%s.xml", worldFileName);
-			EngineStateManager::getInstance()->loadWorld(stringBuffer);
+			EngineStateManager::GetInstance()->LoadWorld(stringBuffer);
 		}
 
-		loadEnvironmentConfig();
+		LoadEnvironmentConfig();
 
 		if (!g_startWorldFilename.empty() && !g_commandLine.hasOption("-world"))
 		{
 			char stringBuffer[256];
 			snprintf(stringBuffer, sizeof(stringBuffer), "worlds/%s.xml", g_startWorldFilename.c_str());
-			EngineStateManager::getInstance()->loadWorld(stringBuffer);
+			EngineStateManager::GetInstance()->LoadWorld(stringBuffer);
 		}
 
 		//if (g_commandLine.hasOption("-world"))
 		//{
 		//	// #TODO: Refactor this
-		//	GameState* gameState = GameState::getInstance();
+		//	GameState* gameState = GameState::GetInstance();
 		//	gameState->setGameState(GameState::GAME_STATE_RUNNING);
 		//	loadLevel();
 		//}
 		//else
 		//{
 		//	// #TODO: Refactor this
-		//	GameState* gameState = GameState::getInstance();
+		//	GameState* gameState = GameState::GetInstance();
 		//	gameState->setGameState(GameState::GAME_STATE_RUNNING);
 		//	loadLevel("entry");
 		//}
 	}
 
-	void EngineLoop::shutdown()
+	void EngineLoop::Shutdown()
 	{
-		g_gameInterface->shutdown();
+		g_gameInterface->Shutdown();
 
-		//Game::shutdown();
+		//Game::Shutdown();
 
-		AudioManager::getInstance()->shutdown();
-		AudioManager::destroyInstance();
+		AudioManager::GetInstance()->Shutdown();
+		AudioManager::DestroyInstance();
 
-		//ImguiManager::getInstance()->shutdown();
+		//ImguiManager::GetInstance()->Shutdown();
 
-		// release content manager (because some objects allocated by renderer, and after
+		// Release content manager (because some objects allocated by renderer, and after
 		//							renderer destroying, render device is unavaliable)
-		g_contentManager->shutdown();
+		g_contentManager->Shutdown();
 
 		graphicsShutdown();
 
-		g_graphicsOptions.saveSettings("GameSettings.ini");
+		g_graphicsOptions.SaveSettings("GameSettings.ini");
 
-		Engine::shutdown();
+		Engine::Shutdown();
 
 		//appShutdown2();
 	}
 
-	bool EngineLoop::update()
+	bool EngineLoop::Update()
 	{
 //		OPTICK_EVENT("EngineLoop::update");
 
-		InputManager* input = InputManager::getInstance();
+		InputManager* input = InputManager::GetInstance();
 
 		if (g_quitAtStart)
 			return true;
@@ -324,49 +324,49 @@ namespace solunar {
 			Sleep(200);
 			
 		// update delta cursor pos and others input stuff
-		input->update();
+		input->Update();
 
 		// update timer
-		Timer::getInstance()->update();
+		Timer::GetInstance()->Update();
 
 		// Begin ImGui frame
-		ImGuiManager::getInstance()->beginFrame();
+		ImGuiManager::GetInstance()->BeginFrame();
 
 		// update camera
-		CameraProxy::getInstance()->updateProxy();
+		CameraProxy::GetInstance()->UpdateProxy();
 
 		// run engine frame
-		Engine::update();
+		Engine::Update();
 
 		// sound
-		AudioManager::getInstance()->update();
+		AudioManager::GetInstance()->Update();
 
 		// set listener position #TODO: SHOULD THIS BE BEFORE AUDIOMANAGER UPDATE
 		AudioManager::getInstance()->setListenerPosition(CameraProxy::getInstance()->getPosition());
 
 		// install current view
-		g_renderer->setView(CameraProxy::getInstance()->getView());
+		g_renderer->SetView(CameraProxy::GetInstance()->GetView());
 
 		// Begin renderer frame
-		g_renderer->beginFrame();
+		g_renderer->BeginFrame();
 		
 		// Render view
-		g_renderer->renderView(appGetView());
+		g_renderer->RenderView(appGetView());
 
 #ifndef FINAL_BUILD
 		// Draw the engine debug overlay
-		//engineDebugOverlay();
+		ShowEngineDebugOverlay();
 #endif // !FINAL_BUILD
 		
 		// End and render ImGui
-		ImGuiManager::getInstance()->endFrame();
+		ImGuiManager::GetInstance()->EndFrame();
 
 		// End renderer frame
-		g_renderer->endFrame();
+		g_renderer->EndFrame();
 
 		// Take screenshot
-		if (input->isPressedWithReset(KeyboardKeys::KEY_F12))
-			g_renderer->takeScreenshot();
+		if (input->IsPressedWithReset(KeyboardKeys::KEY_F12))
+			g_renderer->TakeScreenshot();
 
 		return true;
 	}

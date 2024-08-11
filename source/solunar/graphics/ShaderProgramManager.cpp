@@ -7,15 +7,15 @@ namespace solunar
 
 ShaderProgramManager* g_shaderManager = nullptr;
 
-void ShaderProgramManager::init(const char* shaderPath)
+void ShaderProgramManager::Init(const char* shaderPath)
 {
-	Assert2(this, "Please initialize shader manager for exactly graphics driver API.");
+	Assert2(this, "Please Initialize shader manager for exactly graphics driver API.");
 	Assert2(shaderPath, "Please specify shader path for exactly graphics driver API.");
 
 	m_shaderPath = shaderPath;
 }
 
-void ShaderProgramManager::shutdown()
+void ShaderProgramManager::Shutdown()
 {
 	//for (auto it = m_programs.begin(); it != m_programs.end(); ++it) {
 	//	if (*it) {

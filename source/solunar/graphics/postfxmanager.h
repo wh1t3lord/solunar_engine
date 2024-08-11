@@ -19,16 +19,16 @@ public:
 	PostFxManager();
 	~PostFxManager();
 
-	void init(View* view);
+	void Init(View* view);
 	void initBlur(View* view);
 
-	void shutdown();
+	void Shutdown();
 
 	void initHDR(View* view);
 	void blurPass(ITexture2D* screenTexture);
 	void combinePass(ITexture2D* screenTexture);
 
-	void hdrPass(ITexture2D* screenTexture);
+	void HDRPass(ITexture2D* screenTexture);
 private:
 	TextureDesc m_hdrPingPongTextureDesc;
 

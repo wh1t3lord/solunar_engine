@@ -7,7 +7,7 @@ namespace solunar
 
 // Singleton creation
 
-AudioManager* AudioManager::createInstance()
+AudioManager* AudioManager::CreateInstance()
 {
 	if (!ms_pInstance)
 		ms_pInstance = mem_new<MiniAudioManager>();
@@ -15,7 +15,7 @@ AudioManager* AudioManager::createInstance()
 	return ms_pInstance;
 }
 
-void AudioManager::destroyInstance()
+void AudioManager::DestroyInstance()
 {
 	if (ms_pInstance)
 	{
@@ -45,7 +45,7 @@ MiniAudioManager::~MiniAudioManager()
 {
 }
 
-void MiniAudioManager::init()
+void MiniAudioManager::Init()
 {
 	// Initialize device
 
@@ -57,7 +57,7 @@ void MiniAudioManager::init()
 	config.pUserData = nullptr;					// Can be accessed from the device object (device.pUserData).
 
 	if (ma_device_init(NULL, &config, &m_device) != MA_SUCCESS) {
-		Core::error("MiniAudioManager::init: Failed to initialize the device.");
+		Core::Error("MiniAudioManager::Init: Failed to Initialize the device.");
 	}
 
 	// Initialize resource manager
@@ -70,16 +70,16 @@ void MiniAudioManager::init()
 	ma_result result = ma_resource_manager_init(&m_resourceManagerConfig, &m_resourceManager);
 	if (result != MA_SUCCESS) {
 		ma_device_uninit(&m_device);
-		Core::error("MiniAudioManager::init: Failed to initialize the resource manager.");
+		Core::Error("MiniAudioManager::Init: Failed to Initialize the resource manager.");
 	}
 
 	// Start device
 	ma_device_start(&m_device);
 
-	Core::msg("MiniAudioManager::init: MiniAudio is initialized");
+	Core::Msg("MiniAudioManager::Init: MiniAudio is initialized");
 }
 
-void MiniAudioManager::shutdown()
+void MiniAudioManager::Shutdown()
 {
 	// Shutdown resource manager
 	ma_resource_manager_uninit(&m_resourceManager);
@@ -88,7 +88,7 @@ void MiniAudioManager::shutdown()
 	ma_device_uninit(&m_device);
 }
 
-void MiniAudioManager::update()
+void MiniAudioManager::Update()
 {
 	// #TODO: update queue and remove sources from cache
 	
@@ -97,18 +97,18 @@ void MiniAudioManager::update()
 		size_t deleteQueueSize = m_deleteQueue.size();
 		m_deleteQueue.clear();
 
-		Core::msg("MiniAudioManager::update: deleted %i audio sources", deleteQueueSize);
+		Core::Msg("MiniAudioManager::Update: deleted %i audio sources", deleteQueueSize);
 	}
 }
 
-AudioSource* MiniAudioManager::createSource(const std::string& filename)
+AudioSource* MiniAudioManager::CreateSource(const std::string& filename)
 {
 	MiniAudioSource* miniAudioSource = mem_new<MiniAudioSource>(filename);
 	m_audioSources.push_back(miniAudioSource);
 	return miniAudioSource;
 }
 
-void MiniAudioManager::deleteSource(AudioSource* source)
+void MiniAudioManager::DeleteSource(AudioSource* source)
 {
 	auto it = std::find(m_audioSources.begin(), m_audioSources.end(), source);
 	Assert(it == m_audioSources.end());

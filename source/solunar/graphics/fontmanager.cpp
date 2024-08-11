@@ -47,17 +47,17 @@ FontManager::~FontManager()
 {
 }
 
-void FontManager::initialize()
+void FontManager::Initialize()
 {
-	Assert2(g_renderDevice, "Please initialize font manager after core graphics initialization");
+	Assert2(g_renderDevice, "Please Initialize font manager after core graphics initialization");
 
-	// load system font
-	m_systemFont = createFont("textures/ui/system.ttf", 16.0f);
+	// Load system font
+	m_systemFont = CreateFont("textures/ui/system.ttf", 16.0f);
 
-	initPrivate();
+	InitPrivate();
 }
 
-void FontManager::initPrivate()
+void FontManager::InitPrivate()
 {
 	// create sampler state for font texture
 
@@ -69,7 +69,7 @@ void FontManager::initPrivate()
 	fontSamplerDesc.m_wrapT = TextureWrap::ClampToEdge;
 	fontSamplerDesc.m_anisotropyLevel = 1.0f;
 
-	m_textureSampler = g_renderDevice->createSamplerState(fontSamplerDesc);
+	m_textureSampler = g_renderDevice->CreateSamplerState(fontSamplerDesc);
 
 	// create characters buffer
 
@@ -84,7 +84,7 @@ void FontManager::initPrivate()
 
 	// NOTE: We create dynamic vertex buffer without any data.
 	//       And we will fill buffer at every time when we need to draw some sentence.
-	m_vertexBuffer = g_renderDevice->createBuffer(charBufferDesc, charSubresourceDesc);
+	m_vertexBuffer = g_renderDevice->CreateBuffer(charBufferDesc, charSubresourceDesc);
 
 	// create constant buffer
 	BufferDesc constantBufferDesc;
@@ -96,7 +96,7 @@ void FontManager::initPrivate()
 	SubresourceDesc constantSubresorceDesc;
 	memset(&constantSubresorceDesc, 0, sizeof(constantSubresorceDesc));
 
-	m_constantBuffer = g_renderDevice->createBuffer(constantBufferDesc, constantSubresorceDesc);
+	m_constantBuffer = g_renderDevice->CreateBuffer(constantBufferDesc, constantSubresorceDesc);
 
 	// Create 2d font shader
 	InputLayoutDesc layout[] =
@@ -145,7 +145,7 @@ void FontManager::initPrivate()
 	m_pBlendState = g_stateManager->createBlendState(blendStateDesc);
 }
 
-void FontManager::flushPrimitives()
+void FontManager::FlushPrimitives()
 {
 	Assert2(g_renderer, "Called before renderer initialization.");
 	Assert(m_vertexBuffer);
@@ -154,7 +154,7 @@ void FontManager::flushPrimitives()
 		return;
 
 	// bind texture and their sampler
-	g_renderDevice->setSampler(0, m_textureSampler);
+	g_renderDevice->SetSamplerState(0, m_textureSampler);
 
 	// setup shader and others stuff
 	g_shaderManager->setShaderProgram(m_shaderProgram);
@@ -162,40 +162,40 @@ void FontManager::flushPrimitives()
 	// build orthogonal matrix
 
 	// get current view
-	View* view = CameraProxy::getInstance()->getView();
+	View* view = CameraProxy::GetInstance()->GetView();
 
 	// calculate ortho matrix based on current view
 	glm::mat4 proj = glm::ortho(0.0f, (float)view->m_width, 0.0f, (float)view->m_height, 0.1f, 100.0f);
 
 	// update constant buffer
-	void* constantBufferData = m_constantBuffer->map(BufferMapping::WriteOnly);
+	void* constantBufferData = m_constantBuffer->Map(BufferMapping::WriteOnly);
 	memcpy(constantBufferData, &proj[0], sizeof(proj));
-	m_constantBuffer->unmap();
+	m_constantBuffer->Unmap();
 
 	// setup it to shader
-	g_renderDevice->setConstantBufferIndex(0, m_constantBuffer);
+	g_renderDevice->SetConstantBufferIndex(0, m_constantBuffer);
 
 	// enable rasterizer state
 	g_stateManager->setRasterizerState(m_rasterizerState);
 
 	// disable depth test
-	g_stateManager->setDepthStencilState(m_depthStencilState, 0);
+	g_stateManager->SetDepthStencilState(m_depthStencilState, 0);
 
 	// Setup blend state
 	const float blend_factor[4] = { 0.f, 0.f, 0.f, 0.f };
 	g_stateManager->setBlendState(m_pBlendState, blend_factor, 0xffffffff);
 
 	// bind vertex buffer
-	g_renderDevice->setVertexBuffer(m_vertexBuffer, sizeof(FontVertex), 0);
+	g_renderDevice->SetVertexBuffer(m_vertexBuffer, sizeof(FontVertex), 0);
 
 	// draw font strings
 	for (auto& it : m_drawStrings)
 	{
 		// bind texture 
-		g_renderDevice->setTexture2D(0, it.m_font->m_fontTexture);
+		g_renderDevice->SetTexture2D(0, it.m_font->m_fontTexture);
 
 		// map our text buffer
-		FontVertex* fontVertices = (FontVertex*)m_vertexBuffer->map(BufferMapping::WriteOnly);
+		FontVertex* fontVertices = (FontVertex*)m_vertexBuffer->Map(BufferMapping::WriteOnly);
 
 		uint32_t numVertices = 0;
 		size_t stringLength = it.m_string.length();
@@ -222,17 +222,17 @@ void FontManager::flushPrimitives()
 		}
 
 		// unmap
-		m_vertexBuffer->unmap();
+		m_vertexBuffer->Unmap();
 
 		// draw 
-		g_renderDevice->draw(PM_TriangleList, 0, numVertices);
+		g_renderDevice->Draw(PM_TriangleList, 0, numVertices);
 	}
 
 	m_drawStrings.clear();
 	//m_drawStrings.resize(0);
 }
 
-void FontManager::shutdown()
+void FontManager::Shutdown()
 {
 	for (auto& it : m_fonts)
 	{
@@ -260,14 +260,14 @@ void FontManager::shutdown()
 	}
 }
 
-IFont* FontManager::createFont(const char* filename, float size)
+IFont* FontManager::CreateFont(const char* filename, float size)
 {
 	m_fonts[filename] = mem_new<FontImpl>();
-	m_fonts[filename]->create(filename, size);
+	m_fonts[filename]->Create(filename, size);
 	return m_fonts[filename];
 }
 
-void FontManager::drawFontText(IFont* font, const char* text, float x, float y, const glm::vec4& color)
+void FontManager::DrawFontText(IFont* font, const char* text, float x, float y, const glm::vec4& color)
 {
 	StringDrawInfo drawInfo;
 	drawInfo.m_font = (FontImpl*)font;
@@ -278,9 +278,9 @@ void FontManager::drawFontText(IFont* font, const char* text, float x, float y, 
 	m_drawStrings.push_back(drawInfo);
 }
 
-void FontManager::drawSystemFont(const char* text, float x, float y, const glm::vec4& color)
+void FontManager::DrawSystemFont(const char* text, float x, float y, const glm::vec4& color)
 {
-	m_systemFont->drawText(text, x, y, color);
+	m_systemFont->DrawText(text, x, y, color);
 }
 
 // Font implementation
@@ -293,21 +293,21 @@ FontImpl::FontImpl() :
 
 FontImpl::~FontImpl()
 {
-	destroy();
+	Destroy();
 }
 
-void FontImpl::create(const char* filename, float size)
+void FontImpl::Create(const char* filename, float size)
 {
-	Assert2(g_renderDevice, "Please initialize font manager after core graphics initialization");
+	Assert2(g_renderDevice, "Please Initialize font manager after core graphics initialization");
 
-	// load system font
-	DataStreamPtr stream = g_contentManager->openStream(filename);
-	stream->seek(Seek_End, 0);
-	long fileLength = stream->tell();
-	stream->seek(Seek_Begin, 0);
+	// Load system font
+	DataStreamPtr stream = g_contentManager->OpenStream(filename);
+	stream->Seek(Seek_End, 0);
+	long fileLength = stream->Tell();
+	stream->Seek(Seek_Begin, 0);
 
 	uint8_t* ttfBuffer = new uint8_t[fileLength];
-	stream->read(ttfBuffer, fileLength);
+	stream->Read(ttfBuffer, fileLength);
 
 	uint8_t* tmpBitmap = new uint8_t[512 * 512]; //res of the bitmap
 	stbtt_BakeFontBitmap(ttfBuffer, 0, size, tmpBitmap, 512, 512, 32, 96, m_fontChars);
@@ -325,13 +325,13 @@ void FontImpl::create(const char* filename, float size)
 	subresourceDesc.m_memory = tmpBitmap;
 	subresourceDesc.m_memoryPitch = 512;
 
-	m_fontTexture = g_renderDevice->createTexture2D(textureDesc, subresourceDesc);
+	m_fontTexture = g_renderDevice->CreateTexture2D(textureDesc, subresourceDesc);
 
 	delete[] tmpBitmap;
 	delete[] ttfBuffer;
 }
 
-void FontImpl::destroy()
+void FontImpl::Destroy()
 {
 	if (m_fontTexture)
 	{
@@ -340,10 +340,10 @@ void FontImpl::destroy()
 	}
 }
 
-void FontImpl::drawText(const char* text, float x, float y, const glm::vec4& color)
+void FontImpl::DrawText(const char* text, float x, float y, const glm::vec4& color)
 {
 	Assert(g_fontManager);
-	g_fontManager->drawFontText(this, text, x, y, color);
+	g_fontManager->DrawFontText(this, text, x, y, color);
 }
 
 }

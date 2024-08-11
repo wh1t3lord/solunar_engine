@@ -15,12 +15,12 @@
 namespace solunar
 {
 
-BeginPropertyRegister(ShockPlayerController)
+BEGIN_PROPERTY_REGISTER(ShockPlayerController)
 {
-	RegisterProperty(ShockPlayerController, PropertyFloat, m_playerStats.m_health);
-	RegisterProperty(ShockPlayerController, PropertyFloat, m_playerStats.m_endurance);
+	REGISTER_PROPERTY(ShockPlayerController, PropertyFloat, m_playerStats.m_health);
+	REGISTER_PROPERTY(ShockPlayerController, PropertyFloat, m_playerStats.m_endurance);
 }
-EndPropertyRegister(ShockPlayerController);
+END_PROPERTY_REGISTER(ShockPlayerController);
 
 ShockPlayerController::ShockPlayerController() :
 	m_cameraEntity(nullptr),
@@ -40,32 +40,32 @@ ShockPlayerController::~ShockPlayerController()
 {
 }
 
-void ShockPlayerController::registerObject()
+void ShockPlayerController::RegisterObject()
 {
-	g_typeManager->registerObject<ShockPlayerController>();
+	g_typeManager->RegisterObject<ShockPlayerController>();
 }
 
-void ShockPlayerController::onEntitySet(Entity* entity)
+void ShockPlayerController::OnEntitySet(Entity* entity)
 {
-	PlayerControllerComponent::onEntitySet(entity);
+	PlayerControllerComponent::OnEntitySet(entity);
 
 	initializeCamera();
 	initializeComponents();
 }	
 
-void ShockPlayerController::onEntityRemove()
+void ShockPlayerController::OnEntityRemove()
 {
 	// m_cameraNode = nullptr;
 	// m_cameraTransform = nullptr;
 	// m_camera = nullptr;
 	// m_rigidBody = nullptr;
 
-	PlayerControllerComponent::onEntityRemove();
+	PlayerControllerComponent::OnEntityRemove();
 }
 
-void ShockPlayerController::activateCamera()
+void ShockPlayerController::ActivateCamera()
 {
-	CameraProxy::getInstance()->setCameraComponent(m_camera);
+	CameraProxy::GetInstance()->SetCameraComponent(m_camera);
 
 	g_engineData.m_shouldCaptureMouse = true;
 	g_engineData.m_shouldHideMouse = true;
@@ -73,7 +73,7 @@ void ShockPlayerController::activateCamera()
 
 void ShockPlayerController::initializeCamera()
 {
-	// m_cameraNode = getNode()->createChild();
+	// m_cameraNode = getNode()->CreateChild();
 	// m_cameraTransform = m_cameraNode->createComponentByType<TransformComponent>();
 	// m_camera = m_cameraNode->createComponentByType<CameraFirstPersonComponent>();
 
@@ -83,10 +83,11 @@ void ShockPlayerController::initializeCamera()
 	m_camera = m_cameraEntity->createComponent<CameraFirstPersonComponent>();
 	//m_camera = getEntity()->createComponent<CameraFirstPersonComponent>();
 
-	m_rigidBody = getEntity()->createComponent<RigidBodyProxyComponent>();
-	m_rigidBody->createPlayerController();
 
-	activateCamera();
+	m_rigidBody = GetEntity()->CreateComponent<RigidBodyProxyComponent>();
+	m_rigidBody->CreatePlayerController();
+
+	ActivateCamera();
 
 	// create weapon
 	Entity* hackEntity = m_cameraEntity->createChild();
@@ -119,7 +120,7 @@ void ShockPlayerController::initializeComponents()
 
 static IFont* s_font = nullptr;
 
-void ShockPlayerController::update(float dt)
+void ShockPlayerController::Update(float dt)
 {
 	// if (m_rigidBody == nullptr)
 	// {
@@ -128,7 +129,7 @@ void ShockPlayerController::update(float dt)
 	// }
 
 	if (!s_font)
-		s_font = g_fontManager->createFont("textures/ui/ArchivoBlack-Regular.ttf", 32.0f);
+		s_font = g_fontManager->CreateFont("textures/ui/RobotoMono-Bold.ttf", 32.0f);
 
 	g_engineData.m_shouldCaptureMouse = true;
 	//g_engineData.m_shouldHideMouse = false;
@@ -138,16 +139,16 @@ void ShockPlayerController::update(float dt)
 	static glm::vec3 s_weaponOffset = glm::vec3(0.0f);
 	ImGui::DragFloat3("", glm::value_ptr(s_weaponOffset), 0.1, -4.0f, 4.0f);
 
-	m_weaponEntity->setPosition(s_weaponOffset);
+	m_weaponEntity->SetPosition(s_weaponOffset);
 #endif
 
-	View* view = CameraProxy::getInstance()->getView();
+	View* view = CameraProxy::GetInstance()->GetView();
 	
 	if (m_playerStats.m_health <= 0.0f)
 	{
 		char healthText[64];
 		snprintf(healthText, sizeof(healthText), "WE ARE DEAD :((((");
-		g_fontManager->drawSystemFont(healthText, 500, 500, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
+		g_fontManager->DrawSystemFont(healthText, 500, 500, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
 	}
 
 #if 1
@@ -157,37 +158,37 @@ void ShockPlayerController::update(float dt)
 	char enduranceText[64];
 	snprintf(enduranceText, sizeof(enduranceText), "Endurance: %.0f", m_playerStats.m_endurance);
 
-	s_font->drawText(healthText, 25.0f, view->m_height - 50.0f, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
-	s_font->drawText(enduranceText, 25.0f, view->m_height - 25.0f, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
+	s_font->DrawText(healthText, 25.0f, view->m_height - 50.0f, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
+	s_font->DrawText(enduranceText, 25.0f, view->m_height - 25.0f, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
 #endif
 
 	// update camera look
-	updateCamera(dt);
+	UpdateCamera(dt);
 
 	// update player movement
-	updateMovement(dt);
+	UpdateMovement(dt);
 
 	// update debug
-	debugUpdate(dt);
+	DebugUpdate(dt);
 
-	InputManager* input = InputManager::getInstance();
-	if (input->isPressed(KeyboardKeys::KEY_F))
+	InputManager* input = InputManager::GetInstance();
+	if (input->IsPressed(KeyboardKeys::KEY_F))
 	{
-		Camera* camera = CameraProxy::getInstance();
-		glm::vec3 rayStart = camera->getPosition() + camera->getDirection();
+		Camera* camera = CameraProxy::GetInstance();
+		glm::vec3 rayStart = camera->GetPosition() + camera->GetDirection();
 		glm::vec3 rayEnd = rayStart + 1000.0f;
 
 		RayCastResult rq = {};
-		if (getWorld()->rayCast(rq, rayStart, rayEnd))
+		if (GetWorld()->RayCast(rq, rayStart, rayEnd))
 		{
 			Entity* entity = rq.m_entity;
-			Core::msg("ShockPlayerController::update(): looking at entity 0x%p", entity);
+			Core::Msg("ShockPlayerController::Update(): looking at entity 0x%p", entity);
 		}
 	}
 
-	if (input->isPressedWithReset(KeyboardKeys::KEY_F1))
+	if (input->IsPressedWithReset(KeyboardKeys::KEY_F1))
 	{
-		getWorld()->togglePhysicsDebugDraw();
+		GetWorld()->TogglePhysicsDebugDraw();
 	}
 }
 
@@ -199,45 +200,30 @@ void ShockPlayerController::doHit(float amount)
 	m_playerStats.m_health -= amount;
 }
 
-void ShockPlayerController::updateCamera(float dt)
+void ShockPlayerController::UpdateCamera(float dt)
 {
-	 InputManager* input = InputManager::getInstance();
-	 glm::vec2 mousePos = input->getCursorPos();
+	 InputManager* input = InputManager::GetInstance();
+	 glm::vec2 mousePos = input->GetCursorPos();
 
 #if 0
-	 glm::vec2 deltaMousePos = input->getDeltaCursorPos();
+	 glm::vec2 deltaMousePos = input->GetDeltaCursorPos();
 
 	 m_camera->updateFromMousePosition(deltaMousePos);
 #else
 	 static glm::vec2 deltaMousePos = glm::vec2(0.0f);
 
-	 deltaMousePos += input->getDeltaCursorPos();
+	 deltaMousePos += input->GetDeltaCursorPos();
 
 	 m_camera->updateFromMousePosition(deltaMousePos);
-	 input->resetDelta();
-#endif
-
-#if 0
-	//getEntity()->setRotation(m_camera->getDirection());
-	//m_weaponEntity->setRotation(m_camera->getDirection());
-
-	glm::vec3 weaponSwayRotation = glm::vec3(glm::radians(m_camera->m_pitch), glm::radians(-m_camera->m_yaw), 0.0f);
-	m_weaponSwayAngles = glm::lerp(weaponSwayRotation, m_weaponSwayAngles, 12.0f * dt);
-
-	glm::quat rot = glm::eulerAngleYX(m_weaponSwayAngles.y, m_weaponSwayAngles.x);
-	m_weaponEntity->setRotation(rot);
-
-	//glm::quat rot = glm::eulerAngleYX(glm::radians(-m_camera->m_yaw), glm::radians(m_camera->m_pitch));
-	//m_weaponEntity->setRotation(glm::slerp(rot, m_weaponEntity->getRotation(), 55.0f * dt));
-	//m_weaponEntity->setRotation(rot);
+	 input->ResetDelta();
 #endif
 
 	glm::quat rot = glm::eulerAngleYX(glm::radians(-m_camera->m_yaw), glm::radians(m_camera->m_pitch));
-	m_weaponEntity->setRotation(rot);
+	m_weaponEntity->SetRotation(rot);
 
 #if 0
-	 glm::vec3 cameraDirection = CameraProxy::getInstance()->getDirection();
-	 glm::vec3 pos = getEntity()->getPosition();
+	 glm::vec3 cameraDirection = CameraProxy::GetInstance()->GetDirection();
+	 glm::vec3 pos = GetEntity()->GetPosition();
 	 float camSpeed = 8.0f * dt;
 
 	 if (input->getKey(KeyboardKeys::KEY_LEFT_SHIFT))
@@ -253,22 +239,22 @@ void ShockPlayerController::updateCamera(float dt)
 	 if (input->getKey(KeyboardKeys::KEY_D))
 	 	pos += glm::normalize(glm::cross(cameraDirection, glm::vec3(0.0f, 1.0f, 0.0f))) * camSpeed;
 	 
-	 getEntity()->setPosition(pos);
+	 GetEntity()->SetPosition(pos);
 #endif
 }
 
-void ShockPlayerController::updateMovement(float dt)
+void ShockPlayerController::UpdateMovement(float dt)
 {
 	 glm::vec3 moveVector = glm::vec3(0.0f);
 	 
-	 InputManager* inputManager = InputManager::getInstance();
+	 InputManager* inputManager = InputManager::GetInstance();
 	 
-	 bool isPlayerMove = (inputManager->isPressed(KeyboardKeys::KEY_W)) ||
-	 					(inputManager->isPressed(KeyboardKeys::KEY_S)) ||
-	 					(inputManager->isPressed(KeyboardKeys::KEY_A)) ||
-	 					(inputManager->isPressed(KeyboardKeys::KEY_D));
+	 bool isPlayerMove = (inputManager->IsPressed(KeyboardKeys::KEY_W)) ||
+	 					(inputManager->IsPressed(KeyboardKeys::KEY_S)) ||
+	 					(inputManager->IsPressed(KeyboardKeys::KEY_A)) ||
+	 					(inputManager->IsPressed(KeyboardKeys::KEY_D));
 	 
-	 Camera* camera = CameraProxy::getInstance();
+	 Camera* camera = CameraProxy::GetInstance();
 	 
 #if 0
 	 m_onTheGround = true;
@@ -276,76 +262,76 @@ void ShockPlayerController::updateMovement(float dt)
 	 {
 		 glm::vec3 dir = glm::vec3(0.0f);
 		 if (inputManager->getKey(KeyboardKeys::KEY_W))
-			 dir += camera->getDirection();
+			 dir += camera->GetDirection();
 		 if (inputManager->getKey(KeyboardKeys::KEY_S))
-			 dir -= camera->getDirection();
+			 dir -= camera->GetDirection();
 		 if (inputManager->getKey(KeyboardKeys::KEY_A))
-			 dir -= glm::normalize(glm::cross(camera->getDirection(), glm::vec3(0.0f, 1.0f, 0.0f)));
+			 dir -= glm::normalize(glm::cross(camera->GetDirection(), glm::vec3(0.0f, 1.0f, 0.0f)));
 		 if (inputManager->getKey(KeyboardKeys::KEY_D))
-			 dir += glm::normalize(glm::cross(camera->getDirection(), glm::vec3(0.0f, 1.0f, 0.0f)));
+			 dir += glm::normalize(glm::cross(camera->GetDirection(), glm::vec3(0.0f, 1.0f, 0.0f)));
 
 		 // apply impulse to rigid body
-		 //m_rigidBody->applyImpulse(dir);
-		 //m_rigidBody->setDirection(glm::normalize(dir) * dt * 2.0f);
-		 //m_rigidBody->setPositionForce(getEntity()->getPosition());
-		 m_rigidBody->getCharacterController()->setVelocityForTimeInterval(
+		 //m_rigidBody->ApplyImpulse(dir);
+		 //m_rigidBody->SetDirection(glm::normalize(dir) * dt * 2.0f);
+		 //m_rigidBody->SetPositionForce(getEntity()->getPosition());
+		 m_rigidBody->GetCharacterController()->setVelocityForTimeInterval(
 			 glmVectorToBt(glm::normalize(dir) * 2.0f),
 			 2.0f);
 	 }
 
 	 if (!isPlayerMove)
-		 m_rigidBody->getCharacterController()->setVelocityForTimeInterval(
+		 m_rigidBody->GetCharacterController()->setVelocityForTimeInterval(
 			 glmVectorToBt(glm::vec3(0.0f)),
 			 2.0f);
 #else
-	 m_onTheGround = m_rigidBody->getCharacterController()->onGround();
+	 m_onTheGround = m_rigidBody->GetCharacterController()->onGround();
 	 if (isPlayerMove && m_onTheGround)
 	 {
-		 glm::vec3 camdir = camera->getDirection();
+		 glm::vec3 camdir = camera->GetDirection();
 		 camdir.y = 0.0f;
 
 		 glm::vec3 dir = glm::vec3(0.0f);
-		 if (inputManager->isPressed(KeyboardKeys::KEY_W))
+		 if (inputManager->IsPressed(KeyboardKeys::KEY_W))
 			 dir += camdir;
-		 if (inputManager->isPressed(KeyboardKeys::KEY_S))
+		 if (inputManager->IsPressed(KeyboardKeys::KEY_S))
 			 dir -= camdir;
-		 if (inputManager->isPressed(KeyboardKeys::KEY_A))
+		 if (inputManager->IsPressed(KeyboardKeys::KEY_A))
 			 dir -= glm::normalize(glm::cross(camdir, glm::vec3(0.0f, 1.0f, 0.0f)));
-		 if (inputManager->isPressed(KeyboardKeys::KEY_D))
+		 if (inputManager->IsPressed(KeyboardKeys::KEY_D))
 			 dir += glm::normalize(glm::cross(camdir, glm::vec3(0.0f, 1.0f, 0.0f)));
 
 		 // apply impulse to rigid body
-		 //m_rigidBody->applyImpulse(dir);
+		 //m_rigidBody->ApplyImpulse(dir);
 		 if (glm::length(dir) >= 0.01f)
-			m_rigidBody->setDirection(glm::normalize(dir) * dt * 2.0f);
-		 //m_rigidBody->setPositionForce(getEntity()->getPosition());
+			m_rigidBody->SetDirection(glm::normalize(dir) * dt * 2.0f);
+		 //m_rigidBody->SetPositionForce(getEntity()->getPosition());
 		
 	 }
 
 	 if (!isPlayerMove)
-		 m_rigidBody->setDirection(glm::vec3(0.0f));
+		 m_rigidBody->SetDirection(glm::vec3(0.0f));
 
 	 // #TODO: Save jump velocity vector
-	 if (inputManager->isPressed(KeyboardKeys::KEY_SPACE) && m_onTheGround)
+	 if (inputManager->IsPressed(KeyboardKeys::KEY_SPACE) && m_onTheGround)
 	 {
 		 const glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);
 		 const float jumpPower = 6.0f;
 
-		 glm::vec3 cameraDirection = camera->getDirection();
+		 glm::vec3 cameraDirection = camera->GetDirection();
 		 cameraDirection.y = 0.0f;
 		 
-		 m_rigidBody->getCharacterController()->jump(glmVectorToBt((upVector + cameraDirection) * jumpPower));
+		 m_rigidBody->GetCharacterController()->jump(glmVectorToBt((upVector + cameraDirection) * jumpPower));
 	 }
 
 #endif
 
-	 m_rigidBody->update(dt);
+	 m_rigidBody->Update(dt);
 
-	 btTransform trans = m_rigidBody->getGhostObject()->getWorldTransform();
-	 getEntity()->setPosition(btVectorToGlm(trans.getOrigin()));
+	 btTransform trans = m_rigidBody->GetGhostObject()->getWorldTransform();
+	 GetEntity()->SetPosition(btVectorToGlm(trans.getOrigin()));
 }
 
-void ShockPlayerController::debugUpdate(float dt)
+void ShockPlayerController::DebugUpdate(float dt)
 {
 	return;
 
@@ -357,9 +343,9 @@ void ShockPlayerController::debugUpdate(float dt)
 	// Ghost object stuff ...
 
 	snprintf(buf, sizeof(buf), "--- Ghost Object ---");
-	g_fontManager->drawSystemFontShadowed(buf, 0, 200, glm::vec4(1.0f));
+	g_fontManager->DrawSystemFontShadowed(buf, 0, 200, glm::vec4(1.0f));
 
-	btTransform trans = m_rigidBody->getGhostObject()->getWorldTransform();
+	btTransform trans = m_rigidBody->GetGhostObject()->getWorldTransform();
 	
 	glm::vec3 ghostObjectOrigin = btVectorToGlm(trans.getOrigin());
 	snprintf(buf, sizeof(buf), "Origin: %.2f %.2f %.2f", 
@@ -367,7 +353,7 @@ void ShockPlayerController::debugUpdate(float dt)
 		ghostObjectOrigin.y, 
 		ghostObjectOrigin.z);
 
-	g_fontManager->drawSystemFontShadowed(buf, 0, 220, glm::vec4(1.0f));
+	g_fontManager->DrawSystemFontShadowed(buf, 0, 220, glm::vec4(1.0f));
 
 	btQuaternion ghostObjectRotation = trans.getRotation();
 	snprintf(buf, sizeof(buf), "Basis: %.2f %.2f %.2f %.2f", 
@@ -376,39 +362,38 @@ void ShockPlayerController::debugUpdate(float dt)
 		ghostObjectRotation.z(),
 		ghostObjectRotation.w());
 
-	g_fontManager->drawSystemFontShadowed(buf, 0, 240, glm::vec4(1.0f));
+	g_fontManager->DrawSystemFontShadowed(buf, 0, 240, glm::vec4(1.0f));
 
 	snprintf(buf, sizeof(buf), "--- Character Controller ---");
-	g_fontManager->drawSystemFontShadowed(buf, 0, 280, glm::vec4(1.0f));
+	g_fontManager->DrawSystemFontShadowed(buf, 0, 280, glm::vec4(1.0f));
 
 	snprintf(buf, sizeof(buf), "Delta: %f", dt);
-	g_fontManager->drawSystemFontShadowed(buf, 0, 300, glm::vec4(1.0f));
+	g_fontManager->DrawSystemFontShadowed(buf, 0, 300, glm::vec4(1.0f));
 
-	//Core::msg("%f", dt);
+	btVector3 linearVelocity = m_rigidBody->GetCharacterController()->getLinearVelocity();
 
-	btVector3 linearVelocity = m_rigidBody->getCharacterController()->getLinearVelocity();
 	snprintf(buf, sizeof(buf), "Linear velocity: %.2f %.2f %.2f",
 		ghostObjectRotation.x(),
 		ghostObjectRotation.y(),
 		ghostObjectRotation.z());
 
-	g_fontManager->drawSystemFontShadowed(buf, 0, 320, glm::vec4(1.0f));
+	g_fontManager->DrawSystemFontShadowed(buf, 0, 320, glm::vec4(1.0f));
 
-	btVector3 gravity = m_rigidBody->getCharacterController()->getGravity();
+	btVector3 gravity = m_rigidBody->GetCharacterController()->getGravity();
 	snprintf(buf, sizeof(buf), "Gravity: %.2f %.2f %.2f",
 		ghostObjectRotation.x(),
 		ghostObjectRotation.y(),
 		ghostObjectRotation.z());
 
-	g_fontManager->drawSystemFontShadowed(buf, 0, 340, glm::vec4(1.0f));
+	g_fontManager->DrawSystemFontShadowed(buf, 0, 340, glm::vec4(1.0f));
 
-	btScalar fallSpeed = m_rigidBody->getCharacterController()->getFallSpeed();
+	btScalar fallSpeed = m_rigidBody->GetCharacterController()->getFallSpeed();
 	snprintf(buf, sizeof(buf), "fallSpeed: %f", fallSpeed);
-	g_fontManager->drawSystemFontShadowed(buf, 0, 360, glm::vec4(1.0f));
+	g_fontManager->DrawSystemFontShadowed(buf, 0, 360, glm::vec4(1.0f));
 
-	bool onGround = m_rigidBody->getCharacterController()->onGround();
+	bool onGround = m_rigidBody->GetCharacterController()->onGround();
 	snprintf(buf, sizeof(buf), "onGround: %s", onGround ? "true" : "false");
-	g_fontManager->drawSystemFontShadowed(buf, 0, 380, glm::vec4(1.0f));
+	g_fontManager->DrawSystemFontShadowed(buf, 0, 380, glm::vec4(1.0f));
 }
 
 void shockGamePlayerDebug(bool* open)
@@ -418,11 +403,11 @@ void shockGamePlayerDebug(bool* open)
 		World* world = Engine::ms_world;
 		if (world)
 		{
-			std::vector<Entity*> players = world->getEntityManager().getEntitiesWithComponent<ShockPlayerController>();
+			std::vector<Entity*> players = world->GetEntityManager().GetEntitiesWithComponent<ShockPlayerController>();
 			if (!players.empty())
 			{
 				Entity* player = players[0];
-				ShockPlayerController* playerController = player->getComponent<ShockPlayerController>();
+				ShockPlayerController* playerController = player->GetComponent<ShockPlayerController>();
 				if (playerController)
 				{
 					ImGui::Checkbox("Fly cam", &playerController->m_flyCam);

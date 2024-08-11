@@ -6,14 +6,14 @@ namespace solunar
 	
 class LevelManagerComponent : public Component
 {
-	ImplementObject(LevelManagerComponent, Component);
+	IMPLEMENT_OBJECT(LevelManagerComponent, Component);
 public:
 	LevelManagerComponent();
 	~LevelManagerComponent();
 
-	static void registerObject();
+	static void RegisterObject();
 	
-	void onWorldSet(World* world) override;
+	void OnWorldSet(World* world) override;
 
 
 private:

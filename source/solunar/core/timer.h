@@ -10,15 +10,15 @@ namespace solunar
 class Timer
 {
 public:
-	static Timer* getInstance();
+	static Timer* GetInstance();
 
 public:
 	Timer();
 	~Timer();
 
-	void init();
+	void Init();
 	
-	void update();
+	void Update();
 
 	float getDelta();
 	float getTime();
@@ -34,15 +34,15 @@ private:
 class Timer
 {
 public:
-	static Timer* getInstance();
+	static Timer* GetInstance();
 
 public:
 	Timer();
 	~Timer();
 
-	void init();
+	void Init();
 
-	void update();
+	void Update();
 
 	float getDelta();
 	float getTime();

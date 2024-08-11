@@ -10,7 +10,7 @@ namespace solunar
 	class TextureMap : public GraphicsObject
 	{
 	public:
-		ImplementObject(TextureMap, GraphicsObject);
+		IMPLEMENT_OBJECT(TextureMap, GraphicsObject);
 
 	public:
 		static std::shared_ptr<TextureMap> create2DFromSource(ITexture2D* pTexture2D, const TextureDesc& textureDesc);
@@ -19,9 +19,9 @@ namespace solunar
 		TextureMap();
 		virtual ~TextureMap();
 
-		virtual void load(const std::shared_ptr<DataStream>& dataStream) override;
+		virtual void Load(const std::shared_ptr<DataStream>& dataStream) override;
 	
-		void release();
+		void Release();
 		ITexture2D* getHWTexture() { return m_texture2D; }
 
 		void bind();
@@ -51,14 +51,14 @@ namespace solunar
 	// Cubemap
 	class TextureMapCube : public TextureMap
 	{
-		ImplementObject(TextureMapCube, TextureMap);
+		IMPLEMENT_OBJECT(TextureMapCube, TextureMap);
 	public:
 		TextureMapCube();
 		~TextureMapCube();
 
-		static void registerObject();
+		static void RegisterObject();
 
-		void load(const std::shared_ptr<DataStream>& dataStream) override;
+		void Load(const std::shared_ptr<DataStream>& dataStream) override;
 
 		void loadFace(int face, std::shared_ptr<Image> image);
 	};

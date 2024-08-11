@@ -20,12 +20,12 @@ MiniAudioSource::MiniAudioSource(const std::string& filename)
 	// #TODO: make decoder config based on device values
 	// https://github.com/vertver/audiorex/blob/master/include/emitters_system.h
 
-	// initialize decoder
+	// Initialize decoder
 	
 	m_config = ma_decoder_config_init_default();
 	ma_result result = ma_decoder_init_file(filename.c_str(), &m_config, &m_decoder);
 	if (result != MA_SUCCESS) {
-		Core::error("MiniAudioSource: Failed to initialize decoder. %s", ma_result_description(result));
+		Core::Error("MiniAudioSource: Failed to Initialize decoder. %s", ma_result_description(result));
 	}
 }
 
@@ -38,16 +38,16 @@ MiniAudioSource::~MiniAudioSource()
 	memset(&m_config, 0, sizeof(m_config));
 }
 
-bool MiniAudioSource::isPlaying()
+bool MiniAudioSource::IsPlaying()
 {
 	return false;
 }
 
-void MiniAudioSource::play()
+void MiniAudioSource::Play()
 {
 }
 
-void MiniAudioSource::stop()
+void MiniAudioSource::Stop()
 {
 }
 
@@ -56,7 +56,7 @@ ma_uint64 MiniAudioSource::process(float* pInput, float* pOutput, size_t frames)
 	ma_uint64 framesRead = 0;
 	ma_result result = ma_decoder_read_pcm_frames(&m_decoder, pOutput, frames, &framesRead);
 	if (result != MA_SUCCESS) {
-		Core::msg("MiniAudioSource::process: Failed to read PCM frames! Error: %s", ma_result_description(result));
+		Core::Msg("MiniAudioSource::process: Failed to read PCM frames! Error: %s", ma_result_description(result));
 	}
 
 	return framesRead;

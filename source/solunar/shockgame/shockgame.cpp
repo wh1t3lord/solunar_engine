@@ -59,7 +59,7 @@ ShockGameInterface* getShockGameInterface()
 
 class TestRotatorComponent : public LogicComponent
 {
-	ImplementObject(TestRotatorComponent, LogicComponent);
+	IMPLEMENT_OBJECT(TestRotatorComponent, LogicComponent);
 
 public:
 	TestRotatorComponent() : m_YAxis(0.0f)
@@ -68,15 +68,15 @@ public:
 	~TestRotatorComponent()
 	{}
 
-	static void registerObject()
+	static void RegisterObject()
 	{
-		g_typeManager->registerObject<TestRotatorComponent>();
+		g_typeManager->RegisterObject<TestRotatorComponent>();
 	}
 
-	void update(float dt) override
+	void Update(float dt) override
 	{
 		m_YAxis += dt * 200.0f;
-		getEntity()->quaternionRotate(glm::vec3(0.f, 1.f, 0.f), m_YAxis);
+		GetEntity()->QuaternionRotate(glm::vec3(0.f, 1.f, 0.f), m_YAxis);
 	}
 
 private:
@@ -85,7 +85,7 @@ private:
 
 class TestPositionUpdaterComponent : public LogicComponent
 {
-	ImplementObject(TestPositionUpdaterComponent, LogicComponent);
+	IMPLEMENT_OBJECT(TestPositionUpdaterComponent, LogicComponent);
 
 public:
 	TestPositionUpdaterComponent()
@@ -94,32 +94,32 @@ public:
 	~TestPositionUpdaterComponent()
 	{}
 
-	static void registerObject()
+	static void RegisterObject()
 	{
-		g_typeManager->registerObject<TestPositionUpdaterComponent>();
+		g_typeManager->RegisterObject<TestPositionUpdaterComponent>();
 	}
 
-	void update(float dt) override
+	void Update(float dt) override
 	{
 		const float kSpeed = 2.0f;
 
-		glm::vec3 position = getEntity()->getPosition();
+		glm::vec3 position = GetEntity()->GetPosition();
 		position.y += kSpeed * dt;
-		getEntity()->setPosition(position);
+		GetEntity()->SetPosition(position);
 	}
 
 };
 
 class TestAnimationComponent : public LogicComponent
 {
-	ImplementObject(TestAnimationComponent, LogicComponent);
+	IMPLEMENT_OBJECT(TestAnimationComponent, LogicComponent);
 public:
 	TestAnimationComponent();
 	~TestAnimationComponent();
 
-	void loadXML(tinyxml2::XMLElement& element) override;
+	void LoadXML(tinyxml2::XMLElement& element) override;
 
-	void update(float dt) override;
+	void Update(float dt) override;
 
 private:
 	std::string m_animationName;
@@ -134,7 +134,7 @@ TestAnimationComponent::~TestAnimationComponent()
 {
 }
 
-void TestAnimationComponent::loadXML(tinyxml2::XMLElement& element)
+void TestAnimationComponent::LoadXML(tinyxml2::XMLElement& element)
 {
 	tinyxml2::XMLElement* animationNameElement = element.FirstChildElement("AnimationName");
 	if (animationNameElement)
@@ -147,9 +147,9 @@ void TestAnimationComponent::loadXML(tinyxml2::XMLElement& element)
 	}
 }
 
-void TestAnimationComponent::update(float dt)
+void TestAnimationComponent::Update(float dt)
 {
-	AnimatedMeshComponent* animatedMeshComponent = getEntity()->getComponent<AnimatedMeshComponent>();
+	AnimatedMeshComponent* animatedMeshComponent = GetEntity()->GetComponent<AnimatedMeshComponent>();
 	std::shared_ptr<ModelBase> modelBase = animatedMeshComponent->lockModel();
 	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
 	if (animatedModel) {
@@ -164,12 +164,12 @@ void TestAnimationComponent::update(float dt)
 
 class ViewmodelAnimationController : public LogicComponent
 {
-	ImplementObject(ViewmodelAnimationController, LogicComponent);
+	IMPLEMENT_OBJECT(ViewmodelAnimationController, LogicComponent);
 public:
 	ViewmodelAnimationController();
 	~ViewmodelAnimationController();
 
-	void update(float dt) override;
+	void Update(float dt) override;
 
 private:
 	int m_animationIndex = -1;
@@ -183,24 +183,8 @@ ViewmodelAnimationController::~ViewmodelAnimationController()
 {
 }
 
-static char g_viewmodelDebugBuf[1024];
-
-void ViewmodelAnimationController::update(float dt)
+void ViewmodelAnimationController::Update(float dt)
 {
-	AnimatedMeshComponent* animatedMeshComponent = getEntity()->getComponent<AnimatedMeshComponent>();
-	std::shared_ptr<ModelBase> modelBase = animatedMeshComponent->lockModel();
-	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
-	if (animatedModel) {
-		if (m_animationIndex == -1) {
-			m_animationIndex = animatedModel->getAnimationByName("idle");
-			animatedModel->setPlayAnimation(m_animationIndex, true);
-			//animatedModel->pauseAnimationPlay();
-		}
-	}
-
-	animatedModel->testPlay(dt);
-
-
 }
 
 // More beautiful way to register classes
@@ -208,36 +192,36 @@ void registerGameClasses()
 {
 	const TypeInfo* gameClasses[] = 
 	{
-		ObjectGetTypeInfo(MainMenuWorldComponent),
-		ObjectGetTypeInfo(PlayerControllerComponent),
-		ObjectGetTypeInfo(WeaponComponent),
-		ObjectGetTypeInfo(WeaponAutoComponent),
-		ObjectGetTypeInfo(WeaponPistolComponent),
-		ObjectGetTypeInfo(WeaponChainComponent),
-		ObjectGetTypeInfo(LevelManagerComponent),
-		ObjectGetTypeInfo(TestRotatorComponent),
-		ObjectGetTypeInfo(TestPositionUpdaterComponent),
-		ObjectGetTypeInfo(TestAnimationComponent),
-		ObjectGetTypeInfo(ViewmodelAnimationController),
+		OBJECT_GET_TYPEINFO(MainMenuWorldComponent),
+		OBJECT_GET_TYPEINFO(PlayerControllerComponent),
+		OBJECT_GET_TYPEINFO(WeaponComponent),
+		OBJECT_GET_TYPEINFO(WeaponAutoComponent),
+		OBJECT_GET_TYPEINFO(WeaponPistolComponent),
+		OBJECT_GET_TYPEINFO(WeaponChainComponent),
+		OBJECT_GET_TYPEINFO(LevelManagerComponent),
+		OBJECT_GET_TYPEINFO(TestRotatorComponent),
+		OBJECT_GET_TYPEINFO(TestPositionUpdaterComponent),
+		OBJECT_GET_TYPEINFO(TestAnimationComponent),
+		OBJECT_GET_TYPEINFO(ViewmodelAnimationController),
 	};
 
 	for (int i = 0; i < sizeof(gameClasses) / sizeof(gameClasses[0]); i++)
-		TypeManager::getInstance()->registerType(gameClasses[i]);
+		TypeManager::GetInstance()->RegisterType(gameClasses[i]);
 }
 
 void registerShockClasses()
 {
 	const TypeInfo* shockClasses[] =
 	{
-		ObjectGetTypeInfo(ShockSignal),
-		ObjectGetTypeInfo(ShockPlayerController),
-		ObjectGetTypeInfo(ShockAIComponent),
-		ObjectGetTypeInfo(ShockProjectileComponent),
-		ObjectGetTypeInfo(ShockGameMainMenuComponent),
+		OBJECT_GET_TYPEINFO(ShockSignal),
+		OBJECT_GET_TYPEINFO(ShockPlayerController),
+		OBJECT_GET_TYPEINFO(ShockAIComponent),
+		OBJECT_GET_TYPEINFO(ShockProjectileComponent),
+		OBJECT_GET_TYPEINFO(ShockGameMainMenuComponent),
 	};
 
 	for (int i = 0; i < sizeof(shockClasses) / sizeof(shockClasses[0]); i++)
-		TypeManager::getInstance()->registerType(shockClasses[i]);
+		TypeManager::GetInstance()->RegisterType(shockClasses[i]);
 }
 
 #define DEMO_GAME
@@ -250,9 +234,9 @@ ShockGameInterface::~ShockGameInterface()
 {
 }
 
-void ShockGameInterface::initialize()
+void ShockGameInterface::Initialize()
 {
-	Core::msg("Initializing game");
+	Core::Msg("Initializing game");
 
 	// register game objects
 	registerGameClasses();
@@ -261,20 +245,20 @@ void ShockGameInterface::initialize()
 	registerShockClasses();
 
 #ifdef DEMO_GAME
-	TypeManager::getInstance()->registerType(DemoGameMainMenuComponent::getStaticTypeInfo());
+	TypeManager::GetInstance()->RegisterType(DemoGameMainMenuComponent::GetStaticTypeInfo());
 #endif // DEMO_GAME
 
 	// add event listener
 //	g_eventManager.addEventListener(&g_shockEventListener);
 
 	// Create signal manager
-	ShockSignalManager::createInstance();
+	ShockSignalManager::CreateInstance();
 }
 
-void ShockGameInterface::shutdown()
+void ShockGameInterface::Shutdown()
 {
 	// Destroy signal manager
-	ShockSignalManager::destroyInstance();
+	ShockSignalManager::DestroyInstance();
 
 	// g_eventManager.removeEventListener(&g_shockEventListener);
 }

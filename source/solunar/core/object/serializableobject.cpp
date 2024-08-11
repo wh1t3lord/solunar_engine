@@ -10,23 +10,23 @@ namespace solunar
 	{
 	}
 
-	void SerializableObject::load(const std::shared_ptr<DataStream>& stream)
+	void SerializableObject::Load(const std::shared_ptr<DataStream>& stream)
 	{
 	}
 
-	void SerializableObject::save(const std::shared_ptr<DataStream>& stream)
+	void SerializableObject::Save(const std::shared_ptr<DataStream>& stream)
 	{
 	}
 
-	void SerializableObject::loadXML(tinyxml2::XMLElement& element)
+	void SerializableObject::LoadXML(tinyxml2::XMLElement& element)
 	{
 	}
 
-	void SerializableObject::saveXML(tinyxml2::XMLElement& element)
+	void SerializableObject::SaveXML(tinyxml2::XMLElement& element)
 	{
 	}
 
-	glm::vec3 getVector3FromXMLElement(tinyxml2::XMLElement& element)
+	glm::vec3 GetVector3FromXMLElement(tinyxml2::XMLElement& element)
 	{
 		glm::vec3 v(0.0f);
 
@@ -45,7 +45,7 @@ namespace solunar
 		return v;
 	}
 
-	void saveVector3ToXMLElement(tinyxml2::XMLElement& element, const glm::vec3& v)
+	void SaveVector3ToXMLElement(tinyxml2::XMLElement& element, const glm::vec3& v)
 	{
 		element.SetAttribute("x", v.x);
 		element.SetAttribute("y", v.y);

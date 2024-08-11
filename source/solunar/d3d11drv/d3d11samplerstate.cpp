@@ -102,15 +102,15 @@ D3D11_TEXTURE_ADDRESS_MODE getD3D11AddressMode(TextureWrap textureWrap)
 D3D11SamplerState::D3D11SamplerState(D3D11Device* device, const SamplerDesc& samplerDesc) :
 	m_samplerState(nullptr)
 {
-	create(device, samplerDesc);
+	Create(device, samplerDesc);
 }
 
 D3D11SamplerState::~D3D11SamplerState()
 {
-	destroy();
+	Destroy();
 }
 
-void D3D11SamplerState::create(D3D11Device* device, const SamplerDesc& samplerDesc)
+void D3D11SamplerState::Create(D3D11Device* device, const SamplerDesc& samplerDesc)
 {
 	Assert2(device, "Failed to create sampler state without initialized device.");
 
@@ -125,7 +125,7 @@ void D3D11SamplerState::create(D3D11Device* device, const SamplerDesc& samplerDe
 	D3D11_CHECK(device->getDevice()->CreateSamplerState(&d3d11SamplerDesc, &m_samplerState));
 }
 
-void D3D11SamplerState::destroy()
+void D3D11SamplerState::Destroy()
 {
 	if (m_samplerState)
 	{

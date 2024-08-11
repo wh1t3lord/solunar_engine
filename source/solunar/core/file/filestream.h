@@ -14,15 +14,15 @@ namespace solunar
 		FileStream(const std::string& filename);
 		~FileStream();
 
-		size_t read(void* buffer, size_t count) override;
-		size_t write(void* buffer, size_t count) override;
+		size_t Read(void* buffer, size_t count) override;
+		size_t Write(void* buffer, size_t count) override;
 
-		void seek(SeekWay dir, long offset) override;
-		long tell() override;
+		void Seek(SeekWay dir, long offset) override;
+		long Tell() override;
 
-		bool eof() override;
+		bool Eof() override;
 
-		void flush() override;
+		void Flush() override;
 
 	private:
 		FileHandle m_fileHandle;

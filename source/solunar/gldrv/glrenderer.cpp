@@ -39,13 +39,13 @@ namespace solunar {
 	// this is interface for platform indepented context class.
 	class GLPlatformContext : public Object
 	{
-		ImplementObject(GLPlatformContext, Object);
+		IMPLEMENT_OBJECT(GLPlatformContext, Object);
 	public:
 		GLPlatformContext();
 		virtual ~GLPlatformContext();
 
-		virtual bool create(void* windowHandle);
-		virtual void destroy();
+		virtual bool Create(void* windowHandle);
+		virtual void Destroy();
 		virtual void swapBuffers(int swapInterval);
 	};
 
@@ -57,12 +57,12 @@ namespace solunar {
 	{
 	}
 
-	bool GLPlatformContext::create(void* windowHandle)
+	bool GLPlatformContext::Create(void* windowHandle)
 	{
 		return false;
 	}
 
-	void GLPlatformContext::destroy()
+	void GLPlatformContext::Destroy()
 	{
 	}
 
@@ -74,13 +74,13 @@ namespace solunar {
 	// Windows OpenGL context
 	class GLPlatformContext_Win32 : public GLPlatformContext
 	{
-		ImplementObject(GLPlatformContext_Win32, GLPlatformContext);
+		IMPLEMENT_OBJECT(GLPlatformContext_Win32, GLPlatformContext);
 	public:
 		GLPlatformContext_Win32();
 		~GLPlatformContext_Win32();
 
-		bool create(void* windowHandle) override;
-		void destroy() override;
+		bool Create(void* windowHandle) override;
+		void Destroy() override;
 		void swapBuffers(int swapInterval) override;
 
 	private:
@@ -97,7 +97,7 @@ namespace solunar {
 	{
 	}
 
-	bool GLPlatformContext_Win32::create(void* windowHandle)
+	bool GLPlatformContext_Win32::Create(void* windowHandle)
 	{
 		PIXELFORMATDESCRIPTOR pfd =
 		{
@@ -145,7 +145,7 @@ namespace solunar {
 		return true;
 	}
 
-	void GLPlatformContext_Win32::destroy()
+	void GLPlatformContext_Win32::Destroy()
 	{
 	}
 
@@ -157,13 +157,13 @@ namespace solunar {
 	// Linux OpenGL context
 	class GLPlatformContext_GLX : public GLPlatformContext
 	{
-		ImplementObject(GLPlatformContext_GLX, GLPlatformContext);
+		IMPLEMENT_OBJECT(GLPlatformContext_GLX, GLPlatformContext);
 	public:
 		GLPlatformContext_GLX();
 		~GLPlatformContext_GLX();
 
-		bool create(void* windowHandle) override;
-		void destroy() override;
+		bool Create(void* windowHandle) override;
+		void Destroy() override;
 		void swapBuffers(int swapInterval) override;
 
 	private:
@@ -179,12 +179,12 @@ namespace solunar {
 	{
 	}
 
-	bool GLPlatformContext_GLX::create(void* windowHandle)
+	bool GLPlatformContext_GLX::Create(void* windowHandle)
 	{
 		return false;
 	}
 
-	void GLPlatformContext_GLX::destroy()
+	void GLPlatformContext_GLX::Destroy()
 	{
 	}
 
@@ -212,7 +212,7 @@ namespace solunar {
 			return;
 
 		if (type == GL_DEBUG_TYPE_ERROR)
-			spdlog::error("[gl]: {}type = 0x{}, severity = 0x{}, message = {}",
+			spdlog::Error("[gl]: {}type = 0x{}, severity = 0x{}, message = {}",
 				(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR ** " : ""),
 				type, severity, message);
 		else
@@ -255,16 +255,16 @@ namespace solunar {
 	{
 		const TypeInfo* classes[] =
 		{
-			ObjectGetTypeInfo(GLPlatformContext),
+			OBJECT_GET_TYPEINFO(GLPlatformContext),
 #ifdef WIN32
-			ObjectGetTypeInfo(GLPlatformContext_Win32),
+			OBJECT_GET_TYPEINFO(GLPlatformContext_Win32),
 #else
-			ObjectGetTypeInfo(GLPlatformContext_GLX),
+			OBJECT_GET_TYPEINFO(GLPlatformContext_GLX),
 #endif // WIN32
 		};
 
 		for (int i = 0; i < sizeof(classes) / sizeof(classes[0]); i++)
-			TypeManager::getInstance()->registerType(classes[i]);
+			TypeManager::GetInstance()->RegisterType(classes[i]);
 	}
 
 	GLPlatformContext* g_platformContext = nullptr;
@@ -290,11 +290,11 @@ namespace solunar {
 			const char* externsionName = (const char*)glGetStringi(GL_EXTENSIONS, i);
 
 			if (strcmp(externsionName, "GL_ARB_sampler_objects") == 0)
-				Core::msg("[gldrv]: found GL_ARB_sampler_objects...");
+				Core::Msg("[gldrv]: found GL_ARB_sampler_objects...");
 			if (strcmp(externsionName, "GL_ARB_separate_shader_objects") == 0)
-				Core::msg("[gldrv]: found GL_ARB_separate_shader_objects...");
+				Core::Msg("[gldrv]: found GL_ARB_separate_shader_objects...");
 			if (strcmp(externsionName, "GL_EXT_direct_state_access") == 0)
-				Core::msg("[gldrv]: found GL_EXT_direct_state_access...");
+				Core::Msg("[gldrv]: found GL_EXT_direct_state_access...");
 		}
 
 		//exit(0);
@@ -302,23 +302,23 @@ namespace solunar {
 
 	GLuint g_vertexArrayObject = 0;
 
-	void GLRenderer::init()
+	void GLRenderer::Init()
 	{
 		registerGLRendererClasses();
 
 		// Create OpenGL context
 #ifdef WIN32
-		g_platformContext = (GLPlatformContext*)TypeManager::getInstance()->createObjectByName("GLPlatformContext_Win32");
+		g_platformContext = (GLPlatformContext*)TypeManager::GetInstance()->CreateObjectByName("GLPlatformContext_Win32");
 #else
 #error "Please implement context here for you're platform'!"
 #endif // WIN32
 
 		// create context itself
-		g_platformContext->create(appGetWindow());
+		g_platformContext->Create(appGetWindow());
 
 		// initalize glad
 		if (!gladLoadGL())
-			Core::error("Failed to load OpenGL");
+			Core::Error("Failed to load OpenGL");
 
 		glEnable(GL_CULL_FACE);
 
@@ -326,7 +326,7 @@ namespace solunar {
 
 		int maxVertexUniformBlocks = 0;
 		glGetIntegerv(GL_MAX_VERTEX_UNIFORM_BLOCKS, &maxVertexUniformBlocks);
-		Core::msg("GLRenderer: Max vertex uniform blocks: %i", maxVertexUniformBlocks);
+		Core::Msg("GLRenderer: Max vertex uniform blocks: %i", maxVertexUniformBlocks);
 
 #if 0
 		initGlDebug();
@@ -338,9 +338,9 @@ namespace solunar {
 		// Initialize render device
 		g_renderDevice = (IRenderDevice*)mem_new<GLDevice>();
 
-		// initialize device state manager
+		// Initialize device state manager
 		g_stateManager = mem_new<GLStateManager>();
-		g_glStateManager->init();
+		g_glStateManager->Init();
 
 		// 
 		RasterizerStateDesc rasterizerState;
@@ -355,15 +355,15 @@ namespace solunar {
 
 		// Initialize shader manager with current api
 		g_shaderManager = mem_new<GLShaderProgramManager>();
-		g_shaderManager->init("shaders/gl");
+		g_shaderManager->Init("shaders/gl");
 
-		// initialize base renderer after device creation
-		Renderer::init();
+		// Initialize base renderer after device creation
+		Renderer::Init();
 	}
 
-	void GLRenderer::shutdown()
+	void GLRenderer::Shutdown()
 	{
-		Renderer::shutdown();
+		Renderer::Shutdown();
 
 		if (g_shaderManager)
 		{
@@ -374,31 +374,31 @@ namespace solunar {
 		glBindVertexArray(0);
 		glDeleteVertexArrays(1, &g_vertexArrayObject);
 
-		g_glStateManager->shutdown();
+		g_glStateManager->Shutdown();
 		mem_delete(g_stateManager);
 		g_stateManager = nullptr;
 
 		mem_delete(g_renderDevice);
 		g_renderDevice = nullptr;
 
-		g_platformContext->destroy();
+		g_platformContext->Destroy();
 
 		mem_delete(g_platformContext);
 		g_platformContext = nullptr;
 	}
 
-	void GLRenderer::beginFrame()
+	void GLRenderer::BeginFrame()
 	{
 		glBindVertexArray(g_vertexArrayObject);
 
 		g_stateManager->setRasterizerState(m_rasterizerState);
 		
-		Renderer::beginFrame();
+		Renderer::BeginFrame();
 	}
 
-	void GLRenderer::endFrame()
+	void GLRenderer::EndFrame()
 	{
-		Renderer::endFrame();
+		Renderer::EndFrame();
 
 		if (m_makeScreenshot)
 			takeScreenshotInternal(); // will reset m_makeScreenshot
@@ -406,13 +406,13 @@ namespace solunar {
 		g_platformContext->swapBuffers(0);
 	}
 
-	void GLRenderer::takeScreenshot()
+	void GLRenderer::TakeScreenshot()
 	{
 		m_makeScreenshot = true;
 
 #if 0
-		std::string defpath = FileDevice::getInstance()->getDefaultPath();
-		FileDevice::getInstance()->setDefaultPath("");
+		std::string defpath = FileDevice::GetInstance()->getDefaultPath();
+		FileDevice::GetInstance()->setDefaultPath("");
 
 		char buffer[256];
 		for (int i = 0;; i++)
@@ -446,7 +446,7 @@ namespace solunar {
 
 		IShaderProgram* shaderProgram = nullptr;
 
-		if (mesh->isA<AnimatedMeshComponent>())
+		if (mesh->IsA<AnimatedMeshComponent>())
 			shaderProgram = materialInstance->getShaderProgramVariation(VertexFactory_SkinnedMesh, pixelVariation);
 		else
 			shaderProgram = materialInstance->getShaderProgramVariation(VertexFactory_StaticMesh, pixelVariation);
@@ -462,9 +462,9 @@ namespace solunar {
 		//if (MeshComponent* staticMesh = dynamicCast<MeshComponent>(mesh))
 
 		// setup lights
-		setupLights(graphicsWorld);
+		SetupLights(graphicsWorld);
 
-		if (mesh->isA<AnimatedMeshComponent>())
+		if (mesh->IsA<AnimatedMeshComponent>())
 			renderAnimatedMesh(graphicsWorld, view, mesh);
 		else
 			renderStaticMesh(graphicsWorld, view, mesh);
@@ -479,10 +479,10 @@ namespace solunar {
 		for (const auto& submesh : model->getSubmehes())
 		{
 			// create saved render ctx as previous model.
-			RenderContext savedCtx = RenderContext::getContext();
+			RenderContext savedCtx = RenderContext::GetContext();
 
 			// create local copy of render context
-			RenderContext localCtx = RenderContext::getContext();
+			RenderContext localCtx = RenderContext::GetContext();
 
 			// and overwrite model matrix
 			localCtx.model = savedCtx.model * submesh->getTransform();
@@ -491,18 +491,18 @@ namespace solunar {
 			//localCtx.model = glm::transpose(localCtx.model);
 
 			// set our local render ctx
-			RenderContext::setContext(localCtx);
+			RenderContext::SetContext(localCtx);
 
-			g_renderDevice->setVertexBuffer(submesh->getVertexBuffer(), sizeof(Vertex), 0);
+			g_renderDevice->SetVertexBuffer(submesh->getVertexBuffer(), sizeof(Vertex), 0);
 
-			//g_renderDevice->setIndexBuffer(it->getIndexBuffer());
+			//g_renderDevice->SetIndexBuffer(it->getIndexBuffer());
 
 			//it->getMaterial()->bind();
 
 			std::shared_ptr<Material> material = submesh->lockMaterial();
 			bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
 
-			ShaderConstantManager::getInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
+			ShaderConstantManager::GetInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
 
 			// install polygon fill mode based on which mode set now
 
@@ -519,7 +519,7 @@ namespace solunar {
 				// hack view
 				RenderContext hackHackHack = localCtx;
 				hackHackHack.proj[2][3] -= 0.0001f;
-				RenderContext::setContext(hackHackHack);
+				RenderContext::SetContext(hackHackHack);
 
 				// hack the view
 				RendererViewMode savedViewMode = m_currentViewMode;
@@ -529,7 +529,7 @@ namespace solunar {
 				bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
 
 				// draw with lines
-				g_renderDevice->draw(PM_TriangleList, 0, submesh->getVerticesCount());
+				g_renderDevice->Draw(PM_TriangleList, 0, submesh->getVerticesCount());
 				//glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
 				//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
 
@@ -544,7 +544,7 @@ namespace solunar {
 				//	if (getRenderMode() == RendererViewMode::Wireframe)
 				//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-				g_renderDevice->draw(PM_TriangleList, 0, submesh->getVerticesCount());
+				g_renderDevice->Draw(PM_TriangleList, 0, submesh->getVerticesCount());
 
 				//	glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
 					//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
@@ -555,7 +555,7 @@ namespace solunar {
 			}
 
 			// return what have been
-			RenderContext::setContext(savedCtx);
+			RenderContext::SetContext(savedCtx);
 		}
 	}
 
@@ -569,28 +569,28 @@ namespace solunar {
 		for (const auto& submesh : animatedModel->getAnimatedSubmehes())
 		{
 			// create saved render ctx as previous model.
-			RenderContext savedCtx = RenderContext::getContext();
+			RenderContext savedCtx = RenderContext::GetContext();
 
 			// create local copy of render context
-			RenderContext localCtx = RenderContext::getContext();
+			RenderContext localCtx = RenderContext::GetContext();
 
 			// transpose matrices for D3D11
 			//localCtx.model = glm::transpose(localCtx.model);
 
 			// set our local render ctx
-			RenderContext::setContext(localCtx);
+			RenderContext::SetContext(localCtx);
 
-			g_renderDevice->setVertexBuffer(submesh->m_vertexBuffer, sizeof(AnimatedVertex), 0);
-			g_renderDevice->setIndexBuffer(submesh->m_indexBuffer, false);
+			g_renderDevice->SetVertexBuffer(submesh->m_vertexBuffer, sizeof(AnimatedVertex), 0);
+			g_renderDevice->SetIndexBuffer(submesh->m_indexBuffer, false);
 
-			//g_renderDevice->setIndexBuffer(it->getIndexBuffer());
+			//g_renderDevice->SetIndexBuffer(it->getIndexBuffer());
 
 			//it->getMaterial()->bind();
 
 			std::shared_ptr<Material> material = submesh->m_material.lock();
 			bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
 
-			ShaderConstantManager::getInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
+			ShaderConstantManager::GetInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
 
 			// install polygon fill mode based on which mode set now
 
@@ -607,7 +607,7 @@ namespace solunar {
 				// hack view
 				RenderContext hackHackHack = localCtx;
 				hackHackHack.proj[2][3] -= 0.0001f;
-				RenderContext::setContext(hackHackHack);
+				RenderContext::SetContext(hackHackHack);
 
 				// hack the view
 				RendererViewMode savedViewMode = m_currentViewMode;
@@ -617,8 +617,8 @@ namespace solunar {
 				bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
 
 				// draw with lines
-				g_renderDevice->drawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
-				//g_renderDevice->draw(PM_TriangleList, 0, submesh->m_verticesCount);
+				g_renderDevice->DrawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
+				//g_renderDevice->Draw(PM_TriangleList, 0, submesh->m_verticesCount);
 				//glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
 				//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
 
@@ -633,9 +633,9 @@ namespace solunar {
 				//	if (getRenderMode() == RendererViewMode::Wireframe)
 				//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-				g_renderDevice->drawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
+				g_renderDevice->DrawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
 
-				//g_renderDevice->draw(PM_TriangleList, 0, submesh->m_verticesCount);
+				//g_renderDevice->Draw(PM_TriangleList, 0, submesh->m_verticesCount);
 				//	glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
 					//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
 
@@ -645,7 +645,7 @@ namespace solunar {
 			}
 
 			// return what have been
-			RenderContext::setContext(savedCtx);
+			RenderContext::SetContext(savedCtx);
 		}
 	}
 
@@ -657,18 +657,18 @@ namespace solunar {
 		for (auto it : mesh->getModel()->getSubmehes())
 		{
 			// create saved render ctx as previous model.
-			RenderContext savedCtx = RenderContext::getContext();
+			RenderContext savedCtx = RenderContext::GetContext();
 
 			// create local copy of render context
-			RenderContext localCtx = RenderContext::getContext();
+			RenderContext localCtx = RenderContext::GetContext();
 
 			// and overwrite model matrix
 			localCtx.model = savedCtx.model * it->getTransform();
 
 			// set our local render ctx
-			RenderContext::setContext(localCtx);
+			RenderContext::SetContext(localCtx);
 
-			g_renderDevice->setVertexBuffer(it->getVertexBuffer(), sizeof(Vertex), 0);
+			g_renderDevice->SetVertexBuffer(it->getVertexBuffer(), sizeof(Vertex), 0);
 			g_renderDevice->setVertexFormat(&s_vfVertex);
 
 			it->getMaterial()->bind();
@@ -676,43 +676,43 @@ namespace solunar {
 			g_shaderManager->setShaderProgram(customShader);
 			it->getMaterial()->bindUniformsCustom(customShader);
 
-			/*graphicsDevice->setIndexBuffer(it->getIndexBuffer());
+			/*graphicsDevice->SetIndexBuffer(it->getIndexBuffer());
 
 			graphicsDevice->drawElements(PrimitiveMode::Triangles, it->getIndeciesCount());*/
 
 			glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
 
 			// return what have been
-			RenderContext::setContext(savedCtx);
+			RenderContext::SetContext(savedCtx);
 		}
 #endif
 	}
 
 	void GLRenderer::renderShadows(View* view)
 	{
-		ShadowsRenderer* shadowRenderer = ShadowsRenderer::getInstance();
+		ShadowsRenderer* shadowRenderer = ShadowsRenderer::GetInstance();
 		shadowRenderer->beginRender();
 
-		// initialize render context
-		RenderContext& renderContext = RenderContext::getContext();
+		// Initialize render context
+		RenderContext& renderContext = RenderContext::GetContext();
 		renderContext.width = view->m_width;
 		renderContext.height = view->m_height;
 		renderContext.proj = view->m_projection;
 		renderContext.view = view->m_view;
 		renderContext.model = glm::mat4(1.0f);
-		RenderContext::setContext(renderContext);
+		RenderContext::SetContext(renderContext);
 
 #if 0
 		const std::shared_ptr<GraphicsWorld>& graphicsWorld = WorldManager::getActiveWorld()->getWorldComponent<GraphicsWorld>();
-		const auto& pointLights = graphicsWorld->getLightManager()->getLights();
+		const auto& pointLights = graphicsWorld->GetLightManager()->GetLights();
 		for (auto it : pointLights)
 		{
-			if (!it->isA(PointLightComponent::getStaticTypeInfo()))
+			if (!it->IsA(PointLightComponent::GetStaticTypeInfo()))
 				continue;
 
 			for (auto it2 : graphicsWorld->getDrawables())
 			{
-				if (it2->isA(StaticMeshComponent::getStaticTypeInfo()))
+				if (it2->IsA(StaticMeshComponent::GetStaticTypeInfo()))
 					renderStaticMeshCustomShader(view, dynamicCast<StaticMeshComponent>(it2), shadowRenderer->getShadowMapShader());
 			}
 		}
@@ -765,18 +765,18 @@ namespace solunar {
 		{
 			sprintf(buffer, "sshot_%i.png", i);
 
-			FileHandle fh = g_fileSystem->open(buffer);
+			FileHandle fh = g_fileSystem->Open(buffer);
 			if (!fh)
 			{
 				break;
 			}
 			else
 			{
-				g_fileSystem->close(fh);
+				g_fileSystem->Close(fh);
 			}
 		}
 
-		image.save(buffer);
+		image.Save(buffer);
 
 		delete[] screenBuffer;
 

@@ -19,8 +19,8 @@ namespace solunar
 		ImGuiRenderer();
 		~ImGuiRenderer();
 
-		void init();
-		void shutdown();
+		void Init();
+		void Shutdown();
 
 		void newFrame();
 		void renderDrawData(ImDrawData* drawData);
@@ -49,14 +49,14 @@ namespace solunar
 	{
 		static ImGuiManager ms_instance;
 	public:
-		void init();
-		void shutdown();
+		void Init();
+		void Shutdown();
 
-		void beginFrame();
-		void endFrame();
+		void BeginFrame();
+		void EndFrame();
 
 	private:
-		void draw();
+		void Draw();
 
 	private:
 		ImGuiRenderer m_ImGuiRenderer;

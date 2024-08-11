@@ -71,7 +71,7 @@ namespace solunar
 	{
 		friend IShaderProgram* createShaderProgramFromMaterial(Material* material);
 		
-		ImplementObject(Material, GraphicsObject);
+		IMPLEMENT_OBJECT(Material, GraphicsObject);
 	public:
 		static void createMaterialFromImport(const char* name, const char* diffuseName, const char* normalName);
 
@@ -79,16 +79,16 @@ namespace solunar
 		Material();
 		~Material();
 
-		void load(const std::shared_ptr<DataStream>& dataStream) override;
+		void Load(const std::shared_ptr<DataStream>& dataStream) override;
 
-		void loadXML(tinyxml2::XMLElement& element) override;
-		void saveXML(tinyxml2::XMLElement& element) override;
+		void LoadXML(tinyxml2::XMLElement& element) override;
+		void SaveXML(tinyxml2::XMLElement& element) override;
 
 	public:
 		void setName(const std::string& name) { m_materialName = name; }
 
 		void createHw() override;
-		void releaseHw() override;
+		void ReleaseHw() override;
 
 		void bindSamplers();
 
@@ -96,7 +96,7 @@ namespace solunar
 
 		void bind();
 
-		std::string& getName() { return m_materialName; }
+		std::string& GetName() { return m_materialName; }
 
 		std::weak_ptr<TextureMap> getTexture(MAT_TEX tex);
 		MaterialType getMaterialType() { return m_materialType; }
@@ -138,32 +138,32 @@ namespace solunar
 
 	class NullMaterial : public Material
 	{
-		ImplementObject(NullMaterial, Material);
+		IMPLEMENT_OBJECT(NullMaterial, Material);
 	public:
 		NullMaterial();
 		~NullMaterial();
 
-		static void registerObject();
+		static void RegisterObject();
 	};
 
 	class GenericMaterial : public Material
 	{
-		ImplementObject(GenericMaterial, Material);
+		IMPLEMENT_OBJECT(GenericMaterial, Material);
 	public:
 		GenericMaterial();
 		~GenericMaterial();
 
-		static void registerObject();
+		static void RegisterObject();
 	};
 
 	class LayeredMaskedMaterial : public Material
 	{
-		ImplementObject(LayeredMaskedMaterial, Material);
+		IMPLEMENT_OBJECT(LayeredMaskedMaterial, Material);
 	public:
 		LayeredMaskedMaterial();
 		~LayeredMaskedMaterial();
 
-		static void registerObject();
+		static void RegisterObject();
 	};
 }
 

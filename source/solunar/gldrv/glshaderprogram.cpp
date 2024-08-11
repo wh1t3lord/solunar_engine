@@ -9,14 +9,14 @@ GLuint createShader(GLenum target, const char* filename, const char* defines = n
 {
 	std::string content;
 
-	DataStreamPtr f = g_contentManager->openStream(filename);
+	DataStreamPtr f = g_contentManager->OpenStream(filename);
 
-	f->seek(Seek_End, 0);
-	size_t fileLength = f->tell();
-	f->seek(Seek_Begin, 0);
+	f->Seek(Seek_End, 0);
+	size_t fileLength = f->Tell();
+	f->Seek(Seek_Begin, 0);
 
 	content.resize(fileLength + 1);
-	f->read((void*)content.data(), fileLength);
+	f->Read((void*)content.data(), fileLength);
 	content[fileLength] = '\0';
 
 	if (defines && strlen(defines) > 0) {
@@ -43,13 +43,13 @@ GLuint createShader(GLenum target, const char* filename, const char* defines = n
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 	if (!success) {
 		glGetShaderInfoLog(shader, 512, NULL, infoLog);
-		Core::msg("=== SHADER COMPILE ERROR ===");
-		Core::msg("%s", contentCStr);
-		Core::msg("============================");
-		Core::error("createShader: failed to compile shader %s\n%s", filename, infoLog);
+		Core::Msg("=== SHADER COMPILE ERROR ===");
+		Core::Msg("%s", contentCStr);
+		Core::Msg("============================");
+		Core::Error("createShader: failed to compile shader %s\n%s", filename, infoLog);
 	}
 
-	Core::msg("[graphics]: created %s shader from file %s", (target == GL_VERTEX_SHADER) ? "vertex" : "fragment", filename);
+	Core::Msg("[graphics]: created %s shader from file %s", (target == GL_VERTEX_SHADER) ? "vertex" : "fragment", filename);
 
 	return shader;
 }
@@ -74,7 +74,7 @@ GLShaderProgram::GLShaderProgram(const std::string& vsfilename, const std::strin
 	glGetProgramiv(m_program, GL_LINK_STATUS, &success);
 	if (!success) {
 		glGetProgramInfoLog(m_program, 512, NULL, infoLog);
-		Core::error("IShaderProgram::IShaderProgram: failed to link program %s", infoLog);
+		Core::Error("IShaderProgram::IShaderProgram: failed to link program %s", infoLog);
 	}
 
 	m_inputLayout.resize(inputLayoutCount);
@@ -101,7 +101,7 @@ GLShaderProgram::GLShaderProgram(const std::string& vsfilename, const std::strin
 	glGetProgramiv(m_program, GL_LINK_STATUS, &success);
 	if (!success) {
 		glGetProgramInfoLog(m_program, 512, NULL, infoLog);
-		Core::error("IShaderProgram::IShaderProgram: failed to link program %s", infoLog);
+		Core::Error("IShaderProgram::IShaderProgram: failed to link program %s", infoLog);
 	}
 
 	m_inputLayout.resize(inputLayoutCount);

@@ -6,12 +6,12 @@ namespace solunar
 
 class ShockSignal : public Object
 {
-	ImplementObject(ShockSignal, Object);
+	IMPLEMENT_OBJECT(ShockSignal, Object);
 public:
 	ShockSignal();
 	~ShockSignal();
 
-	static void registerObject();
+	static void RegisterObject();
 };
 
 class ShockSignalManager : public Singleton<ShockSignalManager>
@@ -22,9 +22,9 @@ private:
 	static ShockSignalManager* ms_instance;
 
 public:
-	static void createInstance();
-	static void destroyInstance();
-	static ShockSignalManager* getInstance();
+	static void CreateInstance();
+	static void DestroyInstance();
+	static ShockSignalManager* GetInstance();
 ////////////////////////////////////////////////
 
 public:

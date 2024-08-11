@@ -8,13 +8,13 @@ namespace solunar
 
 class CameraComponent : public Component
 {
-	ImplementObject(CameraComponent, Component);
+	IMPLEMENT_OBJECT(CameraComponent, Component);
 public:
 	CameraComponent();
 	virtual ~CameraComponent();
 
-	void setDirection(const glm::vec3& direction);
-	glm::vec3 getDirection();
+	void SetDirection(const glm::vec3& direction);
+	glm::vec3 GetDirection();
 
 protected:
 	glm::vec3 m_direction;
@@ -24,7 +24,7 @@ protected:
 // Yaw pitch roll camera
 class CameraYawPitchRollComponent : public CameraComponent
 {
-	ImplementObject(CameraYawPitchRollComponent, CameraComponent);
+	IMPLEMENT_OBJECT(CameraYawPitchRollComponent, CameraComponent);
 public:
 	CameraYawPitchRollComponent();
 	virtual ~CameraYawPitchRollComponent();
@@ -33,7 +33,7 @@ public:
 	virtual void updateFromMousePosition(const glm::vec2& mousePos);
 
 	//! Set directly your euler angles
-	void setEulerRotation(float yaw, float pitch, float roll);
+	void SetEulerRotation(float yaw, float pitch, float roll);
 
 	// #TODO: make getters 
 public:
@@ -45,7 +45,7 @@ public:
 // First person camera
 class CameraFirstPersonComponent : public CameraYawPitchRollComponent
 {
-	ImplementObject(CameraFirstPersonComponent, CameraYawPitchRollComponent);
+	IMPLEMENT_OBJECT(CameraFirstPersonComponent, CameraYawPitchRollComponent);
 public:
 	CameraFirstPersonComponent();
 	virtual ~CameraFirstPersonComponent();

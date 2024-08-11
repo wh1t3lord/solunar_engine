@@ -12,14 +12,14 @@ std::string loadShaderText(const std::string& filename)
 {
 	std::string content;
 
-	DataStreamPtr f = g_contentManager->openStream(filename);
+	DataStreamPtr f = g_contentManager->OpenStream(filename);
 
-	f->seek(Seek_End, 0);
-	size_t fileLength = f->tell();
-	f->seek(Seek_Begin, 0);
+	f->Seek(Seek_End, 0);
+	size_t fileLength = f->Tell();
+	f->Seek(Seek_Begin, 0);
 
 	content.resize(fileLength + 1);
-	f->read((void*)content.data(), fileLength);
+	f->Read((void*)content.data(), fileLength);
 	content[fileLength] = '\0';
 
 	f = nullptr;
@@ -51,7 +51,7 @@ IShaderProgram* D3D11ShaderProgramManager::createShaderProgram(const char* vsfil
 
 	D3D11Device* device = (D3D11Device*)g_renderDevice;
 
-	Core::msg("D3D11ShaderProgramManager: compile shader program from files %s, %s", vsfilename, fsfilename);
+	Core::Msg("D3D11ShaderProgramManager: compile shader program from files %s, %s", vsfilename, fsfilename);
 
 	std::string vspath = m_shaderPath;
 	vspath += "/";

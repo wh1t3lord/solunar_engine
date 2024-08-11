@@ -37,17 +37,17 @@ void TriangleMeshServer::saveCollision(const char* modelfilename)
 	char buffer[260];
 	snprintf(buffer, sizeof(buffer), "data/models/%s.cm", modelfilename);
 
-	FileHandle file = g_fileSystem->create(buffer);
+	FileHandle file = g_fileSystem->Create(buffer);
 
 	/////////////////////////////////////////////////////
 	// Write header
 	uint64_t ullMagic = get_cm_magic();
-	g_fileSystem->write(file, &ullMagic, sizeof(ullMagic));
+	g_fileSystem->Write(file, &ullMagic, sizeof(ullMagic));
 
 	float fVersion = CM_VERSION;
-	g_fileSystem->write(file, &fVersion, sizeof(fVersion));
+	g_fileSystem->Write(file, &fVersion, sizeof(fVersion));
 
-	g_fileSystem->close(file);
+	g_fileSystem->Close(file);
 }
 
 /////////////////////////////////////////////////////////////////////
@@ -60,24 +60,24 @@ TriangleMeshShapeComponent::~TriangleMeshShapeComponent()
 {
 }
 
-void TriangleMeshShapeComponent::registerObject()
+void TriangleMeshShapeComponent::RegisterObject()
 {
-	g_typeManager->registerObject<TriangleMeshShapeComponent>();
+	g_typeManager->RegisterObject<TriangleMeshShapeComponent>();
 }
 
-void TriangleMeshShapeComponent::loadXML(tinyxml2::XMLElement& element)
+void TriangleMeshShapeComponent::LoadXML(tinyxml2::XMLElement& element)
 {
-	ShapeComponent::loadXML(element);
+	ShapeComponent::LoadXML(element);
 }
 
-void TriangleMeshShapeComponent::saveXML(tinyxml2::XMLElement& element)
+void TriangleMeshShapeComponent::SaveXML(tinyxml2::XMLElement& element)
 {
-	ShapeComponent::saveXML(element);
+	ShapeComponent::SaveXML(element);
 }
 
 void TriangleMeshShapeComponent::createShapeInternal()
 {
-	TriangleMeshServer::getInstance()->saveCollision("test");
+	TriangleMeshServer::GetInstance()->saveCollision("test");
 }
 
 }

@@ -17,32 +17,32 @@ namespace solunar
 
 	}
 
-	size_t DataStream::read(void* buffer, size_t count)
+	size_t DataStream::Read(void* buffer, size_t count)
 	{
 		return 0;
 	}
 
-	size_t DataStream::write(void* buffer, size_t count)
+	size_t DataStream::Write(void* buffer, size_t count)
 	{
 		return 0;
 	}
 
-	void DataStream::seek(SeekWay dir, long offset)
+	void DataStream::Seek(SeekWay dir, long offset)
 	{
 
 	}
 
-	long DataStream::tell()
+	long DataStream::Tell()
 	{
 		return 0;
 	}
 
-	bool DataStream::eof()
+	bool DataStream::Eof()
 	{
 		return false;
 	}
 
-	void DataStream::flush()
+	void DataStream::Flush()
 	{
 
 	}

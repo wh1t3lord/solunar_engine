@@ -18,18 +18,17 @@ namespace solunar
 		AudioManagerFMOD();
 		~AudioManagerFMOD();
 
-		virtual void init();
-		virtual void shutdown();
+		virtual void Init();
+		virtual void Shutdown();
 
-		void update() override;
+		void Update() override;
 
-		virtual AudioSource* createSource(const std::string& filename);
-		virtual void deleteSource(AudioSource* source);
+		virtual AudioSource* CreateSource(const std::string& filename);
+		virtual void DeleteSource(AudioSource* source);
 	
 		void setListenerPosition(const glm::vec3& position);
-
-		FMOD::System* getFMODSystem();
-
+	
+		FMOD::System* GetFMODSystem();
 		FMOD::Studio::System* getStudioSystem() { return m_studioSystem; }
 
 	private:

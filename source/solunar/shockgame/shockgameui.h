@@ -8,28 +8,28 @@ namespace solunar
 
 class ShockGameMainMenuComponent : public LogicComponent
 {
-	ImplementObject(ShockGameMainMenuComponent, LogicComponent);
+	IMPLEMENT_OBJECT(ShockGameMainMenuComponent, LogicComponent);
 
 public:
 	ShockGameMainMenuComponent();
 	~ShockGameMainMenuComponent();
 
-	void onWorldSet(World* world) override;
+	void OnWorldSet(World* world) override;
 
-	void update(float dt) override;
+	void Update(float dt) override;
 };
 
 class DemoGameMainMenuComponent : public LogicComponent
 {
-	ImplementObject(DemoGameMainMenuComponent, LogicComponent);
+	IMPLEMENT_OBJECT(DemoGameMainMenuComponent, LogicComponent);
 
 public:
 	DemoGameMainMenuComponent();
 	~DemoGameMainMenuComponent();
 
-	void onWorldSet(World* world) override;
+	void OnWorldSet(World* world) override;
 
-	void update(float dt) override;
+	void Update(float dt) override;
 };
 
 }

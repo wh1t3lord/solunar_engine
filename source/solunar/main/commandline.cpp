@@ -6,13 +6,13 @@ namespace solunar
 
 CommandLine g_commandLine;
     
-void CommandLine::init(int argc, char* argv[])
+void CommandLine::Init(int argc, char* argv[])
 {
     m_argc = argc;
     m_argv = argv;
 }
 
-void CommandLine::init(const char* str)
+void CommandLine::Init(const char* str)
 {
     
 }

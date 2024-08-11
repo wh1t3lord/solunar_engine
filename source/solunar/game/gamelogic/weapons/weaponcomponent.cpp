@@ -19,12 +19,12 @@ namespace solunar
 	{
 	}
 
-	void WeaponComponent::registerObject()
+	void WeaponComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<WeaponComponent>();
+		g_typeManager->RegisterObject<WeaponComponent>();
 	}
 
-	void WeaponComponent::update(float dt)
+	void WeaponComponent::Update(float dt)
 	{
 		AnimatedMeshComponent* mesh = getEntity()->getComponent<AnimatedMeshComponent>();
 		std::shared_ptr<ModelBase> modelBase = mesh->lockModel();

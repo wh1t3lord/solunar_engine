@@ -13,7 +13,7 @@ namespace solunar
 
 	}
 
-	void LogicComponent::update(float delta)
+	void LogicComponent::Update(float delta)
 	{
 
 	}

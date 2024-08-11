@@ -8,9 +8,9 @@
 
 namespace solunar {
 
-	void ShapeComponent::registerObject()
+	void ShapeComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<ShapeComponent>();
+		g_typeManager->RegisterObject<ShapeComponent>();
 	}
 
 	ShapeComponent::ShapeComponent() :
@@ -28,27 +28,27 @@ namespace solunar {
 
 	}
 
-	void ShapeComponent::onEntitySet(Entity* entity)
+	void ShapeComponent::OnEntitySet(Entity* entity)
 	{
-		Component::onEntitySet(entity);
+		Component::OnEntitySet(entity);
 	}
 
-	void ShapeComponent::onEntityRemove()
+	void ShapeComponent::OnEntityRemove()
 	{
-		if (getEntity())
+		if (GetEntity())
 		{
 			// HACK: I don't know how it's brokes but... hack...
 #if 1
-			if (RigidBodyComponent* rigidBody = getEntity()->getComponent<RigidBodyComponent>())
+			if (RigidBodyComponent* rigidBody = GetEntity()->GetComponent<RigidBodyComponent>())
 			{
-				Assert2(rigidBody->getCompoundShape(), "RigidBody is not initialized!");
-				rigidBody->getCompoundShape()->removeChildShape(m_shape);
+				Assert2(rigidBody->GetCompoundShape(), "RigidBody is not initialized!");
+				rigidBody->GetCompoundShape()->removeChildShape(m_shape);
 			}
 #else
 			if (m_rigidBody)
 			{
-				Assert2(m_rigidBody->getCompoundShape(), "RigidBody is not initialized!");
-				m_rigidBody->getCompoundShape()->removeChildShape(m_shape);
+				Assert2(m_rigidBody->GetCompoundShape(), "RigidBody is not initialized!");
+				m_rigidBody->GetCompoundShape()->removeChildShape(m_shape);
 			}
 #endif
 		}
@@ -57,33 +57,33 @@ namespace solunar {
 		mem_delete(m_shape);
 	}
 
-	void ShapeComponent::onWorldSet(World* world)
+	void ShapeComponent::OnWorldSet(World* world)
 	{
-		Component::onWorldSet(world);
-		m_physicsWorld = world->getPhysicsWorld();
+		Component::OnWorldSet(world);
+		m_physicsWorld = world->GetPhysicsWorld();
 	}
 
-	void ShapeComponent::loadXML(tinyxml2::XMLElement& element)
+	void ShapeComponent::LoadXML(tinyxml2::XMLElement& element)
 	{
 		tinyxml2::XMLElement* positionElement = element.FirstChildElement("Position");
 		if (positionElement)
 		{
-			m_localPosition = getVector3FromXMLElement(*positionElement);
+			m_localPosition = GetVector3FromXMLElement(*positionElement);
 		}
 	}
 
-	void ShapeComponent::saveXML(tinyxml2::XMLElement& element)
+	void ShapeComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
 		tinyxml2::XMLElement* positionElement = element.InsertNewChildElement("Position");
-		saveVector3ToXMLElement(*positionElement, m_localPosition);
+		SaveVector3ToXMLElement(*positionElement, m_localPosition);
 	}
 
 	void ShapeComponent::initializeShape()
 	{
-		m_rigidBody = getEntity()->getComponent<RigidBodyComponent>();
+		m_rigidBody = GetEntity()->GetComponent<RigidBodyComponent>();
 		if (!m_rigidBody)
 		{
-			m_rigidBody = getEntity()->createComponent<RigidBodyComponent>();
+			m_rigidBody = GetEntity()->CreateComponent<RigidBodyComponent>();
 		}
 
 		createShapeInternal();
@@ -93,8 +93,8 @@ namespace solunar {
 		initializeShapeTransform();
 
 		// apply created shape to rigid body compound shape
-		Assert2(m_rigidBody->getCompoundShape(), "RigidBody is not initialized!");
-		m_rigidBody->getCompoundShape()->addChildShape(m_btLocalTransform, m_shape);
+		Assert2(m_rigidBody->GetCompoundShape(), "RigidBody is not initialized!");
+		m_rigidBody->GetCompoundShape()->addChildShape(m_btLocalTransform, m_shape);
 	}
 
 	void ShapeComponent::initializeShapeTransform()
@@ -114,9 +114,9 @@ namespace solunar {
 	//////////////////////////////////////////////////////////////////////////
 	// Box Shape Component
 
-	void BoxShapeComponent::registerObject()
+	void BoxShapeComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<BoxShapeComponent>();
+		g_typeManager->RegisterObject<BoxShapeComponent>();
 	}
 
 	BoxShapeComponent::BoxShapeComponent()
@@ -128,25 +128,25 @@ namespace solunar {
 	{
 	}
 
-	void BoxShapeComponent::loadXML(tinyxml2::XMLElement& element)
+	void BoxShapeComponent::LoadXML(tinyxml2::XMLElement& element)
 	{
-		ShapeComponent::loadXML(element);
+		ShapeComponent::LoadXML(element);
 
 		tinyxml2::XMLElement* sizeElement = element.FirstChildElement("Size");
 		if (sizeElement)
 		{
-			m_size = getVector3FromXMLElement(*sizeElement);
+			m_size = GetVector3FromXMLElement(*sizeElement);
 		}
 	}
 
-	void BoxShapeComponent::saveXML(tinyxml2::XMLElement& element)
+	void BoxShapeComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
-		ShapeComponent::saveXML(element);
+		ShapeComponent::SaveXML(element);
 
 		tinyxml2::XMLElement* sizeElement = element.InsertNewChildElement("Size");
 		if (sizeElement)
 		{
-			saveVector3ToXMLElement(*sizeElement, m_size);
+			SaveVector3ToXMLElement(*sizeElement, m_size);
 		}
 	}
 
@@ -164,9 +164,9 @@ namespace solunar {
 	//////////////////////////////////////////////////////////////////////////
 	// Sphere Shape Component
 
-	void SphereShapeComponent::registerObject()
+	void SphereShapeComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<SphereShapeComponent>();
+		g_typeManager->RegisterObject<SphereShapeComponent>();
 	}
 
 	SphereShapeComponent::SphereShapeComponent()
@@ -179,9 +179,9 @@ namespace solunar {
 
 	}
 
-	void SphereShapeComponent::loadXML(tinyxml2::XMLElement& element)
+	void SphereShapeComponent::LoadXML(tinyxml2::XMLElement& element)
 	{
-		ShapeComponent::loadXML(element);
+		ShapeComponent::LoadXML(element);
 
 		tinyxml2::XMLElement* sizeElement = element.FirstChildElement("Size");
 		if (sizeElement)
@@ -191,9 +191,9 @@ namespace solunar {
 		}
 	}
 
-	void SphereShapeComponent::saveXML(tinyxml2::XMLElement& element)
+	void SphereShapeComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
-		ShapeComponent::saveXML(element);
+		ShapeComponent::SaveXML(element);
 
 		tinyxml2::XMLElement* sizeElement = element.InsertNewChildElement("Size");
 		if (sizeElement)
@@ -211,9 +211,9 @@ namespace solunar {
 	//////////////////////////////////////////////////////////////////////////
 	// Cylinder Shape Component
 
-	void CylinderShapeComponent::registerObject()
+	void CylinderShapeComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<CylinderShapeComponent>();
+		g_typeManager->RegisterObject<CylinderShapeComponent>();
 	}
 
 	CylinderShapeComponent::CylinderShapeComponent()
@@ -225,25 +225,25 @@ namespace solunar {
 	{
 	}
 
-	void CylinderShapeComponent::loadXML(tinyxml2::XMLElement& element)
+	void CylinderShapeComponent::LoadXML(tinyxml2::XMLElement& element)
 	{
-		ShapeComponent::loadXML(element);
+		ShapeComponent::LoadXML(element);
 
 		tinyxml2::XMLElement* sizeElement = element.FirstChildElement("Size");
 		if (sizeElement)
 		{
-			m_size = getVector3FromXMLElement(*sizeElement);
+			m_size = GetVector3FromXMLElement(*sizeElement);
 		}
 	}
 
-	void CylinderShapeComponent::saveXML(tinyxml2::XMLElement& element)
+	void CylinderShapeComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
-		ShapeComponent::saveXML(element);
+		ShapeComponent::SaveXML(element);
 
 		tinyxml2::XMLElement* sizeElement = element.InsertNewChildElement("Size");
 		if (sizeElement)
 		{
-			saveVector3ToXMLElement(*sizeElement, m_size);
+			SaveVector3ToXMLElement(*sizeElement, m_size);
 		}
 	}
 
@@ -256,9 +256,9 @@ namespace solunar {
 	//////////////////////////////////////////////////////////////////////////
 	// Capsule Shape Component
 
-	void CapsuleShapeComponent::registerObject()
+	void CapsuleShapeComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<CapsuleShapeComponent>();
+		g_typeManager->RegisterObject<CapsuleShapeComponent>();
 	}
 
 	CapsuleShapeComponent::CapsuleShapeComponent()
@@ -279,9 +279,9 @@ namespace solunar {
 		createShapeInternal();
 	}
 
-	void CapsuleShapeComponent::loadXML(tinyxml2::XMLElement& element)
+	void CapsuleShapeComponent::LoadXML(tinyxml2::XMLElement& element)
 	{
-		ShapeComponent::loadXML(element);
+		ShapeComponent::LoadXML(element);
 
 		tinyxml2::XMLElement* sizeElement = element.FirstChildElement("Size");
 		if (sizeElement)
@@ -294,9 +294,9 @@ namespace solunar {
 		}
 	}
 
-	void CapsuleShapeComponent::saveXML(tinyxml2::XMLElement& element)
+	void CapsuleShapeComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
-		ShapeComponent::saveXML(element);
+		ShapeComponent::SaveXML(element);
 
 		tinyxml2::XMLElement* sizeElement = element.InsertNewChildElement("Size");
 		if (sizeElement)

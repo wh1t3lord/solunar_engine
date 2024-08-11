@@ -35,9 +35,9 @@ class IProperty
 public:
 	virtual ~IProperty() {}
 
-	virtual PropertyType getType() = 0;
-	virtual const char* getName() = 0;
-	virtual size_t getOffset() = 0;
+	virtual PropertyType GetType() = 0;
+	virtual const char* GetName() = 0;
+	virtual size_t GetOffset() = 0;
 };
 
 template <typename T, PropertyType Type>
@@ -47,9 +47,9 @@ public:
 	PropertyImpl(const char* name, size_t offset);
 	~PropertyImpl();
 
-	PropertyType getType() override;
-	const char* getName() override;
-	size_t getOffset() override;
+	PropertyType GetType() override;
+	const char* GetName() override;
+	size_t GetOffset() override;
 
 private:
 	const char* m_name;
@@ -70,19 +70,19 @@ inline PropertyImpl<T, Type>::~PropertyImpl()
 }
 
 template<typename T, PropertyType Type>
-inline PropertyType PropertyImpl<T, Type>::getType()
+inline PropertyType PropertyImpl<T, Type>::GetType()
 {
 	return Type;
 }
 
 template<typename T, PropertyType Type>
-inline const char* PropertyImpl<T, Type>::getName()
+inline const char* PropertyImpl<T, Type>::GetName()
 {
 	return m_name;
 }
 
 template<typename T, PropertyType Type>
-inline size_t PropertyImpl<T, Type>::getOffset()
+inline size_t PropertyImpl<T, Type>::GetOffset()
 {
 	return m_offset;
 }
@@ -93,7 +93,7 @@ void PropertyGetValue(Object* object, IProperty* property, T& value);
 template<typename T>
 inline void PropertyGetValue(Object* object, IProperty* property, T& value)
 {
-	void* data = object + property->getOffset();
+	void* data = object + property->GetOffset();
 	T* propertyData = reinterpret_cast<T*>(data);
 	value = *propertyData;
 }
@@ -101,8 +101,8 @@ inline void PropertyGetValue(Object* object, IProperty* property, T& value)
 template<>
 inline void PropertyGetValue(Object* object, IProperty* property, std::string& value)
 {
-	Assert(property->getType() == PropertyType_String);
-	std::string* stringData = (std::string*)(((char*)object) + property->getOffset());
+	Assert(property->GetType() == PropertyType_String);
+	std::string* stringData = (std::string*)(((char*)object) + property->GetOffset());
 	value = *stringData;
 }
 
@@ -119,8 +119,8 @@ using PropertyMatrix4 = PropertyImpl<glm::quat, PropertyType_Matrix4x4>;
 using PropertyBoundingBox = PropertyImpl<BoundingBox, PropertyType_BoundingBox>;
 
 // Macro for more beautiful registration
-#define RegisterProperty(className, propertyType, propertyName) \
-	PropertyManager::getInstance()->registerProperty(className::getStaticTypeInfo(), mem_new<propertyType>(#propertyName, offsetof(className, propertyName)));
+#define REGISTER_PROPERTY(className, propertyType, propertyName) \
+	PropertyManager::GetInstance()->RegisterProperty(className::GetStaticTypeInfo(), mem_new<propertyType>(#propertyName, offsetof(className, propertyName)));
 
 // \brief Property Manager - managing properties list for each TypeInfo 
 class PropertyManager : public Singleton<PropertyManager>
@@ -132,13 +132,13 @@ public:
 	PropertyManager();
 	~PropertyManager();
 
-	void shutdown();
+	void Shutdown();
 
-	void registerProperty(const TypeInfo* typeInfo, IProperty* propertyInstance);
+	void RegisterProperty(const TypeInfo* typeInfo, IProperty* propertyInstance);
 
-	IProperty* findProperty(const TypeInfo* typeInfo, const char* name);
+	IProperty* FindProperty(const TypeInfo* typeInfo, const char* name);
 
-	void getTypeProperties(const TypeInfo* typeInfo, std::vector<IProperty*>& properties);
+	void GetTypeProperties(const TypeInfo* typeInfo, std::vector<IProperty*>& properties);
 
 private:
 	std::unordered_map<size_t, std::vector<IProperty*>> m_properies;
@@ -150,30 +150,30 @@ typedef void (*RegisterPropertiesFunc)();
 class PropertyRegistrator
 {
 public:
-	static PropertyRegistrator* getInstance();
+	static PropertyRegistrator* GetInstance();
 
 public:
 	PropertyRegistrator();
 	~PropertyRegistrator();
 
-	void addFunc(RegisterPropertiesFunc func);
+	void AddFunc(RegisterPropertiesFunc func);
 
-	void registerClasses();
+	void RegisterClasses();
 
 private:
 	std::vector<RegisterPropertiesFunc> m_funcs;
 };
 
-#define DeclarePropertyRegister(className) \
-	static void registerProperties();
+#define DECLARE_PROPERTY_REGISTER(className) \
+	static void RegisterProperties();
 
-#define BeginPropertyRegister(className) \
-	void className::registerProperties()
+#define BEGIN_PROPERTY_REGISTER(className) \
+	void className::RegisterProperties()
 	
-#define EndPropertyRegister(className) \
+#define END_PROPERTY_REGISTER(className) \
 	static struct Registrator##className##Props { \
 		Registrator##className##Props() { \
-			PropertyRegistrator::getInstance()->addFunc(className::registerProperties); \
+			PropertyRegistrator::GetInstance()->AddFunc(className::RegisterProperties); \
 		} \
 	} g_registrator##className##Props;
 

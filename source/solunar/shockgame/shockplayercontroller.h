@@ -20,28 +20,28 @@ struct ShockPlayerStats
 
 class ShockPlayerController : public PlayerControllerComponent
 {
-	ImplementObject(ShockPlayerController, PlayerControllerComponent);
-	DeclarePropertyRegister(ShockPlayerController);
+	IMPLEMENT_OBJECT(ShockPlayerController, PlayerControllerComponent);
+	DECLARE_PROPERTY_REGISTER(ShockPlayerController);
 public:
 	ShockPlayerController();
 	~ShockPlayerController();
 
-	static void registerObject();
+	static void RegisterObject();
 
-	void onEntitySet(Entity* entity) override;
-	void onEntityRemove() override;
+	void OnEntitySet(Entity* entity) override;
+	void OnEntityRemove() override;
 
-	void update(float dt) override;
+	void Update(float dt) override;
 
 	void doHit(float amount);
 
 private:
-	void activateCamera();
+	void ActivateCamera();
 	void initializeCamera();
 	void initializeComponents();
-	void updateCamera(float dt);
-	void updateMovement(float dt);
-	void debugUpdate(float dt);
+	void UpdateCamera(float dt);
+	void UpdateMovement(float dt);
+	void DebugUpdate(float dt);
 
 private:
 	ShockPlayerStats m_playerStats;

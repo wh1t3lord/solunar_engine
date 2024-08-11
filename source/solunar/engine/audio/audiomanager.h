@@ -10,21 +10,22 @@ namespace solunar
 	protected:
 		static AudioManager* ms_pInstance;
 	public:
-		static AudioManager* createInstance();
-		static void destroyInstance();
+		static AudioManager* CreateInstance();
+		static void DestroyInstance();
 	public:
 		AudioManager();
 		virtual ~AudioManager();
 
-		virtual void init();
-		virtual void shutdown();
+		virtual void Init();
+		virtual void Shutdown();
 
-		virtual void update();
+		virtual void Update();
 
-		virtual AudioSource* createSource(const std::string& filename);
-		virtual void deleteSource(AudioSource* source);
-
+		virtual AudioSource* CreateSource(const std::string& filename);
+		virtual void DeleteSource(AudioSource* source);
+		
 		virtual void setListenerPosition(const glm::vec3& position);
+
 	};
 }
 

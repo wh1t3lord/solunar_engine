@@ -7,7 +7,7 @@ namespace solunar
 	{
 	public:
 		bool loadSettings(const std::string& filename);
-		void saveSettings(const std::string& filename);
+		void SaveSettings(const std::string& filename);
 
 		void applyDefaultOptions();
 

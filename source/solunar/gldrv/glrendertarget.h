@@ -12,8 +12,8 @@ public:
 	GLRenderTarget(const RenderTargetCreationDesc& renderTargetDesc);
 	~GLRenderTarget();
 
-	void create(const RenderTargetCreationDesc& renderTargetDesc);
-	void release() override;
+	void Create(const RenderTargetCreationDesc& renderTargetDesc);
+	void Release() override;
 
 	uint32_t getHandle();
 

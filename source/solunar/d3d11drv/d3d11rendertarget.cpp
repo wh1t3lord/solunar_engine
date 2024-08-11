@@ -41,15 +41,15 @@ D3D11RenderTarget::D3D11RenderTarget(D3D11Device* device, const RenderTargetCrea
 	memset(m_renderTargetViews.data(), 0, m_renderTargetViews.size() * sizeof(ID3D11RenderTargetView));
 	memset(m_shaderResourceViews.data(), 0, m_shaderResourceViews.size() * sizeof(ID3D11ShaderResourceView));
 
-	create(device, renderTargetDesc);
+	Create(device, renderTargetDesc);
 }
 
 D3D11RenderTarget::~D3D11RenderTarget()
 {
-	release();
+	Release();
 }
 
-void D3D11RenderTarget::create(D3D11Device* device, const RenderTargetCreationDesc& renderTargetDesc)
+void D3D11RenderTarget::Create(D3D11Device* device, const RenderTargetCreationDesc& renderTargetDesc)
 {
 	for (int i = 0; i < renderTargetDesc.m_textures2DCount; i++)
 	{
@@ -111,7 +111,7 @@ void D3D11RenderTarget::create(D3D11Device* device, const RenderTargetCreationDe
 	}
 }
 
-void D3D11RenderTarget::release()
+void D3D11RenderTarget::Release()
 {
 #if 0
 	for (auto& it : m_shaderResourceViews)

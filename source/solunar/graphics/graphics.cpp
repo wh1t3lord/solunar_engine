@@ -18,39 +18,39 @@ void registerGraphicsObjects()
 {
 	// Graphics objects
 
-	g_typeManager->registerObject<GraphicsObject>();
-	g_typeManager->registerObject<TextureMap>();
-	g_typeManager->registerObject<Material>();
-	g_typeManager->registerObject<GenericMaterial>();
-	g_typeManager->registerObject<LayeredMaskedMaterial>();
-	g_typeManager->registerObject<NullMaterial>();
-	g_typeManager->registerObject<ModelBase>();
-	g_typeManager->registerObject<AnimatedModel>();
-	g_typeManager->registerObject<Model>();
-	g_typeManager->registerObject<ModelSubmesh>();
+	g_typeManager->RegisterObject<GraphicsObject>();
+	g_typeManager->RegisterObject<TextureMap>();
+	g_typeManager->RegisterObject<Material>();
+	g_typeManager->RegisterObject<GenericMaterial>();
+	g_typeManager->RegisterObject<LayeredMaskedMaterial>();
+	g_typeManager->RegisterObject<NullMaterial>();
+	g_typeManager->RegisterObject<ModelBase>();
+	g_typeManager->RegisterObject<AnimatedModel>();
+	g_typeManager->RegisterObject<Model>();
+	g_typeManager->RegisterObject<ModelSubmesh>();
 
 	// Components
-	g_typeManager->registerObject<MeshComponent>();
-	g_typeManager->registerObject<AnimatedMeshComponent>();
+	g_typeManager->RegisterObject<MeshComponent>();
+	g_typeManager->RegisterObject<AnimatedMeshComponent>();
 
-	LightComponent::registerObject();
-	PointLightComponent::registerObject();
-	DirectionalLightComponent::registerObject();
+	LightComponent::RegisterObject();
+	PointLightComponent::RegisterObject();
+	DirectionalLightComponent::RegisterObject();
 }
 
 void graphicsInit()
 {
-	Core::msg("Initializing graphics");
+	Core::Msg("Initializing graphics");
 
 	registerGraphicsObjects();
 
 	createRenderer();
-	g_renderer->init();
+	g_renderer->Init();
 }
 
 void graphicsShutdown()
 {
-	g_renderer->shutdown();
+	g_renderer->Shutdown();
 	destroyRenderer();
 }
 

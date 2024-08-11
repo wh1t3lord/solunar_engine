@@ -4,7 +4,7 @@
 namespace solunar
 {
 
-Timer* Timer::getInstance()
+Timer* Timer::GetInstance()
 {
 	static Timer timer;
 	return &timer;
@@ -23,14 +23,14 @@ Timer::~Timer()
 {
 }
 
-void Timer::init()
+void Timer::Init()
 {
 	QueryPerformanceFrequency((LARGE_INTEGER*)&m_frequency);
 	QueryPerformanceCounter((LARGE_INTEGER*)&m_startTime);
 	m_endTime = m_startTime;
 }
 
-void Timer::update()
+void Timer::Update()
 {
 	QueryPerformanceCounter((LARGE_INTEGER*)&m_startTime);
 	m_deltaTime = (float)(m_startTime - m_endTime) / m_frequency;
@@ -60,13 +60,13 @@ Timer::~Timer()
 {
 }
 
-void Timer::init()
+void Timer::Init()
 {
 	m_startTime = clock();
 	m_endTime = clock();
 }
 
-void Timer::update()
+void Timer::Update()
 {
 	m_startTime = clock();
 	m_deltaTime = (float)(m_startTime - m_endTime) / CLOCKS_PER_SEC;

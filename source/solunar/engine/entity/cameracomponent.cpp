@@ -13,12 +13,12 @@ CameraComponent::~CameraComponent()
 {
 }
 
-void CameraComponent::setDirection(const glm::vec3& direction)
+void CameraComponent::SetDirection(const glm::vec3& direction)
 {
 	m_direction = direction;
 }
 
-glm::vec3 CameraComponent::getDirection()
+glm::vec3 CameraComponent::GetDirection()
 {
 	return m_direction;
 }
@@ -43,7 +43,7 @@ void CameraYawPitchRollComponent::updateFromMousePosition(const glm::vec2& mouse
 	Assert(0);
 }
 
-void CameraYawPitchRollComponent::setEulerRotation(float yaw, float pitch, float roll)
+void CameraYawPitchRollComponent::SetEulerRotation(float yaw, float pitch, float roll)
 {
 	m_yaw = yaw;
 	m_pitch = pitch;

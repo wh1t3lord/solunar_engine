@@ -13,10 +13,10 @@ namespace solunar
 		void addLight(LightComponent* light);
 		void removeLight(LightComponent* light);
 
-		std::vector<LightComponent*>& getLights() { return m_lights; }
-		std::vector<PointLightComponent*>& getPointLights() { return m_pointLights; }
+		std::vector<LightComponent*>& GetLights() { return m_lights; }
+		std::vector<PointLightComponent*>& GetPointLights() { return m_pointLights; }
 
-		DirectionalLightComponent* getDirectionalLight();
+		DirectionalLightComponent* GetDirectionalLight();
 
 	private:
 		std::vector<LightComponent*> m_lights;

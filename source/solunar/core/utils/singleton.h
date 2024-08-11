@@ -15,7 +15,7 @@ protected:
 	}
 
 public:
-	static T* getInstance()
+	static T* GetInstance()
 	{
 		return ms_instance;
 	}

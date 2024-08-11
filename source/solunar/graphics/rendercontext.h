@@ -16,11 +16,11 @@ namespace solunar
 		static RenderContext* ms_instance;
 
 	public:
-		static void init();
-		static void shutdown();
+		static void Init();
+		static void Shutdown();
 
-		static RenderContext& getContext();
-		static void setContext(RenderContext& ctx);
+		static RenderContext& GetContext();
+		static void SetContext(RenderContext& ctx);
 
 	};
 }

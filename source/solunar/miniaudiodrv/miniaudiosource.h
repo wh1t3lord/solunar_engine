@@ -15,10 +15,10 @@ public:
 	MiniAudioSource(const std::string& filename);
 	~MiniAudioSource();
 
-	bool isPlaying() override;
+	bool IsPlaying() override;
 
-	void play() override;
-	void stop() override;
+	void Play() override;
+	void Stop() override;
 
 	// MiniAudio stuff
 	ma_uint64 process(float* pInput, float* pOutput, size_t frames);

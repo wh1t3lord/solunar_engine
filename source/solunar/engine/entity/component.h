@@ -13,25 +13,25 @@ class Component : public SerializableObject
 	friend class Entity;
 	friend class World;
 public:
-	ImplementObject(Component, SerializableObject);
-	DeclarePropertyRegister(Component);
+	IMPLEMENT_OBJECT(Component, SerializableObject);
+	DECLARE_PROPERTY_REGISTER(Component);
 public:
 	Component();
 	virtual ~Component();
 
-	void setActive(bool active);
-	bool isActive();
+	void SetActive(bool active);
+	bool IsActive();
 
-	virtual void onEntitySet(Entity* entity);
-	virtual void onWorldSet(World* world);
+	virtual void OnEntitySet(Entity* entity);
+	virtual void OnWorldSet(World* world);
 
-	virtual void onEntityRemove();
+	virtual void OnEntityRemove();
 
-	Entity* getEntity() { return m_entity; }
-	World* getWorld() { return m_world; }
+	Entity* GetEntity() { return m_entity; }
+	World* GetWorld() { return m_world; }
 
-	void setSerializable(bool value);
-	bool isSerializable() { return m_isSerializable; }
+	void SetSerializable(bool value);
+	bool IsSerializable() { return m_isSerializable; }
 
 private:
 	Entity* m_entity;

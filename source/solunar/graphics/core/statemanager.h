@@ -36,7 +36,7 @@ public:
 	virtual void destroyRasterizerState(IRasterizerState* rasterizerState) = 0;
 	virtual void setRasterizerState(IRasterizerState* rasterizerState) = 0;
 
-	virtual ISamplerState* createSamplerState(const SamplerDesc& samplerDesc) = 0;
+	virtual ISamplerState* CreateSamplerState(const SamplerDesc& samplerDesc) = 0;
 	virtual void destroySamplerState(ISamplerState* samplerState) = 0;
 
 	virtual IBlendState* createBlendState(const BlendStateDesc& blendStateDesc) = 0;
@@ -45,7 +45,7 @@ public:
 
 	virtual IDepthStencilState* createDepthStencilState(const DepthStencilDesc& desc) = 0;
 	virtual void destroyDepthStencilState(IDepthStencilState* state) = 0;
-	virtual void setDepthStencilState(IDepthStencilState* state, uint32_t stencilRef) = 0;
+	virtual void SetDepthStencilState(IDepthStencilState* state, uint32_t stencilRef) = 0;
 };
 
 extern IStateManager* g_stateManager;
