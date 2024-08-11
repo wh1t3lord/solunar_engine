@@ -24,7 +24,7 @@ namespace solunar
 		virtual AudioSource* CreateSource(const std::string& filename);
 		virtual void DeleteSource(AudioSource* source);
 		
-		virtual void setListenerPosition(const glm::vec3& position);
+		virtual void SetListenerPosition(const glm::vec3& position);
 
 	};
 }

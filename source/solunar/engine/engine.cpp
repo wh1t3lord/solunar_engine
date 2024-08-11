@@ -219,8 +219,8 @@ namespace solunar
 		delete[] data;
 
 		// update timer
-		Timer::getInstance()->update();
-		Timer::getInstance()->update();
+		Timer::GetInstance()->Update();
+		Timer::GetInstance()->Update();
 	}
 
 	void Engine::LoadEmptyWorld()

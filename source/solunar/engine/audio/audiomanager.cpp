@@ -40,7 +40,7 @@ namespace solunar
 
 	}
 
-	void AudioManager::setListenerPosition(const glm::vec3& position)
+	void AudioManager::SetListenerPosition(const glm::vec3& position)
 	{
 	}
 

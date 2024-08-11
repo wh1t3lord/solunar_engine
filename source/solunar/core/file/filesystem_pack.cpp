@@ -31,7 +31,7 @@ void FileSystemPack::initialize()
 		{
 			if (ffd.dwFileAttributes != FILE_ATTRIBUTE_DIRECTORY)
 			{
-				Core::msg("[filesystem]: loading %s", ffd.cFileName);
+				Core::Msg("[filesystem]: loading %s", ffd.cFileName);
 				m_packFiles.push_back(mem_new<PackFile>(ffd.cFileName));
 			}
 		} while (FindNextFileA(hFind, &ffd) != 0);

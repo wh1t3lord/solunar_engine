@@ -10,7 +10,7 @@
 
 #include "core/file/packfile.h"
 
-using namespace engine;
+using namespace solunar;
 
 std::string getFileNameWithoutExtension(const std::string& filename)
 {

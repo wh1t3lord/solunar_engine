@@ -273,7 +273,7 @@ void showSettingsMenu()
 
 			if (ImGui::Button("Apply"))
 			{
-				VideoModeManager::apply(item_current_idx);
+				VideoModeManager::Apply(item_current_idx);
 				s_showApplyWindow = true;
 			}
 		}
@@ -341,11 +341,11 @@ void DemoGameMainMenuComponent::Update(float dt)
 
 	CameraProxy* camera = CameraProxy::GetInstance();
 
-	int posX = (camera->getView()->m_width / 2) - 550;
-	int posY = (camera->getView()->m_height / 2) + 150;
+	int posX = (camera->GetView()->m_width / 2) - 550;
+	int posY = (camera->GetView()->m_height / 2) + 150;
 
 	ImGui::SetNextWindowPos(ImVec2(posX, posY));
-	ImGui::SetNextWindowSize(ImVec2(camera->getView()->m_width / 2, camera->getView()->m_height / 2));
+	ImGui::SetNextWindowSize(ImVec2(camera->GetView()->m_width / 2, camera->GetView()->m_height / 2));
 
 
 	ImGui::Begin("Main Menu", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);

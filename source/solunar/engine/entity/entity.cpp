@@ -213,8 +213,8 @@ void Entity::SetRootEntity(Entity* Entity)
 glm::vec3 Entity::GetWorldPosition() const
 {
 	if (m_rootEntity) {
-		m_rootEntity->updateWorldTransform();
-		return glm::vec3(m_rootEntity->getWorldTranslation() * glm::vec4(m_position, 1.0f));
+		m_rootEntity->UpdateWorldTransform();
+		return glm::vec3(m_rootEntity->GetWorldTranslation() * glm::vec4(m_position, 1.0f));
 	}
 	
 	return m_position;

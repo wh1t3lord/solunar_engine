@@ -26,7 +26,7 @@ namespace solunar
 
 	void WeaponComponent::Update(float dt)
 	{
-		AnimatedMeshComponent* mesh = getEntity()->getComponent<AnimatedMeshComponent>();
+		AnimatedMeshComponent* mesh = GetEntity()->GetComponent<AnimatedMeshComponent>();
 		std::shared_ptr<ModelBase> modelBase = mesh->lockModel();
 		AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
 		if (!m_inited) {
@@ -37,11 +37,11 @@ namespace solunar
 			m_inited = true;
 		}
 
-		Camera* camera = CameraProxy::getInstance();
+		Camera* camera = CameraProxy::GetInstance();
 
 		bool isFireAniFinished = animatedModel->getCurrentAnimationId() == m_fireAni && animatedModel->isStoped();
 
-		if (InputManager::getInstance()->isPressed(KeyboardKeys::KEY_F)) {
+		if (InputManager::GetInstance()->IsPressed(KeyboardKeys::KEY_F)) {
 			animatedModel->setPlayAnimation(m_fireAni, false);
 
 			RayCastResult rq = {};
@@ -58,18 +58,18 @@ namespace solunar
 		animatedModel->testPlay(dt);
 
 #if 1
-		View* view = CameraProxy::getInstance()->getView();
+		View* view = CameraProxy::GetInstance()->GetView();
 
 		char buf[256];
 
 		snprintf(buf, sizeof(buf), "--- Viewmodel ---");
-		g_fontManager->drawSystemFontShadowed(buf, (float)view->m_width - 300.0f, 100.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		g_fontManager->DrawSystemFontShadowed(buf, (float)view->m_width - 300.0f, 100.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 		snprintf(buf, sizeof(buf), "Animation: %s", animatedModel->getCurrentAnimation() ? animatedModel->getCurrentAnimation()->m_name.c_str() : "NO ANIMATION");
-		g_fontManager->drawSystemFontShadowed(buf, (float)view->m_width - 300.0f, 125.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		g_fontManager->DrawSystemFontShadowed(buf, (float)view->m_width - 300.0f, 125.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
 		snprintf(buf, sizeof(buf), "Time: %.2f", animatedModel->getCurrentTime());
-		g_fontManager->drawSystemFontShadowed(buf, (float)view->m_width - 300.0f, 140.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		g_fontManager->DrawSystemFontShadowed(buf, (float)view->m_width - 300.0f, 140.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 #endif
 	}
 }

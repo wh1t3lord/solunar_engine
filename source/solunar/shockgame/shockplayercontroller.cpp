@@ -77,10 +77,10 @@ void ShockPlayerController::initializeCamera()
 	// m_cameraTransform = m_cameraNode->createComponentByType<TransformComponent>();
 	// m_camera = m_cameraNode->createComponentByType<CameraFirstPersonComponent>();
 
-	m_cameraEntity = getEntity()->createChild();
-	m_cameraEntity->setPosition(glm::vec3(0.0f, -0.2f, 0.0f));
+	m_cameraEntity = GetEntity()->CreateChild();
+	m_cameraEntity->SetPosition(glm::vec3(0.0f, -0.2f, 0.0f));
 
-	m_camera = m_cameraEntity->createComponent<CameraFirstPersonComponent>();
+	m_camera = m_cameraEntity->CreateComponent<CameraFirstPersonComponent>();
 	//m_camera = getEntity()->createComponent<CameraFirstPersonComponent>();
 
 
@@ -90,18 +90,18 @@ void ShockPlayerController::initializeCamera()
 	ActivateCamera();
 
 	// create weapon
-	Entity* hackEntity = m_cameraEntity->createChild();
+	Entity* hackEntity = m_cameraEntity->CreateChild();
 	//Entity* hackEntity = getEntity()->createChild();
-	hackEntity->quaternionRotate(glm::vec3(0.0f, 1.0f, 0.0f), -90.0f);
+	hackEntity->QuaternionRotate(glm::vec3(0.0f, 1.0f, 0.0f), -90.0f);
 
-	m_weaponEntity = hackEntity->createChild();
-	m_weaponEntity->setPosition(glm::vec3(0.2f, -0.25f, -0.3f));
+	m_weaponEntity = hackEntity->CreateChild();
+	m_weaponEntity->SetPosition(glm::vec3(0.2f, -0.25f, -0.3f));
 
 	// load model
-	m_weaponMesh = m_weaponEntity->createComponent<AnimatedMeshComponent>();
-	m_weaponMesh->loadModel("models/viewmodel_shotgun.glb");
+	m_weaponMesh = m_weaponEntity->CreateComponent<AnimatedMeshComponent>();
+	m_weaponMesh->LoadModel("models/viewmodel_shotgun.glb");
 
-	m_weaponEntity->createComponent<WeaponComponent>();
+	m_weaponEntity->CreateComponent<WeaponComponent>();
 
 	std::weak_ptr<AnimatedModel> weaponModel = dynamicCastWeakPtr<AnimatedModel, ModelBase>(m_weaponMesh->getModel());
 	//int rootNodeIndex = weaponModel.lock()->getNodeByName("Root Node");

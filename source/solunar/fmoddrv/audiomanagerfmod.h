@@ -26,7 +26,7 @@ namespace solunar
 		virtual AudioSource* CreateSource(const std::string& filename);
 		virtual void DeleteSource(AudioSource* source);
 	
-		void setListenerPosition(const glm::vec3& position);
+		void SetListenerPosition(const glm::vec3& position);
 	
 		FMOD::System* GetFMODSystem();
 		FMOD::Studio::System* getStudioSystem() { return m_studioSystem; }

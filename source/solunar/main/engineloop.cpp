@@ -342,7 +342,7 @@ namespace solunar {
 		AudioManager::GetInstance()->Update();
 
 		// set listener position #TODO: SHOULD THIS BE BEFORE AUDIOMANAGER UPDATE
-		AudioManager::getInstance()->setListenerPosition(CameraProxy::getInstance()->getPosition());
+		AudioManager::GetInstance()->SetListenerPosition(CameraProxy::GetInstance()->GetPosition());
 
 		// install current view
 		g_renderer->SetView(CameraProxy::GetInstance()->GetView());

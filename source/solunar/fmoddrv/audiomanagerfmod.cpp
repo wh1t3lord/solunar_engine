@@ -121,10 +121,10 @@ namespace solunar
 		}
 	}
 
-	void AudioManagerFMOD::setListenerPosition(const glm::vec3& position)
+	void AudioManagerFMOD::SetListenerPosition(const glm::vec3& position)
 	{
 		FMOD_VECTOR listenerPosition = { position.x, position.y, position.z };
-		getFMODSystem()->set3DListenerAttributes(0, &listenerPosition, NULL, NULL, NULL);
+		GetFMODSystem()->set3DListenerAttributes(0, &listenerPosition, NULL, NULL, NULL);
 	}
 
 	FMOD::System* AudioManagerFMOD::GetFMODSystem()

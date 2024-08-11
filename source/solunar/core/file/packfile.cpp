@@ -18,11 +18,11 @@ namespace solunar
 		{
 			if (fileEntry.isCompressed)
 			{
-				m_pkgFile->seek(Seek_Begin, fileEntry.pointerOffset);
+				m_pkgFile->Seek(Seek_Begin, fileEntry.pointerOffset);
 
 				std::vector<char> rawData;
 				rawData.resize(fileEntry.compressedSize);
-				m_pkgFile->read(rawData.data(), rawData.size());
+				m_pkgFile->Read(rawData.data(), rawData.size());
 
 				m_fileData.resize(fileEntry.size);
 
@@ -31,24 +31,24 @@ namespace solunar
 			else
 			{
 				m_fileData.resize(fileEntry.size);
-				m_pkgFile->seek(Seek_Begin, fileEntry.pointerOffset);
-				m_pkgFile->read(m_fileData.data(), m_fileData.size());
+				m_pkgFile->Seek(Seek_Begin, fileEntry.pointerOffset);
+				m_pkgFile->Read(m_fileData.data(), m_fileData.size());
 			}
 		}
 
-		size_t read(void* buffer, size_t count) override
+		size_t Read(void* buffer, size_t count) override
 		{
 			memcpy(buffer, m_fileData.data() + m_currentPosition, count);
 			return count;
 		}
 
-		size_t write(void* buffer, size_t count) override
+		size_t Write(void* buffer, size_t count) override
 		{
-			Core::error("The method or operation is not implemented.");
+			Core::Error("The method or operation is not implemented.");
 			return count;
 		}
 
-		void seek(SeekWay dir, long offset) override
+		void Seek(SeekWay dir, long offset) override
 		{
 			long positionChange = 0;
 
@@ -70,19 +70,19 @@ namespace solunar
 			m_currentPosition = positionChange;
 		}
 
-		long tell() override
+		long Tell() override
 		{
 			return m_currentPosition;
 		}
 
-		bool eof() override
+		bool Eof() override
 		{
 			return m_currentPosition >= m_fileEntry.size;
 		}
 
-		void flush() override
+		void Flush() override
 		{
-			Core::error("The method or operation is not implemented.");
+			Core::Error("The method or operation is not implemented.");
 		}
 
 	private:
@@ -111,17 +111,17 @@ namespace solunar
 		m_file = std::make_shared<FileStream>(filename); //std::static_pointer_cast<DataStream>(std::make_shared<FileMemoryMappingStream>(filename));
 
 		PackHeader header;
-		m_file->read(&header, sizeof(header));
+		m_file->Read(&header, sizeof(header));
 
 		if (strcmp(header.magic, "packfile") != 0)
-			Core::error("PackFile::load: %s is not a packfile or file has been damaged.", filename.c_str());
+			Core::Error("PackFile::load: %s is not a packfile or file has been damaged.", filename.c_str());
 
 		if (header.version != 1)
-			Core::error("PackFile::load: packfile mismatch version.");
+			Core::Error("PackFile::load: packfile mismatch version.");
 
 		std::vector<PackFileEntry> fileEntries;
 		fileEntries.resize(header.filecount);
-		m_file->read(fileEntries.data(), sizeof(PackFileEntry) * fileEntries.size());
+		m_file->Read(fileEntries.data(), sizeof(PackFileEntry) * fileEntries.size());
 
 		for (auto it : fileEntries)
 			m_fileEntries.emplace(it.filename, it);
