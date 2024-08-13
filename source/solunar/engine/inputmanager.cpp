@@ -36,6 +36,12 @@ bool InputManager::IsPressedWithReset(uint32_t key)
 	return value;
 }
 
+bool InputManager::IsMouseButtonPressed(MouseButtons buttonId)
+{
+	Assert(buttonId <= MOUSE_BUTTON_COUNT);
+	return m_mouseButtons[buttonId];
+}
+
 void InputManager::SetCursorCapture(bool capture)
 {
 	m_captureCursor = capture;

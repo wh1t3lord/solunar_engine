@@ -21,6 +21,9 @@ namespace solunar
 		// keyboard action
 		void KeyboardAction(uint32_t keyId, bool state);
 
+		// mouse button action
+		void MouseButtonAction(MouseButtons buttonId, bool state);
+
 	private:
 		bool m_lastCursorHiding;
 	};

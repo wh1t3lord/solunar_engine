@@ -122,6 +122,32 @@ namespace solunar
 			break;
 		}
 
+		/////////////////////////////////////////////////////////
+		// Mouse Buttons 
+		// #TODO: REWRITE PLEASE TO WM_MBUTTONUP / WM_MBUTTONDOWN
+
+		case WM_LBUTTONDOWN:
+			inputManager->MouseButtonAction(MOUSE_BUTTON_LEFT, true);
+			break;
+		case WM_RBUTTONDOWN:
+			inputManager->MouseButtonAction(MOUSE_BUTTON_RIGHT, true);
+			break;
+		case WM_MBUTTONDOWN:
+			inputManager->MouseButtonAction(MOUSE_BUTTON_MIDDLE, true);
+			break;
+
+		case WM_LBUTTONUP:
+			inputManager->MouseButtonAction(MOUSE_BUTTON_LEFT, false);
+			break;
+		case WM_RBUTTONUP:
+			inputManager->MouseButtonAction(MOUSE_BUTTON_RIGHT, false);
+			break;
+		case WM_MBUTTONUP:
+			inputManager->MouseButtonAction(MOUSE_BUTTON_MIDDLE, false);
+			break;
+
+		/////////////////////////////////////////////////////////
+
 		case WM_MOUSEMOVE:
 		{
 			if (!g_fMouseInClient) {
