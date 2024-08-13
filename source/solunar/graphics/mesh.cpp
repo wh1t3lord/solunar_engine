@@ -42,7 +42,7 @@ namespace solunar {
 	{
 	}
 
-	void MeshComponent::render()
+	void MeshComponent::Render()
 	{
 #ifndef FINAL_BUILD
 		BoundingBox boundingBox = GetEntity()->GetBoundingBox();

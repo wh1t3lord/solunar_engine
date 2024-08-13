@@ -87,7 +87,7 @@ namespace solunar
 	public:
 		void setName(const std::string& name) { m_materialName = name; }
 
-		void createHw() override;
+		void CreateHw() override;
 		void ReleaseHw() override;
 
 		void bindSamplers();

@@ -25,7 +25,7 @@ public:
 
 	void createContext(int width, int height);
 
-	void render();
+	void Render();
 
 	Rml::Context* GetContext();
 

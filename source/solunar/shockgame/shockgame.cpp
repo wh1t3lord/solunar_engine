@@ -153,12 +153,12 @@ void TestAnimationComponent::Update(float dt)
 	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
 	if (animatedModel) {
 		if (m_animationIndex == -1) {
-			m_animationIndex = animatedModel->getAnimationByName(m_animationName);
-			animatedModel->setPlayAnimation(m_animationIndex, true);
+			m_animationIndex = animatedModel->GetAnimationByName(m_animationName);
+			animatedModel->PlayAnimation(m_animationIndex, true);
 		}
 	}
 
-	animatedModel->testPlay(dt);
+	animatedModel->Update(dt);
 }
 
 class ViewmodelAnimationController : public LogicComponent
@@ -189,13 +189,13 @@ void ViewmodelAnimationController::Update(float dt)
 	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
 	if (animatedModel) {
 		if (m_animationIndex == -1) {
-			m_animationIndex = animatedModel->getAnimationByName("Armature|Armature|Hide");
-			animatedModel->setPlayAnimation(m_animationIndex, true);
-			animatedModel->pauseAnimationPlay();
+			m_animationIndex = animatedModel->GetAnimationByName("Armature|Armature|Hide");
+			animatedModel->PlayAnimation(m_animationIndex, true);
+			animatedModel->PauseAnimation();
 		}
 	}
 
-	animatedModel->testPlay(dt);
+	animatedModel->Update(dt);
 }
 
 // More beautiful way to register classes

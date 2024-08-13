@@ -111,10 +111,10 @@ AnimatedModel::~AnimatedModel()
 
 void AnimatedModel::Load(const std::shared_ptr<DataStream>& stream)
 {
-	load_GLTF(stream);
+	Load_GLTF(stream);
 }
 
-void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
+void AnimatedModel::Load_GLTF(const std::shared_ptr<DataStream>& stream)
 {
 	stream->Seek(Seek_End, 0);
 	size_t filesize = stream->Tell();
@@ -271,10 +271,10 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 
 #if 0
 		if (data->materials_count != data->meshes_count)
-			Core::Msg("AnimatedModel::load_GLTF: wrong material count! using default ...");
+			Core::Msg("AnimatedModel::Load_GLTF: wrong material count! using default ...");
 
 		if (data->materials_count < data->meshes_count)
-			Core::Msg("AnimatedModel::load_GLTF: material count less than mesh count (%i < %i)! using default ...",
+			Core::Msg("AnimatedModel::Load_GLTF: material count less than mesh count (%i < %i)! using default ...",
 				data->materials_count, data->meshes_count);
 
 		// #TODO: This shit should be rewritten !!!
@@ -282,7 +282,7 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 		if (i < data->materials_count)
 		{
 			if (data->materials[i].name && strlen(data->materials[i].name) <= 0)
-				Core::Msg("AnimatedModel::load_GLTF: material name on mesh %i are empty! using default ...", i);
+				Core::Msg("AnimatedModel::Load_GLTF: material name on mesh %i are empty! using default ...", i);
 			else if (data->materials[i].name && strlen(data->materials[i].name) > 0)
 				materialname = std::string("materials/models/") + std::string(data->materials[i].name) + ".xml"; // #TODO: SHIT !!!!
 		}
@@ -497,10 +497,10 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 
 	free(fileData);
 
-	createHw();
+	CreateHw();
 }
 
-void AnimatedModel::createHw()
+void AnimatedModel::CreateHw()
 {
 	for (int i = 0; i < m_subMeshes.size(); i++)
 	{
@@ -526,7 +526,7 @@ void AnimatedModel::ReleaseHw()
 	m_subMeshes.clear();
 }
 
-int AnimatedModel::getAnimationByName(const std::string& name)
+int AnimatedModel::GetAnimationByName(const std::string& name)
 {
 	for (int i = 0; i < m_animations.size(); i++)
 		if (m_animations[i].m_name == name)
@@ -535,14 +535,14 @@ int AnimatedModel::getAnimationByName(const std::string& name)
 	return -1;
 }
 
-void AnimatedModel::setPlayAnimation(int index, bool looped)
+void AnimatedModel::PlayAnimation(int index, bool looped)
 {
 	m_currentAnimation = &m_animations[index];
 	m_playLooped = looped;
 	m_currentTime = 0.0f;
 }
 
-void AnimatedModel::pauseAnimationPlay()
+void AnimatedModel::PauseAnimation()
 {
 	m_speed = 0.0f;
 }
@@ -552,7 +552,7 @@ inline glm::quat samplerRotationToGlm(const glm::vec4& v)
 	return glm::quat(v.w, v.x, v.y, v.z);
 }
 
-void AnimatedModel::testPlay(float dt)
+void AnimatedModel::Update(float dt)
 {
 	m_currentTime += m_speed * dt;
 	
@@ -607,16 +607,16 @@ void AnimatedModel::testPlay(float dt)
 	
 	if (updated == true)
 	{
-		updateNodeTransform(m_rootNodeId);
+		UpdateNodeTransform(m_rootNodeId);
 
 		for (int i = 0; i < (int)m_nodes.size() - 1; i++)
 		{
-			updateNode(i);
+			UpdateNode(i);
 		}
 	}
 }
 
-void AnimatedModel::updateNode(int node_id)
+void AnimatedModel::UpdateNode(int node_id)
 {
 	auto& node = m_nodes[node_id];
 	if (node.m_skinId != -1) {
@@ -624,16 +624,16 @@ void AnimatedModel::updateNode(int node_id)
 		size_t numJoints = skin.m_joints.size();
 		for (size_t i = 0; i < numJoints; ++i)
 		{
-			m_bonesMatrices[i] = getNodeMatrix(skin.m_joints[i]) *  skin.m_inverseBindMatrices[i] ;
+			m_bonesMatrices[i] = GetNodeMatrix(skin.m_joints[i]) *  skin.m_inverseBindMatrices[i] ;
 		}
 	}
 
 	for (int i = 0; i < node.m_children.size(); i++)
-		updateNode(node.m_children[i]);
+		UpdateNode(node.m_children[i]);
 
 }
 
-void AnimatedModel::updateNodeTransform(int node_id) {
+void AnimatedModel::UpdateNodeTransform(int node_id) {
 	Assert(node_id != -1);
 	AnimationNode& node = m_nodes[node_id];
 
@@ -651,10 +651,10 @@ void AnimatedModel::updateNodeTransform(int node_id) {
 	node.m_matrix = translation;
 
 	for (int i = 0; i < node.m_children.size(); i++)
-		updateNodeTransform(node.m_children[i]);
+		UpdateNodeTransform(node.m_children[i]);
 }
 
-glm::mat4 AnimatedModel::getNodeMatrix(int nodeId)
+glm::mat4 AnimatedModel::GetNodeMatrix(int nodeId)
 {
 	Assert(nodeId != -1);
 	AnimationNode& node = m_nodes[nodeId];
@@ -754,7 +754,7 @@ void AnimatedModelRenderer::Shutdown()
 #endif
 }
 
-void AnimatedModelRenderer::render(AnimatedMeshComponent* model)
+void AnimatedModelRenderer::Render(AnimatedMeshComponent* model)
 {
 	std::shared_ptr<ModelBase> modelBase = model->lockModel();
 	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
@@ -781,7 +781,7 @@ void AnimatedModelRenderer::render(AnimatedMeshComponent* model)
 	m_jointTexture->updateTexture(s_boneInfoTest, 0/*sizeof(s_boneInfoTest)*/, 0);
 
 	// draw texture
-	ScreenQuad::render(m_jointTexture);
+	ScreenQuad::Render(m_jointTexture);
 #endif
 }
 

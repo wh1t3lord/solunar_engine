@@ -181,7 +181,7 @@ void GLPostProcessing::HDRPass(ITexture2D* screenTexture)
 	/////////////////
 	g_renderDevice->SetTexture2D(0, screenTexture);
 	//m_hdrPassProgram->setTextureSampler(0, "u_texture");
-	ScreenQuad::renderWithoutTextureBinding(m_hdrPassProgram);
+	ScreenQuad::RenderWithoutTextureBinding(m_hdrPassProgram);
 
 	//////////////////
 	// run second pass
@@ -233,7 +233,7 @@ void GLPostProcessing::blurPass(ITexture2D* screenTexture)
 		g_renderDevice->SetConstantBufferIndex(0, m_hdrConstantBuffer);
 
 		// render
-		ScreenQuad::renderWithoutTextureBinding(m_blurPassProgram);
+		ScreenQuad::RenderWithoutTextureBinding(m_blurPassProgram);
 
 		horizontal = !horizontal;
 		if (first_iteration)
@@ -261,7 +261,7 @@ void GLPostProcessing::combinePass(ITexture2D* screenTexture)
 	g_renderDevice->SetTexture2D(1, m_hdrPinPingTextures[0]);
 
 	// render screen quad
-	ScreenQuad::renderWithoutTextureBinding(m_hdrCombineProgram);
+	ScreenQuad::RenderWithoutTextureBinding(m_hdrCombineProgram);
 }
 
 }

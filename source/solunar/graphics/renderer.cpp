@@ -280,12 +280,12 @@ namespace solunar
 					RenderContext::SetContext(renderCtx);
 
 					if (meshComponent->IsA(AnimatedMeshComponent::GetStaticTypeInfo()))
-						AnimatedModelRenderer::GetInstance()->render((AnimatedMeshComponent*)meshComponent);
+						AnimatedModelRenderer::GetInstance()->Render((AnimatedMeshComponent*)meshComponent);
 
 					// call render function
 					renderMesh(world->GetGraphicsWorld(), view, meshComponent);
 
-					meshComponent->render();
+					meshComponent->Render();
 				}
 			}
 		}
@@ -341,7 +341,7 @@ namespace solunar
 		RenderContext& renderCtx = RenderContext::GetContext();
 		//renderCtx.model = CameraProxy::GetInstance()->GetCameraComponent();
 		RenderContext::SetContext(renderCtx);
-		skyMesh->render();
+		skyMesh->Render();
 #endif
 	}
 

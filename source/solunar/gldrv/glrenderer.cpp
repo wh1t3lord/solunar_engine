@@ -566,7 +566,7 @@ namespace solunar {
 		std::shared_ptr<ModelBase> model = mesh->lockModel();
 		AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(model.get());
 
-		for (const auto& submesh : animatedModel->getAnimatedSubmehes())
+		for (const auto& submesh : animatedModel->GetAnimatedSubmehes())
 		{
 			// create saved render ctx as previous model.
 			RenderContext savedCtx = RenderContext::GetContext();

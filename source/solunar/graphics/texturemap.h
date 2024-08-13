@@ -26,7 +26,7 @@ namespace solunar
 
 		void bind();
 
-		void createHw();
+		void CreateHw();
 		void destroyHW();
 
 		void setWrapS(TextureWrap wrap);

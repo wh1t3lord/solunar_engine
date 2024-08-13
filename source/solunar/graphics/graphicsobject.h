@@ -23,7 +23,7 @@ public:
 	virtual ~GraphicsObject();
 
 	//! Create hardware resource
-	virtual void createHw() = 0;
+	virtual void CreateHw() = 0;
 	
 	//! Release hardware resource
 	virtual void ReleaseHw() = 0;

@@ -35,7 +35,7 @@ namespace solunar
 
 		void Destroy();
 
-		void render();
+		void Render();
 
 		IBufferBase* getVertexBuffer() { return m_vertexBuffer; }
 		IBufferBase* getIndexBuffer() { return m_indexBuffer; }
@@ -80,7 +80,7 @@ namespace solunar
 
 		virtual void renderObjects();
 
-		virtual void createHw() override;
+		virtual void CreateHw() override;
 		virtual void ReleaseHw() override;
 
 		void saveBinary(const std::string& filename);
@@ -132,7 +132,7 @@ namespace solunar
 		void load(DataStreamPtr stream);
 		void Save(DataStreamPtr stream);
 
-		void createHw() override;
+		void CreateHw() override;
 		void ReleaseHw() override;
 
 		// Accessors
@@ -172,7 +172,7 @@ namespace solunar
 		void Load(const std::shared_ptr<DataStream>& stream) override;
 		void Save(const std::shared_ptr<DataStream>& stream) override;
 
-		void createHw() override;
+		void CreateHw() override;
 		void ReleaseHw() override;
 
 	private:

@@ -54,7 +54,7 @@ namespace solunar
 		throw std::logic_error("The method or operation is not implemented.");
 	}
 
-	void TextureMap::createHw()
+	void TextureMap::CreateHw()
 	{
 		m_texture2D = g_renderDevice->CreateTexture2D(m_textureDesc, m_textureSubresourceDesc);
 		Image::freeImageData(m_textureSubresourceDesc.m_memory);
@@ -89,7 +89,7 @@ namespace solunar
 		m_textureSubresourceDesc.m_memory = image.getData();
 		m_textureSubresourceDesc.m_memoryPitch = image.getWidth() * 4;
 
-		createHw();
+		CreateHw();
 	}
 
 	void TextureMap::setWrapS(TextureWrap wrap)

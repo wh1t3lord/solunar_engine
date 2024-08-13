@@ -239,7 +239,7 @@ namespace solunar
 			Core::Error("Material::LoadXML: failed to load material. Doesnt exist \"RenderState\" element.");
 		}
 
-		createHw();
+		CreateHw();
 	}
 
 	void Material::SaveXML(tinyxml2::XMLElement& element)
@@ -345,7 +345,7 @@ namespace solunar
 		return std::weak_ptr<TextureMap>();
 	}
 
-	void Material::createHw()
+	void Material::CreateHw()
 	{
 		//initializeShader();
 
