@@ -126,28 +126,28 @@ public:
 	static void RegisterObject();
 
 	void Load(const std::shared_ptr<DataStream>& dataStream) override;
-	void load_GLTF(const std::shared_ptr<DataStream>& dataStream);
+	void Load_GLTF(const std::shared_ptr<DataStream>& dataStream);
 
-	void createHw() override;
+	void CreateHw() override;
 	void ReleaseHw() override;
 
-	std::vector<AnimatedSubMesh*>& getAnimatedSubmehes() { return m_subMeshes; }
+	std::vector<AnimatedSubMesh*>& GetAnimatedSubmehes() { return m_subMeshes; }
 
 	/** Animation accessing */
-	int getAnimationByName(const std::string& name);
+	int GetAnimationByName(const std::string& name);
+	void PlayAnimation(int index, bool looped = false);
+	void PauseAnimation();
 	int getCurrentAnimationId();
-	void setPlayAnimation(int index, bool looped = false);
-	void pauseAnimationPlay();
 	Animation* getCurrentAnimation();
 	float getCurrentTime();
 	bool isStoped();
 
-	void testPlay(float dt);
+	void Update(float dt);
 
-	void updateNode(int node_id);
-	void updateNodeTransform(int node_id);
+	void UpdateNode(int node_id);
+	void UpdateNodeTransform(int node_id);
 
-	glm::mat4 getNodeMatrix(int nodeId);
+	glm::mat4 GetNodeMatrix(int nodeId);
 
 	const BoundingBox& GetBoundingBox();
 
@@ -191,7 +191,7 @@ public:
 	void Init();
 	void Shutdown();
 
-	void render(AnimatedMeshComponent* model);
+	void Render(AnimatedMeshComponent* model);
 
 private:
 	ITexture2D* m_jointTexture;

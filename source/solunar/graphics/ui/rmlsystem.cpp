@@ -149,9 +149,9 @@ void RmlSystem::createContext(int width, int height)
 		Rml::LoadFontFace(directory + face.filename, face.fallback_face);
 }
 
-void RmlSystem::render()
+void RmlSystem::Render()
 {
-	OPTICK_EVENT("RmlSystem::render");
+	OPTICK_EVENT("RmlSystem::Render");
 
 	m_context->Update();
 

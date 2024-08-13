@@ -58,7 +58,7 @@ namespace solunar
 		}
 	}
 
-	void ScreenQuad::render(ITexture2D* texture)
+	void ScreenQuad::Render(ITexture2D* texture)
 	{
 		Assert(texture);
 		
@@ -72,7 +72,7 @@ namespace solunar
 		g_renderDevice->Draw(PM_TriangleList, 0, 6);
 	}
 
-	void ScreenQuad::render(ITexture2D* texture, IShaderProgram* shader)
+	void ScreenQuad::Render(ITexture2D* texture, IShaderProgram* shader)
 	{
 		Assert(texture);
 		Assert(shader);
@@ -86,7 +86,7 @@ namespace solunar
 		g_renderDevice->Draw(PM_TriangleList, 0, 6);
 	}
 
-	void ScreenQuad::renderWithoutShaderBinding(ITexture2D* texture)
+	void ScreenQuad::RenderWithoutShaderBinding(ITexture2D* texture)
 	{
 		Assert(texture);
 
@@ -98,7 +98,7 @@ namespace solunar
 		g_renderDevice->Draw(PM_TriangleList, 0, 6);
 	}
 
-	void ScreenQuad::renderWithoutTextureBinding(IShaderProgram* shader)
+	void ScreenQuad::RenderWithoutTextureBinding(IShaderProgram* shader)
 	{
 		Assert(shader);
 		
@@ -111,7 +111,7 @@ namespace solunar
 		g_renderDevice->Draw(PM_TriangleList, 0, 6);
 	}
 
-	void ScreenQuad::renderWithoutShaderAndTextureBinding()
+	void ScreenQuad::RenderWithoutShaderAndTextureBinding()
 	{
 		g_renderDevice->Draw(PM_TriangleList, 0, 6);
 	}

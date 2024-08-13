@@ -30,7 +30,7 @@ namespace solunar {
 		virtual void SaveXML(tinyxml2::XMLElement& element) override;
 		void LoadModel(const std::string& filename);
 
-		virtual void render();
+		virtual void Render();
 
 		std::shared_ptr<ModelBase> lockModel();
 		std::weak_ptr<ModelBase> getModel();

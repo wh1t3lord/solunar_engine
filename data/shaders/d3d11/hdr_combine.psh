@@ -5,8 +5,6 @@ Texture2D g_bloomTexture	: register(t1);
 SamplerState g_hdrSampler		: register(s0);
 SamplerState g_bloomSampler		: register(s1);
 
-//uniform float exposure = 0.75f;
-
 float3 toneMapping(float3 v)
 {
     return v / (1.0 + v);

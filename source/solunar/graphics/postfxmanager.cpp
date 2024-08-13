@@ -203,7 +203,7 @@ void PostFxManager::HDRPass(ITexture2D* screenTexture)
 
 	// run first pass (copy texture)
 	g_renderDevice->SetTexture2D(0, screenTexture);
-	ScreenQuad::renderWithoutTextureBinding(m_hdrPassProgram);
+	ScreenQuad::RenderWithoutTextureBinding(m_hdrPassProgram);
 
 	// run second pass (blur)
 	blurPass(screenTexture);
@@ -242,7 +242,7 @@ void PostFxManager::blurPass(ITexture2D* screenTexture)
 		g_renderDevice->SetSamplerState(0, m_hdrPinPongSampler);
 
 		IShaderProgram* shader = horizontal ? m_blurPassHorizontalProgram : m_blurPassProgram;
-		ScreenQuad::renderWithoutTextureBinding(shader);
+		ScreenQuad::RenderWithoutTextureBinding(shader);
 
 		horizontal = !horizontal;
 
@@ -266,7 +266,7 @@ void PostFxManager::combinePass(ITexture2D* screenTexture)
 	g_renderDevice->SetSamplerState(1, m_hdrPinPongSampler);
 
 	// render screen quad
-	ScreenQuad::renderWithoutTextureBinding(m_hdrCombineProgram);
+	ScreenQuad::RenderWithoutTextureBinding(m_hdrCombineProgram);
 }
 
 }

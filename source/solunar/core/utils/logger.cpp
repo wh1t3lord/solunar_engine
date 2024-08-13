@@ -16,13 +16,13 @@ namespace solunar
 		static FILE* s_logFileHandle = nullptr;
 		static DWORD s_logOpenTime = 0;
 
-		void logWriteMsg(const char* Msg)
+		void logWriteMsg(const char* msg)
 		{
 			DWORD dwCurrentTime = GetTickCount() - s_logOpenTime;
 
 			static char buffer[1024];
 			int len = snprintf(buffer, sizeof(buffer), "%02lu:%02lu.%02lu: %s",
-				dwCurrentTime / 60000, dwCurrentTime / 1000 % 60, dwCurrentTime % 1000 / 10, Msg);
+				dwCurrentTime / 60000, dwCurrentTime / 1000 % 60, dwCurrentTime % 1000 / 10, msg);
 
 			if (s_logFileHandle)
 			{

@@ -86,6 +86,12 @@ namespace solunar
 		m_keys[keyId] = state;
 	}
 
+	void InputManager_Win32::MouseButtonAction(MouseButtons buttonId, bool state)
+	{
+		Assert(buttonId <= MOUSE_BUTTON_COUNT);
+		m_mouseButtons[buttonId] = state;
+	}
+
 #if 0
 	void InputManager_Win32::cursorPosAction(float x, float y)
 	{

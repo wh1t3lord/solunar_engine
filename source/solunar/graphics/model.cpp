@@ -216,7 +216,7 @@ namespace solunar
 
 		mem_free_array(fileData);
 
-		createHw();
+		CreateHw();
 	}
 
 	void ModelBase::Destroy()
@@ -233,7 +233,7 @@ namespace solunar
 	void ModelBase::renderObjects()
 	{
 		for (int i = 0; i < m_subMeshes.size(); i++)
-			m_subMeshes[i]->render();
+			m_subMeshes[i]->Render();
 	}
 
 	void ModelBase::saveBinary(const std::string& filename)
@@ -307,7 +307,7 @@ namespace solunar
 		g_fileSystem->Close(file);
 	}
 
-	void ModelBase::createHw()
+	void ModelBase::CreateHw()
 	{
 		for (int i = 0; i < m_subMeshes.size(); i++)
 		{
@@ -410,7 +410,7 @@ namespace solunar
 		}
 	}
 
-	void SubMesh::render()
+	void SubMesh::Render()
 	{
 		//create saved render ctx as previous model.
 		//RenderContext savedCtx = RenderContext::GetContext();
@@ -488,7 +488,7 @@ namespace solunar
 	{
 	}
 
-	void ModelSubmesh::createHw()
+	void ModelSubmesh::CreateHw()
 	{
 		/////////////////////////
 		// Vertex buffer creation
@@ -626,7 +626,7 @@ namespace solunar
 		//stream->Flush();
 	}
 
-	void Model::createHw()
+	void Model::CreateHw()
 	{
 	}
 

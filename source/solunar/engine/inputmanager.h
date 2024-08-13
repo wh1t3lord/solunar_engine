@@ -129,9 +129,18 @@ namespace solunar
 		KEY_COUNT
 	};
 
-	class InputManager : public Singleton<InputManager> //public Object, public Singleton<InputManager>
+	enum MouseButtons
 	{
-		//IMPLEMENT_OBJECT(InputManager, Object);
+		MOUSE_BUTTON_UNKNOWN = -1,
+		MOUSE_BUTTON_LEFT,
+		MOUSE_BUTTON_MIDDLE,
+		MOUSE_BUTTON_RIGHT,
+
+		MOUSE_BUTTON_COUNT,
+	};
+
+	class InputManager : public Singleton<InputManager>
+	{
 	public:
 		InputManager();
 		virtual ~InputManager();
@@ -144,6 +153,9 @@ namespace solunar
 
 		// Get is key pressed and reset it. 
 		virtual bool IsPressedWithReset(uint32_t key);
+
+		// Get is mouse button pressed. 
+		virtual bool IsMouseButtonPressed(MouseButtons buttonId);
 
 		// Set cursor capture
 		virtual void SetCursorCapture(bool capture);
@@ -162,6 +174,7 @@ namespace solunar
 
 	protected:
 		bool m_keys[KEY_COUNT];
+		bool m_mouseButtons[MOUSE_BUTTON_COUNT];
 		glm::vec2 m_cursorPos;
 		glm::vec2 m_lastCursorPos;
 		glm::vec2 m_deltaCursorPos;
