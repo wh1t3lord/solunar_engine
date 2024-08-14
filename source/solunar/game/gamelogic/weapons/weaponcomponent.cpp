@@ -4,6 +4,9 @@
 #include "engine/camera.h"
 #include "engine/inputmanager.h"
 
+#include "engine/audio/audiomanager.h"
+#include "engine/audio/audiosource.h"
+
 #include "graphics/animatedmodel.h"
 #include "graphics/mesh.h"
 #include "graphics/ifontmanager.h"
@@ -11,8 +14,12 @@
 namespace solunar
 {
 	WeaponComponent::WeaponComponent() :
-		m_inited(false)
+		m_inited(false),
+		m_ammo(0)
 	{
+
+		// Shotgun
+		m_ammo = 8;
 	}
 
 	WeaponComponent::~WeaponComponent()
@@ -26,23 +33,39 @@ namespace solunar
 
 	void WeaponComponent::Update(float dt)
 	{
+		static AudioSource* s_fireSound = nullptr;
+		static IFont* s_font = nullptr;
+
 		AnimatedMeshComponent* mesh = GetEntity()->GetComponent<AnimatedMeshComponent>();
 		std::shared_ptr<ModelBase> modelBase = mesh->lockModel();
 		AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
 		if (!m_inited) {
-			m_idleAni = animatedModel->getAnimationByName("idle");
-			m_fireAni = animatedModel->getAnimationByName("fire");
+			s_fireSound = AudioManager::GetInstance()->CreateSource("sounds/sfx/weapons/shotgun_fire.wav");
 
-			animatedModel->setPlayAnimation(m_idleAni, true);
+			s_font = g_fontManager->CreateFont("textures/ui/Anton-Regular.ttf", 50.0f);
+
+			m_idleAni = animatedModel->GetAnimationByName("idle");
+			m_fireAni = animatedModel->GetAnimationByName("fire");
+
+			animatedModel->PlayAnimation(m_idleAni, true);
 			m_inited = true;
 		}
 
 		Camera* camera = CameraProxy::GetInstance();
 
-		bool isFireAniFinished = animatedModel->getCurrentAnimationId() == m_fireAni && animatedModel->isStoped();
+		bool isFireAniFinished = animatedModel->GetCurrentAnimationId() == m_fireAni && animatedModel->IsStoped();
 
-		if (InputManager::GetInstance()->IsPressed(KeyboardKeys::KEY_F)) {
-			animatedModel->setPlayAnimation(m_fireAni, false);
+		if (InputManager::GetInstance()->IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
+			( isFireAniFinished || animatedModel->GetCurrentAnimationId() != m_fireAni) &&
+			m_ammo > 0) {
+			animatedModel->PlayAnimation(m_fireAni, false);
+			
+			if (s_fireSound->IsPlaying())
+				s_fireSound->Stop();
+
+			s_fireSound->Play();
+
+			--m_ammo;
 
 			RayCastResult rq = {};
 			//if (getWorld()->rayCast(rq, camera->getDirection(), camera->getDirection() + glm::vec3(10000.0f)))
@@ -52,23 +75,26 @@ namespace solunar
 		}
 
 		if (isFireAniFinished) {
-			animatedModel->setPlayAnimation(m_idleAni, true);
+			animatedModel->PlayAnimation(m_idleAni, true);
 		}
 
-		animatedModel->testPlay(dt);
+		animatedModel->Update(dt);
 
-#if 1
 		View* view = CameraProxy::GetInstance()->GetView();
 
 		char buf[256];
 
+		snprintf(buf, sizeof(buf), "Ammo: %i", m_ammo);
+		s_font->DrawText(buf, 25.0f, view->m_height - 20.0f, glm::vec4(1.0f, 0.2f, 0.0f, 1.0f));
+
+#if 1
 		snprintf(buf, sizeof(buf), "--- Viewmodel ---");
 		g_fontManager->DrawSystemFontShadowed(buf, (float)view->m_width - 300.0f, 100.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-		snprintf(buf, sizeof(buf), "Animation: %s", animatedModel->getCurrentAnimation() ? animatedModel->getCurrentAnimation()->m_name.c_str() : "NO ANIMATION");
+		snprintf(buf, sizeof(buf), "Animation: %s", animatedModel->GetCurrentAnimation() ? animatedModel->GetCurrentAnimation()->m_name.c_str() : "NO ANIMATION");
 		g_fontManager->DrawSystemFontShadowed(buf, (float)view->m_width - 300.0f, 125.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-		snprintf(buf, sizeof(buf), "Time: %.2f", animatedModel->getCurrentTime());
+		snprintf(buf, sizeof(buf), "Time: %.2f", animatedModel->GetCurrentTime());
 		g_fontManager->DrawSystemFontShadowed(buf, (float)view->m_width - 300.0f, 140.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 #endif
 	}

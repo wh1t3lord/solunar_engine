@@ -27,6 +27,8 @@ namespace solunar {
 		bool m_inited;
 		int m_idleAni;
 		int m_fireAni;
+
+		int m_ammo;
 	};
 }
 #endif // ! WEAPONCOMPONENT_H

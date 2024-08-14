@@ -159,7 +159,7 @@ void ShockPlayerController::Update(float dt)
 	snprintf(enduranceText, sizeof(enduranceText), "Endurance: %.0f", m_playerStats.m_endurance);
 
 	s_font->DrawText(healthText, 25.0f, view->m_height - 50.0f, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
-	s_font->DrawText(enduranceText, 25.0f, view->m_height - 25.0f, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
+	//s_font->DrawText(enduranceText, 25.0f, view->m_height - 25.0f, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
 #endif
 
 	// update camera look

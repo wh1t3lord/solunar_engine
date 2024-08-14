@@ -137,10 +137,10 @@ public:
 	int GetAnimationByName(const std::string& name);
 	void PlayAnimation(int index, bool looped = false);
 	void PauseAnimation();
-	int getCurrentAnimationId();
-	Animation* getCurrentAnimation();
-	float getCurrentTime();
-	bool isStoped();
+	int GetCurrentAnimationId();
+	Animation* GetCurrentAnimation();
+	float GetCurrentTime();
+	bool IsStoped();
 
 	void Update(float dt);
 

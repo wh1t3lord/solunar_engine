@@ -536,7 +536,7 @@ int AnimatedModel::GetAnimationByName(const std::string& name)
 	return -1;
 }
 
-int AnimatedModel::getCurrentAnimationId()
+int AnimatedModel::GetCurrentAnimationId()
 {
 	return m_animationId;
 }
@@ -556,17 +556,17 @@ void AnimatedModel::PauseAnimation()
 	m_speed = 0.0f;
 }
 
-Animation* AnimatedModel::getCurrentAnimation()
+Animation* AnimatedModel::GetCurrentAnimation()
 {
 	return m_currentAnimation;
 }
 
-float AnimatedModel::getCurrentTime()
+float AnimatedModel::GetCurrentTime()
 {
 	return m_currentTime;
 }
 
-bool AnimatedModel::isStoped()
+bool AnimatedModel::IsStoped()
 {
 	return !m_play;
 }
