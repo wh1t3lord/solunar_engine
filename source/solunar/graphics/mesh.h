@@ -28,6 +28,9 @@ namespace solunar {
 
 		virtual void LoadXML(tinyxml2::XMLElement& element) override;
 		virtual void SaveXML(tinyxml2::XMLElement& element) override;
+
+		virtual void OnWorldSet(World* world) override;
+
 		void LoadModel(const std::string& filename);
 
 		virtual void Render();

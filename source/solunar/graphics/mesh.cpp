@@ -4,6 +4,8 @@
 #include "graphics/renderer.h"
 #include "graphics/animatedmodel.h"
 
+#include "engine/entity/world.h"
+
 namespace solunar {
 
 	void MeshComponent::RegisterObject()
@@ -18,6 +20,9 @@ namespace solunar {
 	MeshComponent::~MeshComponent()
 	{
 		m_model.reset();
+
+		if (GetWorld())
+			GetWorld()->GetGraphicsWorld()->RemoveMesh(this);
 	}
 
 	void MeshComponent::LoadXML(tinyxml2::XMLElement& element)
@@ -40,6 +45,11 @@ namespace solunar {
 
 	void MeshComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
+	}
+
+	void MeshComponent::OnWorldSet(World* world)
+	{
+		world->GetGraphicsWorld()->AddMesh(this);
 	}
 
 	void MeshComponent::Render()
