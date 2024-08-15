@@ -264,15 +264,13 @@ namespace solunar
 		World* world = Engine::ms_world;
 		if (world)
 		{
-			EntityManager& entityManager = world->GetEntityManager();
-
-			std::vector<Entity*> drawableEntities = entityManager.GetEntitiesWithComponent<MeshComponent>();
+			const std::vector<MeshComponent*>& drawableEntities = world->GetGraphicsWorld()->GetMeshes();
 
 			// color pass
-			for (auto entity : drawableEntities)
+			for (auto meshComponent : drawableEntities)
 			{
-				MeshComponent* meshComponent = entity->GetComponent<MeshComponent>();
-				if (meshComponent)
+				Entity* entity = meshComponent->GetEntity();
+				if (entity)
 				{
 					// setup render context
 					RenderContext& renderCtx = RenderContext::GetContext();

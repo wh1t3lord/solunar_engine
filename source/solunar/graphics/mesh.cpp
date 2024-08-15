@@ -20,9 +20,6 @@ namespace solunar {
 	MeshComponent::~MeshComponent()
 	{
 		m_model.reset();
-
-		if (GetWorld())
-			GetWorld()->GetGraphicsWorld()->RemoveMesh(this);
 	}
 
 	void MeshComponent::LoadXML(tinyxml2::XMLElement& element)
@@ -50,6 +47,12 @@ namespace solunar {
 	void MeshComponent::OnWorldSet(World* world)
 	{
 		world->GetGraphicsWorld()->AddMesh(this);
+	}
+
+	void MeshComponent::OnEntityRemove()
+	{
+		if (GetWorld())
+			GetWorld()->GetGraphicsWorld()->RemoveMesh(this);
 	}
 
 	void MeshComponent::Render()

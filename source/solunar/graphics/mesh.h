@@ -31,6 +31,8 @@ namespace solunar {
 
 		virtual void OnWorldSet(World* world) override;
 
+		virtual void OnEntityRemove() override;
+
 		void LoadModel(const std::string& filename);
 
 		virtual void Render();
