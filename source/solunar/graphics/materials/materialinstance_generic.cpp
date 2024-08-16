@@ -84,7 +84,7 @@ IShaderProgram* MaterialInstance_Generic::getShaderProgramVariation(VertexFactor
 	switch (vertexFactory)
 	{
 	case VertexFactory_StaticMesh:
-		shaderProgram = g_shaderManager->createShaderProgram(
+		shaderProgram = g_shaderManager->CreateShaderProgram(
 			"materialinstance_generic.hlsl",
 			"materialinstance_generic.hlsl",
 			defines.c_str(),
@@ -94,7 +94,7 @@ IShaderProgram* MaterialInstance_Generic::getShaderProgramVariation(VertexFactor
 	case VertexFactory_SkinnedMesh:
 		defines += "SKINNED\n";
 
-		shaderProgram = g_shaderManager->createShaderProgram(
+		shaderProgram = g_shaderManager->CreateShaderProgram(
 			"materialinstance_generic.hlsl",
 			"materialinstance_generic.hlsl",
 			defines.c_str(),

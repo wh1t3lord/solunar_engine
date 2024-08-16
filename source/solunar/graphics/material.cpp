@@ -407,7 +407,7 @@ namespace solunar
 			m_albedoTextureFileName = "textures/system/notex.bmp";
 
 		m_albedoTexture = g_contentManager->LoadObject<TextureMap>(m_albedoTextureFileName);
-		m_albedoTexture.lock()->getHWTexture()->setDebugName(m_albedoTextureFileName.c_str());
+		m_albedoTexture.lock()->getHWTexture()->SetDebugName(m_albedoTextureFileName.c_str());
 
 		//m_albedoTexture = dynamicCastPtr< TextureMap >(g_contentManager->Load(m_albedoTextureName, TextureMap::GetStaticTypeInfo()));
 

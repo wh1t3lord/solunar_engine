@@ -17,13 +17,13 @@ public:
 	void Create(D3D11Device* device, const char* vstext, const char* pstext, const char* defines = nullptr, InputLayoutDesc* inputLayout = nullptr, int inputLayoutCount = 0);
 	void Destroy();
 
-	void createInputLayout(D3D11Device* device, ID3DBlob* vertexShaderBlob);
+	void CreateInputLayout(D3D11Device* device, ID3DBlob* vertexShaderBlob);
 
 	ID3D11InputLayout* getInputLayout() { return m_inputLayout; }
 	ID3D11VertexShader* getVertexShader() { return m_vertexShader; }
 	ID3D11PixelShader* getPixelShader() { return m_pixelShader; }
 
-	void setDebugName(const char* vsname, const char* psname);
+	void SetDebugName(const char* vsname, const char* psname);
 
 private:
 	ID3D11InputLayout* m_inputLayout;

@@ -24,7 +24,7 @@ namespace solunar {
 		virtual void Release() = 0;
 
 		//! Set debug name.
-		virtual void setDebugName(const char* debugName) = 0;
+		virtual void SetDebugName(const char* debugName) = 0;
 	};
 
 }

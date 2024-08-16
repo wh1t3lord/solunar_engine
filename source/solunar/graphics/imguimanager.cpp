@@ -269,7 +269,7 @@ namespace solunar
 		};
 
 		// Create the shader program
-		m_pShaderProgram = g_shaderManager->createShaderProgram("imgui_backend.vsh", "imgui_backend.psh", nullptr,
+		m_pShaderProgram = g_shaderManager->CreateShaderProgram("imgui_backend.vsh", "imgui_backend.psh", nullptr,
 			local_layout, sizeof(local_layout) / sizeof(local_layout[0]));
 	
 		// Create the constant buffer
@@ -361,7 +361,7 @@ namespace solunar
 		g_renderDevice->SetVertexBuffer(m_pVB, stride, offset);
 		g_renderDevice->SetIndexBuffer(m_pIB, sizeof(ImDrawIdx) == 2 ? true : false);
 		g_renderDevice->SetConstantBufferIndex(0, m_pVertexConstantBuffer);
-		g_shaderManager->setShaderProgram(m_pShaderProgram);
+		g_shaderManager->SetShaderProgram(m_pShaderProgram);
 
 		// Setup blend state
 		const float blend_factor[4] = { 0.f, 0.f, 0.f, 0.f };

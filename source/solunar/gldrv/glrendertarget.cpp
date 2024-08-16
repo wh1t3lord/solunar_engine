@@ -57,7 +57,7 @@ namespace solunar {
 		return m_handle;
 	}
 
-	void GLRenderTarget::setDebugName(const char* debugName)
+	void GLRenderTarget::SetDebugName(const char* debugName)
 	{
 	}
 

@@ -454,7 +454,7 @@ namespace solunar {
 		Assert2(shaderProgram, "Unknowed mesh component type!");
 
 		// bind material instance shader and material uniforms
-		g_shaderManager->setShaderProgram(shaderProgram);
+		g_shaderManager->SetShaderProgram(shaderProgram);
 	}
 
 	void GLRenderer::renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
@@ -673,7 +673,7 @@ namespace solunar {
 
 			it->getMaterial()->bind();
 
-			g_shaderManager->setShaderProgram(customShader);
+			g_shaderManager->SetShaderProgram(customShader);
 			it->getMaterial()->bindUniformsCustom(customShader);
 
 			/*graphicsDevice->SetIndexBuffer(it->getIndexBuffer());

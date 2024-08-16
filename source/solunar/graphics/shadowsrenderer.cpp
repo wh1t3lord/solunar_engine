@@ -57,7 +57,7 @@ namespace solunar
 		m_shadowFbo = g_renderDevice->CreateRenderTarget(renderTargetDesc);
 
 		// Create shader for static mesh
-		m_shadowShader_StaticMesh = g_shaderManager->createShaderProgram("shadowmap.hlsl", "shadowmap.hlsl");
+		m_shadowShader_StaticMesh = g_shaderManager->CreateShaderProgram("shadowmap.hlsl", "shadowmap.hlsl");
 	}
 
 	void ShadowsRenderer::Shutdown()

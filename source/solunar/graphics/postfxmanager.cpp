@@ -69,15 +69,15 @@ void PostFxManager::initHDR(View* view)
 	memset(&hdrTextureSubresourceDesc, 0, sizeof(hdrTextureSubresourceDesc));
 
 	m_hdrTempTex = g_renderDevice->CreateTexture2D(hdrTextureDesc, hdrTextureSubresourceDesc);
-	m_hdrTempTex->setDebugName("HDR Temp Texture");
+	m_hdrTempTex->SetDebugName("HDR Temp Texture");
 
 	RenderTargetCreationDesc rtCreationDesc = {};
 	rtCreationDesc.m_textures2D[0] = m_hdrTempTex;
 	rtCreationDesc.m_textures2DCount = 1;
 	m_hdrRenderTarget = g_renderDevice->CreateRenderTarget(rtCreationDesc);
-	m_hdrRenderTarget->setDebugName("HDR Render Target");
+	m_hdrRenderTarget->SetDebugName("HDR Render Target");
 
-	m_hdrPassProgram = g_shaderManager->createShaderProgram(
+	m_hdrPassProgram = g_shaderManager->CreateShaderProgram(
 		"quad.vsh", 
 		"hdr_main.psh",
 		nullptr,
@@ -121,7 +121,7 @@ void PostFxManager::initBlur(View* view)
 		m_hdrPinPongTextures[i] = g_renderDevice->CreateTexture2D(m_hdrPingPongTextureDesc, hdrPingPongTextureSubresourceDesc);
 
 		snprintf(buf, sizeof(buf), "HDR Pin-Pong Texture %i", i);
-		m_hdrPinPongTextures[i]->setDebugName(buf);
+		m_hdrPinPongTextures[i]->SetDebugName(buf);
 
 		// framebuffer creation
 		RenderTargetCreationDesc rtCreationDesc = {};
@@ -131,7 +131,7 @@ void PostFxManager::initBlur(View* view)
 		m_hdrPinPongRenderTargets[i] = g_renderDevice->CreateRenderTarget(rtCreationDesc);
 
 		snprintf(buf, sizeof(buf), "HDR Pin-Pong Render Target %i", i);
-		m_hdrPinPongRenderTargets[i]->setDebugName(buf);
+		m_hdrPinPongRenderTargets[i]->SetDebugName(buf);
 	}
 
 	SamplerDesc hdrPinPongSamplerDesc;
@@ -144,21 +144,21 @@ void PostFxManager::initBlur(View* view)
 	hdrPinPongSamplerDesc.m_anisotropyLevel = 1.0f;
 	m_hdrPinPongSampler = g_renderDevice->CreateSamplerState(hdrPinPongSamplerDesc);
 
-	m_blurPassProgram = g_shaderManager->createShaderProgram(
+	m_blurPassProgram = g_shaderManager->CreateShaderProgram(
 		"quad.vsh", 
 		"hdr_blur.psh",
 		nullptr,
 		ScreenQuad::ms_inputLayout,
 		sizeof(ScreenQuad::ms_inputLayout) / sizeof(ScreenQuad::ms_inputLayout[0]));
 
-	m_blurPassHorizontalProgram = g_shaderManager->createShaderProgram(
+	m_blurPassHorizontalProgram = g_shaderManager->CreateShaderProgram(
 		"quad.vsh",
 		"hdr_blur.psh",
 		"BLUR_HORIZONTAL\n",
 		ScreenQuad::ms_inputLayout,
 		sizeof(ScreenQuad::ms_inputLayout) / sizeof(ScreenQuad::ms_inputLayout[0]));
 
-	m_hdrCombineProgram = g_shaderManager->createShaderProgram(
+	m_hdrCombineProgram = g_shaderManager->CreateShaderProgram(
 		"quad.vsh", 
 		"hdr_combine.psh",
 		nullptr,

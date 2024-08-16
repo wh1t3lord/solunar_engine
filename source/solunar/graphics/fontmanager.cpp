@@ -106,7 +106,7 @@ void FontManager::InitPrivate()
 		{ "COLOR", 0, ImageFormat::RGBA32F,   0, (UINT)offsetof(FontVertex, color),  INPUT_PER_VERTEX_DATA, 0 },
 	};
 
-	m_shaderProgram = g_shaderManager->createShaderProgram("2d_font.vsh", "2d_font.psh", nullptr,
+	m_shaderProgram = g_shaderManager->CreateShaderProgram("2d_font.vsh", "2d_font.psh", nullptr,
 		layout, sizeof(layout) / sizeof(layout[0]));
 
 	// create rasterizer state
@@ -157,7 +157,7 @@ void FontManager::FlushPrimitives()
 	g_renderDevice->SetSamplerState(0, m_textureSampler);
 
 	// setup shader and others stuff
-	g_shaderManager->setShaderProgram(m_shaderProgram);
+	g_shaderManager->SetShaderProgram(m_shaderProgram);
 
 	// build orthogonal matrix
 
