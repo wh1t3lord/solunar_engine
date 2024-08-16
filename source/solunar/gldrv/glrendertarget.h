@@ -17,7 +17,7 @@ public:
 
 	uint32_t getHandle();
 
-	void setDebugName(const char* debugName) override;
+	void SetDebugName(const char* debugName) override;
 
 	// Old stuff of IRenderTarget, can be used ;)
 	void attachTexture2D(int slot, ITexture2D* textureHandle);

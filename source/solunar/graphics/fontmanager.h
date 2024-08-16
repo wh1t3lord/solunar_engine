@@ -25,7 +25,7 @@ struct FontVertex
 
 // Limited to 1024 characters per one sentence
 const int kMaxFontVBSize = sizeof(FontVertex)	* 1024;
-const int kMaxFontIBSize = sizeof(uint32_t)		* 1024;
+const int kMaxFontIBSize = sizeof(uint16_t)		* 1024;
 
 class FontManager;
 

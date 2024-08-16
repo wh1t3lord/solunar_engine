@@ -5,7 +5,7 @@
 
 namespace solunar {
 	
-	class DrawableComponent;
+	class MeshComponent;
 	
 	class GraphicsWorld : public Object
 	{
@@ -19,17 +19,17 @@ namespace solunar {
 
 		void OnWorldSet(World* world);
 
-		void addDrawable(DrawableComponent* drawable);
-		void removeDrawable(DrawableComponent* drawable);
+		void AddMesh(MeshComponent* mesh);
+		void RemoveMesh(MeshComponent* mesh);
 
 		LightManager* GetLightManager() { return &m_lightManager; }
 
-		const std::vector<DrawableComponent*>& getDrawables() { return m_drawables; }
+		const std::vector<MeshComponent*>& GetMeshes() { return m_meshes; }
 
-		void updateDrawables();
+		void Update();
 		
 	private:
-		std::vector<DrawableComponent*> m_drawables;
+		std::vector<MeshComponent*> m_meshes;
 
 		LightManager m_lightManager;
 	};

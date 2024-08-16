@@ -69,7 +69,7 @@ void GLPostProcessing::initHDR(View* view)
 	hdrRTDesc.m_textures2DCount = 1;
 	m_hdrRenderTarget = g_renderDevice->CreateRenderTarget(hdrRTDesc);
 
-	m_hdrPassProgram = g_shaderManager->createShaderProgram("quad.vsh", "hdr_main.psh");
+	m_hdrPassProgram = g_shaderManager->CreateShaderProgram("quad.vsh", "hdr_main.psh");
 
 	BufferDesc constantBufferDesc;
 	memset(&constantBufferDesc, 0, sizeof(constantBufferDesc));
@@ -135,8 +135,8 @@ void GLPostProcessing::initBlur(View* view)
 	hdrPinPongSamplerDesc.m_anisotropyLevel = 1.0f;
 	m_hdrPinPongSampler = g_renderDevice->CreateSamplerState(hdrPinPongSamplerDesc);
 
-	m_blurPassProgram = g_shaderManager->createShaderProgram("quad.vsh", "hdr_blur.psh");
-	m_hdrCombineProgram = g_shaderManager->createShaderProgram("quad.vsh", "hdr_combine.psh");
+	m_blurPassProgram = g_shaderManager->CreateShaderProgram("quad.vsh", "hdr_blur.psh");
+	m_hdrCombineProgram = g_shaderManager->CreateShaderProgram("quad.vsh", "hdr_combine.psh");
 }
 
 void GLPostProcessing::Shutdown()
@@ -212,7 +212,7 @@ void GLPostProcessing::blurPass(ITexture2D* screenTexture)
 	{
 		g_renderDevice->SetRenderTarget(m_hdrPinPongRenderTargets[horizontal]);
 
-		g_shaderManager->setShaderProgram(m_blurPassProgram);
+		g_shaderManager->SetShaderProgram(m_blurPassProgram);
 
 		// setup textures
 		g_renderDevice->SetSamplerState(0, m_hdrPinPongSampler);
@@ -250,7 +250,7 @@ void GLPostProcessing::combinePass(ITexture2D* screenTexture)
 	// clear color
 	//graphicsDevice->clear(ClearRenderTarget | ClearDepth);
 
-	g_shaderManager->setShaderProgram(m_hdrCombineProgram);
+	g_shaderManager->SetShaderProgram(m_hdrCombineProgram);
 
 	// screen texture
 	g_renderDevice->SetSamplerState(0, m_hdrPinPongSampler);

@@ -52,7 +52,7 @@ SurfaceDesc GLTexture2D::getSurfaceDesc()
 	return m_surfaceDesc;
 }
 
-void GLTexture2D::setDebugName(const char* debugName)
+void GLTexture2D::SetDebugName(const char* debugName)
 {
 }
 

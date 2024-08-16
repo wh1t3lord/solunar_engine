@@ -9,7 +9,7 @@
 namespace solunar
 {
 
-extern DXGI_FORMAT getDxgiFormat(ImageFormat format);
+extern DXGI_FORMAT GetDxgiFormat(ImageFormat format);
 
 enum ShaderType
 {
@@ -24,12 +24,11 @@ public:
 	STDMETHOD(Close)(THIS_ LPCVOID pData);
 };
 
-
 // https://www.asawicki.info/news_1515_implementing_id3d10include
 
 STDMETHODIMP D3D11Include::Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT* pBytes)
 {
-	std::string includeFilename = g_shaderManager->getShaderPath();
+	std::string includeFilename = g_shaderManager->GetShaderPath();
 	includeFilename += "/";
 	includeFilename += pFileName;
 
@@ -65,7 +64,7 @@ STDMETHODIMP D3D11Include::Close(LPCVOID pData)
 
 D3D11Include g_d3d11Include;
 
-ID3DBlob* createShaderFromText(const char* text, ShaderType shaderType, const char* defines = nullptr)
+ID3DBlob* CreateShaderFromText(const char* text, ShaderType shaderType, const char* defines = nullptr)
 {
 	ID3DBlob* shaderBlob = nullptr;
 	ID3DBlob* errorTextBlob = nullptr;
@@ -86,7 +85,7 @@ ID3DBlob* createShaderFromText(const char* text, ShaderType shaderType, const ch
 		size_t iterator = definesStr.find_first_of('\n');
 		while (iterator != std::string::npos) {
 			std::string exactDefineStr = definesStr.substr(0, iterator);
-			Core::Msg("createShaderFromText: %s", exactDefineStr.c_str());
+			Core::Msg("CreateShaderFromText: %s", exactDefineStr.c_str());
 			shderMacroStrings.push_back(exactDefineStr);
 			iterator = definesStr.find_first_of('\n', iterator);
 		}*/
@@ -125,7 +124,7 @@ ID3DBlob* createShaderFromText(const char* text, ShaderType shaderType, const ch
 			errorText += " ";
 		}
 
-		Core::Msg("createShaderFromText: %s", errorText.c_str());
+		Core::Msg("CreateShaderFromText: %s", errorText.c_str());
 
 		//std::terminate();
 		//DebugBreak();
@@ -138,6 +137,20 @@ ID3DBlob* createShaderFromText(const char* text, ShaderType shaderType, const ch
 	}
 
 	return shaderBlob;
+}
+
+inline D3D11_INPUT_CLASSIFICATION GetD3DInputClassification(InputAligment inputAligment)
+{
+	switch (inputAligment)
+	{
+	case INPUT_PER_VERTEX_DATA:
+		return D3D11_INPUT_PER_VERTEX_DATA;
+	case INPUT_PER_INSTANCE_DATA:
+		return D3D11_INPUT_PER_INSTANCE_DATA;
+	}
+
+	Assert(0);
+	return (D3D11_INPUT_CLASSIFICATION)0;
 }
 
 D3D11ShaderProgram::D3D11ShaderProgram(D3D11Device* device, 
@@ -160,7 +173,7 @@ D3D11ShaderProgram::~D3D11ShaderProgram()
 
 void D3D11ShaderProgram::Create(D3D11Device* device, const char* vstext, const char* pstext, const char* defines /*= nullptr*/, InputLayoutDesc* inputLayout /*= nullptr*/, int inputLayoutCount /*= 0*/)
 {
-	ID3DBlob* vertexShaderBlob = createShaderFromText(vstext, ShaderType_Vertex, defines);
+	ID3DBlob* vertexShaderBlob = CreateShaderFromText(vstext, ShaderType_Vertex, defines);
 	device->getDevice()->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), NULL, &m_vertexShader);
 
 	if (inputLayout && inputLayoutCount > 0)
@@ -172,11 +185,11 @@ void D3D11ShaderProgram::Create(D3D11Device* device, const char* vstext, const c
 			D3D11_INPUT_ELEMENT_DESC inputElementDesc	= {};
 			inputElementDesc.SemanticName				= inputLayout[i].m_semanticName;
 			inputElementDesc.SemanticIndex				= inputLayout[i].m_semanticIndex;
-			inputElementDesc.Format						= getDxgiFormat(inputLayout[i].m_format);
+			inputElementDesc.Format						= GetDxgiFormat(inputLayout[i].m_format);
 			inputElementDesc.InputSlot					= inputLayout[i].m_inputSlot;
 			inputElementDesc.AlignedByteOffset			= inputLayout[i].m_alignedByteOffset;
 			inputElementDesc.InstanceDataStepRate		= inputLayout[i].m_instanceDataStepRate;
-			inputElementDesc.InputSlotClass				= D3D11_INPUT_PER_VERTEX_DATA;
+			inputElementDesc.InputSlotClass				= GetD3DInputClassification(inputLayout[i].m_inputSlotClass);
 			inputLayoutDesc.push_back(inputElementDesc);
 		}
 
@@ -189,7 +202,7 @@ void D3D11ShaderProgram::Create(D3D11Device* device, const char* vstext, const c
 #ifdef CREATE_INPUT_LAYOUT_FROM_REFLECT
 	else
 	{
-		createInputLayout(device, vertexShaderBlob);
+		CreateInputLayout(device, vertexShaderBlob);
 	}
 #else
 	Assert2(inputLayout, "Failed to create shader input layout");
@@ -198,7 +211,7 @@ void D3D11ShaderProgram::Create(D3D11Device* device, const char* vstext, const c
 	vertexShaderBlob->Release();
 	vertexShaderBlob = nullptr;
 
-	ID3DBlob* pixelShaderBlob = createShaderFromText(pstext, ShaderType_Pixel, defines);
+	ID3DBlob* pixelShaderBlob = CreateShaderFromText(pstext, ShaderType_Pixel, defines);
 	device->getDevice()->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), NULL, &m_pixelShader);
 
 	pixelShaderBlob->Release();
@@ -226,7 +239,7 @@ void D3D11ShaderProgram::Destroy()
 	}
 }
 
-void D3D11ShaderProgram::createInputLayout(D3D11Device* device, ID3DBlob* vertexShaderBlob)
+void D3D11ShaderProgram::CreateInputLayout(D3D11Device* device, ID3DBlob* vertexShaderBlob)
 {
 	// #TODO: convert engine inputLayouts to D3D11 input layout
 
@@ -298,7 +311,7 @@ void D3D11ShaderProgram::createInputLayout(D3D11Device* device, ID3DBlob* vertex
 	shaderReflection->Release();
 }
 
-void D3D11ShaderProgram::setDebugName(const char* vsname, const char* psname)
+void D3D11ShaderProgram::SetDebugName(const char* vsname, const char* psname)
 {
 	D3D11_CHECK(m_vertexShader->SetPrivateData(WKPDID_D3DDebugObjectName, strlen(vsname), vsname));
 	D3D11_CHECK(m_pixelShader->SetPrivateData(WKPDID_D3DDebugObjectName, strlen(psname), psname));

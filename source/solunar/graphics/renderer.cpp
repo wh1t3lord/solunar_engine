@@ -111,7 +111,7 @@ namespace solunar
 		memset(&colorTextureSubresourceDesc, 0, sizeof(colorTextureSubresourceDesc));
 
 		m_screenColorTexture = g_renderDevice->CreateTexture2D(colorTextureDesc, colorTextureSubresourceDesc);
-		m_screenColorTexture->setDebugName("Screen Color Texture");
+		m_screenColorTexture->SetDebugName("Screen Color Texture");
 
 		TextureDesc depthTextureDesc;
 		memset(&depthTextureDesc, 0, sizeof(depthTextureDesc));
@@ -124,7 +124,7 @@ namespace solunar
 		memset(&depthTextureSubresourceDesc, 0, sizeof(depthTextureSubresourceDesc));
 
 		m_screenDepthTexture = g_renderDevice->CreateTexture2D(depthTextureDesc, depthTextureSubresourceDesc);
-		m_screenDepthTexture->setDebugName("Screen Depth Texture");
+		m_screenDepthTexture->SetDebugName("Screen Depth Texture");
 
 		RenderTargetCreationDesc renderTargetDesc;
 		memset(&renderTargetDesc, 0, sizeof(renderTargetDesc));
@@ -132,7 +132,7 @@ namespace solunar
 		renderTargetDesc.m_textures2D[0] = m_screenColorTexture;
 		renderTargetDesc.m_textures2DCount = 1;
 		m_screenRenderTarget = g_renderDevice->CreateRenderTarget(renderTargetDesc);
-		m_screenRenderTarget->setDebugName("Screen Render Target");
+		m_screenRenderTarget->SetDebugName("Screen Render Target");
 	}
 
 	void Renderer::Init()
@@ -264,15 +264,13 @@ namespace solunar
 		World* world = Engine::ms_world;
 		if (world)
 		{
-			EntityManager& entityManager = world->GetEntityManager();
-
-			std::vector<Entity*> drawableEntities = entityManager.GetEntitiesWithComponent<MeshComponent>();
+			const std::vector<MeshComponent*>& drawableEntities = world->GetGraphicsWorld()->GetMeshes();
 
 			// color pass
-			for (auto entity : drawableEntities)
+			for (auto meshComponent : drawableEntities)
 			{
-				MeshComponent* meshComponent = entity->GetComponent<MeshComponent>();
-				if (meshComponent)
+				Entity* entity = meshComponent->GetEntity();
+				if (entity)
 				{
 					// setup render context
 					RenderContext& renderCtx = RenderContext::GetContext();

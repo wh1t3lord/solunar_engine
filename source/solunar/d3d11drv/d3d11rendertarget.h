@@ -22,7 +22,7 @@ public:
 	void Create(D3D11Device* device, const RenderTargetCreationDesc& renderTargetDesc);
 	void Release() override;
 
-	void setDebugName(const char* debugName) override;
+	void SetDebugName(const char* debugName) override;
 
 	void bind(D3D11Device* device);
 

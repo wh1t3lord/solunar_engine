@@ -80,7 +80,7 @@ void RmlRenderer::Init()
 	g_defaultRmlUISampler = g_renderDevice->CreateSamplerState(samplerDesc);
 
 	// Load shader
-	m_shaderProgram = g_shaderManager->createShaderProgram("2d_ui.vsh", "2d_ui.psh");
+	m_shaderProgram = g_shaderManager->CreateShaderProgram("2d_ui.vsh", "2d_ui.psh");
 }
 
 void RmlRenderer::Shutdown()
@@ -188,7 +188,7 @@ void RmlRenderer::RenderCompiledGeometry(Rml::CompiledGeometryHandle geometry, c
 
 	// Initialize device state
 
-	g_shaderManager->setShaderProgram(m_shaderProgram);
+	g_shaderManager->SetShaderProgram(m_shaderProgram);
 
 	VertexFormat vtxf;
 	vtxf.addPosition_Float2();

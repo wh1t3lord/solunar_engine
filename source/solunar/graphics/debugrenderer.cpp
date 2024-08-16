@@ -65,7 +65,7 @@ void DebugRender::Initialize()
 	};
 
 	// create shader
-	m_shaderProgram = g_shaderManager->createShaderProgram(
+	m_shaderProgram = g_shaderManager->CreateShaderProgram(
 		"debug_draw.vsh", 
 		"debug_draw.psh",
 		nullptr,
@@ -268,7 +268,7 @@ void DebugRender::drawLinesInternal(View* view)
 	memcpy(vertices, m_lines.data(), m_lines.size() * sizeof(Line));
 	m_verticesBuffer->Unmap();
 
-	g_shaderManager->setShaderProgram(m_shaderProgram);
+	g_shaderManager->SetShaderProgram(m_shaderProgram);
 
 	glm::mat4 mVP = glm::mat4(1.0f);
 	mVP = view->m_projection * view->m_view;

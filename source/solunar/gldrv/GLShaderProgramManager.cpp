@@ -42,7 +42,7 @@ GLShaderProgramManager::~GLShaderProgramManager()
 	m_programs.clear();
 }
 
-IShaderProgram* GLShaderProgramManager::createShaderProgram(
+IShaderProgram* GLShaderProgramManager::CreateShaderProgram(
 	const char* vsfilename, 
 	const char* fsfilename, 
 	const char* defines,
@@ -79,7 +79,7 @@ IShaderProgram* GLShaderProgramManager::createShaderProgram(
 	return (GLShaderProgram*)program;
 }
 
-void GLShaderProgramManager::setShaderProgram(IShaderProgram* program)
+void GLShaderProgramManager::SetShaderProgram(IShaderProgram* program)
 {
 	GLShaderProgram* nativeProgram = (GLShaderProgram*)program;
 	glUseProgram(nativeProgram ? nativeProgram->getProgramhandle() : 0);
@@ -111,7 +111,7 @@ void GLShaderProgramManager::setShaderProgram(IShaderProgram* program)
 	}
 }
 
-void GLShaderProgramManager::deleteProgram(IShaderProgram* program)
+void GLShaderProgramManager::DeleteProgram(IShaderProgram* program)
 {
 	Assert(program);
 

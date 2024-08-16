@@ -19,14 +19,14 @@ void ShaderProgramManager::Shutdown()
 {
 	//for (auto it = m_programs.begin(); it != m_programs.end(); ++it) {
 	//	if (*it) {
-	//		deleteProgram(*it);
+	//		DeleteProgram(*it);
 	//	}
 	//}
 
 	//m_programs.clear();
 }
 
-std::string ShaderProgramManager::getShaderPath()
+std::string ShaderProgramManager::GetShaderPath()
 {
 	return m_shaderPath;
 }

@@ -327,7 +327,7 @@ void D3D12Renderer::bindMaterialForMesh(MeshComponent* mesh, Material* material,
 	Assert2(shaderProgram, "Unknowed mesh component type!");
 
 	// bind material instance shader and material uniforms
-	g_shaderManager->setShaderProgram(shaderProgram);
+	g_shaderManager->SetShaderProgram(shaderProgram);
 #endif
 
 #if 0
@@ -343,7 +343,7 @@ void D3D12Renderer::bindMaterialForMesh(MeshComponent* mesh, Material* material,
 	Assert2(shaderProgram, "Unknowed mesh component type!");
 
 	// bind material instance shader and material uniforms
-	g_shaderManager->setShaderProgram(shaderProgram);
+	g_shaderManager->SetShaderProgram(shaderProgram);
 
 	material->bindUniformsCustom(shaderProgram);
 

@@ -5,7 +5,7 @@
 namespace solunar
 {
 
-extern DXGI_FORMAT getDxgiFormat(ImageFormat format);
+extern DXGI_FORMAT GetDxgiFormat(ImageFormat format);
 
 D3D11RenderTarget::D3D11RenderTarget(ID3D11RenderTargetView* renderTargetView, ID3D11DepthStencilView* depthStencilView)
 {
@@ -65,7 +65,7 @@ void D3D11RenderTarget::Create(D3D11Device* device, const RenderTargetCreationDe
 
 		D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
 		memset(&renderTargetViewDesc, 0, sizeof(renderTargetViewDesc));
-		renderTargetViewDesc.Format = getDxgiFormat(textureDesc.m_format);
+		renderTargetViewDesc.Format = GetDxgiFormat(textureDesc.m_format);
 		renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 		renderTargetViewDesc.Texture2D.MipSlice = 0;
 
@@ -79,7 +79,7 @@ void D3D11RenderTarget::Create(D3D11Device* device, const RenderTargetCreationDe
 #if 0
 		D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 		memset(&shaderResourceViewDesc, 0, sizeof(shaderResourceViewDesc));
-		shaderResourceViewDesc.Format = getDxgiFormat(textureDesc.m_format);
+		shaderResourceViewDesc.Format = GetDxgiFormat(textureDesc.m_format);
 		shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		shaderResourceViewDesc.Texture2D.MipLevels = 1;
 		
@@ -134,7 +134,7 @@ void D3D11RenderTarget::Release()
 	}
 }
 
-void D3D11RenderTarget::setDebugName(const char* debugName)
+void D3D11RenderTarget::SetDebugName(const char* debugName)
 {
 	for (auto it : m_renderTargetViews)
 	{

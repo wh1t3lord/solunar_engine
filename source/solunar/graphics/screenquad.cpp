@@ -41,7 +41,7 @@ namespace solunar
 
 		ms_vertexBuffer = g_renderDevice->CreateBuffer(bufferDesc, subresourceDesc);
 
-		ms_screenQuadShader = g_shaderManager->createShaderProgram(
+		ms_screenQuadShader = g_shaderManager->CreateShaderProgram(
 			"quad.vsh", 
 			"quad.psh", 
 			nullptr,
@@ -68,7 +68,7 @@ namespace solunar
 		g_renderDevice->SetTexture2D(0, texture);
 		g_renderDevice->SetSamplerState(0, g_defaultSampler);
 
-		g_shaderManager->setShaderProgram(ms_screenQuadShader);
+		g_shaderManager->SetShaderProgram(ms_screenQuadShader);
 		g_renderDevice->Draw(PM_TriangleList, 0, 6);
 	}
 
@@ -82,7 +82,7 @@ namespace solunar
 		g_renderDevice->SetVertexBuffer(ms_vertexBuffer, sizeof(QuadVertex), 0);
 		g_renderDevice->SetTexture2D(0, texture);
 
-		g_shaderManager->setShaderProgram(shader);
+		g_shaderManager->SetShaderProgram(shader);
 		g_renderDevice->Draw(PM_TriangleList, 0, 6);
 	}
 
@@ -106,7 +106,7 @@ namespace solunar
 
 		g_renderDevice->SetVertexBuffer(ms_vertexBuffer, sizeof(QuadVertex), 0);
 		
-		g_shaderManager->setShaderProgram(shader);
+		g_shaderManager->SetShaderProgram(shader);
 
 		g_renderDevice->Draw(PM_TriangleList, 0, 6);
 	}
