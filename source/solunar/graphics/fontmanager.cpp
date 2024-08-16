@@ -86,6 +86,18 @@ void FontManager::InitPrivate()
 	//       And we will fill buffer at every time when we need to draw some sentence.
 	m_vertexBuffer = g_renderDevice->CreateBuffer(charBufferDesc, charSubresourceDesc);
 
+	// create characters index buffer
+
+	BufferDesc charIndexBufferDesc;
+	memset(&charBufferDesc, 0, sizeof(charIndexBufferDesc));
+	charIndexBufferDesc.m_bufferType = BufferType::IndexBuffer;
+	charIndexBufferDesc.m_bufferAccess = BufferAccess::Stream;
+	charIndexBufferDesc.m_bufferMemorySize = kMaxFontIBSize;
+
+	// NOTE: We create dynamic index buffer without any data.
+	//       And we will fill buffer at every time when we need to draw some sentence.
+	m_indexBuffer = g_renderDevice->CreateBuffer(charIndexBufferDesc, charSubresourceDesc);
+
 	// create constant buffer
 	BufferDesc constantBufferDesc;
 	memset(&constantBufferDesc, 0, sizeof(constantBufferDesc));
@@ -188,6 +200,9 @@ void FontManager::FlushPrimitives()
 	// bind vertex buffer
 	g_renderDevice->SetVertexBuffer(m_vertexBuffer, sizeof(FontVertex), 0);
 
+	// bind index buffer
+	g_renderDevice->SetIndexBuffer(m_indexBuffer, true);
+
 	// draw font strings
 	for (auto& it : m_drawStrings)
 	{
@@ -197,7 +212,12 @@ void FontManager::FlushPrimitives()
 		// map our text buffer
 		FontVertex* fontVertices = (FontVertex*)m_vertexBuffer->Map(BufferMapping::WriteOnly);
 
+		// map our index buffer
+		uint16_t* fontIndices = (uint16_t*)m_indexBuffer->Map(BufferMapping::WriteOnly);
+
 		uint32_t numVertices = 0;
+		uint32_t numIndices = 0;
+		uint16_t currentIndex = 0;
 		size_t stringLength = it.m_string.length();
 
 		for (int i = 0; i < stringLength; i++)
@@ -205,27 +225,42 @@ void FontManager::FlushPrimitives()
 			stbtt_aligned_quad q;
 			stbtt_GetBakedQuad(it.m_font->m_fontChars, 512, 512, it.m_string[i] - 32, &it.m_x, &it.m_y, &q, 1);
 
-			fontVertices[numVertices + 0].position = glm::vec2(q.x0, (float)view->m_height - q.y0); fontVertices[numVertices + 0].texcoord = glm::vec2(q.s0, q.t0);
-			fontVertices[numVertices + 1].position = glm::vec2(q.x1, (float)view->m_height - q.y0); fontVertices[numVertices + 1].texcoord = glm::vec2(q.s1, q.t0);
-			fontVertices[numVertices + 2].position = glm::vec2(q.x1, (float)view->m_height - q.y1); fontVertices[numVertices + 2].texcoord = glm::vec2(q.s1, q.t1);
-			fontVertices[numVertices + 3].position = glm::vec2(q.x0, (float)view->m_height - q.y1); fontVertices[numVertices + 3].texcoord = glm::vec2(q.s0, q.t1);
-			fontVertices[numVertices + 4].position = glm::vec2(q.x0, (float)view->m_height - q.y0); fontVertices[numVertices + 4].texcoord = glm::vec2(q.s0, q.t0);
-			fontVertices[numVertices + 5].position = glm::vec2(q.x1, (float)view->m_height - q.y1); fontVertices[numVertices + 5].texcoord = glm::vec2(q.s1, q.t1);
+			fontIndices[numIndices] = currentIndex;
+			fontIndices[numIndices + 1] = currentIndex + 1;
+			fontIndices[numIndices + 2] = currentIndex + 2;
+			fontIndices[numIndices + 3] = currentIndex;
+			fontIndices[numIndices + 4] = currentIndex + 2;
+			fontIndices[numIndices + 5] = currentIndex + 3;
 
+			// position
+			fontVertices[numVertices + 0].position = glm::vec2(q.x0, (float)view->m_height - q.y0);
+			fontVertices[numVertices + 1].position = glm::vec2(q.x1, (float)view->m_height - q.y0);
+			fontVertices[numVertices + 2].position = glm::vec2(q.x1, (float)view->m_height - q.y1);
+			fontVertices[numVertices + 3].position = glm::vec2(q.x0, (float)view->m_height - q.y1);
+
+			// color
 			fontVertices[numVertices + 0].color = it.m_color;
 			fontVertices[numVertices + 1].color = it.m_color;
 			fontVertices[numVertices + 2].color = it.m_color;
 			fontVertices[numVertices + 3].color = it.m_color;
-			fontVertices[numVertices + 4].color = it.m_color;
-			fontVertices[numVertices + 5].color = it.m_color;
-			numVertices += 6;
+
+			// texcoord
+			fontVertices[numVertices + 0].texcoord = glm::vec2(q.s0, q.t0);
+			fontVertices[numVertices + 1].texcoord = glm::vec2(q.s1, q.t0);
+			fontVertices[numVertices + 2].texcoord = glm::vec2(q.s1, q.t1);
+			fontVertices[numVertices + 3].texcoord = glm::vec2(q.s0, q.t1);
+
+			currentIndex += 4;
+			numIndices += 6;
+			numVertices += 4;
 		}
 
 		// unmap
+		m_indexBuffer->Unmap();
 		m_vertexBuffer->Unmap();
 
-		// draw 
-		g_renderDevice->Draw(PM_TriangleList, 0, numVertices);
+		// draw
+		g_renderDevice->DrawIndexed(PM_TriangleList, 0, numIndices, 0);
 	}
 
 	m_drawStrings.clear();
@@ -245,6 +280,12 @@ void FontManager::Shutdown()
 	{
 		mem_delete(m_constantBuffer);
 		m_constantBuffer = nullptr;
+	}
+
+	if (m_indexBuffer)
+	{
+		mem_delete(m_indexBuffer);
+		m_indexBuffer = nullptr;
 	}
 
 	if (m_vertexBuffer)
