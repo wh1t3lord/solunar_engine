@@ -427,7 +427,7 @@ namespace solunar
 		m_albedoTexture.lock()->getHWTexture()->SetDebugName(m_albedoTextureFileName.c_str());
 
 		if (m_albedoTexture.lock())
-			m_albedoTexture.lock()->getHWTexture()->setDebugName(m_albedoTextureFileName.c_str());
+			m_albedoTexture.lock()->getHWTexture()->SetDebugName(m_albedoTextureFileName.c_str());
 
 		// REWRITE TO SAMPLER !!!
 #if 0
