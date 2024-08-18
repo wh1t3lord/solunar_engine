@@ -95,13 +95,13 @@ namespace solunar
 		for (auto entity : logicEntities)
 		{
 			LogicComponent* logicComponent = entity->GetComponent<LogicComponent>();
-			logicComponent->Update(Timer::GetInstance()->getDelta());
+			logicComponent->Update(Timer::GetInstance()->GetDelta());
 		}
 	}
 
 	void World::Update_PhysicsEntity()
 	{
-		float delta = Timer::GetInstance()->getDelta();
+		float delta = Timer::GetInstance()->GetDelta();
 		m_physicsWorld->step(delta);
 
 		std::vector<Entity*> physicsEntities = m_entityManager.GetEntitiesWithComponent<RigidBodyComponent>();

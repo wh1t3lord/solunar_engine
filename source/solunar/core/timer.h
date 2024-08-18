@@ -20,7 +20,7 @@ public:
 	
 	void Update();
 
-	float getDelta();
+	float GetDelta();
 	float getTime();
 
 private:
@@ -44,7 +44,7 @@ public:
 
 	void Update();
 
-	float getDelta();
+	float GetDelta();
 	float getTime();
 private:
 	clock_t m_startTime;
