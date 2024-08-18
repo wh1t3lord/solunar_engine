@@ -151,9 +151,6 @@ namespace solunar {
 		btVector3 localInertia(0.0f, 0.0f, 0.0f);
 		btRigidBody::btRigidBodyConstructionInfo rigidBodyCInfo(m_mass, nullptr, m_compoundShape, localInertia);
 		m_rigidBody = mem_new<btRigidBody>(rigidBodyCInfo);
-		
-		// TODO: TO THINK
-		// It is right to assing entity instance to user pointer or entity should have multiply rigid bodies component ???
 		m_rigidBody->setUserPointer(this);
 
 		int bodyCollisionFlags = m_rigidBody->getCollisionFlags();

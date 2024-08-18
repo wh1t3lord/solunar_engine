@@ -17,8 +17,6 @@ namespace solunar {
 		GraphicsWorld();
 		~GraphicsWorld();
 
-		void OnWorldSet(World* world);
-
 		void AddMesh(MeshComponent* mesh);
 		void RemoveMesh(MeshComponent* mesh);
 

@@ -39,7 +39,7 @@ void Timer::Update()
 	m_endTime = m_startTime;
 }
 
-float Timer::getDelta()
+float Timer::GetDelta()
 {
 	return m_deltaTime;
 }
@@ -73,7 +73,7 @@ void Timer::Update()
 	m_endTime = m_startTime;
 }
 
-float Timer::getDelta()
+float Timer::GetDelta()
 {
 	return m_deltaTime;
 }

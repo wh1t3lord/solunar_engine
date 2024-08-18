@@ -1,6 +1,9 @@
 #include "graphicspch.h"
 #include "graphics/graphicsworld.h"
 #include "graphics/mesh.h"
+
+#include "core/timer.h"
+
 #include "engine/camera.h"
 
 #include <algorithm>
@@ -16,10 +19,6 @@ namespace solunar {
 	{
 	}
 
-	void GraphicsWorld::OnWorldSet(World* world)
-	{
-	}
-	
 	void GraphicsWorld::AddMesh(MeshComponent* mesh)
 	{
 		Assert2(mesh, "Cannot add nullptr mesh component.");
@@ -48,10 +47,13 @@ namespace solunar {
 				!dc2->IsA(MeshComponent::GetStaticTypeInfo()))
 				return false;
 
-			float length1 = glm::length(camera->GetPosition() - dc1->GetEntity()->GetPosition());
-			float length2 = glm::length(camera->GetPosition() - dc2->GetEntity()->GetPosition());
+			glm::vec3 pos1 = camera->GetPosition() - dc1->GetEntity()->GetPosition();
+			glm::vec3 pos2 = camera->GetPosition() - dc2->GetEntity()->GetPosition();
 
-			return length1 < length2;
+			float sqrdist1 = glm::dot(pos1, pos1);
+			float sqrdist2 = glm::dot(pos2, pos2);
+
+			return sqrdist1 > sqrdist2;
 		});
 	}
 }
