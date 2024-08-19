@@ -68,6 +68,7 @@ namespace solunar {
 		bool m_isEnable;
 		bool m_static;
 		bool m_isKinematic;
+		bool m_isTrigger;
 		bool m_inWorld;
 	};
 

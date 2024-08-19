@@ -78,7 +78,7 @@ namespace solunar {
 		SaveVector3ToXMLElement(*positionElement, m_localPosition);
 	}
 
-	void ShapeComponent::initializeShape()
+	void ShapeComponent::InitializeShape()
 	{
 		m_rigidBody = GetEntity()->GetComponent<RigidBodyComponent>();
 		if (!m_rigidBody)
@@ -86,18 +86,18 @@ namespace solunar {
 			m_rigidBody = GetEntity()->CreateComponent<RigidBodyComponent>();
 		}
 
-		createShapeInternal();
+		CreateShapeInternal();
 
 		Assert2(m_shape, "Failed to allocate or create shape.");
 
-		initializeShapeTransform();
+		InitializeShapeTransform();
 
 		// apply created shape to rigid body compound shape
 		Assert2(m_rigidBody->GetCompoundShape(), "RigidBody is not initialized!");
 		m_rigidBody->GetCompoundShape()->addChildShape(m_btLocalTransform, m_shape);
 	}
 
-	void ShapeComponent::initializeShapeTransform()
+	void ShapeComponent::InitializeShapeTransform()
 	{
 		// identity
 		m_btLocalTransform.setIdentity();
@@ -106,7 +106,7 @@ namespace solunar {
 		m_btLocalTransform.setOrigin(glmVectorToBt(m_localPosition));
 	}
 
-	void ShapeComponent::createShapeInternal()
+	void ShapeComponent::CreateShapeInternal()
 	{
 		Assert2(0, "Pure virtual call");
 	}
@@ -153,10 +153,10 @@ namespace solunar {
 	void BoxShapeComponent::createShape(const glm::vec3& size)
 	{
 		m_size = size;
-		createShapeInternal();
+		CreateShapeInternal();
 	}
 
-	void BoxShapeComponent::createShapeInternal()
+	void BoxShapeComponent::CreateShapeInternal()
 	{
 		m_shape = (btCollisionShape*)mem_new<btBoxShape>(glmVectorToBt(m_size));
 	}
@@ -202,7 +202,7 @@ namespace solunar {
 		}
 	}
 
-	void SphereShapeComponent::createShapeInternal()
+	void SphereShapeComponent::CreateShapeInternal()
 	{
 		m_shape = (btCollisionShape*)mem_new<btSphereShape>(m_fRadius);
 	}
@@ -247,7 +247,7 @@ namespace solunar {
 		}
 	}
 
-	void CylinderShapeComponent::createShapeInternal()
+	void CylinderShapeComponent::CreateShapeInternal()
 	{
 		m_shape = (btCollisionShape*)mem_new<btCylinderShape>(glmVectorToBt(m_size));
 	}
@@ -276,7 +276,7 @@ namespace solunar {
 	{
 		m_fRadius = _fRadius;
 		m_fHeight = _fHeight;
-		createShapeInternal();
+		CreateShapeInternal();
 	}
 
 	void CapsuleShapeComponent::LoadXML(tinyxml2::XMLElement& element)
@@ -306,7 +306,7 @@ namespace solunar {
 		}
 	}
 
-	void CapsuleShapeComponent::createShapeInternal()
+	void CapsuleShapeComponent::CreateShapeInternal()
 	{
 		m_shape = (btCollisionShape*)mem_new<btCapsuleShape>(m_fRadius, m_fHeight);
 	}

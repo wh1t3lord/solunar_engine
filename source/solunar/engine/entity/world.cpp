@@ -75,7 +75,7 @@ namespace solunar
 		if (!shapes.empty())
 		{
 			for (auto it : shapes)
-				it->initializeShape();
+				it->InitializeShape();
 		}
 	}
 
@@ -102,7 +102,7 @@ namespace solunar
 	void World::Update_PhysicsEntity()
 	{
 		float delta = Timer::GetInstance()->GetDelta();
-		m_physicsWorld->step(delta);
+		m_physicsWorld->Step(delta);
 
 		std::vector<Entity*> physicsEntities = m_entityManager.GetEntitiesWithComponent<RigidBodyComponent>();
 

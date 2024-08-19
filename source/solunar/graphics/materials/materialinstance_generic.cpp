@@ -58,7 +58,7 @@ MaterialInstance_Generic::MaterialInstance_Generic()
 		getShaderProgramVariation(VertexFactory_StaticMesh, PixelVariation_Lit);
 		getShaderProgramVariation(VertexFactory_StaticMesh, PixelVariation_Unlit);
 		getShaderProgramVariation(VertexFactory_SkinnedMesh, PixelVariation_Lit);
-		getShaderProgramVariation(VertexFactory_SkinnedMesh, PixelVariation_Unlit);
+		//getShaderProgramVariation(VertexFactory_SkinnedMesh, PixelVariation_Unlit);
 		isInited = true;
 	}
 }
@@ -85,8 +85,8 @@ IShaderProgram* MaterialInstance_Generic::getShaderProgramVariation(VertexFactor
 	{
 	case VertexFactory_StaticMesh:
 		shaderProgram = g_shaderManager->CreateShaderProgram(
-			"materialinstance_generic.hlsl",
-			"materialinstance_generic.hlsl",
+			"materialinstance_generic.vsh",
+			"materialinstance_generic.psh",
 			defines.c_str(),
 			s_vertexInputLayout,
 			sizeof(s_vertexInputLayout) / sizeof(s_vertexInputLayout[0]));
@@ -95,8 +95,8 @@ IShaderProgram* MaterialInstance_Generic::getShaderProgramVariation(VertexFactor
 		defines += "SKINNED\n";
 
 		shaderProgram = g_shaderManager->CreateShaderProgram(
-			"materialinstance_generic.hlsl",
-			"materialinstance_generic.hlsl",
+			"materialinstance_generic.vsh",
+			"materialinstance_generic.psh",
 			defines.c_str(),
 			s_animatedVertexInputLayout,
 			sizeof(s_animatedVertexInputLayout) / sizeof(s_animatedVertexInputLayout[0]));

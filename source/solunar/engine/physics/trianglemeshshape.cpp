@@ -75,7 +75,7 @@ void TriangleMeshShapeComponent::SaveXML(tinyxml2::XMLElement& element)
 	ShapeComponent::SaveXML(element);
 }
 
-void TriangleMeshShapeComponent::createShapeInternal()
+void TriangleMeshShapeComponent::CreateShapeInternal()
 {
 	TriangleMeshServer::GetInstance()->saveCollision("test");
 }

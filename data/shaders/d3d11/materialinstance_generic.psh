@@ -4,6 +4,7 @@
 // C++ defines:
 //	UNLIT
 
+#include "common.h"
 #include "cbuffers.h"
 
 struct VSOutput
@@ -29,8 +30,7 @@ float4 PSMain(VSOutput input) : SV_Target
 	const float kSpecPower = 256.0f;
 
 	float3 ambientColor = g_DirLight_ambientColor.xyz;
-	//float3 albedoColor = g_albedoTexture.Sample(g_albedoSampler, input.texcoord).rgb;
-	float3 albedoColor = materialAlbedo(input.texcoord);
+	float3 albedoColor = materialAlbedo(g_albedoTexture, g_albedoSampler, input.texcoord);
 
 #ifdef UNLIT
 	return float4(albedoColor, 1.0f);

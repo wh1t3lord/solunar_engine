@@ -62,7 +62,7 @@ public:
 	void SaveXML(tinyxml2::XMLElement& element) override;
 
 private:
-	void createShapeInternal() override;
+	void CreateShapeInternal() override;
 };
 
 }

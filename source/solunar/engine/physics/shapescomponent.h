@@ -39,17 +39,17 @@ namespace solunar {
 		virtual void SaveXML(tinyxml2::XMLElement& element);
 
 		//! Public initialization of shape
-		void initializeShape();
+		void InitializeShape();
 
 		//! Get Physics SDK shape.
 		btCollisionShape* getSdkShape() { return m_shape; }
 
 	private:
-		void initializeShapeTransform();
+		void InitializeShapeTransform();
 
 	protected:
 		//! Base virtual function for shape creation.
-		virtual void createShapeInternal();
+		virtual void CreateShapeInternal();
 
 	protected:
 		//! Instance of current entity rigid body component.
@@ -87,7 +87,7 @@ namespace solunar {
 		void createShape(const glm::vec3& size);
 
 	private:
-		void createShapeInternal() override;
+		void CreateShapeInternal() override;
 
 	private:
 		glm::vec3 m_size;
@@ -107,7 +107,7 @@ namespace solunar {
 		void SaveXML(tinyxml2::XMLElement& element) override;
 
 	private:
-		void createShapeInternal() override;
+		void CreateShapeInternal() override;
 
 	private:
 		float m_fRadius;
@@ -128,7 +128,7 @@ namespace solunar {
 		void SaveXML(tinyxml2::XMLElement& element) override;
 
 	private:
-		void createShapeInternal() override;
+		void CreateShapeInternal() override;
 
 	private:
 		glm::vec3 m_size;
@@ -151,7 +151,7 @@ namespace solunar {
 		void SaveXML(tinyxml2::XMLElement& element) override;
 
 	private:
-		void createShapeInternal() override;
+		void CreateShapeInternal() override;
 
 	private:
 		float m_fRadius;

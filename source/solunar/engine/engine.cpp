@@ -1,5 +1,7 @@
 #include "enginepch.h"
 #include "core/file/contentmanager.h"
+#include "core/timer.h"
+
 #include "engine/engine.h"
 #include "engine/entity/entity.h"
 #include "engine/entity/component.h"
@@ -10,49 +12,10 @@
 #include "engine/physics/shapescomponent.h"
 #include "engine/physics/rigidbodycomponent.h"
 #include "engine/physics/trianglemeshshape.h"
+#include "engine/physics/triggercomponent.h"
 
 namespace solunar
 {
-
-	//void registerEngineObjects()
-	//{
-	//	// TODO: Rewrite to Class::RegisterObject()
-
-	//	TypeManager::GetInstance()->RegisterObject<Entity>();
-	//	TypeManager::GetInstance()->RegisterObject<Component>();
-	//	TypeManager::GetInstance()->RegisterObject<World>();
-
-	//	TypeManager::GetInstance()->RegisterObject<CameraComponent>();
-	//	TypeManager::GetInstance()->RegisterObject<CameraYawPitchRollComponent>();
-	//	TypeManager::GetInstance()->RegisterObject<CameraFirstPersonComponent>();
-
-	//	TypeManager::GetInstance()->RegisterObject<LogicComponent>();
-
-	//	// Physics
-	//	ShapeComponent::RegisterObject();
-	//	BoxShapeComponent::RegisterObject();
-	//	SphereShapeComponent::RegisterObject();
-	//	CylinderShapeComponent::RegisterObject();
-	//	CapsuleShapeComponent::RegisterObject();
-	//	TriangleMeshShapeComponent::RegisterObject();
-	//	RigidBodyComponent::RegisterObject();
-	//	RigidBodyProxyComponent::RegisterObject();
-
-	//	/*Node::RegisterObject();
-	//	CameraNode::RegisterObject();
-
-	//	Component::RegisterObject();
-	//	TransformComponent::RegisterObject();
-	//	LogicComponent::RegisterObject();
-
-
-	//	WorldComponent::RegisterObject();
-	//	WorldEnvironmentComponent::RegisterObject();
-
-	//	World::RegisterObject();
-	//	LoadingRoomManager::RegisterObject();*/
-	//}
-
 	EngineData g_engineData;
 
 	// There is more nice looking object registration
@@ -81,7 +44,8 @@ namespace solunar
 			CapsuleShapeComponent::GetStaticTypeInfo(),
 			TriangleMeshShapeComponent::GetStaticTypeInfo(),
 			RigidBodyComponent::GetStaticTypeInfo(),
-			RigidBodyProxyComponent::GetStaticTypeInfo()
+			RigidBodyProxyComponent::GetStaticTypeInfo(),
+			TriggerComponent::GetStaticTypeInfo()
 		};
 
 		// register types
@@ -216,6 +180,10 @@ namespace solunar
 		ms_world = world;
 		
 		delete[] data;
+
+		// #TODO: RESET TIMER AND RUN ONE FRAME INSTEAD
+		Timer::GetInstance()->Update();
+		Timer::GetInstance()->Update();
 	}
 
 	void Engine::LoadEmptyWorld()
@@ -230,6 +198,10 @@ namespace solunar
 
 		World* world = g_typeManager->CreateObject<World>();
 		ms_world = world;
+
+		// #TODO: RESET TIMER AND RUN ONE FRAME INSTEAD
+		Timer::GetInstance()->Update();
+		Timer::GetInstance()->Update();
 	}
 
 	void Engine::Update()

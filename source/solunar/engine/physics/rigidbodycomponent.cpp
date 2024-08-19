@@ -15,6 +15,7 @@ namespace solunar {
 		REGISTER_PROPERTY(RigidBodyComponent, PropertyBool, m_isEnable);
 		REGISTER_PROPERTY(RigidBodyComponent, PropertyBool, m_static);
 		REGISTER_PROPERTY(RigidBodyComponent, PropertyBool, m_isKinematic);
+		REGISTER_PROPERTY(RigidBodyComponent, PropertyBool, m_isTrigger);
 	//	RegisterProperty(RigidBodyComponent, PropertyBool, m_inWorld); INTERNAL !!!
 	}
 	END_PROPERTY_REGISTER(RigidBodyComponent)
@@ -29,6 +30,7 @@ namespace solunar {
 		m_isEnable = false;
 		m_static = false;
 		m_isKinematic = false;
+		m_isTrigger = false;
 		m_inWorld = false;
 	}
 
@@ -48,8 +50,9 @@ namespace solunar {
 	{
 		Component::OnEntitySet(entity);
 
-		if (m_physicsWorld && !m_rigidBody)
-			CreateBody();
+		// #TODO: WEIRD STUFF !!!
+		//if (m_physicsWorld && !m_rigidBody)
+		//	CreateBody();
 	}
 
 	void RigidBodyComponent::OnWorldSet(World* world)
@@ -68,9 +71,11 @@ namespace solunar {
 	{
 		tinyxml2::XMLElement* staticElement = element.FirstChildElement("Static");
 		if (staticElement)
-		{
 			staticElement->QueryBoolAttribute("value", &m_static);
-		}
+
+		tinyxml2::XMLElement* triggerElement = element.FirstChildElement("Trigger");
+		if (triggerElement)
+			triggerElement->QueryBoolAttribute("value", &m_isTrigger);
 
 		CreateBody();
 		UpdateBodyTranslationDirty();
@@ -89,6 +94,9 @@ namespace solunar {
 
 		tinyxml2::XMLElement* kinematicElement = element.InsertNewChildElement("Kinematic");
 		kinematicElement->SetAttribute("value", m_isKinematic);
+
+		tinyxml2::XMLElement* triggerElement = element.InsertNewChildElement("Trigger");
+		triggerElement->SetAttribute("value", m_isTrigger);
 	}
 
 	void RigidBodyComponent::UpdateEntityTranslationDirty()
@@ -153,16 +161,9 @@ namespace solunar {
 		m_rigidBody = mem_new<btRigidBody>(rigidBodyCInfo);
 		m_rigidBody->setUserPointer(this);
 
-		int bodyCollisionFlags = m_rigidBody->getCollisionFlags();
+		UpdateBodyProperties();
 
-		if (m_static)
-			bodyCollisionFlags |= btRigidBody::CF_STATIC_OBJECT;
-		else
-			bodyCollisionFlags &= ~btRigidBody::CF_STATIC_OBJECT;
-
-		m_rigidBody->setCollisionFlags(bodyCollisionFlags);
-
-		m_physicsWorld->addRigidBody(this);
+		m_physicsWorld->AddRigidBody(this);
 		m_inWorld = m_rigidBody->isInWorld();
 	}
 
@@ -170,8 +171,7 @@ namespace solunar {
 	{
 		if (m_physicsWorld)
 		{
-			btDynamicsWorld* physicsWorld = m_physicsWorld->GetWorld();
-			physicsWorld->removeRigidBody(m_rigidBody);
+			m_physicsWorld->RemoveRigidBody(this);
 		}
 		else
 		{
@@ -191,6 +191,24 @@ namespace solunar {
 
 	void RigidBodyComponent::UpdateBodyProperties()
 	{
+		int bodyCollisionFlags = m_rigidBody->getCollisionFlags();
+
+		if (m_static)
+			bodyCollisionFlags |= btRigidBody::CF_STATIC_OBJECT;
+		else
+			bodyCollisionFlags &= ~btRigidBody::CF_STATIC_OBJECT;
+
+		if (m_isKinematic)
+			bodyCollisionFlags |= btRigidBody::CF_KINEMATIC_OBJECT;
+		else
+			bodyCollisionFlags &= ~btRigidBody::CF_KINEMATIC_OBJECT;
+
+		if (m_isTrigger)
+			bodyCollisionFlags |= btRigidBody::CF_NO_CONTACT_RESPONSE;
+		else
+			bodyCollisionFlags &= ~btRigidBody::CF_NO_CONTACT_RESPONSE;
+
+		m_rigidBody->setCollisionFlags(bodyCollisionFlags);
 	}
 
 	void RigidBodyComponent::DisableCollide()
@@ -205,7 +223,7 @@ namespace solunar {
 
 	void RigidBodyComponent::AttachShape(ShapeComponent* shape)
 	{
-		shape->initializeShape();
+		shape->InitializeShape();
 	}
 
 	void RigidBodyComponent::DettachShape(ShapeComponent* shape)
@@ -239,6 +257,8 @@ namespace solunar {
 		GetPhysicsWorld()->GetWorld()->removeCollisionObject(m_ghostObject);
 		m_ghostObject->setCollisionShape(nullptr);
 		GetPhysicsWorld()->GetWorld()->getPairCache()->setInternalGhostPairCallback(nullptr);
+
+		m_ghostObject->setUserPointer(nullptr);
 
 		mem_delete(m_capsuleShape);
 		mem_delete(m_ghostCallback);
@@ -278,6 +298,7 @@ namespace solunar {
 		m_ghostObject = mem_new<btPairCachingGhostObject>();
 		m_ghostObject->setWorldTransform(startTransform);
 		m_ghostObject->setCollisionFlags(btCollisionObject::CF_CHARACTER_OBJECT);
+		m_ghostObject->setUserPointer(this);
 
 		m_ghostCallback = mem_new<btGhostPairCallback>();
 		GetPhysicsWorld()->GetWorld()->getPairCache()->setInternalGhostPairCallback(m_ghostCallback);
