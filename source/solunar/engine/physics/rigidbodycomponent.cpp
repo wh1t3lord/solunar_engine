@@ -9,6 +9,8 @@
 
 namespace solunar {
 
+	IMPLEMENT_OBJECT(RigidBodyComponent, Component);
+
 	BEGIN_PROPERTY_REGISTER(RigidBodyComponent)
 	{
 		REGISTER_PROPERTY(RigidBodyComponent, PropertyFloat, m_mass);
@@ -242,6 +244,8 @@ namespace solunar {
 	}
 
 	/////////////////////////////////////////////////////////////////
+
+	IMPLEMENT_OBJECT(RigidBodyProxyComponent, RigidBodyComponent);
 
 	RigidBodyProxyComponent::RigidBodyProxyComponent() :
 		m_characterController(nullptr),

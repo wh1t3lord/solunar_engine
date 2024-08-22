@@ -171,6 +171,8 @@ namespace solunar
 		}
 	}
 
+	IMPLEMENT_OBJECT(ModelBase, GraphicsObject);
+
 	ModelBase::ModelBase()
 	{
 	}
@@ -443,6 +445,9 @@ namespace solunar
 		return m_material.lock();
 	}
 
+
+	IMPLEMENT_OBJECT(ModelSubmesh, GraphicsObject);
+
 	void ModelSubmesh::RegisterObject()
 	{
 		TypeManager::GetInstance()->RegisterObject<ModelSubmesh>();
@@ -528,6 +533,7 @@ namespace solunar
 	{
 	}
 
+	IMPLEMENT_OBJECT(Model, GraphicsObject);
 	void Model::RegisterObject()
 	{
 		TypeManager::GetInstance()->RegisterObject<Model>();
@@ -570,20 +576,18 @@ namespace solunar
 		if (header.version > kModelFileVersion)
 			Core::Msg("[graphics]: model has older version format");
 		else if (header.version < kModelFileVersion)
-			Core::Error("Model has newer version than engine support. (model %i, engine %i)", header.version, kModelFileVersion);
+			Core::Msg("Model has newer version than engine support. (model %i, engine %i)", header.version, kModelFileVersion);
 
 		if (header.submeshCount == 0)
-			Core::Error("Model has zero sub meshes, cannot load");
+			Core::Msg("Model has zero sub meshes, cannot load");
 
 		for (uint32_t i = 0; i < header.submeshCount; i++)
 		{
 			// Create submesh
 			ModelSubmesh* submeshPtr = (ModelSubmesh*)TypeManager::GetInstance()->CreateObjectByTypeInfo(ModelSubmesh::GetStaticTypeInfo());
 		
-			std::shared_ptr<ModelSubmesh> submesh = std::shared_ptr<ModelSubmesh>(submeshPtr, templatedObjectDeleter<ModelSubmesh>);
-
 			// Load from current stream
-			submesh->Load(stream);
+			submeshPtr->Load(stream);
 		}
 	}
 

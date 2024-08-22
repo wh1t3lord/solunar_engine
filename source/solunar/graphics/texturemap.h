@@ -10,7 +10,7 @@ namespace solunar
 	class TextureMap : public GraphicsObject
 	{
 	public:
-		IMPLEMENT_OBJECT(TextureMap, GraphicsObject);
+		DECLARE_OBJECT(TextureMap);
 
 	public:
 		static std::shared_ptr<TextureMap> create2DFromSource(ITexture2D* pTexture2D, const TextureDesc& textureDesc);
@@ -51,7 +51,7 @@ namespace solunar
 	// Cubemap
 	class TextureMapCube : public TextureMap
 	{
-		IMPLEMENT_OBJECT(TextureMapCube, TextureMap);
+		DECLARE_OBJECT(TextureMapCube);
 	public:
 		TextureMapCube();
 		~TextureMapCube();

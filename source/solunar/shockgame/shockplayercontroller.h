@@ -20,7 +20,7 @@ struct ShockPlayerStats
 
 class ShockPlayerController : public PlayerControllerComponent
 {
-	IMPLEMENT_OBJECT(ShockPlayerController, PlayerControllerComponent);
+	DECLARE_OBJECT(ShockPlayerController);
 	DECLARE_PROPERTY_REGISTER(ShockPlayerController);
 public:
 	ShockPlayerController();

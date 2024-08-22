@@ -3,6 +3,8 @@
 
 namespace solunar
 {
+	IMPLEMENT_OBJECT(WeaponComponent, LogicComponent);
+
 	WeaponComponent::WeaponComponent()
 	{
 

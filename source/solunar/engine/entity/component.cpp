@@ -4,6 +4,8 @@
 namespace solunar
 {
 
+IMPLEMENT_OBJECT(Component, SerializableObject);
+
 BEGIN_PROPERTY_REGISTER(Component)
 {
 	REGISTER_PROPERTY(Component, PropertyBool, m_isActive);

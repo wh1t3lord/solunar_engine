@@ -9,6 +9,8 @@
 namespace solunar
 {
 
+IMPLEMENT_OBJECT(ShockProjectileComponent, LogicComponent);
+
 BEGIN_PROPERTY_REGISTER(ShockProjectileComponent)
 {
 	REGISTER_PROPERTY(ShockProjectileComponent, PropertyVector3, m_direction);

@@ -5,6 +5,8 @@
 namespace solunar
 {
 
+IMPLEMENT_OBJECT(TriggerComponent, Component);
+
 TriggerComponent::TriggerComponent()
 {
 	m_isOnce = false;

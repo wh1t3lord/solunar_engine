@@ -6,7 +6,7 @@ namespace solunar
 	
 class LevelManagerComponent : public Component
 {
-	IMPLEMENT_OBJECT(LevelManagerComponent, Component);
+	DECLARE_OBJECT(LevelManagerComponent);
 public:
 	LevelManagerComponent();
 	~LevelManagerComponent();

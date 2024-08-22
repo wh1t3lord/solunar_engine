@@ -13,6 +13,8 @@
 namespace solunar
 {
 
+IMPLEMENT_OBJECT(ShockPlayerController, PlayerControllerComponent);
+
 BEGIN_PROPERTY_REGISTER(ShockPlayerController)
 {
 	REGISTER_PROPERTY(ShockPlayerController, PropertyFloat, m_playerStats.m_health);

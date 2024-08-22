@@ -80,6 +80,8 @@ namespace solunar
 		g_fileSystem->Close(file);
 	}
 
+	IMPLEMENT_OBJECT(Material, GraphicsObject);
+
 	Material::Material()
 	{
 		m_albedoColor = glm::vec3(1.0f);
@@ -456,6 +458,8 @@ namespace solunar
 	// Generic Material
 	///////////////////////////////////////////////////////
 
+	IMPLEMENT_OBJECT(GenericMaterial, Material);
+
 	GenericMaterial::GenericMaterial()
 	{
 	}
@@ -473,6 +477,7 @@ namespace solunar
 	// Layered and masked material
 	///////////////////////////////////////////////////////
 
+	IMPLEMENT_OBJECT(LayeredMaskedMaterial, Material);
 
 	LayeredMaskedMaterial::LayeredMaskedMaterial()
 	{
@@ -490,6 +495,8 @@ namespace solunar
 	///////////////////////////////////////////////////////
 	// Null material
 	///////////////////////////////////////////////////////
+
+	IMPLEMENT_OBJECT(NullMaterial, Material);
 
 	NullMaterial::NullMaterial()
 	{

@@ -18,7 +18,7 @@ namespace solunar {
 
 	class MeshComponent : public Component
 	{
-		IMPLEMENT_OBJECT(MeshComponent, Component);
+		DECLARE_OBJECT(MeshComponent);
 	public:
 		static void RegisterObject();
 
@@ -46,7 +46,7 @@ namespace solunar {
 
 	class AnimatedMeshComponent : public MeshComponent
 	{
-		IMPLEMENT_OBJECT(AnimatedMeshComponent, MeshComponent);
+		DECLARE_OBJECT(AnimatedMeshComponent);
 	public:
 		AnimatedMeshComponent();
 		~AnimatedMeshComponent();

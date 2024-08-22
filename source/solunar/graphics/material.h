@@ -71,7 +71,7 @@ namespace solunar
 	{
 		friend IShaderProgram* createShaderProgramFromMaterial(Material* material);
 		
-		IMPLEMENT_OBJECT(Material, GraphicsObject);
+		DECLARE_OBJECT(Material);
 	public:
 		static void createMaterialFromImport(const char* name, const char* diffuseName, const char* normalName);
 
@@ -137,7 +137,7 @@ namespace solunar
 
 	class NullMaterial : public Material
 	{
-		IMPLEMENT_OBJECT(NullMaterial, Material);
+		DECLARE_OBJECT(NullMaterial);
 	public:
 		NullMaterial();
 		~NullMaterial();
@@ -147,7 +147,7 @@ namespace solunar
 
 	class GenericMaterial : public Material
 	{
-		IMPLEMENT_OBJECT(GenericMaterial, Material);
+		DECLARE_OBJECT(GenericMaterial);
 	public:
 		GenericMaterial();
 		~GenericMaterial();
@@ -157,7 +157,7 @@ namespace solunar
 
 	class LayeredMaskedMaterial : public Material
 	{
-		IMPLEMENT_OBJECT(LayeredMaskedMaterial, Material);
+		DECLARE_OBJECT(LayeredMaskedMaterial);
 	public:
 		LayeredMaskedMaterial();
 		~LayeredMaskedMaterial();

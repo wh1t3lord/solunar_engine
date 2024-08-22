@@ -6,7 +6,7 @@ namespace solunar
 
 class ShockSignal : public Object
 {
-	IMPLEMENT_OBJECT(ShockSignal, Object);
+	DECLARE_OBJECT(ShockSignal);
 public:
 	ShockSignal();
 	~ShockSignal();

@@ -4,6 +4,8 @@
 namespace solunar
 {
 
+IMPLEMENT_OBJECT(CameraComponent, Component);
+
 CameraComponent::CameraComponent()
 {
 	m_direction = glm::vec3(0.0f, 0.0f, -1.0f);
@@ -26,6 +28,8 @@ glm::vec3 CameraComponent::GetDirection()
 
 ////////////////////////
 // Yaw pitch roll camera
+
+IMPLEMENT_OBJECT(CameraYawPitchRollComponent, CameraComponent);
 
 CameraYawPitchRollComponent::CameraYawPitchRollComponent()
 {
@@ -52,6 +56,8 @@ void CameraYawPitchRollComponent::SetEulerRotation(float yaw, float pitch, float
 
 //////////////////////
 // First Person camera
+
+IMPLEMENT_OBJECT(CameraFirstPersonComponent, CameraYawPitchRollComponent);
 
 CameraFirstPersonComponent::CameraFirstPersonComponent()
 {

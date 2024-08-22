@@ -11,6 +11,8 @@
 
 namespace solunar
 {
+	IMPLEMENT_OBJECT(World, SerializableObject);
+
 	World::World() :
 		m_physicsWorld(nullptr), m_graphicsWorld(nullptr)
 	{

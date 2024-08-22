@@ -52,6 +52,8 @@ void TriangleMeshServer::saveCollision(const char* modelfilename)
 
 /////////////////////////////////////////////////////////////////////
 
+IMPLEMENT_OBJECT(TriangleMeshShapeComponent, ShapeComponent);
+
 TriangleMeshShapeComponent::TriangleMeshShapeComponent()
 {
 }

@@ -21,7 +21,7 @@ class RigidBodyComponent;
 
 class TriggerComponent : public Component
 {
-	IMPLEMENT_OBJECT(TriggerComponent, Component);
+	DECLARE_OBJECT(TriggerComponent);
 	DECLARE_PROPERTY_REGISTER(TriggerComponent);
 public:
 	TriggerComponent();
