@@ -7,6 +7,7 @@ namespace solunar
 
 TriggerComponent::TriggerComponent()
 {
+	m_isOnce = false;
 }
 
 TriggerComponent::~TriggerComponent()
@@ -16,6 +17,15 @@ TriggerComponent::~TriggerComponent()
 void TriggerComponent::RegisterObject()
 {
 	TypeManager::GetInstance()->RegisterObject<TriggerComponent>();
+}
+
+void TriggerComponent::LoadXML(tinyxml2::XMLElement& element)
+{
+
+}
+
+void TriggerComponent::SaveXML(tinyxml2::XMLElement& element)
+{
 }
 
 void TriggerComponent::OnCollide(RigidBodyComponent* selfBody, RigidBodyComponent* touchingBody)
