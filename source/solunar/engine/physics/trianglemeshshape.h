@@ -51,7 +51,7 @@ private:
 //! Trimesh collision shape
 class TriangleMeshShapeComponent : public ShapeComponent
 {
-	IMPLEMENT_OBJECT(TriangleMeshShapeComponent, ShapeComponent);
+	DECLARE_OBJECT(TriangleMeshShapeComponent);
 public:
 	TriangleMeshShapeComponent();
 	~TriangleMeshShapeComponent();

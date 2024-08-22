@@ -7,6 +7,8 @@
 
 namespace solunar
 {
+	IMPLEMENT_OBJECT(LightComponent, Component);
+
 	BEGIN_PROPERTY_REGISTER(LightComponent)
 	{
 		REGISTER_PROPERTY(LightComponent, PropertyVector3, m_color);
@@ -108,6 +110,11 @@ namespace solunar
 	{
 	}
 
+	/////////////////////////////////////////////////////////////////////
+	// Point Light
+
+	IMPLEMENT_OBJECT(PointLightComponent, LightComponent);
+
 	void PointLightComponent::RegisterObject()
 	{
 		g_typeManager->RegisterObject<PointLightComponent>();
@@ -129,6 +136,12 @@ namespace solunar
 	void PointLightComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
 	}
+
+
+	/////////////////////////////////////////////////////////////////////
+	// Directional Light
+
+	IMPLEMENT_OBJECT(DirectionalLightComponent, LightComponent);
 
 	BEGIN_PROPERTY_REGISTER(DirectionalLightComponent)
 	{

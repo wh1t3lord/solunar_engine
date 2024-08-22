@@ -8,7 +8,7 @@ namespace solunar
 
 class WeaponAutoComponent : public WeaponComponent
 {
-    IMPLEMENT_OBJECT(WeaponAutoComponent, WeaponComponent);
+    DECLARE_OBJECT(WeaponAutoComponent);
 public:
     static void RegisterObject();
 

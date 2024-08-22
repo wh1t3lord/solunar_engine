@@ -4,6 +4,8 @@
 namespace solunar
 {
 
+IMPLEMENT_OBJECT(GraphicsObject, SerializableObject);
+
 GraphicsObject::GraphicsObject()
 {
 }

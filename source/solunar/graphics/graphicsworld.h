@@ -9,7 +9,7 @@ namespace solunar {
 	
 	class GraphicsWorld : public Object
 	{
-		IMPLEMENT_OBJECT(GraphicsWorld, Object);
+		DECLARE_OBJECT(GraphicsWorld);
 	public:
 		static void RegisterObject();
 		

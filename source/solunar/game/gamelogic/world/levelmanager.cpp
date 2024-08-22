@@ -5,6 +5,8 @@
 namespace solunar
 {
 
+IMPLEMENT_OBJECT(LevelManagerComponent, Component);
+
 LevelManagerComponent::LevelManagerComponent()
 {
 }

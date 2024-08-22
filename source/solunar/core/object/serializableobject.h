@@ -12,8 +12,8 @@ namespace solunar
 	class SerializableObject : public Object
 	{
 	public:
-		IMPLEMENT_OBJECT(SerializableObject, Object);
-	
+		DECLARE_OBJECT(SerializableObject);
+
 	public:
 		SerializableObject();
 		virtual ~SerializableObject();

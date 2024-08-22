@@ -18,7 +18,7 @@ enum ShockProjectileType
 
 class ShockProjectileComponent : public LogicComponent
 {
-	IMPLEMENT_OBJECT(ShockProjectileComponent, LogicComponent);
+	DECLARE_OBJECT(ShockProjectileComponent);
 	DECLARE_PROPERTY_REGISTER(ShockProjectileComponent);
 public:
 	ShockProjectileComponent();

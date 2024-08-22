@@ -38,6 +38,8 @@ ShockSignalManager::~ShockSignalManager()
 // Shock signal implementation
 //////////////////////////////
 
+IMPLEMENT_OBJECT(ShockSignal, Object);
+
 ShockSignal::ShockSignal()
 {
 }

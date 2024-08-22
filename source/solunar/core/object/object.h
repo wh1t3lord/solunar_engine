@@ -46,25 +46,25 @@ namespace solunar
 
 	};
 
+#define DECLARE_OBJECT(typeName) \
+	public: \
+		static const TypeInfo s_typeInfo; \
+		static void StaticConstructor(void* ptr) { reinterpret_cast<typeName*>(ptr)->typeName::typeName(); } \
+		static const TypeInfo* GetStaticTypeInfo() { return &typeName::s_typeInfo; } \
+		virtual const TypeInfo* GetTypeInfo() { return GetStaticTypeInfo();  }
 
 #define IMPLEMENT_ROOT_OBJECT(typeName) \
-	public: \
-		static void StaticConstructor(void* ptr) { reinterpret_cast<typeName*>(ptr)->typeName::typeName(); } \
-		static const TypeInfo* GetStaticTypeInfo() { static const TypeInfo s_typeInfo(#typeName, typeName::StaticConstructor, sizeof(typeName), alignof(typeName), nullptr); return &s_typeInfo; } \
-		virtual const TypeInfo* GetTypeInfo() { return GetStaticTypeInfo();  }
+	const TypeInfo typeName::s_typeInfo(#typeName, typeName::StaticConstructor, sizeof(typeName), alignof(typeName), nullptr)
 
 #define IMPLEMENT_OBJECT(typeName, baseTypeName) \
-	public: \
-		static void StaticConstructor(void* ptr) { reinterpret_cast<typeName*>(ptr)->typeName::typeName(); } \
-		static const TypeInfo* GetStaticTypeInfo() { static const TypeInfo s_typeInfo(#typeName, typeName::StaticConstructor, sizeof(typeName), alignof(typeName), baseTypeName::GetStaticTypeInfo()); return &s_typeInfo; } \
-		virtual const TypeInfo* GetTypeInfo() { return GetStaticTypeInfo();  }
+	const TypeInfo typeName::s_typeInfo(#typeName, typeName::StaticConstructor, sizeof(typeName), alignof(typeName), baseTypeName::GetStaticTypeInfo())
 	
 #define OBJECT_GET_TYPEINFO(typeName) \
 	typeName::GetStaticTypeInfo()
 
 	class Object
 	{
-		IMPLEMENT_ROOT_OBJECT(Object);
+		DECLARE_OBJECT(Object);
 	public:
 		Object();
 		virtual ~Object();

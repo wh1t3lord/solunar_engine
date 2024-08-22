@@ -9,7 +9,7 @@ namespace solunar
 // Компонент цепи оружия
 class WeaponChainComponent : public Component
 {
-	IMPLEMENT_OBJECT(WeaponChainComponent, Component);
+	DECLARE_OBJECT(WeaponChainComponent);
 public:
 	static void RegisterObject();
 	

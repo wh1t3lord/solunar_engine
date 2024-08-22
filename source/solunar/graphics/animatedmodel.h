@@ -118,7 +118,7 @@ struct BoneInfo
 
 class AnimatedModel : public ModelBase
 {
-	IMPLEMENT_OBJECT(AnimatedModel, ModelBase);
+	DECLARE_OBJECT(AnimatedModel);
 public:
 	AnimatedModel();
 	~AnimatedModel();

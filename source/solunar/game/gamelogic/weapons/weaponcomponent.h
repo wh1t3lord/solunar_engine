@@ -14,7 +14,7 @@ namespace solunar {
 	
 	class WeaponComponent : public LogicComponent
 	{
-		IMPLEMENT_OBJECT(WeaponComponent, LogicComponent);
+		DECLARE_OBJECT(WeaponComponent);
 	public:
 		WeaponComponent();
 		virtual ~WeaponComponent();

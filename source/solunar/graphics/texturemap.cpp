@@ -7,6 +7,8 @@
 
 namespace solunar
 {
+	IMPLEMENT_OBJECT(TextureMap, GraphicsObject);
+
 	TextureMap::TextureMap() :
 		m_bManualCreated(false)
 	{
@@ -131,6 +133,8 @@ namespace solunar
 	void TextureMap::destroyHW()
 	{
 	}
+
+	IMPLEMENT_OBJECT(TextureMapCube, TextureMap);
 
 	TextureMapCube::TextureMapCube()
 	{

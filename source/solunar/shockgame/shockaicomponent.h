@@ -12,7 +12,7 @@ enum ShockAIType
 
 class ShockAIComponent : public LogicComponent
 {
-	IMPLEMENT_OBJECT(ShockAIComponent, LogicComponent);
+	DECLARE_OBJECT(ShockAIComponent);
 	DECLARE_PROPERTY_REGISTER(ShockAIComponent);
 public:
 	ShockAIComponent();

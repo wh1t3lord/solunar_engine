@@ -90,6 +90,8 @@ inline AnimationPathType getAnimationPathType(cgltf_animation_path_type type)
 	return AnimationPathType_Unknown;
 }
 
+IMPLEMENT_OBJECT(AnimatedModel, ModelBase);
+
 // Object registering
 void AnimatedModel::RegisterObject()
 {

@@ -42,7 +42,7 @@ namespace solunar
 
 	class LightComponent : public Component
 	{
-		IMPLEMENT_OBJECT(LightComponent, Component);
+		DECLARE_OBJECT(LightComponent);
 		DECLARE_PROPERTY_REGISTER(LightComponent);
 	public:
 		LightComponent();
@@ -67,7 +67,7 @@ namespace solunar
 
 	class PointLightComponent : public LightComponent
 	{
-		IMPLEMENT_OBJECT(PointLightComponent, LightComponent);
+		DECLARE_OBJECT(PointLightComponent);
 	public:
 		static void RegisterObject();
 
@@ -77,7 +77,7 @@ namespace solunar
 
 	class DirectionalLightComponent : public LightComponent
 	{
-		IMPLEMENT_OBJECT(DirectionalLightComponent, LightComponent);
+		DECLARE_OBJECT(DirectionalLightComponent);
 		DECLARE_PROPERTY_REGISTER(DirectionalLightComponent);
 	public:
 		static void RegisterObject();

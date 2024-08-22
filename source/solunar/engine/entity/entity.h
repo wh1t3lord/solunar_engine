@@ -13,7 +13,7 @@ class Entity : public SerializableObject
 {
 	friend class World;
 public:
-	IMPLEMENT_OBJECT(Entity, SerializableObject);
+	DECLARE_OBJECT(Entity);
 	DECLARE_PROPERTY_REGISTER(Entity);
 
 public:

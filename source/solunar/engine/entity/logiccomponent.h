@@ -9,7 +9,7 @@ namespace solunar
 	class LogicComponent : public Component
 	{
 	public:
-		IMPLEMENT_OBJECT(LogicComponent, Component);
+		DECLARE_OBJECT(LogicComponent);
 
 	public:
 		LogicComponent();

@@ -2,6 +2,8 @@
 
 namespace solunar
 {
+	IMPLEMENT_OBJECT(SerializableObject, Object);
+
 	SerializableObject::SerializableObject()
 	{
 	}

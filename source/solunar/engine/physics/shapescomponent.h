@@ -22,7 +22,7 @@ namespace solunar {
 	//! Interface class for any type of rigid body shapes.
 	class ShapeComponent : public Component
 	{
-		IMPLEMENT_OBJECT(ShapeComponent, Component);
+		DECLARE_OBJECT(ShapeComponent);
 	public:
 		static void RegisterObject();
 
@@ -73,7 +73,7 @@ namespace solunar {
 
 	class BoxShapeComponent : public ShapeComponent
 	{
-		IMPLEMENT_OBJECT(BoxShapeComponent, ShapeComponent);
+		DECLARE_OBJECT(BoxShapeComponent);
 	public:
 		static void RegisterObject();
 
@@ -95,7 +95,7 @@ namespace solunar {
 
 	class SphereShapeComponent : public ShapeComponent
 	{
-		IMPLEMENT_OBJECT(SphereShapeComponent, ShapeComponent);
+		DECLARE_OBJECT(SphereShapeComponent);
 	public:
 		static void RegisterObject();
 
@@ -116,7 +116,7 @@ namespace solunar {
 
 	class CylinderShapeComponent : public ShapeComponent
 	{
-		IMPLEMENT_OBJECT(CylinderShapeComponent, ShapeComponent);
+		DECLARE_OBJECT(CylinderShapeComponent);
 	public:
 		static void RegisterObject();
 
@@ -137,7 +137,7 @@ namespace solunar {
 
 	class CapsuleShapeComponent : public ShapeComponent
 	{
-		IMPLEMENT_OBJECT(CapsuleShapeComponent, ShapeComponent);
+		DECLARE_OBJECT(CapsuleShapeComponent);
 	public:
 		static void RegisterObject();
 

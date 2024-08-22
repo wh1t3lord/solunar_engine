@@ -8,6 +8,8 @@
 
 namespace solunar {
 
+	IMPLEMENT_OBJECT(MeshComponent, Component);
+
 	void MeshComponent::RegisterObject()
 	{
 		g_typeManager->RegisterObject<MeshComponent>();
@@ -79,6 +81,8 @@ namespace solunar {
 	}
 
 	// animated mesh component
+
+	IMPLEMENT_OBJECT(AnimatedMeshComponent, MeshComponent);
 
 	AnimatedMeshComponent::AnimatedMeshComponent()
 	{

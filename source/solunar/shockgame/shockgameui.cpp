@@ -19,6 +19,8 @@ namespace solunar
 
 static std::weak_ptr<TextureMap> g_mainMenuBackground;
 
+IMPLEMENT_OBJECT(ShockGameMainMenuComponent, LogicComponent);
+
 ShockGameMainMenuComponent::ShockGameMainMenuComponent()
 {
 }
@@ -210,6 +212,8 @@ void showSettingsMenu()
 
 	ImGui::End();
 }
+
+IMPLEMENT_OBJECT(DemoGameMainMenuComponent, LogicComponent);
 
 DemoGameMainMenuComponent::DemoGameMainMenuComponent()
 {

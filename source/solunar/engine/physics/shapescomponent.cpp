@@ -8,6 +8,8 @@
 
 namespace solunar {
 
+	IMPLEMENT_OBJECT(ShapeComponent, Component);
+
 	void ShapeComponent::RegisterObject()
 	{
 		g_typeManager->RegisterObject<ShapeComponent>();
@@ -114,6 +116,8 @@ namespace solunar {
 	//////////////////////////////////////////////////////////////////////////
 	// Box Shape Component
 
+	IMPLEMENT_OBJECT(BoxShapeComponent, ShapeComponent);
+
 	void BoxShapeComponent::RegisterObject()
 	{
 		g_typeManager->RegisterObject<BoxShapeComponent>();
@@ -164,6 +168,8 @@ namespace solunar {
 	//////////////////////////////////////////////////////////////////////////
 	// Sphere Shape Component
 
+	IMPLEMENT_OBJECT(SphereShapeComponent, ShapeComponent);
+
 	void SphereShapeComponent::RegisterObject()
 	{
 		g_typeManager->RegisterObject<SphereShapeComponent>();
@@ -211,6 +217,8 @@ namespace solunar {
 	//////////////////////////////////////////////////////////////////////////
 	// Cylinder Shape Component
 
+	IMPLEMENT_OBJECT(CylinderShapeComponent, ShapeComponent);
+
 	void CylinderShapeComponent::RegisterObject()
 	{
 		g_typeManager->RegisterObject<CylinderShapeComponent>();
@@ -255,6 +263,8 @@ namespace solunar {
 
 	//////////////////////////////////////////////////////////////////////////
 	// Capsule Shape Component
+
+	IMPLEMENT_OBJECT(CapsuleShapeComponent, ShapeComponent);
 
 	void CapsuleShapeComponent::RegisterObject()
 	{

@@ -3,19 +3,21 @@
 
 namespace solunar
 {
-	LogicComponent::LogicComponent()
-	{
 
-	}
+IMPLEMENT_OBJECT(LogicComponent, Component);
 
-	LogicComponent::~LogicComponent()
-	{
+LogicComponent::LogicComponent()
+{
 
-	}
+}
 
-	void LogicComponent::Update(float delta)
-	{
+LogicComponent::~LogicComponent()
+{
 
-	}
+}
+
+void LogicComponent::Update(float delta)
+{
+}
 
 }

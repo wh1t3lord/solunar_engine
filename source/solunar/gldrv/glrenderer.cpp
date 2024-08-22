@@ -39,7 +39,7 @@ namespace solunar {
 	// this is interface for platform indepented context class.
 	class GLPlatformContext : public Object
 	{
-		IMPLEMENT_OBJECT(GLPlatformContext, Object);
+		DECLARE_OBJECT(GLPlatformContext);
 	public:
 		GLPlatformContext();
 		virtual ~GLPlatformContext();
@@ -48,6 +48,8 @@ namespace solunar {
 		virtual void Destroy();
 		virtual void swapBuffers(int swapInterval);
 	};
+
+	IMPLEMENT_OBJECT(GLPlatformContext, Object);
 
 	GLPlatformContext::GLPlatformContext()
 	{
@@ -74,7 +76,7 @@ namespace solunar {
 	// Windows OpenGL context
 	class GLPlatformContext_Win32 : public GLPlatformContext
 	{
-		IMPLEMENT_OBJECT(GLPlatformContext_Win32, GLPlatformContext);
+		DECLARE_OBJECT(GLPlatformContext_Win32);
 	public:
 		GLPlatformContext_Win32();
 		~GLPlatformContext_Win32();
@@ -88,6 +90,8 @@ namespace solunar {
 		HGLRC m_openglContext = NULL;
 
 	};
+
+	IMPLEMENT_OBJECT(GLPlatformContext_Win32, GLPlatformContext);
 
 	GLPlatformContext_Win32::GLPlatformContext_Win32()
 	{
@@ -157,7 +161,7 @@ namespace solunar {
 	// Linux OpenGL context
 	class GLPlatformContext_GLX : public GLPlatformContext
 	{
-		IMPLEMENT_OBJECT(GLPlatformContext_GLX, GLPlatformContext);
+		DECLARE_OBJECT(GLPlatformContext_GLX);
 	public:
 		GLPlatformContext_GLX();
 		~GLPlatformContext_GLX();
@@ -170,6 +174,8 @@ namespace solunar {
 		GLXContext m_openglContext = 0;
 
 	};
+
+	IMPLEMENT_OBJECT(GLPlatformContext_GLX, GLPlatformContext);
 
 	GLPlatformContext_GLX::GLPlatformContext_GLX()
 	{
