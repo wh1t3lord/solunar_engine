@@ -21,41 +21,6 @@ namespace solunar
 	struct IRasterizerState;
 	struct IBlendState;
 
-	struct MaterialUniforms
-	{
-		// Material data
-		uint32_t m_albedoColor;
-
-		// Samplers
-		uint32_t m_albedoTexture;
-		uint32_t m_normalTexture;
-		uint32_t m_hasNormalTexture;
-		uint32_t m_specularTexture;
-		uint32_t m_hasSpecularTexture;
-
-		
-		uint32_t m_selfillum;
-		uint32_t m_viewPos;
-
-		// Matrices
-		uint32_t m_modelViewProjection;
-		uint32_t m_modelMatrix;
-		uint32_t m_viewMatrix;
-		uint32_t m_projectionMatrix;
-
-		// #TODO: Lights
-		uint32_t m_lightsCount;
-
-		// #TODO: CAMERA
-		uint32_t m_znear;
-		uint32_t m_zfar;
-
-		// Constant buffers
-		uint32_t m_perWorldMatricesLocation;
-		uint32_t m_perObjectMatricesLocation;
-		
-	};
-
 	class Material;
 	
 	IShaderProgram* createShaderProgramFromMaterial(Material* material);
@@ -119,8 +84,6 @@ namespace solunar
 		std::string m_albedoTextureFileName;
 		std::string m_normalTextureName;
 		std::string m_specularTextureName;
-
-		MaterialUniforms m_uniforms;
 
 		glm::vec3 m_albedoColor;
 

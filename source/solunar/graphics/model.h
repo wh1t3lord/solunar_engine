@@ -69,7 +69,6 @@ namespace solunar
 		DECLARE_OBJECT(ModelBase);
 	public:
 		ModelBase();
-		ModelBase(const std::string& name);
 		~ModelBase();
 
 		static void RegisterObject();

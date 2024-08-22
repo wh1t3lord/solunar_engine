@@ -106,10 +106,15 @@ namespace solunar {
 		btTransform trans = m_rigidBody->getWorldTransform();
 		GetEntity()->SetPosition(btVectorToGlm(trans.getOrigin()));
 
+		// calculate rotation
+		btQuaternion quaternion;
+		trans.getBasis().getRotation(quaternion);
+		GetEntity()->SetRotation(glm::quat(quaternion.getW(), quaternion.getX(), quaternion.getY(), quaternion.getZ()));
+
 		// calculate rotation based on euler angles
-		float roll, pitch, yaw;
-		trans.getRotation().getEulerZYX(yaw, pitch, roll);
-		GetEntity()->SetEulerRotation(glm::vec3(roll, pitch, yaw));
+		//float roll, pitch, yaw;
+		//trans.getRotation().getEulerZYX(yaw, pitch, roll);
+		//GetEntity()->SetEulerRotation(glm::vec3(roll, pitch, yaw));
 	}
 
 	void RigidBodyComponent::UpdateBodyTranslationDirty()

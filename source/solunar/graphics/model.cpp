@@ -445,6 +445,8 @@ namespace solunar
 		return m_material.lock();
 	}
 
+	////////////////////////////////////////////////////////////////////
+	// Model Submesh
 
 	IMPLEMENT_OBJECT(ModelSubmesh, GraphicsObject);
 
@@ -534,6 +536,7 @@ namespace solunar
 	}
 
 	IMPLEMENT_OBJECT(Model, GraphicsObject);
+
 	void Model::RegisterObject()
 	{
 		TypeManager::GetInstance()->RegisterObject<Model>();
