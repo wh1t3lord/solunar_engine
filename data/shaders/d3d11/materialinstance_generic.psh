@@ -60,10 +60,17 @@ float4 PSMain(VSOutput input) : SV_Target
 		float radius = pointLight.lightData.r;
 		
 		// light attenuation
-		float lightDistance = length(pointLight.position.xyz - input.worldPos) / radius;
-		float attenuation = 1.0 / (1.0 + lightDistance * lightDistance);
+		//float lightDistance = length(pointLight.position.xyz - input.worldPos) / radius;
+		//float attenuation = 1.0 / (1.0 + lightDistance * lightDistance);
+		//
+		//ligthing += pointLightPhong(pointLight.color.rgb, pointLight.specular.rgb, 2.0, PL, input.normal, R) * attenuation;
 		
-		ligthing += pointLightPhong(pointLight.color.rgb, pointLight.specular.rgb, 2.0, PL, input.normal, R) * attenuation;
+		// normal falloff
+		
+		float3 distance = length(pointLight.position.xyz - input.worldPos);
+		float falloff = pow(saturate(1.0f - pow(distance / radius, 4.0f)), 2.0f) / ( pow(distance, 2.0f) + 1.0f) ;
+		
+		ligthing += pointLightPhong(pointLight.color.rgb, pointLight.specular.rgb, 2.0, PL, input.normal, R) * falloff;
 	}
 	
 	//float3 finalColor = albedoColor * (diffuseColor + specularColor);
