@@ -7,6 +7,7 @@
 namespace solunar
 {
 	#define MAX_POINT_LIGHTS 32
+	#define MAX_SPOT_LIGHTS 32
 
 	struct DirectionalLightCB
 	{
@@ -15,7 +16,20 @@ namespace solunar
 		glm::vec4 m_color;
 	};
 
+	// #TODO: Encapsulate in to the one LightData 
+
 	struct PointLightData
+	{
+		glm::vec4 position;
+
+		// colors
+		glm::vec4 color;
+		glm::vec4 specular;
+
+		glm::vec4 lightData;
+	};
+
+	struct SpotLightData
 	{
 		glm::vec4 position;
 
@@ -29,6 +43,11 @@ namespace solunar
 	struct PointLightCB
 	{
 		PointLightData pointLights[MAX_POINT_LIGHTS];
+	};
+
+	struct SpotLightCB
+	{
+		SpotLightData spotLights[MAX_SPOT_LIGHTS];
 	};
 
 	struct LightGlobalDataCB
@@ -83,6 +102,16 @@ namespace solunar
 		static void RegisterObject();
 
 		glm::vec3 m_direction;
+	};
+
+	class SpotLightComponent : public LightComponent
+	{
+		DECLARE_OBJECT(SpotLightComponent);
+		DECLARE_PROPERTY_REGISTER(SpotLightComponent);
+	public:
+		static void RegisterObject();
+
+		float m_cutoff = 1.0f;
 	};
 }
 

@@ -36,6 +36,7 @@ void registerGraphicsObjects()
 	LightComponent::RegisterObject();
 	PointLightComponent::RegisterObject();
 	DirectionalLightComponent::RegisterObject();
+	SpotLightComponent::RegisterObject();
 }
 
 void graphicsInit()

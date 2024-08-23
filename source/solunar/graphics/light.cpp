@@ -154,4 +154,20 @@ namespace solunar
 		g_typeManager->RegisterObject<DirectionalLightComponent>();
 	}
 
+	/////////////////////////////////////////////////////////////////////
+	// Spot Light
+
+	IMPLEMENT_OBJECT(SpotLightComponent, LightComponent);
+
+	BEGIN_PROPERTY_REGISTER(SpotLightComponent)
+	{
+		REGISTER_PROPERTY(SpotLightComponent, PropertyFloat, m_cutoff);
+	}
+	END_PROPERTY_REGISTER(SpotLightComponent)
+
+	void SpotLightComponent::RegisterObject()
+	{
+		g_typeManager->RegisterObject<SpotLightComponent>();
+	}
+
 }
