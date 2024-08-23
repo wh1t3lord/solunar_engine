@@ -111,6 +111,9 @@ namespace solunar
 	public:
 		static void RegisterObject();
 
+		void LoadXML(tinyxml2::XMLElement& element) override;
+		void SaveXML(tinyxml2::XMLElement& element) override;
+
 		float m_cutoff = 1.0f;
 	};
 }

@@ -59,7 +59,7 @@ namespace solunar {
 
 	void MeshComponent::Render()
 	{
-#ifndef FINAL_BUILD
+#if 0//ndef FINAL_BUILD
 		BoundingBox boundingBox = GetEntity()->GetBoundingBox();
 		g_debugRender.drawBoundingBox(boundingBox, glm::vec3(1.f));
 #endif // !FINAL_BUILD

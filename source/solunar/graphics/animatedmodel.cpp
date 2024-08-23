@@ -765,14 +765,14 @@ void AnimatedModelRenderer::Render(AnimatedMeshComponent* model)
 	memcpy(data, animatedModel->m_bonesMatrices, sizeof(animatedModel->m_bonesMatrices));
 	g_bonesConstantBuffer->Unmap();
 
-	g_renderDevice->SetConstantBufferIndex(ConstantBufferBindings_Skinning, g_bonesConstantBuffer.get());
+	g_renderDevice->SetConstantBufferIndex(CBBindings_Skinning, g_bonesConstantBuffer.get());
 
 #if 0
 	glm::mat4* data = (glm::mat4*)g_bonesConstantBuffer->Map(BufferMapping::WriteOnly);
 	memcpy(data, s_boneInfoTest, sizeof(s_boneInfoTest));
 	g_bonesConstantBuffer->Unmap();
 
-	g_renderDevice->SetConstantBufferIndex(ConstantBufferBindings_Skinning, g_bonesConstantBuffer.get());
+	g_renderDevice->SetConstantBufferIndex(CBBindings_Skinning, g_bonesConstantBuffer.get());
 #endif
 
 #if 0

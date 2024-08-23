@@ -45,7 +45,7 @@ namespace solunar
 		{
 			if (GraphicsWorld* gfxWorld = world->GetGraphicsWorld())
 			{
-				gfxWorld->GetLightManager()->addLight(this);
+				gfxWorld->GetLightManager()->AddLight(this);
 			}
 		}
 	}
@@ -57,7 +57,7 @@ namespace solunar
 		{
 			if (GraphicsWorld* gfxWorld = world->GetGraphicsWorld())
 			{
-				gfxWorld->GetLightManager()->removeLight(this);
+				gfxWorld->GetLightManager()->RemoveLight(this);
 			}
 		}
 		
@@ -168,6 +168,23 @@ namespace solunar
 	void SpotLightComponent::RegisterObject()
 	{
 		g_typeManager->RegisterObject<SpotLightComponent>();
+	}
+
+	void SpotLightComponent::LoadXML(tinyxml2::XMLElement& element)
+	{
+		LightComponent::LoadXML(element);
+
+		tinyxml2::XMLElement* cutoffElement = element.FirstChildElement("Cutoff");
+		Assert(cutoffElement && "Spot light require cutoff element!");
+
+		const tinyxml2::XMLAttribute* cutoffValue = cutoffElement->FindAttribute("value");
+		Assert(cutoffValue && "Spot light require value attribute in cutoff element!");
+
+		m_cutoff = cutoffValue->FloatValue();
+	}
+
+	void SpotLightComponent::SaveXML(tinyxml2::XMLElement& element)
+	{
 	}
 
 }

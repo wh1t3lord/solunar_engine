@@ -351,7 +351,7 @@ namespace solunar
 
 		g_lightDataConstantBuffer->Unmap();
 
-		g_renderDevice->SetConstantBufferIndex(ConstantBufferBinding_LightData, g_lightDataConstantBuffer.get());
+		g_renderDevice->SetConstantBufferIndex(CBBindings_LightData, g_lightDataConstantBuffer.get());
 	}
 
 	void SetupDirectionalLight(DirectionalLightComponent* directionalLight)
@@ -378,7 +378,7 @@ namespace solunar
 		V[2] = 1 - 2 * (o.x * o.x + o.y * o.y);
 		data->m_direction = glm::vec4(-V, 1.0f);
 
-#ifndef FINAL_BUILD
+#if 0//ndef FINAL_BUILD
 		g_debugRender.DrawLine(directionalLight->GetEntity()->GetPosition(),
 			directionalLight->GetEntity()->GetPosition() + V, glm::vec3(1.0f, 1.0f, 0.0f));
 #endif // !FINAL_BUILD
@@ -414,13 +414,59 @@ namespace solunar
 			pointLightData = nullptr;
 		}
 
+		g_renderDevice->SetConstantBufferIndex(CBBindings_PointLights, g_pointLightConstantBuffer.get());	
+	}
+
+	void UpdateSpotLightCB(GraphicsWorld* graphicsWorld)
+	{
+		LightManager* lightMgr = graphicsWorld->GetLightManager();
+
+		const std::vector<LightComponent*>& lights = lightMgr->GetLights();
+		const std::vector<SpotLightComponent*>& spotLights = lightMgr->GetSpotLights();
+
+		if (!spotLights.empty())
+		{
+			SpotLightCB* spotLightData = (SpotLightCB*)g_spotLightConstantBuffer->Map(BufferMapping::WriteOnly);
+			for (int i = 0; i < spotLights.size(); i++)
+			{
+				auto it = spotLights[i];
+				spotLightData->spotLights[i].color = glm::vec4(it->m_color, 1.0f);
+				spotLightData->spotLights[i].position = glm::vec4(it->GetEntity()->GetPosition(), 1.0f);
+				spotLightData->spotLights[i].specular = glm::vec4(it->m_specularColor, 1.0f);
+				spotLightData->spotLights[i].lightData.r = it->m_cutoff;
+
+				// #TODO STUPID REFACTOR
+				glm::quat o = it->GetEntity()->GetRotation();
+				glm::vec3 V;
+				V[0] = 2 * (o.x * o.z - o.w * o.y);
+				V[1] = 2 * (o.y * o.z + o.w * o.x);
+				V[2] = 1 - 2 * (o.x * o.x + o.y * o.y);
+
+				spotLightData->spotLights[i].lightData.g = V.x;
+				spotLightData->spotLights[i].lightData.b = V.y;
+				spotLightData->spotLights[i].lightData.a = V.z;
+			}
+
+			g_spotLightConstantBuffer->Unmap();
+			spotLightData = nullptr;
+		}
+
+		g_renderDevice->SetConstantBufferIndex(CBBindings_SpotLights, g_spotLightConstantBuffer.get());
+	}
+
+	void UpdateLightDataCB(GraphicsWorld* graphicsWorld)
+	{
+		LightManager* lightMgr = graphicsWorld->GetLightManager();
+
+		const std::vector<PointLightComponent*>& pointLights = lightMgr->GetPointLights();
+		const std::vector<SpotLightComponent*>& spotLights = lightMgr->GetSpotLights();
+
 		LightGlobalDataCB* lightGlobalData = (LightGlobalDataCB*)g_lightDataConstantBuffer->Map(BufferMapping::WriteOnly);
 		lightGlobalData->m_pointLightCount = (uint32_t)pointLights.size();
+		lightGlobalData->m_spotLightCount = (uint32_t)spotLights.size();
 		g_lightDataConstantBuffer->Unmap();
-		lightGlobalData = nullptr;
 
-		g_renderDevice->SetConstantBufferIndex(ConstantBufferBindings_PointLights, g_pointLightConstantBuffer.get());
-		g_renderDevice->SetConstantBufferIndex(ConstantBufferBinding_LightData, g_lightDataConstantBuffer.get());
+		g_renderDevice->SetConstantBufferIndex(CBBindings_LightData, g_lightDataConstantBuffer.get());
 	}
 
 	void Renderer::SetupLights(GraphicsWorld* graphicsWorld)
@@ -433,6 +479,8 @@ namespace solunar
 
 		SetupDirectionalLight(lightMgr->GetDirectionalLight());
 		UpdatePointLightCB(graphicsWorld);
+		UpdateSpotLightCB(graphicsWorld);
+		UpdateLightDataCB(graphicsWorld);
 	}
 
 	void Renderer::EndFrame()

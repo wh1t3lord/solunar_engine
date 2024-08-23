@@ -115,7 +115,7 @@ using PropertyVector2 = PropertyImpl<glm::vec2, PropertyType_Vector2>;
 using PropertyVector3 = PropertyImpl<glm::vec3, PropertyType_Vector3>;
 using PropertyVector4 = PropertyImpl<glm::vec4, PropertyType_Vector4>;
 using PropertyQuaternion = PropertyImpl<glm::quat, PropertyType_Quaternion>;
-using PropertyMatrix4 = PropertyImpl<glm::quat, PropertyType_Matrix4x4>;
+using PropertyMatrix4 = PropertyImpl<glm::mat4, PropertyType_Matrix4x4>;
 using PropertyBoundingBox = PropertyImpl<BoundingBox, PropertyType_BoundingBox>;
 
 // Macro for more beautiful registration

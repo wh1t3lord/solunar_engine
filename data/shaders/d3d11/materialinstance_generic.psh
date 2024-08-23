@@ -26,7 +26,7 @@ float4 PSMain(VSOutput input) : SV_Target
 {
 	//return float4(input.normal, 1.0f);
 
-	const float3 kSpecColor = float3(2.0f, 2.0f, 2.0f);
+	const float3 kSpecColor = float3(4.0f, 4.0f, 4.0f);
 	const float kSpecPower = 256.0f;
 
 	float3 ambientColor = g_DirLight_ambientColor.xyz;
@@ -71,6 +71,31 @@ float4 PSMain(VSOutput input) : SV_Target
 		float falloff = pow(saturate(1.0f - pow(distance / radius, 4.0f)), 2.0f) / ( pow(distance, 2.0f) + 1.0f) ;
 		
 		ligthing += pointLightPhong(pointLight.color.rgb, pointLight.specular.rgb, 2.0, PL, input.normal, R) * falloff;
+	}
+	
+	for (int i = 0; i < g_spotLightCount; i++)
+	{
+		// get local copy of spot light from ubo
+		SpotLight spotLight = g_spotLights[i];
+		
+		// we store spot light cutoff in r component
+		float cutoff = cos(spotLight.lightData.r);
+		
+		// we store spot light direction in gba component
+		float3 lightDirection = spotLight.lightData.gba;
+		
+		float3 PL = normalize(spotLight.position.xyz - input.worldPos);
+		float3 R = reflect(-PL, input.normal);
+		
+		float theta = dot( normalize( lightDirection ), normalize( -lightDirection ) );
+		
+		if (theta > cutoff)
+		{
+			float3 distance = length(spotLight.position.xyz - input.worldPos);
+			float falloff = pow(saturate(1.0f - pow(distance, 4.0f)), 2.0f) / ( pow(distance, 2.0f) + 1.0f);
+			ligthing += float3(1.0f, 0.0f, 0.0f);
+			//ligthing += pointLightPhong(spotLight.color.rgb, spotLight.specular.rgb, 2.0, PL, input.normal, R) * falloff;
+		}
 	}
 	
 	//float3 finalColor = albedoColor * (diffuseColor + specularColor);

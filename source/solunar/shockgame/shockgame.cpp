@@ -75,7 +75,18 @@ public:
 	void Update(float dt) override
 	{
 		m_YAxis += dt * 200.0f;
-		GetEntity()->QuaternionRotate(glm::vec3(0.f, 1.f, 0.f), m_YAxis);
+		GetEntity()->QuaternionRotate(glm::vec3(1.f, 1.f, 0.f), m_YAxis);
+
+		glm::quat o = GetEntity()->GetRotation();
+		glm::vec3 V;
+		V[0] = 2 * (o.x * o.z - o.w * o.y);
+		V[1] = 2 * (o.y * o.z + o.w * o.x);
+		V[2] = 1 - 2 * (o.x * o.x + o.y * o.y);
+
+		g_debugRender.DrawLine(GetEntity()->GetPosition(),
+			GetEntity()->GetPosition() + V, glm::vec3(1.0f, 1.0f, 0.0f));
+
+		g_debugRender.drawBoundingBox(GetEntity()->GetBoundingBox(), glm::vec3(1.0f));
 	}
 
 private:

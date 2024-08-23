@@ -22,6 +22,16 @@ namespace solunar
 		Matrix4x4,
 	};
 
+	enum ConstantBufferBindings
+	{
+		CBBindings_Scene,
+		CBBindings_Skinning,
+		CBBindings_DirectionalLight,
+		CBBindings_PointLights,
+		CBBindings_SpotLights,
+		CBBindings_LightData,
+	};
+
 	struct StaticMeshGlobalData
 	{
 		glm::mat4 m_modelMatrix;
