@@ -37,8 +37,8 @@ public:
 
 private:
 	void ActivateCamera();
-	void initializeCamera();
-	void initializeComponents();
+	void InitializeCamera();
+	void InitializeComponents();
 	void UpdateCamera(float dt);
 	void UpdateMovement(float dt);
 	void DebugUpdate(float dt);

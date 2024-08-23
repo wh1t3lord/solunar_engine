@@ -156,7 +156,7 @@ namespace solunar
 			
 			rayResult.m_entity = entity;
 			rayResult.m_hitPosition = btVectorToGlm(rayCallback.m_hitPointWorld);
-			rayResult.m_hitPosition = btVectorToGlm(rayCallback.m_hitNormalWorld);
+			rayResult.m_hitNormal = btVectorToGlm(rayCallback.m_hitNormalWorld);
 			return true;
 		}
 
