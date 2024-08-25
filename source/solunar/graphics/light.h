@@ -7,6 +7,7 @@
 namespace solunar
 {
 	#define MAX_POINT_LIGHTS 32
+	#define MAX_SPOT_LIGHTS 32
 
 	struct DirectionalLightCB
 	{
@@ -15,7 +16,20 @@ namespace solunar
 		glm::vec4 m_color;
 	};
 
+	// #TODO: Encapsulate in to the one LightData 
+
 	struct PointLightData
+	{
+		glm::vec4 position;
+
+		// colors
+		glm::vec4 color;
+		glm::vec4 specular;
+
+		glm::vec4 lightData;
+	};
+
+	struct SpotLightData
 	{
 		glm::vec4 position;
 
@@ -31,6 +45,11 @@ namespace solunar
 		PointLightData pointLights[MAX_POINT_LIGHTS];
 	};
 
+	struct SpotLightCB
+	{
+		SpotLightData spotLights[MAX_SPOT_LIGHTS];
+	};
+
 	struct LightGlobalDataCB
 	{
 		uint32_t m_pointLightCount;
@@ -42,7 +61,7 @@ namespace solunar
 
 	class LightComponent : public Component
 	{
-		IMPLEMENT_OBJECT(LightComponent, Component);
+		DECLARE_OBJECT(LightComponent);
 		DECLARE_PROPERTY_REGISTER(LightComponent);
 	public:
 		LightComponent();
@@ -67,7 +86,7 @@ namespace solunar
 
 	class PointLightComponent : public LightComponent
 	{
-		IMPLEMENT_OBJECT(PointLightComponent, LightComponent);
+		DECLARE_OBJECT(PointLightComponent);
 	public:
 		static void RegisterObject();
 
@@ -77,12 +96,25 @@ namespace solunar
 
 	class DirectionalLightComponent : public LightComponent
 	{
-		IMPLEMENT_OBJECT(DirectionalLightComponent, LightComponent);
+		DECLARE_OBJECT(DirectionalLightComponent);
 		DECLARE_PROPERTY_REGISTER(DirectionalLightComponent);
 	public:
 		static void RegisterObject();
 
 		glm::vec3 m_direction;
+	};
+
+	class SpotLightComponent : public LightComponent
+	{
+		DECLARE_OBJECT(SpotLightComponent);
+		DECLARE_PROPERTY_REGISTER(SpotLightComponent);
+	public:
+		static void RegisterObject();
+
+		void LoadXML(tinyxml2::XMLElement& element) override;
+		void SaveXML(tinyxml2::XMLElement& element) override;
+
+		float m_cutoff = 1.0f;
 	};
 }
 

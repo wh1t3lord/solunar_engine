@@ -12,7 +12,7 @@ namespace solunar {
 	//! Rigid body component
 	class RigidBodyComponent : public Component
 	{
-		IMPLEMENT_OBJECT(RigidBodyComponent, Component);
+		DECLARE_OBJECT(RigidBodyComponent);
 		DECLARE_PROPERTY_REGISTER(RigidBodyComponent);
 	public:
 		RigidBodyComponent();
@@ -68,13 +68,14 @@ namespace solunar {
 		bool m_isEnable;
 		bool m_static;
 		bool m_isKinematic;
+		bool m_isTrigger;
 		bool m_inWorld;
 	};
 
 	//! Hack due support btCharacterController in the physics system.
 	class RigidBodyProxyComponent : public RigidBodyComponent
 	{
-		IMPLEMENT_OBJECT(RigidBodyProxyComponent, RigidBodyComponent);
+		DECLARE_OBJECT(RigidBodyProxyComponent);
 	public:
 		RigidBodyProxyComponent();
 		~RigidBodyProxyComponent();

@@ -18,7 +18,7 @@ namespace solunar
 	class World : public SerializableObject
 	{
 	public:
-		IMPLEMENT_OBJECT(World, SerializableObject);
+		DECLARE_OBJECT(World);
 
 	public:
 		World();

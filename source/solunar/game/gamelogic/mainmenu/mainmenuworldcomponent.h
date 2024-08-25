@@ -7,7 +7,7 @@ namespace solunar {
 	
 	class MainMenuWorldComponent : public LogicComponent
 	{
-		IMPLEMENT_OBJECT(MainMenuWorldComponent, LogicComponent);
+		DECLARE_OBJECT(MainMenuWorldComponent);
 	public:
 		static void RegisterObject();
 		

@@ -8,7 +8,7 @@ namespace solunar
 
 class CameraComponent : public Component
 {
-	IMPLEMENT_OBJECT(CameraComponent, Component);
+	DECLARE_OBJECT(CameraComponent);
 public:
 	CameraComponent();
 	virtual ~CameraComponent();
@@ -24,7 +24,7 @@ protected:
 // Yaw pitch roll camera
 class CameraYawPitchRollComponent : public CameraComponent
 {
-	IMPLEMENT_OBJECT(CameraYawPitchRollComponent, CameraComponent);
+	DECLARE_OBJECT(CameraYawPitchRollComponent);
 public:
 	CameraYawPitchRollComponent();
 	virtual ~CameraYawPitchRollComponent();
@@ -45,7 +45,7 @@ public:
 // First person camera
 class CameraFirstPersonComponent : public CameraYawPitchRollComponent
 {
-	IMPLEMENT_OBJECT(CameraFirstPersonComponent, CameraYawPitchRollComponent);
+	DECLARE_OBJECT(CameraFirstPersonComponent);
 public:
 	CameraFirstPersonComponent();
 	virtual ~CameraFirstPersonComponent();

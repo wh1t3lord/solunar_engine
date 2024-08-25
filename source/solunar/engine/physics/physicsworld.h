@@ -13,17 +13,20 @@ namespace solunar
 		PhysicsWorld();
 		~PhysicsWorld();
 
-		void addRigidBody(RigidBodyComponent* body);
+		void AddRigidBody(RigidBodyComponent* body);
+		void RemoveRigidBody(RigidBodyComponent* body);
 
-		void step(float delta);
+		void Step(float delta);
 
 		btDynamicsWorld* GetWorld() { return m_world; }
 
-		float getFixedTimeStep() { return m_stepTime; }
+		float GetFixedTimeStep() { return m_stepTime; }
 
 		void ToggleDebugDraw();
 
-		void internalTick();
+		void InternalTick();
+
+		void DebugDrawTriggers();
 
 	private:
 		btDefaultCollisionConfiguration* m_collisionConfiguration;

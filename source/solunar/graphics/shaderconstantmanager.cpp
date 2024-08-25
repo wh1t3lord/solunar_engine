@@ -19,6 +19,7 @@ namespace solunar
 	ConstantBufferProxy g_staticMeshConstantBuffer;
 	ConstantBufferProxy g_directionalLightConstantBuffer;
 	ConstantBufferProxy g_pointLightConstantBuffer;
+	ConstantBufferProxy g_spotLightConstantBuffer;
 	ConstantBufferProxy g_lightDataConstantBuffer;
 
 	ConstantBufferProxy::ConstantBufferProxy(IBufferBase* buffer)
@@ -82,6 +83,7 @@ namespace solunar
 		g_staticMeshConstantBuffer = Create<StaticMeshGlobalData>("StaticMeshGlobalData");
 		g_directionalLightConstantBuffer = Create<DirectionalLightCB>("DirectionalLightCB");
 		g_pointLightConstantBuffer = Create<PointLightCB>("PointLightCB");
+		g_spotLightConstantBuffer = Create<SpotLightCB>("SpotLightCB");
 		g_lightDataConstantBuffer = Create<LightGlobalDataCB>("LightGlobalDataCB");
 	}
 

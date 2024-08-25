@@ -7,6 +7,8 @@
 
 namespace solunar
 {
+	IMPLEMENT_OBJECT(LightComponent, Component);
+
 	BEGIN_PROPERTY_REGISTER(LightComponent)
 	{
 		REGISTER_PROPERTY(LightComponent, PropertyVector3, m_color);
@@ -43,7 +45,7 @@ namespace solunar
 		{
 			if (GraphicsWorld* gfxWorld = world->GetGraphicsWorld())
 			{
-				gfxWorld->GetLightManager()->addLight(this);
+				gfxWorld->GetLightManager()->AddLight(this);
 			}
 		}
 	}
@@ -55,7 +57,7 @@ namespace solunar
 		{
 			if (GraphicsWorld* gfxWorld = world->GetGraphicsWorld())
 			{
-				gfxWorld->GetLightManager()->removeLight(this);
+				gfxWorld->GetLightManager()->RemoveLight(this);
 			}
 		}
 		
@@ -108,6 +110,11 @@ namespace solunar
 	{
 	}
 
+	/////////////////////////////////////////////////////////////////////
+	// Point Light
+
+	IMPLEMENT_OBJECT(PointLightComponent, LightComponent);
+
 	void PointLightComponent::RegisterObject()
 	{
 		g_typeManager->RegisterObject<PointLightComponent>();
@@ -130,6 +137,12 @@ namespace solunar
 	{
 	}
 
+
+	/////////////////////////////////////////////////////////////////////
+	// Directional Light
+
+	IMPLEMENT_OBJECT(DirectionalLightComponent, LightComponent);
+
 	BEGIN_PROPERTY_REGISTER(DirectionalLightComponent)
 	{
 		REGISTER_PROPERTY(DirectionalLightComponent, PropertyVector3, m_direction);
@@ -139,6 +152,39 @@ namespace solunar
 	void DirectionalLightComponent::RegisterObject()
 	{
 		g_typeManager->RegisterObject<DirectionalLightComponent>();
+	}
+
+	/////////////////////////////////////////////////////////////////////
+	// Spot Light
+
+	IMPLEMENT_OBJECT(SpotLightComponent, LightComponent);
+
+	BEGIN_PROPERTY_REGISTER(SpotLightComponent)
+	{
+		REGISTER_PROPERTY(SpotLightComponent, PropertyFloat, m_cutoff);
+	}
+	END_PROPERTY_REGISTER(SpotLightComponent)
+
+	void SpotLightComponent::RegisterObject()
+	{
+		g_typeManager->RegisterObject<SpotLightComponent>();
+	}
+
+	void SpotLightComponent::LoadXML(tinyxml2::XMLElement& element)
+	{
+		LightComponent::LoadXML(element);
+
+		tinyxml2::XMLElement* cutoffElement = element.FirstChildElement("Cutoff");
+		Assert(cutoffElement && "Spot light require cutoff element!");
+
+		const tinyxml2::XMLAttribute* cutoffValue = cutoffElement->FindAttribute("value");
+		Assert(cutoffValue && "Spot light require value attribute in cutoff element!");
+
+		m_cutoff = cutoffValue->FloatValue();
+	}
+
+	void SpotLightComponent::SaveXML(tinyxml2::XMLElement& element)
+	{
 	}
 
 }

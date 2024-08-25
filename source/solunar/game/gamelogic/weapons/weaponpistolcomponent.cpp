@@ -3,7 +3,9 @@
 
 namespace solunar
 {
-    
+
+IMPLEMENT_OBJECT(WeaponPistolComponent, WeaponAutoComponent);
+
 WeaponPistolComponent::WeaponPistolComponent()
 {
 }

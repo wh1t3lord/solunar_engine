@@ -13,11 +13,12 @@
 
 namespace solunar
 {
+	IMPLEMENT_OBJECT(WeaponComponent, LogicComponent);
+	
 	WeaponComponent::WeaponComponent() :
 		m_inited(false),
 		m_ammo(0)
 	{
-
 		// Shotgun
 		m_ammo = 8;
 	}

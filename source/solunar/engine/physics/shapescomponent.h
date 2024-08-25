@@ -22,7 +22,7 @@ namespace solunar {
 	//! Interface class for any type of rigid body shapes.
 	class ShapeComponent : public Component
 	{
-		IMPLEMENT_OBJECT(ShapeComponent, Component);
+		DECLARE_OBJECT(ShapeComponent);
 	public:
 		static void RegisterObject();
 
@@ -39,17 +39,17 @@ namespace solunar {
 		virtual void SaveXML(tinyxml2::XMLElement& element);
 
 		//! Public initialization of shape
-		void initializeShape();
+		void InitializeShape();
 
 		//! Get Physics SDK shape.
 		btCollisionShape* getSdkShape() { return m_shape; }
 
 	private:
-		void initializeShapeTransform();
+		void InitializeShapeTransform();
 
 	protected:
 		//! Base virtual function for shape creation.
-		virtual void createShapeInternal();
+		virtual void CreateShapeInternal();
 
 	protected:
 		//! Instance of current entity rigid body component.
@@ -73,7 +73,7 @@ namespace solunar {
 
 	class BoxShapeComponent : public ShapeComponent
 	{
-		IMPLEMENT_OBJECT(BoxShapeComponent, ShapeComponent);
+		DECLARE_OBJECT(BoxShapeComponent);
 	public:
 		static void RegisterObject();
 
@@ -87,7 +87,7 @@ namespace solunar {
 		void createShape(const glm::vec3& size);
 
 	private:
-		void createShapeInternal() override;
+		void CreateShapeInternal() override;
 
 	private:
 		glm::vec3 m_size;
@@ -95,7 +95,7 @@ namespace solunar {
 
 	class SphereShapeComponent : public ShapeComponent
 	{
-		IMPLEMENT_OBJECT(SphereShapeComponent, ShapeComponent);
+		DECLARE_OBJECT(SphereShapeComponent);
 	public:
 		static void RegisterObject();
 
@@ -107,7 +107,7 @@ namespace solunar {
 		void SaveXML(tinyxml2::XMLElement& element) override;
 
 	private:
-		void createShapeInternal() override;
+		void CreateShapeInternal() override;
 
 	private:
 		float m_fRadius;
@@ -116,7 +116,7 @@ namespace solunar {
 
 	class CylinderShapeComponent : public ShapeComponent
 	{
-		IMPLEMENT_OBJECT(CylinderShapeComponent, ShapeComponent);
+		DECLARE_OBJECT(CylinderShapeComponent);
 	public:
 		static void RegisterObject();
 
@@ -128,7 +128,7 @@ namespace solunar {
 		void SaveXML(tinyxml2::XMLElement& element) override;
 
 	private:
-		void createShapeInternal() override;
+		void CreateShapeInternal() override;
 
 	private:
 		glm::vec3 m_size;
@@ -137,7 +137,7 @@ namespace solunar {
 
 	class CapsuleShapeComponent : public ShapeComponent
 	{
-		IMPLEMENT_OBJECT(CapsuleShapeComponent, ShapeComponent);
+		DECLARE_OBJECT(CapsuleShapeComponent);
 	public:
 		static void RegisterObject();
 
@@ -151,7 +151,7 @@ namespace solunar {
 		void SaveXML(tinyxml2::XMLElement& element) override;
 
 	private:
-		void createShapeInternal() override;
+		void CreateShapeInternal() override;
 
 	private:
 		float m_fRadius;

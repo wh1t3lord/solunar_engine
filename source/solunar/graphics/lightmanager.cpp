@@ -7,16 +7,18 @@
 
 namespace solunar
 {
-	void LightManager::addLight(LightComponent* light)
+	void LightManager::AddLight(LightComponent* light)
 	{
 		Assert(light);
 		m_lights.push_back(light);
 
 		if (PointLightComponent* pointLight = dynamicCast<PointLightComponent>(light))
 			m_pointLights.push_back(pointLight);
+		else if (SpotLightComponent* spotLight = dynamicCast<SpotLightComponent>(light))
+			m_spotLights.push_back(spotLight);
 	}
 
-	void LightManager::removeLight(LightComponent* light)
+	void LightManager::RemoveLight(LightComponent* light)
 	{
 		Assert(light);
 
@@ -34,6 +36,17 @@ namespace solunar
 			if (it2 != m_pointLights.end())
 			{
 				m_pointLights.erase(it2);
+			}
+		}
+
+		// clean from spot light array
+		if (SpotLightComponent* spotLight = dynamicCast<SpotLightComponent>(light))
+		{
+			// find in array
+			auto it2 = std::find(m_spotLights.begin(), m_spotLights.end(), spotLight);
+			if (it2 != m_spotLights.end())
+			{
+				m_spotLights.erase(it2);
 			}
 		}
 	}

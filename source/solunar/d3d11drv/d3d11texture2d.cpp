@@ -4,7 +4,7 @@
 namespace solunar
 {
 
-DXGI_FORMAT GetDxgiFormat(ImageFormat format)
+DXGI_FORMAT GetDXGIFormat(ImageFormat format)
 {
 	switch (format)
 	{
@@ -183,7 +183,7 @@ void D3D11Texture2D::Create(D3D11Device* device, const TextureDesc& textureDesc,
 	d3dTextureDesc.Height = textureDesc.m_height;
 	d3dTextureDesc.MipLevels = (textureDesc.m_mipmapLevel < 1 ? 1 : textureDesc.m_mipmapLevel);
 	d3dTextureDesc.ArraySize = 1;
-	d3dTextureDesc.Format = GetDxgiFormat(textureDesc.m_format);
+	d3dTextureDesc.Format = GetDXGIFormat(textureDesc.m_format);
 	d3dTextureDesc.SampleDesc.Count = 1;
 	d3dTextureDesc.Usage = D3D11_USAGE_DEFAULT;
 	d3dTextureDesc.BindFlags = D3D11_BIND_SHADER_RESOURCE;

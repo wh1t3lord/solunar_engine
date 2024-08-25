@@ -3,6 +3,7 @@
 
 // NOTE: Please note this macro should be up to date with C++ code: graphics\light.h
 #define MAX_POINT_LIGHTS 32
+#define MAX_SPOT_LIGHTS 32
 
 // We are use row major matrices
 #pragma pack_matrix( row_major )
@@ -38,12 +39,25 @@ struct PointLight
 	float4 lightData; // r - radius
 };
 
+struct SpotLight
+{
+	float4 position;
+	float4 color;
+	float4 specular;
+	float4 lightData; // r - cutoff, gba - direction
+};
+
 cbuffer PointLightCB : register(b3)
 {
 	PointLight g_pointLights[MAX_POINT_LIGHTS];
 };
 
-cbuffer LightGlobalDataCB : register(b4)
+cbuffer SpotLightCB : register(b4)
+{
+	SpotLight g_spotLights[MAX_SPOT_LIGHTS];
+};
+
+cbuffer LightGlobalDataCB : register(b5)
 {
 	uint g_pointLightCount;
 	uint g_spotLightCount;

@@ -6,6 +6,7 @@
 #include "graphics/imguimanager.h"
 #include "graphics/ifontmanager.h"
 #include "graphics/animatedmodel.h"
+#include "graphics/debugrenderer.h"
 
 #include "game/gamelogic/weapons/weaponcomponent.h"
 
@@ -14,6 +15,8 @@
 
 namespace solunar
 {
+
+IMPLEMENT_OBJECT(ShockPlayerController, PlayerControllerComponent);
 
 BEGIN_PROPERTY_REGISTER(ShockPlayerController)
 {
@@ -49,8 +52,8 @@ void ShockPlayerController::OnEntitySet(Entity* entity)
 {
 	PlayerControllerComponent::OnEntitySet(entity);
 
-	initializeCamera();
-	initializeComponents();
+	InitializeCamera();
+	InitializeComponents();
 }	
 
 void ShockPlayerController::OnEntityRemove()
@@ -71,7 +74,7 @@ void ShockPlayerController::ActivateCamera()
 	g_engineData.m_shouldHideMouse = true;
 }
 
-void ShockPlayerController::initializeCamera()
+void ShockPlayerController::InitializeCamera()
 {
 	// m_cameraNode = getNode()->CreateChild();
 	// m_cameraTransform = m_cameraNode->createComponentByType<TransformComponent>();
@@ -112,7 +115,7 @@ void ShockPlayerController::initializeCamera()
 	//m_weaponEntity->addComponent(viewmodelComponent);
 }
 
-void ShockPlayerController::initializeComponents()
+void ShockPlayerController::InitializeComponents()
 {
 	// m_transform = getNode()->getComponentByTypeSafe<TransformComponent>();
 	// m_rigidBody = getNode()->getComponentByTypeSafe<RigidBodyComponent>();
@@ -171,19 +174,30 @@ void ShockPlayerController::Update(float dt)
 	// update debug
 	DebugUpdate(dt);
 
+	static std::vector< std::pair<glm::vec3, glm::vec3> > debugLines;
+
 	InputManager* input = InputManager::GetInstance();
 	if (input->IsPressed(KeyboardKeys::KEY_F))
 	{
 		Camera* camera = CameraProxy::GetInstance();
 		glm::vec3 rayStart = camera->GetPosition() + camera->GetDirection();
-		glm::vec3 rayEnd = rayStart + 1000.0f;
+		glm::vec3 rayEnd = camera->GetPosition() + camera->GetDirection() * 1000.0f;
+
+		debugLines.push_back(std::make_pair(rayStart, rayEnd));
 
 		RayCastResult rq = {};
 		if (GetWorld()->RayCast(rq, rayStart, rayEnd))
 		{
 			Entity* entity = rq.m_entity;
 			Core::Msg("ShockPlayerController::Update(): looking at entity 0x%p", entity);
+
+			g_debugRender.drawAxis(rq.m_hitPosition);
 		}
+	}
+
+	for (auto& it : debugLines)
+	{
+		g_debugRender.DrawLine(it.first, it.second, glm::vec3(1.0f, 0.0f, 0.0f));
 	}
 
 	if (input->IsPressedWithReset(KeyboardKeys::KEY_F1))

@@ -1,8 +1,15 @@
 #include "enginepch.h"
+#include "engine/engine.h"
+#include "engine/camera.h"
+#include "engine/entity/world.h"
 #include "engine/entity/entity.h"
 #include "engine/physics/physicsworld.h"
 #include "engine/physics/physicsdebugdraw.h"
 #include "engine/physics/rigidbodycomponent.h"
+#include "engine/physics/triggercomponent.h"
+
+// #TODO: REMOVE GRAPHICS FROM ENGINE
+#include "graphics/ifontmanager.h"
 
 #include <BulletCollision/BroadphaseCollision/btDbvtBroadphase.h>
 #include <BulletCollision/CollisionDispatch/btDefaultCollisionConfiguration.h>
@@ -11,11 +18,11 @@
 
 namespace solunar
 {
-	static void internalTickCallback(btDynamicsWorld* world, btScalar timeStep)
+	static void InternalTickCallback(btDynamicsWorld* world, btScalar timeStep)
 	{
 		Assert(world);
 		Assert(world->getWorldUserInfo());
-		static_cast<PhysicsWorld*>(world->getWorldUserInfo())->internalTick();
+		static_cast<PhysicsWorld*>(world->getWorldUserInfo())->InternalTick();
 	}
 
 	PhysicsWorld::PhysicsWorld()
@@ -30,7 +37,7 @@ namespace solunar
 		m_btGhostPairCallback		= mem_new<btGhostPairCallback>();
 
 		m_world->getBroadphase()->getOverlappingPairCache()->setInternalGhostPairCallback(m_btGhostPairCallback);
-		m_world->setInternalTickCallback(internalTickCallback, this);
+		m_world->setInternalTickCallback(InternalTickCallback, this);
 		m_world->setDebugDrawer(&g_physicsDebugDraw);
 
 		m_accumulatedTime = 0.0f;
@@ -65,13 +72,19 @@ namespace solunar
 
 	}
 
-	void PhysicsWorld::addRigidBody(RigidBodyComponent* body)
+	void PhysicsWorld::AddRigidBody(RigidBodyComponent* body)
 	{
 		Assert2(body->GetSDKBody(), "RigidBodyComponent is not properly initialized");
 		m_world->addRigidBody(body->GetSDKBody());
 	}
 
-	void PhysicsWorld::step(float delta)
+	void PhysicsWorld::RemoveRigidBody(RigidBodyComponent* body)
+	{
+		Assert2(body->GetSDKBody(), "RigidBodyComponent is not properly initialized");
+		m_world->removeRigidBody(body->GetSDKBody());
+	}
+
+	void PhysicsWorld::Step(float delta)
 	{
 		m_world->stepSimulation(delta, 12, m_stepTime);
 #if 0
@@ -93,6 +106,10 @@ namespace solunar
 		//m_debugDraw = true;
 		if (m_debugDraw)
 		{
+			DebugDrawTriggers();
+
+			return;
+
 			int debugDrawMode = 0;
 			debugDrawMode |= btIDebugDraw::DBG_DrawAabb;
 			debugDrawMode |= btIDebugDraw::DBG_DrawWireframe;
@@ -119,9 +136,8 @@ namespace solunar
 		m_debugDraw = !m_debugDraw;
 	}
 
-	void PhysicsWorld::internalTick()
+	void PhysicsWorld::InternalTick()
 	{
-#if 0
 		int numManifolds = m_world->getDispatcher()->getNumManifolds();
 		for (int i = 0; i < numManifolds; i++)
 		{
@@ -139,59 +155,49 @@ namespace solunar
 					const btVector3& ptB = pt.getPositionWorldOnB();
 					const btVector3& normalOnB = pt.m_normalWorldOnB;
 
-					// player is obA
-					if (btGhostObject* ghostObject = btGhostObject::upcast(obA))
-					{
-						if (obB)
-						{
-							RigidBodyComponent* rb = static_cast<RigidBodyComponent*>(obB->getUserPointer());
-							if (TriggerComponent* trigger = rb->getNode()->getComponentByType<TriggerComponent>())
-							{
-								ASSERT(ghostObject->getUserPointer());// no node instance sadly :(
+					RigidBodyComponent* rbA = static_cast<RigidBodyComponent*>(obA->getUserPointer());
+					RigidBodyComponent* rbB = static_cast<RigidBodyComponent*>(obB->getUserPointer());
 
-								Node* node = static_cast<Node*>(ghostObject->getUserPointer());
-								trigger->onCollidePlayer(rb, node);
-							}
-						}
+					if (!rbA || !rbB)
+						continue;
+
+					Assert(rbA);
+					Assert(rbB);
+
+					if (TriggerComponent* trigger = rbA->GetEntity()->GetComponent<TriggerComponent>())
+					{
+						trigger->OnCollide(rbA, rbB);
 					}
-					// player is obB
-					else if (btGhostObject* ghostObject = btGhostObject::upcast(obB))
+					else if (TriggerComponent* trigger = rbB->GetEntity()->GetComponent<TriggerComponent>())
 					{
-						if (obA)
-						{
-							RigidBodyComponent* rb = static_cast<RigidBodyComponent*>(obA->getUserPointer());
-							if (TriggerComponent* trigger = rb->getNode()->getComponentByType<TriggerComponent>())
-							{
-								ASSERT(ghostObject->getUserPointer());// no node instance sadly :(
-
-								Node* node = static_cast<Node*>(ghostObject->getUserPointer());
-								trigger->onCollidePlayer(rb, node);
-							}
-						}
-					}
-					else
-					{
-						RigidBodyComponent* rbA = static_cast<RigidBodyComponent*>(obA->getUserPointer());
-						RigidBodyComponent* rbB = static_cast<RigidBodyComponent*>(obB->getUserPointer());
-
-						if (!rbA || !rbB)
-							continue;
-
-						ASSERT(rbA);
-						ASSERT(rbB);
-
-						if (TriggerComponent* trigger = rbA->getNode()->getComponentByType<TriggerComponent>())
-						{
-							trigger->onCollide(rbA, rbB);
-						}
-						else if (TriggerComponent* trigger = rbB->getNode()->getComponentByType<TriggerComponent>())
-						{
-							trigger->onCollide(rbB, rbA);
-						}
+						trigger->OnCollide(rbB, rbA);
 					}
 				}
 			}
 		}
-#endif
+	}
+
+	void PhysicsWorld::DebugDrawTriggers()
+	{
+		if (Engine::ms_world)
+		{
+			std::vector<Entity*> triggers = Engine::ms_world->GetEntityManager().GetEntitiesWithComponent<TriggerComponent>();
+
+			int numTriggers = triggers.size();
+			for (int i = 0; i < numTriggers; i++)
+			{
+				RigidBodyComponent* body = triggers[i]->GetComponent<RigidBodyComponent>();
+				btCompoundShape* compoundShape = body->GetCompoundShape();
+
+				btVector3 aabbMin;
+				btVector3 aabbMax;
+				compoundShape->getAabb(body->GetSDKBody()->getWorldTransform(), aabbMin, aabbMax);
+
+				const btVector3 color = btVector3(1.0f, 0.6f, 0.0f);
+				g_physicsDebugDraw.drawBox(aabbMin, aabbMax, color);
+
+				std::string entityName = "Trigger #" + std::to_string(i);
+			}
+		}
 	}
 }

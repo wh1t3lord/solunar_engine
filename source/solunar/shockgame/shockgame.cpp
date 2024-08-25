@@ -59,7 +59,7 @@ ShockGameInterface* getShockGameInterface()
 
 class TestRotatorComponent : public LogicComponent
 {
-	IMPLEMENT_OBJECT(TestRotatorComponent, LogicComponent);
+	DECLARE_OBJECT(TestRotatorComponent);
 
 public:
 	TestRotatorComponent() : m_YAxis(0.0f)
@@ -76,16 +76,29 @@ public:
 	void Update(float dt) override
 	{
 		m_YAxis += dt * 200.0f;
-		GetEntity()->QuaternionRotate(glm::vec3(0.f, 1.f, 0.f), m_YAxis);
+		GetEntity()->QuaternionRotate(glm::vec3(1.f, 1.f, 0.f), m_YAxis);
+
+		glm::quat o = GetEntity()->GetRotation();
+		glm::vec3 V;
+		V[0] = 2 * (o.x * o.z - o.w * o.y);
+		V[1] = 2 * (o.y * o.z + o.w * o.x);
+		V[2] = 1 - 2 * (o.x * o.x + o.y * o.y);
+
+		g_debugRender.DrawLine(GetEntity()->GetPosition(),
+			GetEntity()->GetPosition() + V, glm::vec3(1.0f, 1.0f, 0.0f));
+
+		g_debugRender.drawBoundingBox(GetEntity()->GetBoundingBox(), glm::vec3(1.0f));
 	}
 
 private:
 	float m_YAxis;
 };
 
+IMPLEMENT_OBJECT(TestRotatorComponent, LogicComponent);
+
 class TestPositionUpdaterComponent : public LogicComponent
 {
-	IMPLEMENT_OBJECT(TestPositionUpdaterComponent, LogicComponent);
+	DECLARE_OBJECT(TestPositionUpdaterComponent);
 
 public:
 	TestPositionUpdaterComponent()
@@ -110,9 +123,11 @@ public:
 
 };
 
+IMPLEMENT_OBJECT(TestPositionUpdaterComponent, LogicComponent);
+
 class TestAnimationComponent : public LogicComponent
 {
-	IMPLEMENT_OBJECT(TestAnimationComponent, LogicComponent);
+	DECLARE_OBJECT(TestAnimationComponent);
 public:
 	TestAnimationComponent();
 	~TestAnimationComponent();
@@ -125,6 +140,8 @@ private:
 	std::string m_animationName;
 	int m_animationIndex = -1;
 };
+
+IMPLEMENT_OBJECT(TestAnimationComponent, LogicComponent);
 
 TestAnimationComponent::TestAnimationComponent()
 {
@@ -164,7 +181,7 @@ void TestAnimationComponent::Update(float dt)
 
 class ViewmodelAnimationController : public LogicComponent
 {
-	IMPLEMENT_OBJECT(ViewmodelAnimationController, LogicComponent);
+	DECLARE_OBJECT(ViewmodelAnimationController);
 public:
 	ViewmodelAnimationController();
 	~ViewmodelAnimationController();
@@ -174,6 +191,8 @@ public:
 private:
 	int m_animationIndex = -1;
 };
+
+IMPLEMENT_OBJECT(ViewmodelAnimationController, LogicComponent);
 
 ViewmodelAnimationController::ViewmodelAnimationController()
 {

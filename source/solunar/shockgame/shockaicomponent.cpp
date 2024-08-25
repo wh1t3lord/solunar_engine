@@ -8,6 +8,8 @@
 namespace solunar
 {
 
+IMPLEMENT_OBJECT(ShockAIComponent, LogicComponent);
+
 BEGIN_PROPERTY_REGISTER(ShockAIComponent)
 {
 	REGISTER_PROPERTY(ShockAIComponent, PropertyInt, m_aiType);

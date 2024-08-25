@@ -4,6 +4,8 @@
 namespace solunar
 {
 
+IMPLEMENT_OBJECT(WeaponAutoComponent, WeaponComponent);
+
 void WeaponAutoComponent::RegisterObject()
 {
     g_typeManager->RegisterObject<WeaponAutoComponent>();

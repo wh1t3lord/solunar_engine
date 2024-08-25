@@ -7,7 +7,7 @@ namespace solunar {
 	
 	class PlayerControllerComponent : public LogicComponent
 	{
-		IMPLEMENT_OBJECT(PlayerControllerComponent, LogicComponent);
+		DECLARE_OBJECT(PlayerControllerComponent);
 	public:
 		static void RegisterObject();
 		

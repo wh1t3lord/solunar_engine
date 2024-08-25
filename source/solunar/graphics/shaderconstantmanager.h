@@ -22,6 +22,16 @@ namespace solunar
 		Matrix4x4,
 	};
 
+	enum ConstantBufferBindings
+	{
+		CBBindings_Scene,
+		CBBindings_Skinning,
+		CBBindings_DirectionalLight,
+		CBBindings_PointLights,
+		CBBindings_SpotLights,
+		CBBindings_LightData,
+	};
+
 	struct StaticMeshGlobalData
 	{
 		glm::mat4 m_modelMatrix;
@@ -59,6 +69,7 @@ namespace solunar
 	extern ConstantBufferProxy g_staticMeshConstantBuffer;
 	extern ConstantBufferProxy g_directionalLightConstantBuffer;
 	extern ConstantBufferProxy g_pointLightConstantBuffer;
+	extern ConstantBufferProxy g_spotLightConstantBuffer;
 	extern ConstantBufferProxy g_lightDataConstantBuffer;
 
 	class ShaderConstantManager : public Singleton<ShaderConstantManager>

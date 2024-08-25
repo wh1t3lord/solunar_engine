@@ -8,6 +8,8 @@
 
 namespace solunar {
 
+	IMPLEMENT_OBJECT(MeshComponent, Component);
+
 	void MeshComponent::RegisterObject()
 	{
 		g_typeManager->RegisterObject<MeshComponent>();
@@ -57,6 +59,10 @@ namespace solunar {
 
 	void MeshComponent::Render()
 	{
+#if 0//ndef FINAL_BUILD
+		BoundingBox boundingBox = GetEntity()->GetBoundingBox();
+		g_debugRender.drawBoundingBox(boundingBox, glm::vec3(1.f));
+#endif // !FINAL_BUILD
 	}
 
 	void MeshComponent::LoadModel(const std::string& filename)
@@ -75,6 +81,8 @@ namespace solunar {
 	}
 
 	// animated mesh component
+
+	IMPLEMENT_OBJECT(AnimatedMeshComponent, MeshComponent);
 
 	AnimatedMeshComponent::AnimatedMeshComponent()
 	{

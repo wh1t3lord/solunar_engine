@@ -66,10 +66,9 @@ namespace solunar
 
 	class ModelBase : public GraphicsObject
 	{
-		IMPLEMENT_OBJECT(ModelBase, GraphicsObject);
+		DECLARE_OBJECT(ModelBase);
 	public:
 		ModelBase();
-		ModelBase(const std::string& name);
 		~ModelBase();
 
 		static void RegisterObject();
@@ -124,7 +123,7 @@ namespace solunar
 	//! Model submesh class
 	class ModelSubmesh : public GraphicsObject
 	{
-		IMPLEMENT_OBJECT(ModelSubmesh, GraphicsObject);
+		DECLARE_OBJECT(ModelSubmesh);
 	public:
 		static void RegisterObject();
 
@@ -161,7 +160,7 @@ namespace solunar
 	//! Model class
 	class Model : public GraphicsObject
 	{
-		IMPLEMENT_OBJECT(Model, GraphicsObject);
+		DECLARE_OBJECT(Model);
 	public:
 		static void RegisterObject();
 		

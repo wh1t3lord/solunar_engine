@@ -9,7 +9,7 @@
 namespace solunar
 {
 
-extern DXGI_FORMAT GetDxgiFormat(ImageFormat format);
+extern DXGI_FORMAT GetDXGIFormat(ImageFormat format);
 
 enum ShaderType
 {
@@ -185,7 +185,7 @@ void D3D11ShaderProgram::Create(D3D11Device* device, const char* vstext, const c
 			D3D11_INPUT_ELEMENT_DESC inputElementDesc	= {};
 			inputElementDesc.SemanticName				= inputLayout[i].m_semanticName;
 			inputElementDesc.SemanticIndex				= inputLayout[i].m_semanticIndex;
-			inputElementDesc.Format						= GetDxgiFormat(inputLayout[i].m_format);
+			inputElementDesc.Format						= GetDXGIFormat(inputLayout[i].m_format);
 			inputElementDesc.InputSlot					= inputLayout[i].m_inputSlot;
 			inputElementDesc.AlignedByteOffset			= inputLayout[i].m_alignedByteOffset;
 			inputElementDesc.InstanceDataStepRate		= inputLayout[i].m_instanceDataStepRate;

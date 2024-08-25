@@ -10,6 +10,12 @@
 
 namespace solunar {
 
+	IMPLEMENT_OBJECT(GraphicsWorld, Object);
+
+	void GraphicsWorld::RegisterObject()
+	{
+		g_typeManager->RegisterObject<GraphicsWorld>();
+	}
 
 	GraphicsWorld::GraphicsWorld()
 	{

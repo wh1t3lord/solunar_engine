@@ -12,6 +12,8 @@
 
 namespace solunar
 {
+	IMPLEMENT_OBJECT(World, SerializableObject);
+
 	World::World() :
 		m_physicsWorld(nullptr), m_graphicsWorld(nullptr)
 	{
@@ -76,7 +78,7 @@ namespace solunar
 		if (!shapes.empty())
 		{
 			for (auto it : shapes)
-				it->initializeShape();
+				it->InitializeShape();
 		}
 	}
 
@@ -103,7 +105,7 @@ namespace solunar
 	void World::Update_PhysicsEntity()
 	{
 		float delta = Timer::GetInstance()->GetDelta();
-		m_physicsWorld->step(delta);
+		m_physicsWorld->Step(delta);
 
 		std::vector<Entity*> physicsEntities = m_entityManager.GetEntitiesWithComponent<RigidBodyComponent>();
 
@@ -155,7 +157,7 @@ namespace solunar
 			
 			rayResult.m_entity = entity;
 			rayResult.m_hitPosition = btVectorToGlm(rayCallback.m_hitPointWorld);
-			rayResult.m_hitPosition = btVectorToGlm(rayCallback.m_hitNormalWorld);
+			rayResult.m_hitNormal = btVectorToGlm(rayCallback.m_hitNormalWorld);
 			return true;
 		}
 

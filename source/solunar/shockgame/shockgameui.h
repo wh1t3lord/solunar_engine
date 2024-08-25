@@ -8,7 +8,7 @@ namespace solunar
 
 class ShockGameMainMenuComponent : public LogicComponent
 {
-	IMPLEMENT_OBJECT(ShockGameMainMenuComponent, LogicComponent);
+	DECLARE_OBJECT(ShockGameMainMenuComponent);
 
 public:
 	ShockGameMainMenuComponent();
@@ -21,7 +21,7 @@ public:
 
 class DemoGameMainMenuComponent : public LogicComponent
 {
-	IMPLEMENT_OBJECT(DemoGameMainMenuComponent, LogicComponent);
+	DECLARE_OBJECT(DemoGameMainMenuComponent);
 
 public:
 	DemoGameMainMenuComponent();

@@ -6,6 +6,8 @@
 namespace solunar
 {
 
+IMPLEMENT_OBJECT(Entity, SerializableObject);
+
 BEGIN_PROPERTY_REGISTER(Entity)
 {
 	REGISTER_PROPERTY(Entity, PropertyMatrix4, m_worldTransform);

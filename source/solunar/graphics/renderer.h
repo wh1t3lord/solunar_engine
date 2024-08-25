@@ -24,15 +24,6 @@ namespace solunar
 		Lit
 	};
 
-	enum ConstantBufferBindings
-	{
-		ConstantBufferBindings_Scene,
-		ConstantBufferBindings_Skinning,
-		CBBindings_DirectionalLight,
-		ConstantBufferBindings_PointLights,
-		ConstantBufferBinding_LightData,
-	};
-
 	class Renderer
 	{
 	public:

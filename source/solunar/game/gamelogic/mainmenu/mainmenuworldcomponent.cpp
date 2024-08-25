@@ -5,6 +5,8 @@
 
 namespace solunar {
 	
+	IMPLEMENT_OBJECT(MainMenuWorldComponent, LogicComponent);
+
 	void MainMenuWorldComponent::RegisterObject()
 	{
 		g_typeManager->RegisterObject<MainMenuWorldComponent>();

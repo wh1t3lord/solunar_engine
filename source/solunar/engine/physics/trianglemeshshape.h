@@ -51,7 +51,7 @@ private:
 //! Trimesh collision shape
 class TriangleMeshShapeComponent : public ShapeComponent
 {
-	IMPLEMENT_OBJECT(TriangleMeshShapeComponent, ShapeComponent);
+	DECLARE_OBJECT(TriangleMeshShapeComponent);
 public:
 	TriangleMeshShapeComponent();
 	~TriangleMeshShapeComponent();
@@ -62,7 +62,7 @@ public:
 	void SaveXML(tinyxml2::XMLElement& element) override;
 
 private:
-	void createShapeInternal() override;
+	void CreateShapeInternal() override;
 };
 
 }

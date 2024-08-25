@@ -20,6 +20,14 @@ GLuint createShader(GLenum target, const char* filename, const char* defines = n
 	content[fileLength] = '\0';
 
 	if (defines && strlen(defines) > 0) {
+		std::string newDefines;
+
+		//std::size_t pos = 0;
+		//while (pos != std::string::npos)
+		//{
+		//	
+		//}
+
 		size_t versionLocation = content.find("#version 330 core");
 
 		size_t definesStringLength = versionLocation + strlen("#version 330 core") + 2;

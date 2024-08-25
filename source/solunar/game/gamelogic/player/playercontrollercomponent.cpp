@@ -3,6 +3,8 @@
 
 namespace solunar {
 	
+	IMPLEMENT_OBJECT(PlayerControllerComponent, LogicComponent);
+
 	void PlayerControllerComponent::RegisterObject()
 	{
 		g_typeManager->RegisterObject<PlayerControllerComponent>();
