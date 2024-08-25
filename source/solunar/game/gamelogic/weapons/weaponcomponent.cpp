@@ -10,6 +10,7 @@
 #include "graphics/animatedmodel.h"
 #include "graphics/mesh.h"
 #include "graphics/ifontmanager.h"
+#include "graphics/debugrenderer.h"
 
 namespace solunar
 {
@@ -52,6 +53,8 @@ namespace solunar
 			m_inited = true;
 		}
 
+		static std::vector< std::pair<glm::vec3, glm::vec3> > debugLines;
+
 		Camera* camera = CameraProxy::GetInstance();
 
 		bool isFireAniFinished = animatedModel->GetCurrentAnimationId() == m_fireAni && animatedModel->IsStoped();
@@ -68,11 +71,33 @@ namespace solunar
 
 			--m_ammo;
 
-			RayCastResult rq = {};
-			//if (getWorld()->rayCast(rq, camera->getDirection(), camera->getDirection() + glm::vec3(10000.0f)))
-			//{
-			//	
-			//}
+			int shellCount = 6;
+			for (int i = 0; i < shellCount; i++)
+			{
+				float r = rand() % 10;
+				r = r / 100;
+
+				glm::vec3 rayStart = camera->GetPosition() + r + camera->GetDirection() ;
+				glm::vec3 rayEnd = camera->GetPosition() + r + camera->GetDirection()  * 1000.0f;
+
+				//debugLines.push_back(std::make_pair(rayStart, rayEnd));
+
+				RayCastResult rq = {};
+				if (GetWorld()->RayCast(rq, rayStart, rayEnd))
+				{
+					Entity* entity = rq.m_entity;
+					Core::Msg("WeaponComponent::Update(): shot entity 0x%p", entity);
+
+					debugLines.push_back(std::make_pair(rayStart, rq.m_hitPosition));
+
+					g_debugRender.drawAxis(rq.m_hitPosition);
+				}
+			}
+		}		
+
+		for (auto& it : debugLines)
+		{
+			g_debugRender.DrawLine(it.first, it.second, glm::vec3(1.0f, 0.0f, 0.0f));
 		}
 
 		if (isFireAniFinished) {

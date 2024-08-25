@@ -174,33 +174,7 @@ void ShockPlayerController::Update(float dt)
 	// update debug
 	DebugUpdate(dt);
 
-	static std::vector< std::pair<glm::vec3, glm::vec3> > debugLines;
-
-	InputManager* input = InputManager::GetInstance();
-	if (input->IsPressed(KeyboardKeys::KEY_F))
-	{
-		Camera* camera = CameraProxy::GetInstance();
-		glm::vec3 rayStart = camera->GetPosition() + camera->GetDirection();
-		glm::vec3 rayEnd = camera->GetPosition() + camera->GetDirection() * 1000.0f;
-
-		debugLines.push_back(std::make_pair(rayStart, rayEnd));
-
-		RayCastResult rq = {};
-		if (GetWorld()->RayCast(rq, rayStart, rayEnd))
-		{
-			Entity* entity = rq.m_entity;
-			Core::Msg("ShockPlayerController::Update(): looking at entity 0x%p", entity);
-
-			g_debugRender.drawAxis(rq.m_hitPosition);
-		}
-	}
-
-	for (auto& it : debugLines)
-	{
-		g_debugRender.DrawLine(it.first, it.second, glm::vec3(1.0f, 0.0f, 0.0f));
-	}
-
-	if (input->IsPressedWithReset(KeyboardKeys::KEY_F1))
+	if (InputManager::GetInstance()->IsPressedWithReset(KeyboardKeys::KEY_F1))
 	{
 		GetWorld()->TogglePhysicsDebugDraw();
 	}
