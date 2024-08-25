@@ -63,7 +63,7 @@ IProperty* PropertyManager::FindProperty(const TypeInfo* typeInfo, const char* n
 	return nullptr;
 }
 
-void PropertyManager::GetTypeProperties(const TypeInfo* typeInfo, std::vector<IProperty*>& properties)
+void PropertyManager::GetProperties(const TypeInfo* typeInfo, std::vector<IProperty*>& properties)
 {
 	auto it = m_properies.find(typeInfo->GetStringHash());
 	if (it != m_properies.end()) {

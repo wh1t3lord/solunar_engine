@@ -138,7 +138,7 @@ public:
 
 	IProperty* FindProperty(const TypeInfo* typeInfo, const char* name);
 
-	void GetTypeProperties(const TypeInfo* typeInfo, std::vector<IProperty*>& properties);
+	void GetProperties(const TypeInfo* typeInfo, std::vector<IProperty*>& properties);
 
 private:
 	std::unordered_map<size_t, std::vector<IProperty*>> m_properies;

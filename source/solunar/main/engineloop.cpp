@@ -95,7 +95,7 @@ namespace solunar {
 			pRoot->InsertFirstChild(component);
 
 			std::vector<IProperty*> properties;
-			PropertyManager::GetInstance()->GetTypeProperties(it, properties);
+			PropertyManager::GetInstance()->GetProperties(it, properties);
 			if (!properties.empty())
 			{
 				tinyxml2::XMLElement* propertiesElement = doc.NewElement("Properties");
