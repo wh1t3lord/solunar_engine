@@ -21,6 +21,9 @@ void RegisterCoreTypes()
 
 void Core::Init()
 {
+	// Initialize random
+	srand(time(NULL));
+
 	Logger::Init();
 	Logger::LogPrint("Core builted at %s %s", __TIME__, __DATE__);
 
