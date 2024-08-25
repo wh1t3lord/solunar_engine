@@ -106,9 +106,7 @@ namespace solunar
 		//m_debugDraw = true;
 		if (m_debugDraw)
 		{
-			DebugDrawTriggers();
-
-			return;
+			//DebugDrawTriggers();
 
 			int debugDrawMode = 0;
 			debugDrawMode |= btIDebugDraw::DBG_DrawAabb;
