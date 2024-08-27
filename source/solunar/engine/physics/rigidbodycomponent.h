@@ -9,6 +9,12 @@ namespace solunar {
 	class PhysicsWorld;
 	class ShapeComponent;
 
+	enum PhysicsFilter
+	{
+		PhysicsFilter_None = 1 << 6,
+		PhysicsFilter_Player = 1 << 6,
+	};
+
 	//! Rigid body component
 	class RigidBodyComponent : public Component
 	{

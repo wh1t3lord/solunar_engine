@@ -27,6 +27,9 @@ namespace solunar {
 		bool m_inited;
 		int m_idleAni;
 		int m_fireAni;
+		int m_prior_to_reload_Ani;
+		int m_reload_one_Ani;
+		int m_reload_last_one_Ani;
 
 		int m_ammo;
 	};

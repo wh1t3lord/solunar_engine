@@ -144,6 +144,8 @@ namespace solunar
 		Assert2(m_physicsWorld, "Physics world is not initialized for ray casting");
 
 		btDynamicsWorld::ClosestRayResultCallback rayCallback(glmVectorToBt(rayStart), glmVectorToBt(rayEnd));
+		rayCallback.m_collisionFilterMask = kCollisionFilterAllMask ^ PhysicsFilter_Player;
+
 		m_physicsWorld->GetWorld()->rayTest(glmVectorToBt(rayStart), glmVectorToBt(rayEnd), rayCallback);
 		if (rayCallback.hasHit())
 		{

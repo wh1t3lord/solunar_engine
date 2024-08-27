@@ -155,6 +155,8 @@ public:
 	int GetNodeByName(const std::string& name);
 	void SetNodeScale(int nodeid, const glm::vec3& scale);
 
+	void DebugRender(const glm::mat4& modelMatrix);
+
 private:
 	std::vector<AnimatedSubMesh*> m_subMeshes;
 	std::vector<Animation> m_animations;

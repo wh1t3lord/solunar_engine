@@ -326,7 +326,7 @@ namespace solunar {
 		GetPhysicsWorld()->GetWorld()->addCollisionObject(
 			m_ghostObject,
 			btBroadphaseProxy::CharacterFilter,
-			btBroadphaseProxy::AllFilter
+			kCollisionFilterAllMask | PhysicsFilter_Player
 		);
 
 		GetPhysicsWorld()->GetWorld()->addAction(m_characterController);

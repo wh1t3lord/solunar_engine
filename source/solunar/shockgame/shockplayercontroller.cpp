@@ -25,6 +25,10 @@ BEGIN_PROPERTY_REGISTER(ShockPlayerController)
 }
 END_PROPERTY_REGISTER(ShockPlayerController);
 
+// #TODO: REFACTOR
+Entity* g_freeCameraEntity = nullptr;
+CameraFirstPersonComponent* g_freeCamera = nullptr;
+
 ShockPlayerController::ShockPlayerController() :
 	m_cameraEntity(nullptr),
 	m_camera(nullptr),
@@ -81,7 +85,7 @@ void ShockPlayerController::InitializeCamera()
 	// m_camera = m_cameraNode->createComponentByType<CameraFirstPersonComponent>();
 
 	m_cameraEntity = GetEntity()->CreateChild();
-	m_cameraEntity->SetPosition(glm::vec3(0.0f, -0.2f, 0.0f));
+	m_cameraEntity->SetPosition(glm::vec3(0.0f, 1.0f, 0.0f));
 
 	m_camera = m_cameraEntity->CreateComponent<CameraFirstPersonComponent>();
 	//m_camera = getEntity()->createComponent<CameraFirstPersonComponent>();
@@ -113,6 +117,13 @@ void ShockPlayerController::InitializeCamera()
 	// little hack #TODO: please remove ViewmodelAnimationController from shockgame.cpp
 	//Component* viewmodelComponent = (Component*)TypeManager::getInstance()->createObjectByName("ViewmodelAnimationController");
 	//m_weaponEntity->addComponent(viewmodelComponent);
+
+	// #TODO: REMOVE FROM THIS
+	if (!g_freeCamera)
+	{
+		g_freeCameraEntity = GetWorld()->CreateEntity();
+		g_freeCamera = g_freeCameraEntity->CreateComponent<CameraFirstPersonComponent>();
+	}
 }
 
 void ShockPlayerController::InitializeComponents()
@@ -130,6 +141,61 @@ void ShockPlayerController::Update(float dt)
 	// 	initializeComponents();
 	// 	//ASSERT2(m_rigidBody, "Node don't have rigid body component.");
 	// }
+
+		// #TODO: REMOVE FROM THIS
+	if (InputManager::GetInstance()->IsPressedWithReset(KeyboardKeys::KEY_F2))
+	{
+		ActivateCamera();
+	}
+
+	if (InputManager::GetInstance()->IsPressedWithReset(KeyboardKeys::KEY_F3))
+	{
+		CameraProxy::GetInstance()->SetCameraComponent(g_freeCamera);
+		g_freeCameraEntity->SetPosition(GetEntity()->GetWorldPosition());
+	}
+
+	if (CameraProxy::GetInstance()->GetCameraComponent() == g_freeCamera)
+	{
+		InputManager* input = InputManager::GetInstance();
+		glm::vec2 mousePos = input->GetCursorPos();
+
+#if 0
+		glm::vec2 deltaMousePos = input->GetDeltaCursorPos();
+
+		g_freeCamera->updateFromMousePosition(deltaMousePos);
+#else
+		static glm::vec2 deltaMousePos = glm::vec2(0.0f);
+
+		deltaMousePos += input->GetDeltaCursorPos();
+
+		g_freeCamera->updateFromMousePosition(deltaMousePos);
+		input->ResetDelta();
+#endif
+
+		glm::vec3 cameraDirection = CameraProxy::GetInstance()->GetDirection();
+		glm::vec3 pos = g_freeCameraEntity->GetPosition();
+		float camSpeed = 8.0f * dt;
+
+		if (input->IsPressed(KeyboardKeys::KEY_LEFT_SHIFT))
+			camSpeed = 18.0f * dt;
+
+		if (input->IsPressed(KeyboardKeys::KEY_UP))
+			pos += camSpeed * cameraDirection;
+		if (input->IsPressed(KeyboardKeys::KEY_DOWN))
+			pos -= camSpeed * cameraDirection;
+
+		//if (input->IsPressed(KeyboardKeys::KEY_Q))
+		//	pos -= glm::normalize(glm::cross(cameraDirection, glm::vec3(1.0f, 0.0f, 0.0f))) * camSpeed;
+		//if (input->IsPressed(KeyboardKeys::KEY_E))
+		//	pos += glm::normalize(glm::cross(cameraDirection, glm::vec3(1.0f, 0.0f, 0.0f))) * camSpeed;
+
+		if (input->IsPressed(KeyboardKeys::KEY_LEFT))
+			pos -= glm::normalize(glm::cross(cameraDirection, glm::vec3(0.0f, 1.0f, 0.0f))) * camSpeed;
+		if (input->IsPressed(KeyboardKeys::KEY_RIGHT))
+			pos += glm::normalize(glm::cross(cameraDirection, glm::vec3(0.0f, 1.0f, 0.0f))) * camSpeed;
+
+		g_freeCameraEntity->SetPosition(pos);
+	}
 
 	if (!s_font)
 		s_font = g_fontManager->CreateFont("textures/ui/RobotoMono-Bold.ttf", 32.0f);

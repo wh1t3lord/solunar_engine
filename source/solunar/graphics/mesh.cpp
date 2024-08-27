@@ -136,4 +136,16 @@ namespace solunar {
 			Core::Msg("WARNING: AnimatedMeshComponent at entity(0x%p) has empty filename!", GetEntity());
 		}
 	}
+
+	void AnimatedMeshComponent::Render()
+	{
+		return;
+
+		if (!m_model.expired())
+		{
+			// guarantee cast, trust me 
+			std::weak_ptr<AnimatedModel> animatedModel = dynamicCastWeakPtr<AnimatedModel, ModelBase>(m_model);
+			animatedModel.lock()->DebugRender(GetEntity()->GetWorldTranslation());
+		}
+	}
 }

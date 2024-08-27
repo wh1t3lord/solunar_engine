@@ -290,7 +290,7 @@ namespace solunar
 	{
 #ifdef _DEBUG
 		_CrtSetDbgFlag(_CRTDBG_ALLOC_MEM_DF | _CRTDBG_LEAK_CHECK_DF | _CRTDBG_CHECK_ALWAYS_DF);
-		//_CrtSetBreakAlloc(1335);
+		//_CrtSetBreakAlloc(11760);
 #endif // _DEBUG
 
 		appInit(argc, argv);

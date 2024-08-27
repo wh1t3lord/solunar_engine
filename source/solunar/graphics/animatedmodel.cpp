@@ -717,6 +717,37 @@ void AnimatedModel::SetNodeScale(int nodeid, const glm::vec3& scale)
 	m_nodes[nodeid].m_scale = scale;
 }
 
+void AnimatedModel::DebugRender(const glm::mat4& modelMatrix)
+{
+	for (int i = 0; i < (int)m_nodes.size(); i++)
+	{
+		auto& node = m_nodes[i];
+		if (node.m_skinId != -1) {
+			auto& skin = m_skins[node.m_skinId];
+			size_t numJoints = skin.m_joints.size();
+			for (size_t i = 0; i < numJoints; ++i)
+			{
+				const glm::mat4 trans = modelMatrix * GetNodeMatrix(skin.m_joints[i]) * skin.m_inverseBindMatrices[i];
+
+				g_debugRender.PushModelMatrix(trans);
+				g_debugRender.drawAxis(glm::vec3(0.0f));
+				g_debugRender.PopModelMatrix();
+			}
+		}
+	}
+
+#if 0
+	for (int i = 0; i < (int)m_nodes.size() - 1; i++)
+	{
+		const glm::mat4 trans = modelMatrix * m_bonesMatrices[i];
+
+		g_debugRender.PushModelMatrix(trans);
+		g_debugRender.drawAxis(glm::vec3(0.0f));
+		g_debugRender.PopModelMatrix();
+	}
+#endif
+}
+
 ///////////////////////////////////////////////////////////
 // Animated Model Renderer
 

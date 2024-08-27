@@ -53,6 +53,9 @@ namespace solunar {
 
 		void LoadXML(tinyxml2::XMLElement& element) override;
 		void LoadModel(const std::string& filename);
+
+		void Render() override;
+
 	};
 
 }

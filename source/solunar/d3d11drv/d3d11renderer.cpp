@@ -143,7 +143,7 @@ void D3D11Renderer::createSwapChain()
 	swapChainDesc.BufferCount = 2;
 	swapChainDesc.OutputWindow = windowHandle;
 	swapChainDesc.Windowed = TRUE;
-	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
+	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 	D3D11_CHECK(dxgiFactory->CreateSwapChain(device->getDevice(), &swapChainDesc, &m_swapChain));
 
 	ID3D11Texture2D* backBuffer;

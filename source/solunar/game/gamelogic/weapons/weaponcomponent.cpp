@@ -36,6 +36,7 @@ namespace solunar
 	void WeaponComponent::Update(float dt)
 	{
 		static AudioSource* s_fireSound = nullptr;
+		static AudioSource* s_reloadSound = nullptr;
 		static IFont* s_font = nullptr;
 
 		AnimatedMeshComponent* mesh = GetEntity()->GetComponent<AnimatedMeshComponent>();
@@ -43,24 +44,81 @@ namespace solunar
 		AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
 		if (!m_inited) {
 			s_fireSound = AudioManager::GetInstance()->CreateSource("sounds/sfx/weapons/shotgun_fire.wav");
+			s_reloadSound = AudioManager::GetInstance()->CreateSource("sounds/sfx/weapons/shotgun_reload.wav");
 
 			s_font = g_fontManager->CreateFont("textures/ui/Anton-Regular.ttf", 50.0f);
 
 			m_idleAni = animatedModel->GetAnimationByName("idle");
 			m_fireAni = animatedModel->GetAnimationByName("fire");
 
+			//AnimatedModel: animation prior_to_reload channels 135
+			//AnimatedModel : animation reload_last_one channels 135
+			//AnimatedModel : animation reload_one channels 135
+
+			m_prior_to_reload_Ani = animatedModel->GetAnimationByName("prior_to_reload");
+			m_reload_one_Ani = animatedModel->GetAnimationByName("reload_one");
+			m_reload_last_one_Ani = animatedModel->GetAnimationByName("reload_last_one");
+
 			animatedModel->PlayAnimation(m_idleAni, true);
 			m_inited = true;
 		}
 
 		static std::vector< std::pair<glm::vec3, glm::vec3> > debugLines;
+		static std::vector< glm::vec3 > debugHits;
+		static float debugTime = 0.0f;
+		debugTime += dt;
 
 		Camera* camera = CameraProxy::GetInstance();
 
-		bool isFireAniFinished = animatedModel->GetCurrentAnimationId() == m_fireAni && animatedModel->IsStoped();
+		int currentId = animatedModel->GetCurrentAnimationId();
+		bool isFireAniFinished = currentId == m_fireAni && animatedModel->IsStoped();
+		bool isPriorAniFinished = currentId == m_prior_to_reload_Ani && animatedModel->IsStoped();
+		bool isReloadAniFinished = currentId == m_reload_one_Ani && animatedModel->IsStoped();
+		bool isReloadLastOneAniFinished = currentId == m_reload_last_one_Ani && animatedModel->IsStoped();
+		static bool reload = false;
+	
+
+		if (InputManager::GetInstance()->IsPressed(KEY_R) && (isFireAniFinished || currentId == m_idleAni))
+		{
+			animatedModel->PlayAnimation(m_prior_to_reload_Ani, false);
+			reload = true;
+		}
+
+		const int kMaxAmmo = 12;
+
+		if (reload && m_ammo >= kMaxAmmo)
+		{
+			animatedModel->PlayAnimation(m_reload_last_one_Ani, false);
+			reload = false;
+		}
+
+		if (isReloadLastOneAniFinished)
+			animatedModel->PlayAnimation(m_idleAni, true);
+			
+
+		if (reload)
+		{
+			if (isPriorAniFinished)
+			{
+				animatedModel->PlayAnimation(m_reload_one_Ani, false);
+
+				if (!s_reloadSound->IsPlaying())
+					s_reloadSound->Play();
+			}
+
+			if (isReloadAniFinished)
+			{
+				m_ammo += 1;
+				animatedModel->PlayAnimation(m_reload_one_Ani, false);
+				if (!s_reloadSound->IsPlaying())
+					s_reloadSound->Play();
+			}
+		}
+
+		//	m_ammo = 8;
 
 		if (InputManager::GetInstance()->IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
-			( isFireAniFinished || animatedModel->GetCurrentAnimationId() != m_fireAni) &&
+			( isFireAniFinished || currentId != m_fireAni) &&
 			m_ammo > 0) {
 			animatedModel->PlayAnimation(m_fireAni, false);
 			
@@ -90,7 +148,7 @@ namespace solunar
 
 					debugLines.push_back(std::make_pair(rayStart, rq.m_hitPosition));
 
-					g_debugRender.drawAxis(rq.m_hitPosition);
+					debugHits.push_back(rq.m_hitPosition);
 				}
 			}
 		}		
@@ -98,6 +156,24 @@ namespace solunar
 		for (auto& it : debugLines)
 		{
 			g_debugRender.DrawLine(it.first, it.second, glm::vec3(1.0f, 0.0f, 0.0f));
+		}
+
+		for (auto& it : debugHits)
+		{
+			g_debugRender.drawAxis(it);
+		}
+
+		if (debugTime >= 4.0f)
+		{
+			for (int i = 0; i < 12; i++)
+			{
+				if (!debugLines.empty())
+					debugLines.pop_back();
+
+				if (!debugHits.empty())
+					debugHits.pop_back();
+			}
+			debugTime = 0.0f;
 		}
 
 		if (isFireAniFinished) {

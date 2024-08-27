@@ -12,12 +12,12 @@
 			<Static value="true"/>
 		</RigidBodyComponent>
 		<BoxShapeComponent>
+			<Position x="0" y="-1" z="0"/>
 			<Size x="20" y="1" z="20"/>
 		</BoxShapeComponent>
 	</Entity>
 	
 	<!-- Camera AI test -->
-	<!--
 	<Entity>
 		<Position x="0" y="3" z="0"/>
 		<Rotation x="0" y="0" z="0"/>
@@ -29,7 +29,7 @@
 			<AIType value="ShockAIType_Camera"/>
 		</ShockAIComponent>
 	</Entity>
-	-->
+
 	
 	<!-- Test animated model
 	<Entity>

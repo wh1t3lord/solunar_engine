@@ -10,8 +10,11 @@
 
 namespace solunar {
 
+const int kCollisionFilterAllMask = btBroadphaseProxy::DefaultFilter | btBroadphaseProxy::StaticFilter | btBroadphaseProxy::KinematicFilter | btBroadphaseProxy::DebrisFilter;
+
 glm::vec3 btVectorToGlm(const btVector3& vec);
 btVector3 glmVectorToBt(const glm::vec3& vec);
+
 
 }
 

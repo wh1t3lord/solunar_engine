@@ -230,7 +230,7 @@ void DebugRender::PopModelMatrix()
 
 void DebugRender::drawAxis(const glm::vec3& vec)
 {
-	const float length = 0.2f;
+	const float length = 0.1f;
 	DrawLine(vec, glm::vec3(vec.x + length, vec.y, vec.z), glm::vec3(1.0f, 0.0, 0.0f));
 	DrawLine(vec, glm::vec3(vec.x, vec.y + length, vec.z), glm::vec3(0.0f, 0.0f, 1.0f));
 	DrawLine(vec, glm::vec3(vec.x, vec.y, vec.z + length), glm::vec3(0.0f, 1.0f, 0.0f));
