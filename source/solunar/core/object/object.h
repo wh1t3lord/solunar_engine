@@ -49,7 +49,7 @@ namespace solunar
 #define DECLARE_OBJECT(typeName) \
 	public: \
 		static const TypeInfo s_typeInfo; \
-		static void StaticConstructor(void* ptr) { reinterpret_cast<typeName*>(ptr)->typeName::typeName(); } \
+		static void StaticConstructor(void* ptr) { new(ptr) typeName(); } \
 		static const TypeInfo* GetStaticTypeInfo() { return &typeName::s_typeInfo; } \
 		virtual const TypeInfo* GetTypeInfo() { return GetStaticTypeInfo();  }
 
@@ -148,7 +148,7 @@ namespace solunar
 	{
 		if (std::shared_ptr<U> objectPtr = object.lock())
 		{
-			if (objectPtr->IsA<T>())
+			if (objectPtr->template IsA<T>())
 			{
 				return std::static_pointer_cast<T>(objectPtr);
 			}

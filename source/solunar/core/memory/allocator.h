@@ -1,6 +1,8 @@
 #ifndef CORE_ALLOCATOR_H
 #define CORE_ALLOCATOR_H
 
+#include <stddef.h>
+
 namespace solunar
 {
 

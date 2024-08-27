@@ -5,6 +5,11 @@
 #	include "core/platform/core_platform_win32.h"
 #endif // WIN32
 
+#ifdef __ORBIS__
+#include <sys\unistd.h>
+#endif // __ORBIS__
+
+#include <stddef.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -13,5 +18,6 @@
 #include <memory.h>
 #include <math.h>
 #include <time.h>
+
 
 #endif // !CORE_PLATFORM_H

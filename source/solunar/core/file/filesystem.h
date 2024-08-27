@@ -1,6 +1,8 @@
 #ifndef CORE_FILESYSTEM_H
 #define CORE_FILESYSTEM_H
 
+#include <stddef.h>
+
 namespace solunar
 {
 

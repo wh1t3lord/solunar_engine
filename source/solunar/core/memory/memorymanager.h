@@ -1,6 +1,7 @@
 #ifndef CORE_MEMORYMANAGER_H
 #define CORE_MEMORYMANAGER_H
 
+#include "core/platform/core_platform.h"
 #include "core/debug.h"
 #include "core/memory/allocator.h"
 

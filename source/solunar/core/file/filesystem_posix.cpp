@@ -1,7 +1,11 @@
-#if defined(__unix__) || defined(__unix) || defined(__APPLE__)
+//#if defined(__unix__) || defined(__unix) || defined(__APPLE__) || defined(__ORBIS__)
+
+#ifndef WIN32
 
 #include "core/platform/core_platform.h"
 #include "core/file/filesystem_posix.h"
+
+#include <stdlib.h>
 
 namespace solunar
 {
@@ -63,4 +67,6 @@ size_t FileSystem_Posix::Write(FileHandle handle, const void* data, size_t size)
 
 }
 
-#endif // defined(__unix__) || defined(__unix) || defined(__APPLE__)
+#endif // !WIN32
+
+//#endif // defined(__unix__) || defined(__unix) || defined(__APPLE__)

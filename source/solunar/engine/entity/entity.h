@@ -3,6 +3,8 @@
 
 #include "core/math/boundingbox.h"
 
+#include "engine/entity/component.h"
+
 namespace solunar
 {
 

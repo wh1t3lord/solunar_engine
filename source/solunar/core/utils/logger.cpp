@@ -11,24 +11,21 @@
 
 namespace solunar
 {
-	namespace
+	static FILE* s_logFileHandle = nullptr;
+	static clock_t s_logOpenTime = 0;
+
+	void logWriteMsg(const char* msg)
 	{
-		static FILE* s_logFileHandle = nullptr;
-		static DWORD s_logOpenTime = 0;
+		clock_t dwCurrentTime = clock() - s_logOpenTime;
 
-		void logWriteMsg(const char* msg)
+		static char buffer[1024];
+		int len = snprintf(buffer, sizeof(buffer), "%02lu:%02lu.%02lu: %s",
+			dwCurrentTime / 60000, dwCurrentTime / 1000 % 60, dwCurrentTime % 1000 / 10, msg);
+
+		if (s_logFileHandle)
 		{
-			DWORD dwCurrentTime = GetTickCount() - s_logOpenTime;
-
-			static char buffer[1024];
-			int len = snprintf(buffer, sizeof(buffer), "%02lu:%02lu.%02lu: %s",
-				dwCurrentTime / 60000, dwCurrentTime / 1000 % 60, dwCurrentTime % 1000 / 10, msg);
-
-			if (s_logFileHandle)
-			{
-				fwrite(buffer, sizeof(char), len, s_logFileHandle);
-				fflush(s_logFileHandle);
-			}
+			fwrite(buffer, sizeof(char), len, s_logFileHandle);
+			fflush(s_logFileHandle);
 		}
 	}
 
@@ -37,20 +34,17 @@ namespace solunar
 		s_logFileHandle = fopen("engine_output.txt", "w");
 		assert(s_logFileHandle);
 
-		struct tm newtime;
-		__time32_t aclock;
-
-		char buffer[32];
-		_time32(&aclock);
-		_localtime32_s(&newtime, &aclock);
-		errno_t errNum = asctime_s(buffer, 32, &newtime);
+		time_t aclock;
+		time(&aclock);
+		struct tm* newtime = localtime(&aclock);
+		const char* buffer = asctime(newtime);
 
 		char timeBuffer[1024];
 		int len = snprintf(timeBuffer, sizeof(timeBuffer), "Log started: %s", buffer);
 
 		fwrite(timeBuffer, sizeof(char), len, s_logFileHandle);
 
-		s_logOpenTime = GetTickCount();
+		s_logOpenTime = clock();
 	}
 
 	void Logger::Shutdown()
@@ -72,8 +66,10 @@ namespace solunar
 
 		strcat(buffer, "\n");
 
+#ifdef WIN32
 		OutputDebugStringA(buffer);
-
+#endif // WIN32
+		
 		// write to console
 		fwrite(buffer, sizeof(char), strlen(buffer), stdout);
 

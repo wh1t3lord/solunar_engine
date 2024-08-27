@@ -83,6 +83,9 @@ bool Thread::start()
 
 #endif
 
+namespace solunar
+{
+
 Thread::Thread()
 	: m_threadHandle(NULL),
 	  m_threadId(0),
