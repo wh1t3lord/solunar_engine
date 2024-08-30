@@ -159,18 +159,8 @@ void ShockPlayerController::Update(float dt)
 		InputManager* input = InputManager::GetInstance();
 		glm::vec2 mousePos = input->GetCursorPos();
 
-#if 0
 		glm::vec2 deltaMousePos = input->GetDeltaCursorPos();
-
 		g_freeCamera->updateFromMousePosition(deltaMousePos);
-#else
-		static glm::vec2 deltaMousePos = glm::vec2(0.0f);
-
-		deltaMousePos += input->GetDeltaCursorPos();
-
-		g_freeCamera->updateFromMousePosition(deltaMousePos);
-		input->ResetDelta();
-#endif
 
 		glm::vec3 cameraDirection = CameraProxy::GetInstance()->GetDirection();
 		glm::vec3 pos = g_freeCameraEntity->GetPosition();
@@ -257,20 +247,9 @@ void ShockPlayerController::doHit(float amount)
 void ShockPlayerController::UpdateCamera(float dt)
 {
 	 InputManager* input = InputManager::GetInstance();
-	 glm::vec2 mousePos = input->GetCursorPos();
 
-#if 0
 	 glm::vec2 deltaMousePos = input->GetDeltaCursorPos();
-
 	 m_camera->updateFromMousePosition(deltaMousePos);
-#else
-	 static glm::vec2 deltaMousePos = glm::vec2(0.0f);
-
-	 deltaMousePos += input->GetDeltaCursorPos();
-
-	 m_camera->updateFromMousePosition(deltaMousePos);
-	 input->ResetDelta();
-#endif
 
 	glm::quat rot = glm::eulerAngleYX(glm::radians(-m_camera->m_yaw), glm::radians(m_camera->m_pitch));
 	m_weaponEntity->SetRotation(rot);

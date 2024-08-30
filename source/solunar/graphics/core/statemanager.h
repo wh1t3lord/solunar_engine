@@ -32,19 +32,19 @@ class IStateManager
 public:
 	virtual ~IStateManager() = default;
 
-	virtual IRasterizerState* createRasterizerState(const RasterizerStateDesc& rasterizerDesc) = 0;
-	virtual void destroyRasterizerState(IRasterizerState* rasterizerState) = 0;
-	virtual void setRasterizerState(IRasterizerState* rasterizerState) = 0;
+	virtual IRasterizerState* CreateRasterizerState(const RasterizerStateDesc& rasterizerDesc) = 0;
+	virtual void DestroyRasterizerState(IRasterizerState* rasterizerState) = 0;
+	virtual void SetRasterizerState(IRasterizerState* rasterizerState) = 0;
 
 	virtual ISamplerState* CreateSamplerState(const SamplerDesc& samplerDesc) = 0;
-	virtual void destroySamplerState(ISamplerState* samplerState) = 0;
+	virtual void DestroySamplerState(ISamplerState* samplerState) = 0;
 
-	virtual IBlendState* createBlendState(const BlendStateDesc& blendStateDesc) = 0;
-	virtual void destroyBlendState(IBlendState* blendState) = 0;
-	virtual void setBlendState(IBlendState* blendState, const float blendFactor[4], uint32_t sampleMask) = 0;
+	virtual IBlendState* CreateBlendState(const BlendStateDesc& blendStateDesc) = 0;
+	virtual void DestroyBlendState(IBlendState* blendState) = 0;
+	virtual void SetBlendState(IBlendState* blendState, const float blendFactor[4], uint32_t sampleMask) = 0;
 
-	virtual IDepthStencilState* createDepthStencilState(const DepthStencilDesc& desc) = 0;
-	virtual void destroyDepthStencilState(IDepthStencilState* state) = 0;
+	virtual IDepthStencilState* CreateDepthStencilState(const DepthStencilDesc& desc) = 0;
+	virtual void DestroyDepthStencilState(IDepthStencilState* state) = 0;
 	virtual void SetDepthStencilState(IDepthStencilState* state, uint32_t stencilRef) = 0;
 };
 

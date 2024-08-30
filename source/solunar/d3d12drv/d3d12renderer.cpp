@@ -102,7 +102,7 @@ void D3D12Renderer::Init()
 	//g_stateManager = mem_new<D3D11StateManager>();
 	//g_d3d11StateManager->Init();
 
-	createRasterizerState();
+	CreateRasterizerState();
 
 	// Initialize shader manager with current api
 	//g_shaderManager = mem_new<D3D11ShaderProgramManager>();
@@ -219,7 +219,7 @@ void D3D12Renderer::createSwapChain()
 	//device->getDeviceContext()->OMSetDepthStencilState(m_depthStencilState, 0);
 }
 
-void D3D12Renderer::createRasterizerState()
+void D3D12Renderer::CreateRasterizerState()
 {
 	RasterizerStateDesc rasterizerState;
 	memset(&rasterizerState, 0, sizeof(rasterizerState));
@@ -227,8 +227,8 @@ void D3D12Renderer::createRasterizerState()
 	rasterizerState.m_frontCCW = true;
 	rasterizerState.m_fillMode = FillMode::Solid;
 
-	//m_rasterizerState = g_stateManager->createRasterizerState(rasterizerState);
-	//g_stateManager->setRasterizerState(m_rasterizerState);
+	//m_rasterizerState = g_stateManager->CreateRasterizerState(rasterizerState);
+	//g_stateManager->SetRasterizerState(m_rasterizerState);
 }
 
 void D3D12Renderer::Shutdown()
@@ -363,7 +363,7 @@ void D3D12Renderer::renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshCom
 
 	// Set depth stencil state
 	//g_d3d11Device->getDeviceContext()->OMSetDepthStencilState(m_depthStencilState, 0);
-	//g_stateManager->setRasterizerState(m_rasterizerState);
+	//g_stateManager->SetRasterizerState(m_rasterizerState);
 
 	// setup lights
 	SetupLights(graphicsWorld);

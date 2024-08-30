@@ -89,7 +89,7 @@ namespace solunar
 		desc.m_frontFace.m_stencilFailOp = desc.m_frontFace.m_stencilDepthFailOp = desc.m_frontFace.m_stencilPassOp = STENCIL_OP_KEEP;
 		desc.m_frontFace.m_stencilFunc = COMPARISON_ALWAYS;
 		desc.m_backFace = desc.m_frontFace;
-		g_depthStencilState_NoWrite = g_stateManager->createDepthStencilState(desc);
+		g_depthStencilState_NoWrite = g_stateManager->CreateDepthStencilState(desc);
 
 		g_defaultMaterial = g_contentManager->LoadObject<Material>("materials/default_material.xml");
 
@@ -214,7 +214,7 @@ namespace solunar
 		//Exception thrown at 0x00007FFE0F6EAB89 (KernelBase.dll) in solunar_main_d.exe : 0x0000087D (parameters : 0x0000000000000000, 0x000000F2E33CD930, 0x000000F2E33CD950).
 		//Unhandled exception at 0x00007FFE0F6EAB89 (KernelBase.dll) in solunar_main_d.exe : 0x0000087D (parameters : 0x0000000000000000, 0x000000F2E33CD930, 0x000000F2E33CD950).
 
-		//g_stateManager->destroyDepthStencilState(g_depthStencilState_NoWrite);
+		//g_stateManager->DestroyDepthStencilState(g_depthStencilState_NoWrite);
 		//g_depthStencilState_NoWrite = nullptr;
 
 		mem_delete(g_defaultSampler);

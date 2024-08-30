@@ -262,7 +262,7 @@ void DebugRender::drawLinesInternal(View* view)
 
 	g_renderDevice->SetVertexBuffer(m_verticesBuffer, sizeof(LineVertex), 0);
 	
-	//m_verticesBuffer->updateSubresource(m_lines.data(), m_lines.size() * sizeof(Line));
+	//m_verticesBuffer->UpdateSubresource(m_lines.data(), m_lines.size() * sizeof(Line));
 
 	LineVertex* vertices = (LineVertex*)m_verticesBuffer->Map(BufferMapping::WriteOnly);
 	memcpy(vertices, m_lines.data(), m_lines.size() * sizeof(Line));
@@ -274,7 +274,7 @@ void DebugRender::drawLinesInternal(View* view)
 	mVP = view->m_projection * view->m_view;
 
 	//updateMatrixBuffer(m_matrixBuffer, mVP);
-	m_matrixBuffer->updateSubresource(&mVP[0], sizeof(mVP));
+	m_matrixBuffer->UpdateSubresource(&mVP[0], sizeof(mVP));
 	g_renderDevice->SetConstantBufferIndex(0, m_matrixBuffer);
 
 	g_renderDevice->Draw(PM_LineList, 0, m_lines.size() * 2);

@@ -356,8 +356,8 @@ namespace solunar {
 		rasterizerState.m_fillMode = FillMode::Solid;
 		rasterizerState.m_scissorEnable = false;
 
-		m_rasterizerState = g_stateManager->createRasterizerState(rasterizerState);
-		g_stateManager->setRasterizerState(m_rasterizerState);
+		m_rasterizerState = g_stateManager->CreateRasterizerState(rasterizerState);
+		g_stateManager->SetRasterizerState(m_rasterizerState);
 
 		// Initialize shader manager with current api
 		g_shaderManager = mem_new<GLShaderProgramManager>();
@@ -397,7 +397,7 @@ namespace solunar {
 	{
 		glBindVertexArray(g_vertexArrayObject);
 
-		g_stateManager->setRasterizerState(m_rasterizerState);
+		g_stateManager->SetRasterizerState(m_rasterizerState);
 		
 		Renderer::BeginFrame();
 	}
