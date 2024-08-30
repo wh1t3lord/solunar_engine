@@ -126,7 +126,7 @@ void D3D11BufferImpl::Unmap()
 	m_device->getDeviceContext()->Unmap(m_buffer, 0);
 }
 
-void D3D11BufferImpl::updateSubresource(void* data, size_t size)
+void D3D11BufferImpl::UpdateSubresource(void* data, size_t size)
 {
 	m_device->getDeviceContext()->UpdateSubresource(m_buffer, 0, NULL, data, 0, 0);
 }

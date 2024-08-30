@@ -4,8 +4,8 @@
 namespace solunar
 {
 	
-extern GLenum getBufferAccess(BufferAccess access);
-extern GLenum getBufferMapping(BufferMapping mapping);
+extern GLenum GetBufferAccess(BufferAccess access);
+extern GLenum GetBufferMapping(BufferMapping mapping);
 
 GLBufferImpl::GLBufferImpl(const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc)
 {
@@ -25,7 +25,7 @@ void GLBufferImpl::Create(const BufferDesc& bufferDesc, const SubresourceDesc& s
 
 	glGenBuffers(1, &m_handle);
 	glNamedBufferDataEXT(m_handle, bufferDesc.m_bufferMemorySize, 
-		subresourceDesc.m_memory, getBufferAccess(bufferDesc.m_bufferAccess));
+		subresourceDesc.m_memory, GetBufferAccess(bufferDesc.m_bufferAccess));
 }
 
 void GLBufferImpl::Destroy()
@@ -35,7 +35,7 @@ void GLBufferImpl::Destroy()
 
 void* GLBufferImpl::Map(BufferMapping mapping)
 {
-	void* ret = glMapNamedBufferEXT(m_handle, getBufferMapping(mapping));
+	void* ret = glMapNamedBufferEXT(m_handle, GetBufferMapping(mapping));
 	return ret;
 }
 
@@ -44,7 +44,7 @@ void GLBufferImpl::Unmap()
 	glUnmapNamedBufferEXT(m_handle);
 }
 
-void GLBufferImpl::updateSubresource(void* data, size_t size)
+void GLBufferImpl::UpdateSubresource(void* data, size_t size)
 {
 	glNamedBufferSubDataEXT(m_handle, 0, size, data);
 }

@@ -94,7 +94,7 @@ namespace solunar
 		virtual void* Map(BufferMapping mapping) = 0;
 		virtual void  Unmap() = 0;
 
-		virtual void updateSubresource(void* data, size_t size) = 0;
+		virtual void UpdateSubresource(void* data, size_t size) = 0;
 
 		virtual BufferDesc getBufferDesc() = 0;
 	};

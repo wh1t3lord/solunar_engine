@@ -164,7 +164,7 @@ void D3D12BufferImpl::Unmap()
 	m_buffer->Unmap(0, nullptr);
 }
 
-void D3D12BufferImpl::updateSubresource(void* data, size_t size)
+void D3D12BufferImpl::UpdateSubresource(void* data, size_t size)
 {
 	Assert2(0, "Implement please");
 //	m_device->getDeviceContext()->UpdateSubresource(m_buffer, 0, NULL, data, 0, 0);

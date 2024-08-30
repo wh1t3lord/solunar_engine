@@ -18,7 +18,7 @@ public:
 	void* Map(BufferMapping mapping) override;
 	void Unmap() override;
 
-	void updateSubresource(void * data, size_t size) override;
+	void UpdateSubresource(void * data, size_t size) override;
 
 	BufferDesc getBufferDesc() override { return m_bufferDesc; }
 
