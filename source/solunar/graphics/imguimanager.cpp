@@ -295,7 +295,7 @@ namespace solunar
 			desc.m_renderTarget[0].m_destBlendAlpha = BLEND_INV_SRC_ALPHA;
 			desc.m_renderTarget[0].m_blendOpAlpha	= BLEND_OP_ADD;
 			desc.m_renderTarget[0].m_renderTargetWriteMask = COLOR_WRITE_ENABLE_ALL;
-			m_pBlendState = g_stateManager->createBlendState(desc);
+			m_pBlendState = g_stateManager->CreateBlendState(desc);
 		}
 
 		// Create the rasterizer state
@@ -306,7 +306,7 @@ namespace solunar
 			desc.m_scissorEnable = true;
 			desc.m_depthClipEnable = true;
 			desc.m_frontCCW = false;
-			m_pRasterizerState = g_stateManager->createRasterizerState(desc);
+			m_pRasterizerState = g_stateManager->CreateRasterizerState(desc);
 		}
 
 		// Create depth-stencil State
@@ -319,7 +319,7 @@ namespace solunar
 			desc.m_frontFace.m_stencilFailOp = desc.m_frontFace.m_stencilDepthFailOp = desc.m_frontFace.m_stencilPassOp = STENCIL_OP_KEEP;
 			desc.m_frontFace.m_stencilFunc = COMPARISON_ALWAYS;
 			desc.m_backFace = desc.m_frontFace;
-			m_pDepthStencilState = g_stateManager->createDepthStencilState(desc);
+			m_pDepthStencilState = g_stateManager->CreateDepthStencilState(desc);
 		}
 
 		createFontsTexture();
@@ -365,9 +365,9 @@ namespace solunar
 
 		// Setup blend state
 		const float blend_factor[4] = { 0.f, 0.f, 0.f, 0.f };
-		g_stateManager->setBlendState(m_pBlendState, blend_factor, 0xffffffff);
+		g_stateManager->SetBlendState(m_pBlendState, blend_factor, 0xffffffff);
 		g_stateManager->SetDepthStencilState(m_pDepthStencilState, 0);
-		g_stateManager->setRasterizerState(m_pRasterizerState);
+		g_stateManager->SetRasterizerState(m_pRasterizerState);
 	}
 
 	void ImGuiStyleCustom()

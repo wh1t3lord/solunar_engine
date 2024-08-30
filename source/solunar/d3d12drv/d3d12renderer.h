@@ -26,7 +26,7 @@ public:
 
 private:
 	void createSwapChain();
-	void createRasterizerState();
+	void CreateRasterizerState();
 
 	void takeScreenshotInternal();
 

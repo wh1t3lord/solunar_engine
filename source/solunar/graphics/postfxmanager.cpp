@@ -52,7 +52,7 @@ void PostFxManager::Init(View* view)
 	blendState.m_renderTarget[0].m_destBlendAlpha = BLEND_ONE;
 	blendState.m_renderTarget[0].m_blendOpAlpha = BLEND_OP_ADD;
 	blendState.m_renderTarget[0].m_renderTargetWriteMask = COLOR_WRITE_ENABLE_ALL;
-	m_blendState = g_stateManager->createBlendState(blendState);
+	m_blendState = g_stateManager->CreateBlendState(blendState);
 }
 
 void PostFxManager::initHDR(View* view)
@@ -196,7 +196,7 @@ void PostFxManager::HDRPass(ITexture2D* screenTexture)
 {
 	// lets go
 	const float blend_factor[4] = { 0.f, 0.f, 0.f, 0.f };
-	g_stateManager->setBlendState(m_blendState, blend_factor, 0xffffffff);
+	g_stateManager->SetBlendState(m_blendState, blend_factor, 0xffffffff);
 
 	// setup device state
 	g_renderDevice->SetRenderTarget(m_hdrRenderTarget);

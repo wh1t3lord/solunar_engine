@@ -91,19 +91,19 @@ public:
 	void Init();
 	void Shutdown();
 
-	IRasterizerState* createRasterizerState(const RasterizerStateDesc& rasterizerDesc) override;
-	void destroyRasterizerState(IRasterizerState* rasterizerState) override;
-	void setRasterizerState(IRasterizerState* rasterizerState) override;
+	IRasterizerState* CreateRasterizerState(const RasterizerStateDesc& rasterizerDesc) override;
+	void DestroyRasterizerState(IRasterizerState* rasterizerState) override;
+	void SetRasterizerState(IRasterizerState* rasterizerState) override;
 
 	ISamplerState* CreateSamplerState(const SamplerDesc& samplerDesc) override;
-	void destroySamplerState(ISamplerState* samplerState) override;
+	void DestroySamplerState(ISamplerState* samplerState) override;
 
-	IBlendState* createBlendState(const BlendStateDesc& blendStateDesc) override;
-	void destroyBlendState(IBlendState* blendState) override;
-	void setBlendState(IBlendState* blendState, const float blendFactor[4], uint32_t sampleMask) override;
+	IBlendState* CreateBlendState(const BlendStateDesc& blendStateDesc) override;
+	void DestroyBlendState(IBlendState* blendState) override;
+	void SetBlendState(IBlendState* blendState, const float blendFactor[4], uint32_t sampleMask) override;
 
-	IDepthStencilState* createDepthStencilState(const DepthStencilDesc& desc) override;
-	void destroyDepthStencilState(IDepthStencilState* state) override;
+	IDepthStencilState* CreateDepthStencilState(const DepthStencilDesc& desc) override;
+	void DestroyDepthStencilState(IDepthStencilState* state) override;
 	void SetDepthStencilState(IDepthStencilState* state, uint32_t stencilRef) override;
 
 private:

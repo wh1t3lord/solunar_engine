@@ -129,7 +129,7 @@ void FontManager::InitPrivate()
 	rasterizerState.m_frontCCW = false;
 	rasterizerState.m_fillMode = FillMode::Solid;
 
-	m_rasterizerState = g_stateManager->createRasterizerState(rasterizerState);
+	m_rasterizerState = g_stateManager->CreateRasterizerState(rasterizerState);
 
 	// create depth stencil test
 	DepthStencilDesc desc = {};
@@ -140,7 +140,7 @@ void FontManager::InitPrivate()
 	desc.m_frontFace.m_stencilFailOp = desc.m_frontFace.m_stencilDepthFailOp = desc.m_frontFace.m_stencilPassOp = STENCIL_OP_KEEP;
 	desc.m_frontFace.m_stencilFunc = COMPARISON_ALWAYS;
 	desc.m_backFace = desc.m_frontFace;
-	m_depthStencilState = g_stateManager->createDepthStencilState(desc);
+	m_depthStencilState = g_stateManager->CreateDepthStencilState(desc);
 
 
 	// Create the blending setup
@@ -154,7 +154,7 @@ void FontManager::InitPrivate()
 	blendStateDesc.m_renderTarget[0].m_destBlendAlpha = BLEND_INV_SRC_ALPHA;
 	blendStateDesc.m_renderTarget[0].m_blendOpAlpha = BLEND_OP_ADD;
 	blendStateDesc.m_renderTarget[0].m_renderTargetWriteMask = COLOR_WRITE_ENABLE_ALL;
-	m_pBlendState = g_stateManager->createBlendState(blendStateDesc);
+	m_pBlendState = g_stateManager->CreateBlendState(blendStateDesc);
 }
 
 void FontManager::FlushPrimitives()
@@ -188,14 +188,14 @@ void FontManager::FlushPrimitives()
 	g_renderDevice->SetConstantBufferIndex(0, m_constantBuffer);
 
 	// enable rasterizer state
-	g_stateManager->setRasterizerState(m_rasterizerState);
+	g_stateManager->SetRasterizerState(m_rasterizerState);
 
 	// disable depth test
 	g_stateManager->SetDepthStencilState(m_depthStencilState, 0);
 
 	// Setup blend state
 	const float blend_factor[4] = { 0.f, 0.f, 0.f, 0.f };
-	g_stateManager->setBlendState(m_pBlendState, blend_factor, 0xffffffff);
+	g_stateManager->SetBlendState(m_pBlendState, blend_factor, 0xffffffff);
 
 	// bind vertex buffer
 	g_renderDevice->SetVertexBuffer(m_vertexBuffer, sizeof(FontVertex), 0);
