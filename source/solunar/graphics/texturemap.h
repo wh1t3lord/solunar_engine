@@ -45,6 +45,9 @@ namespace solunar
 		TextureDesc m_textureDesc;
 		SubresourceDesc m_textureSubresourceDesc;
 		bool m_bManualCreated;
+
+		// Inherited via GraphicsObject
+		void ReleaseHw() override;
 	};
 
 

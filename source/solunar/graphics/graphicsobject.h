@@ -17,7 +17,7 @@ enum GraphicsObjectType
 //! Graphics object, wrapper on any gpu resource.
 class GraphicsObject : public SerializableObject
 {
-	DECLARE_OBJECT(GraphicsObject);
+	DECLARE_OBJECT_INTERFACE(GraphicsObject);
 public:
 	GraphicsObject();
 	virtual ~GraphicsObject();

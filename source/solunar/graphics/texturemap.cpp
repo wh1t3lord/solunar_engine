@@ -130,6 +130,10 @@ namespace solunar
 		//}
 	}
 
+	void TextureMap::ReleaseHw()
+	{
+	}
+
 	void TextureMap::destroyHW()
 	{
 	}
