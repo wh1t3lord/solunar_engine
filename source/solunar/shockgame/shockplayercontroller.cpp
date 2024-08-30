@@ -206,20 +206,10 @@ void ShockPlayerController::doHit(float amount)
 void ShockPlayerController::UpdateCamera(float dt)
 {
 	 InputManager* input = InputManager::GetInstance();
-	 glm::vec2 mousePos = input->GetCursorPos();
 
-#if 0
 	 glm::vec2 deltaMousePos = input->GetDeltaCursorPos();
-
 	 m_camera->updateFromMousePosition(deltaMousePos);
-#else
-	 static glm::vec2 deltaMousePos = glm::vec2(0.0f);
 
-	 deltaMousePos += input->GetDeltaCursorPos();
-
-	 m_camera->updateFromMousePosition(deltaMousePos);
-	 input->ResetDelta();
-#endif
 	 //getEntity()->setRotation(m_camera->GetDirection());
 	 //m_weaponEntity->setRotation(m_camera->GetDirection());
 
