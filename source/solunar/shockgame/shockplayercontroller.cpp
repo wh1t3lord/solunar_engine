@@ -350,7 +350,7 @@ void ShockPlayerController::UpdateMovement(float dt)
 		 const glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);
 		 const float jumpPower = 6.0f;
 
-		 glm::vec3 cameraDirection = camera->GetDirection();
+		 glm::vec3 cameraDirection = m_camera->GetDirection(); // camera->GetDirection();
 		 cameraDirection.y = 0.0f;
 		 
 		 m_rigidBody->GetCharacterController()->jump(glmVectorToBt((upVector + cameraDirection) * jumpPower));

@@ -77,18 +77,19 @@ namespace solunar
 		bool isReloadLastOneAniFinished = currentId == m_reload_last_one_Ani && animatedModel->IsStoped();
 		static bool reload = false;
 	
+		const int kMaxAmmo = 12;
 
-		if (InputManager::GetInstance()->IsPressed(KEY_R) && (isFireAniFinished || currentId == m_idleAni))
+		if (InputManager::GetInstance()->IsPressed(KEY_R) && (isFireAniFinished || currentId == m_idleAni) && m_ammo < kMaxAmmo)
 		{
 			animatedModel->PlayAnimation(m_prior_to_reload_Ani, false);
 			reload = true;
 		}
 
-		const int kMaxAmmo = 12;
-
 		if (reload && m_ammo >= kMaxAmmo)
 		{
 			animatedModel->PlayAnimation(m_reload_last_one_Ani, false);
+			if (s_reloadSound->IsPlaying())
+				s_reloadSound->Stop();
 			reload = false;
 		}
 
