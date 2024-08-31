@@ -1,7 +1,7 @@
 #include "d3d11drv_pch.h"
 #include "d3d11drv/d3d11utils.h"
 
-namespace engine
+namespace solunar
 {
 
 bool d3d11ErrorBackend(HRESULT hr, const char* expression, const char* filename, int line, const char* function)

@@ -20,7 +20,7 @@
 #define CGLTF_IMPLEMENTATION
 #include <cgltf.h>
 
-namespace engine
+namespace solunar
 {
 
 // #TODO: shit move to vertex.h\.cpp
@@ -49,14 +49,14 @@ template <typename T>
 bool gltfUnpackValues(const cgltf_primitive& primitive, int64_t index, int64_t vtxCount, std::vector<T>& data)
 {
 	if (index == -1) {
-		Core::msg("gltfUnpackValue: Invalid index %i", index);
+		Core::Msg("gltfUnpackValue: Invalid index %i", index);
 		return false;
 	}
 
 	const auto& Attributes = primitive.attributes[index];
 	const size_t NumComponents = cgltf_num_components(Attributes.data->type);
 	if (NumComponents != (sizeof(T) / sizeof(float))) {
-		Core::msg("gltfUnpackValue: Mesh doesn't contain invalid attribute %s information.", Attributes.name);
+		Core::Msg("gltfUnpackValue: Mesh doesn't contain invalid attribute %s information.", Attributes.name);
 		return false;
 	}
 
@@ -111,48 +111,54 @@ inline AnimationPathType getAnimationPathType(cgltf_animation_path_type type)
 	return AnimationPathType_Unknown;
 }
 
+IMPLEMENT_OBJECT(AnimatedModel, ModelBase);
+
 // Object registering
-void AnimatedModel::registerObject()
+void AnimatedModel::RegisterObject()
 {
-	TypeManager::getInstance()->registerObject<AnimatedModel>();
+	TypeManager::GetInstance()->RegisterObject<AnimatedModel>();
 }
 
 AnimatedModel::AnimatedModel()
 {
+	for (int i = 0; i < sizeof(m_bonesMatrices) / sizeof(m_bonesMatrices[0]); i++)
+	{
+		m_bonesMatrices[i] = glm::mat4(1.0f);
+	}
 }
 
 AnimatedModel::~AnimatedModel()
 {
-	releaseHw();
+	ReleaseHw();
 }
 
-void AnimatedModel::load(const std::shared_ptr<DataStream>& stream)
+void AnimatedModel::Load(const std::shared_ptr<DataStream>& stream)
 {
-	load_GLTF(stream);
+	Load_GLTF(stream);
 }
 
-void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
+void AnimatedModel::Load_GLTF(const std::shared_ptr<DataStream>& stream)
 {
-	stream->seek(Seek_End, 0);
-	size_t filesize = stream->tell();
-	stream->seek(Seek_Begin, 0);
+	stream->Seek(Seek_End, 0);
+	size_t filesize = stream->Tell();
+	stream->Seek(Seek_Begin, 0);
 
 	uint8_t* fileData = (uint8_t*)malloc(filesize);
-	stream->read(fileData, filesize);
+	stream->Read(fileData, filesize);
 
 	cgltf_data* data = NULL;
 	cgltf_options options = {};
 	cgltf_result result = cgltf_parse(&options, fileData, filesize, &data);
 
 	if (result != cgltf_result_success) {
-		Core::msg("AnimatedModel: Failed to parse GLTF asset.");
+		Core::Msg("AnimatedModel: Failed to parse GLTF asset.");
 		return;
 	}
 
 	result = cgltf_load_buffers(&options, data, nullptr);
 	if (result != cgltf_result_success) {
 		cgltf_free(data);
-		Core::msg("AnimatedModel: Failed to load buffers for GLTF asset .");
+		Core::Msg("AnimatedModel: Failed to load buffers for GLTF asset .");
 		return;
 	}
 
@@ -176,7 +182,7 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 			const auto& attribute = primitive.attributes[j];
 			std::string name = std::string(attribute.name);
 			if (attribute.data->count != vtxCount) {
-				Core::msg("AnimatedModel: Invalid attribute count in mesh %s for attribute %i.", mesh.name, (int)attribute.type);
+				Core::Msg("AnimatedModel: Invalid attribute count in mesh %s for attribute %i.", mesh.name, (int)attribute.type);
 				return;
 			}
 
@@ -231,7 +237,7 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 		// Bounding box calculation
 
 		BoundingBox AABB;
-		AABB.setIdentity();
+		AABB.SetIdentity();
 
 		for (size_t o = 0; o < vtxCount; o++) {
 			//positions[o].z = -positions[o].z;  // Sparkle uses LH Y+
@@ -288,10 +294,10 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 
 #if 0
 		if (data->materials_count != data->meshes_count)
-			Core::msg("AnimatedModel::load_GLTF: wrong material count! using default ...");
+			Core::Msg("AnimatedModel::Load_GLTF: wrong material count! using default ...");
 
 		if (data->materials_count < data->meshes_count)
-			Core::msg("AnimatedModel::load_GLTF: material count less than mesh count (%i < %i)! using default ...",
+			Core::Msg("AnimatedModel::Load_GLTF: material count less than mesh count (%i < %i)! using default ...",
 				data->materials_count, data->meshes_count);
 
 		// #TODO: This shit should be rewritten !!!
@@ -299,7 +305,7 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 		if (i < data->materials_count)
 		{
 			if (data->materials[i].name && strlen(data->materials[i].name) <= 0)
-				Core::msg("AnimatedModel::load_GLTF: material name on mesh %i are empty! using default ...", i);
+				Core::Msg("AnimatedModel::Load_GLTF: material name on mesh %i are empty! using default ...", i);
 			else if (data->materials[i].name && strlen(data->materials[i].name) > 0)
 				materialname = std::string("materials/models/") + std::string(data->materials[i].name) + ".xml"; // #TODO: SHIT !!!!
 		}
@@ -307,9 +313,9 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 
 		AnimatedSubMesh* submesh = mem_new<AnimatedSubMesh>();
 		submesh->m_vertices = vertices;
-		submesh->m_verticesCount = vertices.size();
+		submesh->m_verticesCount = (uint32_t)vertices.size();
 		submesh->m_indices = indices;
-		submesh->m_indicesCount = indices.size();
+		submesh->m_indicesCount = (uint32_t)indices.size();
 		submesh->m_materialName = materialname;
 		m_subMeshes.push_back(submesh);
 	}
@@ -369,11 +375,11 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 			
 			Assert(animationChannel.m_pathType != AnimationPathType_Unknown);
 
-			animationChannel.m_nodeId = cgltf_node_index(data, gltf_animationChannel.target_node);
-			animationChannel.m_samplerId = cgltf_animation_sampler_index(&gltf_animation, gltf_animationChannel.sampler);
+			animationChannel.m_nodeId = (int)cgltf_node_index(data, gltf_animationChannel.target_node);
+			animationChannel.m_samplerId = (int)cgltf_animation_sampler_index(&gltf_animation, gltf_animationChannel.sampler);
 		}
 
-		Core::msg("AnimatedModel: animation %s channels %i", gltf_animation.name, gltf_animation.channels_count);
+		Core::Msg("AnimatedModel: animation %s channels %i", gltf_animation.name, gltf_animation.channels_count);
 	}
 
 	// loading model skin
@@ -389,11 +395,11 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 
 		skin.m_joints.resize(gltf_skin.joints_count);
 
-		// load joint too
+		// Load joint too
 		for (int j = 0; j < gltf_skin.joints_count; j++) {
 			const cgltf_node* joint = gltf_skin.joints[j];
 
-			int jointIndex = cgltf_node_index(data, joint);
+			int jointIndex = (int)cgltf_node_index(data, joint);
 			skin.m_joints[j] = jointIndex;
 #if 0
 			if (joint->name) {
@@ -426,13 +432,13 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 #endif	
 		}
 
-		// load the inverse bind matrices
+		// Load the inverse bind matrices
 		size_t inverseBindMatricesCount = gltf_skin.inverse_bind_matrices->count;
 		skin.m_inverseBindMatrices.resize(inverseBindMatricesCount);
 		cgltf_accessor_unpack_floats(gltf_skin.inverse_bind_matrices, (float*)skin.m_inverseBindMatrices.data(), inverseBindMatricesCount * 16);
 		
 		if (gltf_skin.skeleton)
-			skin.m_skeletonRootId = cgltf_node_index(data, gltf_skin.skeleton);
+			skin.m_skeletonRootId = (int)cgltf_node_index(data, gltf_skin.skeleton);
 
 		m_skins.push_back(skin);
 	}
@@ -464,40 +470,40 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 			node.m_matrix = glm::mat4(1.0f);
 
 		if (data->nodes[i].parent)
-			node.m_parentId = cgltf_node_index(data, data->nodes[i].parent);
+			node.m_parentId = (int)cgltf_node_index(data, data->nodes[i].parent);
 
 		if (data->nodes[i].children_count > 0) {
 			node.m_children.resize(data->nodes[i].children_count);
 			for (int j = 0; j < data->nodes[i].children_count; j++) {
-				node.m_children[j] = cgltf_node_index(data, data->nodes[i].children[j]);
+				node.m_children[j] = (int)cgltf_node_index(data, data->nodes[i].children[j]);
 			}
 		}
 
 		if (data->nodes[i].skin)
-			node.m_skinId = cgltf_skin_index(data, data->nodes[i].skin);
+			node.m_skinId = (int)cgltf_skin_index(data, data->nodes[i].skin);
 	}
 
 #if 1
-	int rootNode = m_nodes.size();
+	m_rootNodeId = (int)m_nodes.size();
 	m_nodes.resize(m_nodes.size() + 1);
 	
 	for (int i = 0; i < m_nodes.size() - 1; ++i) {
 		if (m_nodes[i].m_parentId == -1) {
-			m_nodes[i].m_parentId = rootNode;
-			m_nodes[rootNode].m_children.push_back(i);
+			m_nodes[i].m_parentId = m_rootNodeId;
+			m_nodes[m_rootNodeId].m_children.push_back(i);
 		}
 	}
 	// main rotate Y
-	m_nodes[rootNode].m_name = "Root Node";
-	m_nodes[rootNode].m_skinId = -1;
-	m_nodes[rootNode].m_parentId = -1;
-	m_nodes[rootNode].m_matrix = glm::mat4(1.0f);
-	m_nodes[rootNode].m_translation = glm::vec3(0.0f);
-	m_nodes[rootNode].m_scale = glm::vec3(1.0f);//glm::vec3(0.1f);
-	m_nodes[rootNode].m_rotation.x = 0;
-	m_nodes[rootNode].m_rotation.y = sinf(180.0 / 2.0 / 180.0 * maths::PI);
-	m_nodes[rootNode].m_rotation.z = 0;
-	m_nodes[rootNode].m_rotation.w = cosf(180.0 / 2.0 / 180.0 * maths::PI);
+	m_nodes[m_rootNodeId].m_name = "Root Node";
+	m_nodes[m_rootNodeId].m_skinId = -1;
+	m_nodes[m_rootNodeId].m_parentId = -1;
+	m_nodes[m_rootNodeId].m_matrix = glm::mat4(1.0f);
+	m_nodes[m_rootNodeId].m_translation = glm::vec3(0.0f);
+	m_nodes[m_rootNodeId].m_scale = glm::vec3(1.0f);//glm::vec3(0.1f);
+	m_nodes[m_rootNodeId].m_rotation.x = 0;
+	m_nodes[m_rootNodeId].m_rotation.y = sinf(180.0 / 2.0 / 180.0 * maths::PI);
+	m_nodes[m_rootNodeId].m_rotation.z = 0;
+	m_nodes[m_rootNodeId].m_rotation.w = cosf(180.0 / 2.0 / 180.0 * maths::PI);
 
 	//m_nodes[rootNode].m_rotation = glm::quat(0, 6, 1, 0);
 #endif
@@ -514,48 +520,20 @@ void AnimatedModel::load_GLTF(const std::shared_ptr<DataStream>& stream)
 
 	free(fileData);
 
-	createHw();
+	CreateHw();
 }
 
-void AnimatedModel::createHw()
+void AnimatedModel::CreateHw()
 {
 	for (int i = 0; i < m_subMeshes.size(); i++)
 	{
-		AnimatedSubMesh* submesh = m_subMeshes[i];
-
-		BufferDesc bufferDesc;
-		memset(&bufferDesc, 0, sizeof(bufferDesc));
-		bufferDesc.m_bufferType = BufferType::VertexBuffer;
-		bufferDesc.m_bufferAccess = BufferAccess::Static;
-		bufferDesc.m_bufferMemorySize = submesh->m_vertices.size() * sizeof(AnimatedVertex);
-
-		SubresourceDesc subresourceDesc;
-		memset(&subresourceDesc, 0, sizeof(subresourceDesc));
-		subresourceDesc.m_memory = submesh->m_vertices.data();
-		subresourceDesc.m_memoryPitch = sizeof(AnimatedVertex);
-
-		submesh->m_vertexBuffer = g_renderDevice->createBuffer(bufferDesc, subresourceDesc);
-		submesh->m_vertices.clear();
-
-		memset(&bufferDesc, 0, sizeof(bufferDesc));
-		bufferDesc.m_bufferType = BufferType::IndexBuffer;
-		bufferDesc.m_bufferAccess = BufferAccess::Static;
-		bufferDesc.m_bufferMemorySize = submesh->m_indices.size() * sizeof(uint32_t);
-
-		memset(&subresourceDesc, 0, sizeof(subresourceDesc));
-		subresourceDesc.m_memory = submesh->m_indices.data();
-		subresourceDesc.m_memoryPitch = sizeof(uint32_t);
-
-		submesh->m_indexBuffer = g_renderDevice->createBuffer(bufferDesc, subresourceDesc);
-		submesh->m_indices.clear();
-
-		submesh->m_material = g_contentManager->loadObject<Material>(submesh->m_materialName);
-		if (submesh->m_material.expired())
-			submesh->m_material = getDefaultMaterial();
+		m_subMeshes[i]->Create();
+		//AnimatedSubMesh* submesh = m_subMeshes[i];
+		
 	}
 }
 
-void AnimatedModel::releaseHw()
+void AnimatedModel::ReleaseHw()
 {
 	for (int i = 0; i < m_subMeshes.size(); i++)
 	{
@@ -571,7 +549,7 @@ void AnimatedModel::releaseHw()
 	m_subMeshes.clear();
 }
 
-int AnimatedModel::getAnimationByName(const std::string& name)
+int AnimatedModel::GetAnimationByName(const std::string& name)
 {
 	for (int i = 0; i < m_animations.size(); i++)
 		if (m_animations[i].m_name == name)
@@ -580,11 +558,16 @@ int AnimatedModel::getAnimationByName(const std::string& name)
 	return -1;
 }
 
-void AnimatedModel::setPlayAnimation(int index, bool looped)
+void AnimatedModel::PlayAnimation(int index, bool looped)
 {
 	m_currentAnimation = &m_animations[index];
 	m_playLooped = looped;
 	m_currentTime = 0.0f;
+}
+
+void AnimatedModel::PauseAnimation()
+{
+	m_speed = 0.0f;
 }
 
 inline glm::quat samplerRotationToGlm(const glm::vec4& v)
@@ -592,12 +575,16 @@ inline glm::quat samplerRotationToGlm(const glm::vec4& v)
 	return glm::quat(v.w, v.x, v.y, v.z);
 }
 
-void AnimatedModel::testPlay(float dt)
+void AnimatedModel::Update(float dt)
 {
-	m_currentTime += 1.0f * dt;
+	m_currentTime += m_speed * dt;
 	
 	bool updated = false;
 	Animation& animation = *m_currentAnimation;
+
+	if (animation.m_startTime >= m_currentTime)
+		m_currentTime = animation.m_startTime;
+
 	float time = std::fmod(static_cast<float>(m_currentTime), animation.m_endTime - animation.m_startTime);
 	
 	for (auto& channel : animation.m_channels)
@@ -613,19 +600,12 @@ void AnimatedModel::testPlay(float dt)
 				float u = std::max(0.0f, time - sampler.m_inputs[i]) / (sampler.m_inputs[i + 1] - sampler.m_inputs[i]);
 				if (u <= 1.0f)
 				{
-					/* NOTE: use the previous sampler output information of the current frame              */
-					/* TODO: interpolate the sampler output information before and after the current frame */
-					/*       using the interpolation information stored in the sampler                     */
 					if (channel.m_pathType == AnimationPathType_Translation)
 					{
 						auto A = sampler.m_outputs[i];
 						auto B = sampler.m_outputs[i + 1];
 						auto translation = glm::lerp(A, B, u);
 						m_nodes[channel.m_nodeId].m_translation = translation;
-#if 0
-						auto translation = sampler.m_outputs[i];
-						m_nodes[channel.m_nodeId].m_translation = glm::vec3(translation);
-#endif
 					}
 					else if (channel.m_pathType == AnimationPathType_Scale)
 					{
@@ -633,10 +613,6 @@ void AnimatedModel::testPlay(float dt)
 						auto B = sampler.m_outputs[i + 1];
 						auto scale = glm::lerp(A, B, u);
 						m_nodes[channel.m_nodeId].m_scale = scale;
-#if 0
-						auto scale = sampler.m_outputs[i];
-						m_nodes[channel.m_nodeId].m_scale = glm::vec3(scale);
-#endif
 					}
 					else if (channel.m_pathType == AnimationPathType_Rotation)
 					{
@@ -644,10 +620,6 @@ void AnimatedModel::testPlay(float dt)
 						auto B = samplerRotationToGlm(sampler.m_outputs[i + 1]);
 						auto rotate = glm::slerp(A, B, u);
 						m_nodes[channel.m_nodeId].m_rotation = glm::normalize(rotate);
-#if 0
-						auto rotation = sampler.m_outputs[i];
-						m_nodes[channel.m_nodeId].m_rotation = glm::quat(rotation.w, rotation.x, rotation.y, rotation.z);
-#endif
 					}
 
 					updated = true;
@@ -655,134 +627,69 @@ void AnimatedModel::testPlay(float dt)
 			}
 		}
 	}
-
+	
 	if (updated == true)
 	{
-		updateNodePreCasheFrow(m_nodes.size() - 1);
+		UpdateNodeTransform(m_rootNodeId);
 
-		for (size_t i = 0; i < m_nodes.size() - 1; i++)
+		for (int i = 0; i < (int)m_nodes.size() - 1; i++)
 		{
-			updateNode(i);
+			UpdateNode(i);
 		}
 	}
 }
 
-void AnimatedModel::updateNode(int node_id)
+void AnimatedModel::UpdateNode(int node_id)
 {
 	auto& node = m_nodes[node_id];
 	if (node.m_skinId != -1) {
 		auto& skin = m_skins[node.m_skinId];
-
-		auto inverse_transform = glm::inverse(getNodeMatrix(node_id));
-
-		//Logger::logPrint("frowrikdebug: %s \n", glm::to_string(inverse_transform).c_str());
-
-		unsigned int num_joints = skin.m_joints.size();//skin.m_joints.size();//m_joints.size(); //std::min(static_cast<unsigned int>(skin.joints.size()), MAX_NUM_JOINTS);
-		for (unsigned int i = 0; i < num_joints; ++i)
+		size_t numJoints = skin.m_joints.size();
+		for (size_t i = 0; i < numJoints; ++i)
 		{
-			/* NOTE: Reference: https://github.com/KhronosGroup/glTF-Tutorials/blob/master/gltfTutorial/gltfTutorial_020_Skins.md */
-			
-		//	jointMatrix(j) = globalTransformOfJointNode(j) * inverseBindMatrixForJoint(j);
-
-			m_bonesMatrices[i] = getNodeMatrix(skin.m_joints[i]) *  skin.m_inverseBindMatrices[i] ;
-
-		/*	BoneInfo boneInfo;
-			boneInfo.id = skin.m_joints[i];
-			boneInfo.offset = joint_mat;
-			s_boneInfoTest[s_boneInfoTestCounter++] = boneInfo;*/
-
-			//mesh.joint_matrices[i] = joint_mat;
+			m_bonesMatrices[i] = GetNodeMatrix(skin.m_joints[i]) *  skin.m_inverseBindMatrices[i] ;
 		}
 	}
 
 	for (int i = 0; i < node.m_children.size(); i++)
-		updateNode(node.m_children[i]);
+		UpdateNode(node.m_children[i]);
 
 }
 
-glm::mat4 makeRotationMatrix(const glm::quat& u)
-{
-	float wx, wy, wz, xx, yy, yz, xy, xz, zz;
-
-	// adapted from Shoemake
-	xx = u.x * u.x;
-	xy = u.x * u.y;
-	xz = u.x * u.z;
-	yy = u.y * u.y;
-	zz = u.z * u.z;
-	yz = u.y * u.z;
-
-	wx = u.w * u.x;
-	wy = u.w * u.y;
-	wz = u.w * u.z;
-
-	// make identity matrix
-	float matrix[16];
-
-	matrix[0] = 1.0f - 2.0f * (yy + zz);
-	matrix[4] = 2.0f * (xy - wz);
-	matrix[8] = 2.0f * (xz + wy);
-	matrix[12] = 0.0;
-
-	matrix[1] = 2.0f * (xy + wz);
-	matrix[5] = 1.0f - 2.0f * (xx + zz);
-	matrix[9] = 2.0f * (yz - wx);
-	matrix[13] = 0.0;
-
-	matrix[2] = 2.0f * (xz - wy);
-	matrix[6] = 2.0f * (yz + wx);
-	matrix[10] = 1.0f - 2.0f * (xx + yy);
-	matrix[14] = 0.0;
-
-	matrix[3] = 0;
-	matrix[7] = 0;
-	matrix[11] = 0;
-	matrix[15] = 1;
-
-	return glm::mat4(	matrix[0],	matrix[1],	matrix[2],	matrix[3],
-						matrix[4],	matrix[5],	matrix[6],	matrix[7],
-						matrix[8],	matrix[9],	matrix[10], matrix[11],
-						matrix[12], matrix[13], matrix[14], matrix[15]);
-}
-
-
-void AnimatedModel::updateNodePreCasheFrow(int node_id) {
+void AnimatedModel::UpdateNodeTransform(int node_id) {
 	Assert(node_id != -1);
 	AnimationNode& node = m_nodes[node_id];
 
-	glm::mat4 Smat = glm::scale(glm::mat4(1.0f), node.m_scale);
-	glm::mat4 Rmat = glm::toMat4(node.m_rotation);
-	glm::mat4 Tmat = glm::translate(glm::mat4(1.0f), node.m_translation);
-
-	glm::mat4 tranlation = Tmat * Rmat * Smat;
+	glm::mat4 translation = glm::translate(
+		glm::mat4(1.0f), node.m_translation) * 
+		glm::toMat4(node.m_rotation) * 
+		glm::scale(glm::mat4(1.0f), node.m_scale);
 
 	if (node.m_parentId != -1) {
 		auto& nodeParent = m_nodes[node.m_parentId];
 		
-		tranlation = nodeParent.m_matrix * tranlation;
+		translation = nodeParent.m_matrix * translation;
 	}
 
-	node.m_matrix = tranlation;
-
-	///Logger::logPrint("getNodeMatrix: parent %d %s", id, glm::to_string(parentTranlation).c_str());
+	node.m_matrix = translation;
 
 	for (int i = 0; i < node.m_children.size(); i++)
-		updateNodePreCasheFrow(node.m_children[i]);
+		UpdateNodeTransform(node.m_children[i]);
 }
 
-glm::mat4 AnimatedModel::getNodeMatrix(int nodeId)
+glm::mat4 AnimatedModel::GetNodeMatrix(int nodeId)
 {
 	Assert(nodeId != -1);
 	AnimationNode& node = m_nodes[nodeId];
 	return node.m_matrix;
 }
 
-const BoundingBox& AnimatedModel::getBoundingBox()
+const BoundingBox& AnimatedModel::GetBoundingBox()
 {
 	return m_boundingBox;
 }
 
-int AnimatedModel::getNodeByName(const std::string& name)
+int AnimatedModel::GetNodeByName(const std::string& name)
 {
 	for (int i = 0; i < m_nodes.size(); i++)
 		if (m_nodes[i].m_name == name)
@@ -791,7 +698,7 @@ int AnimatedModel::getNodeByName(const std::string& name)
 	return -1;
 }
 
-void AnimatedModel::setNodeScale(int nodeid, const glm::vec3& scale)
+void AnimatedModel::SetNodeScale(int nodeid, const glm::vec3& scale)
 {
 	Assert(nodeid != -1);
 	m_nodes[nodeid].m_scale = scale;
@@ -819,9 +726,9 @@ AnimatedModelRenderer::~AnimatedModelRenderer()
 {
 }
 
-void AnimatedModelRenderer::init()
+void AnimatedModelRenderer::Init()
 {
-	g_bonesConstantBuffer = ShaderConstantManager::getInstance()->create<BonesCB>("BonesCB");
+	g_bonesConstantBuffer = ShaderConstantManager::GetInstance()->Create<BonesCB>("BonesCB");
 
 #if 0
 	// create a dynamic joint-palette texture and sampler
@@ -839,7 +746,7 @@ void AnimatedModelRenderer::init()
 	memset(&subresourceDesc, 0, sizeof(subresourceDesc));
 	subresourceDesc.m_memoryPitch = textureDesc.m_width * 4;
 
-	m_jointTexture = g_renderDevice->createTexture2D(textureDesc, subresourceDesc);
+	m_jointTexture = g_renderDevice->CreateTexture2D(textureDesc, subresourceDesc);
 
 	SamplerDesc samplerDesc;
 	memset(&samplerDesc, 0, sizeof(samplerDesc));
@@ -849,11 +756,11 @@ void AnimatedModelRenderer::init()
 	samplerDesc.m_wrapT = TextureWrap::ClampToEdge;
 	samplerDesc.m_anisotropyLevel = 1.0f;
 
-	m_jointSampler = g_renderDevice->createSamplerState(samplerDesc);
+	m_jointSampler = g_renderDevice->CreateSamplerState(samplerDesc);
 #endif
 }
 
-void AnimatedModelRenderer::shutdown()
+void AnimatedModelRenderer::Shutdown()
 {
 #if 0
 	if (m_jointSampler)
@@ -870,23 +777,23 @@ void AnimatedModelRenderer::shutdown()
 #endif
 }
 
-void AnimatedModelRenderer::render(AnimatedMeshComponent* model)
+void AnimatedModelRenderer::Render(AnimatedMeshComponent* model)
 {
 	std::shared_ptr<ModelBase> modelBase = model->lockModel();
 	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
 
-	glm::mat4* data = (glm::mat4*)g_bonesConstantBuffer->map(BufferMapping::WriteOnly);
+	glm::mat4* data = (glm::mat4*)g_bonesConstantBuffer->Map(BufferMapping::WriteOnly);
 	memcpy(data, animatedModel->m_bonesMatrices, sizeof(animatedModel->m_bonesMatrices));
-	g_bonesConstantBuffer->unmap();
+	g_bonesConstantBuffer->Unmap();
 
-	g_renderDevice->setConstantBufferIndex(ConstantBufferBindings_Skinning, g_bonesConstantBuffer.get());
+	g_renderDevice->SetConstantBufferIndex(CBBindings_Skinning, g_bonesConstantBuffer.get());
 
 #if 0
-	glm::mat4* data = (glm::mat4*)g_bonesConstantBuffer->map(BufferMapping::WriteOnly);
+	glm::mat4* data = (glm::mat4*)g_bonesConstantBuffer->Map(BufferMapping::WriteOnly);
 	memcpy(data, s_boneInfoTest, sizeof(s_boneInfoTest));
-	g_bonesConstantBuffer->unmap();
+	g_bonesConstantBuffer->Unmap();
 
-	g_renderDevice->setConstantBufferIndex(ConstantBufferBindings_Skinning, g_bonesConstantBuffer.get());
+	g_renderDevice->SetConstantBufferIndex(CBBindings_Skinning, g_bonesConstantBuffer.get());
 #endif
 
 #if 0
@@ -897,8 +804,41 @@ void AnimatedModelRenderer::render(AnimatedMeshComponent* model)
 	m_jointTexture->updateTexture(s_boneInfoTest, 0/*sizeof(s_boneInfoTest)*/, 0);
 
 	// draw texture
-	ScreenQuad::render(m_jointTexture);
+	ScreenQuad::Render(m_jointTexture);
 #endif
+}
+
+void AnimatedSubMesh::Create()
+{
+	BufferDesc bufferDesc;
+	memset(&bufferDesc, 0, sizeof(bufferDesc));
+	bufferDesc.m_bufferType = BufferType::VertexBuffer;
+	bufferDesc.m_bufferAccess = BufferAccess::Static;
+	bufferDesc.m_bufferMemorySize = (uint32_t)m_vertices.size() * sizeof(AnimatedVertex);
+
+	SubresourceDesc subresourceDesc;
+	memset(&subresourceDesc, 0, sizeof(subresourceDesc));
+	subresourceDesc.m_memory = m_vertices.data();
+	subresourceDesc.m_memoryPitch = sizeof(AnimatedVertex);
+
+	m_vertexBuffer = g_renderDevice->CreateBuffer(bufferDesc, subresourceDesc);
+	m_vertices.clear();
+
+	memset(&bufferDesc, 0, sizeof(bufferDesc));
+	bufferDesc.m_bufferType = BufferType::IndexBuffer;
+	bufferDesc.m_bufferAccess = BufferAccess::Static;
+	bufferDesc.m_bufferMemorySize = (uint32_t)m_indices.size() * sizeof(uint32_t);
+
+	memset(&subresourceDesc, 0, sizeof(subresourceDesc));
+	subresourceDesc.m_memory = m_indices.data();
+	subresourceDesc.m_memoryPitch = sizeof(uint32_t);
+
+	m_indexBuffer = g_renderDevice->CreateBuffer(bufferDesc, subresourceDesc);
+	m_indices.clear();
+
+	m_material = g_contentManager->LoadObject<Material>(m_materialName);
+	if (m_material.expired())
+		m_material = GetDefaultMaterial();
 }
 
 }

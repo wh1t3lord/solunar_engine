@@ -1,7 +1,7 @@
 #ifndef CORE_ALLOCATOR_H
 #define CORE_ALLOCATOR_H
 
-namespace engine
+namespace solunar
 {
 
 class IAllocator

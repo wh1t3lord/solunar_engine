@@ -2,7 +2,7 @@
 #include "gldrv/glstatemanager.h"
 #include "gldrv/gldevice.h"
 
-namespace engine
+namespace solunar
 {
 
 inline GLenum getGLFillMode(FillMode fillmode)
@@ -82,69 +82,24 @@ inline GLenum getGLBlend(Blend blend)
     }
 }
 
-inline GLenum getD3DBlendOp(BlendOp blendop)
+inline GLenum GetD3DBlendOp(BlendOp blendop)
 {
     
     switch (blendop)
     {
-    case engine::BLEND_OP_ADD:
+    case BLEND_OP_ADD:
         break;
-    case engine::BLEND_OP_SUBTRACT:
+    case BLEND_OP_SUBTRACT:
         break;
-    case engine::BLEND_OP_REV_SUBTRACT:
+    case BLEND_OP_REV_SUBTRACT:
         break;
-    case engine::BLEND_OP_MIN:
+    case BLEND_OP_MIN:
         break;
-    case engine::BLEND_OP_MAX:
+    case BLEND_OP_MAX:
         break;
     default:
         break;
     }
-}
-
-// proximity objects for state manager
-
-// implementation of IRasterizerState interface
-struct IRasterizerState
-{
-    RasterizerStateDesc m_desc;
-};
-
-// implementation of IBlendState interface
-struct IBlendState
-{
-    BlendStateDesc m_desc;
-};
-
-// implementation of IDepthStencilState interface
-struct IDepthStencilState
-{
-    DepthStencilDesc m_desc;
-};
-
-std::vector<IRasterizerState> g_rasterizerStates;
-std::vector<IBlendState> g_blendStates;
-std::vector<IDepthStencilState> g_depthStencilStates;
-
-IRasterizerState* allocateRasterizerState(const RasterizerStateDesc& desc)
-{
-    IRasterizerState state = { desc };
-    g_rasterizerStates.push_back(state);
-    return &g_rasterizerStates.back();
-}
-
-IBlendState* allocateBlendState(const BlendStateDesc& desc)
-{
-    IBlendState state = { desc };
-    g_blendStates.push_back(state);
-    return &g_blendStates.back();
-}
-
-IDepthStencilState* allocateDepthStencilState(const DepthStencilDesc& desc)
-{
-    IDepthStencilState state = { desc };
-    g_depthStencilStates.push_back(state);
-    return &g_depthStencilStates.back();
 }
 
 GLStateManager::GLStateManager()
@@ -153,74 +108,66 @@ GLStateManager::GLStateManager()
 
 GLStateManager::~GLStateManager()
 {
-    shutdown();
+    Shutdown();
 }
 
-void GLStateManager::init()
+void GLStateManager::Init()
 {
 }
 
-void GLStateManager::shutdown()
+void GLStateManager::Shutdown()
 {
     for (auto it : m_blendStates)
     {
-        destroyBlendState(it.second);
+        DestroyBlendState(it.second);
     }
 
     m_blendStates.clear();
 
-
     for (auto it : m_depthStencilStates)
     {
-        destroyDepthStencilState(it.second);
+        DestroyDepthStencilState(it.second);
     }
 
     m_depthStencilStates.clear();
 
-
     for (auto it : m_samplerStates)
     {
-        destroySamplerState(it.second);
+        DestroySamplerState(it.second);
     }
 
     m_samplerStates.clear();
 
-
-    //for (auto it : m_rasterizerStates)
-    //{
-    //    destroyRasterizerState(it.second);
-    //}
-    g_rasterizerStates.clear();
+    for (auto it : m_rasterizerStates)
+    {
+        DestroyRasterizerState(it.second);
+    }
 
     m_rasterizerStates.clear();
 }
 
-IRasterizerState* GLStateManager::createRasterizerState(const RasterizerStateDesc& rasterizerDesc)
+IRasterizerState* GLStateManager::CreateRasterizerState(const RasterizerStateDesc& rasterizerDesc)
 {
     // Find already created IRasterizerState
-    // costyl
-#if 0
 	auto it = m_rasterizerStates.find(rasterizerDesc);
     if (it != m_rasterizerStates.end())
     {
         return (*it).second;
     }
-#endif
-
 
     // create d3d object
-    IRasterizerState* rasterizerState = allocateRasterizerState(rasterizerDesc);
+    IRasterizerState* rasterizerState = mem_new<IRasterizerState>(rasterizerDesc);
     m_rasterizerStates.emplace(rasterizerDesc, rasterizerState);
 
 	return rasterizerState;
 }
 
-void GLStateManager::destroyRasterizerState(IRasterizerState* rasterizerState)
+void GLStateManager::DestroyRasterizerState(IRasterizerState* rasterizerState)
 {
-    // nothing to destroy in OpenGL backend
+    mem_delete(rasterizerState);
 }
 
-void GLStateManager::setRasterizerState(IRasterizerState* rasterizerState)
+void GLStateManager::SetRasterizerState(IRasterizerState* rasterizerState)
 {
     static IRasterizerState* previousRasterizerState = nullptr;
     if (previousRasterizerState != rasterizerState) {
@@ -229,16 +176,16 @@ void GLStateManager::setRasterizerState(IRasterizerState* rasterizerState)
         glCullFace(getGLCullMode(desc.m_cullMode));
         glFrontFace(desc.m_frontCCW ? GL_CCW : GL_CW); // #TODO: INSPECT PLEASE
 
-      //if (desc.m_scissorEnable)
-      //    glEnable(GL_SCISSOR_TEST);
-      //else
+        if (desc.m_scissorEnable)
+            glEnable(GL_SCISSOR_TEST);
+        else
             glDisable(GL_SCISSOR_TEST);
 
         previousRasterizerState = rasterizerState;
     }
 }
 
-ISamplerState* GLStateManager::createSamplerState(const SamplerDesc& samplerDesc)
+ISamplerState* GLStateManager::CreateSamplerState(const SamplerDesc& samplerDesc)
 {
     // Find already created ISamplerState
     auto it = m_samplerStates.find(samplerDesc);
@@ -247,18 +194,17 @@ ISamplerState* GLStateManager::createSamplerState(const SamplerDesc& samplerDesc
         return (*it).second;
     }
 
-    ISamplerState* samplerState = g_renderDevice->createSamplerState(samplerDesc);
+    ISamplerState* samplerState = g_renderDevice->CreateSamplerState(samplerDesc);
     m_samplerStates.emplace(samplerDesc, samplerState);
     return samplerState;
 }
 
-void GLStateManager::destroySamplerState(ISamplerState* samplerState)
+void GLStateManager::DestroySamplerState(ISamplerState* samplerState)
 {
-    // ???
     mem_delete(samplerState);
 }
 
-IBlendState* GLStateManager::createBlendState(const BlendStateDesc& blendStateDesc)
+IBlendState* GLStateManager::CreateBlendState(const BlendStateDesc& blendStateDesc)
 {
     // Find already created IBlendState
     auto it = m_blendStates.find(blendStateDesc);
@@ -268,23 +214,24 @@ IBlendState* GLStateManager::createBlendState(const BlendStateDesc& blendStateDe
     }
 
     // create d3d object
-    IBlendState* blendState = allocateBlendState(blendStateDesc);
+    IBlendState* blendState = mem_new<IBlendState>(blendStateDesc);
     m_blendStates.emplace(blendStateDesc, blendState);
     return blendState;
+
 }
 
-void GLStateManager::destroyBlendState(IBlendState* blendState)
+void GLStateManager::DestroyBlendState(IBlendState* blendState)
 {
-    // nothing to destroy in OpenGL backend
+    mem_delete(blendState);
 }
 
-void GLStateManager::setBlendState(IBlendState* blendState, const float blendFactor[4], uint32_t sampleMask)
+void GLStateManager::SetBlendState(IBlendState* blendState, const float blendFactor[4], uint32_t sampleMask)
 {
     //ID3D11BlendState* d3dBlendState = (ID3D11BlendState*)blendState;
     //g_d3d11Device->getDeviceContext()->OMSetBlendState(d3dBlendState, blendFactor, sampleMask);
 }
 
-IDepthStencilState* GLStateManager::createDepthStencilState(const DepthStencilDesc& desc)
+IDepthStencilState* GLStateManager::CreateDepthStencilState(const DepthStencilDesc& desc)
 {
     // Find already created IDepthStencilState
     auto it = m_depthStencilStates.find(desc);
@@ -295,21 +242,29 @@ IDepthStencilState* GLStateManager::createDepthStencilState(const DepthStencilDe
 
 
     // create d3d object
-    IDepthStencilState* depthStencilState = allocateDepthStencilState(desc);
+    IDepthStencilState* depthStencilState = mem_new<IDepthStencilState>(desc);
     m_depthStencilStates.emplace(desc, depthStencilState);
     return depthStencilState;
 }
 
-void GLStateManager::destroyDepthStencilState(IDepthStencilState* state)
+void GLStateManager::DestroyDepthStencilState(IDepthStencilState* state)
 {
-    // nothing to destroy in OpenGL backend
+    mem_delete(state);
 }
 
-void GLStateManager::setDepthStencilState(IDepthStencilState* state, uint32_t stencilRef)
+void GLStateManager::SetDepthStencilState(IDepthStencilState* state, uint32_t stencilRef)
 {
-    //ID3D11DepthStencilState* d3dDSState = (ID3D11DepthStencilState*)state;
-    //g_d3d11Device->getDeviceContext()->OMSetDepthStencilState(d3dDSState, stencilRef);
-}
+    static IDepthStencilState* previousDepthStencilState = nullptr;
+    if (previousDepthStencilState != state) {
+        const DepthStencilDesc& desc = state->m_desc;
 
+        if (desc.m_depthEnable)
+            glEnable(GL_DEPTH_TEST);
+        else
+            glDisable(GL_DEPTH_TEST);
+
+        previousDepthStencilState = state;
+    }
+}
 
 }

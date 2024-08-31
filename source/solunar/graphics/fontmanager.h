@@ -5,7 +5,7 @@
 
 #include "stb_truetype.h"
 
-namespace engine
+namespace solunar
 {
 
 class ITexture2D;
@@ -14,6 +14,7 @@ class IShaderProgram;
 class ISamplerState;
 struct IRasterizerState;
 struct IDepthStencilState;
+struct IBlendState;
 
 struct FontVertex
 {
@@ -24,7 +25,7 @@ struct FontVertex
 
 // Limited to 1024 characters per one sentence
 const int kMaxFontVBSize = sizeof(FontVertex)	* 1024;
-const int kMaxFontIBSize = sizeof(uint32_t)		* 1024;
+const int kMaxFontIBSize = sizeof(uint16_t)		* 1024;
 
 class FontManager;
 
@@ -35,11 +36,11 @@ public:
 	FontImpl();
 	~FontImpl();
 
-	void create(const char* filename, float size);
-	void destroy();
+	void Create(const char* filename, float size);
+	void Destroy();
 
 	// Inherited via IFont
-	void drawText(const char* text, float x, float y, const glm::vec4& color) override;
+	void DrawText(const char* text, float x, float y, const glm::vec4& color) override;
 
 private:
 	stbtt_bakedchar m_fontChars[96];
@@ -52,31 +53,20 @@ public:
 	FontManager();
 	~FontManager();
 	
-	void initialize() override;
-	void shutdown() override;
+	void Initialize() override;
+	void Shutdown() override;
 
-	IFont* createFont(const char* filename, float size) override;
+	IFont* CreateFont(const char* filename, float size) override;
 
-	void drawFontText(IFont* font, const char* text, float x, float y, const glm::vec4& color) override;
+	void DrawFontText(IFont* font, const char* text, float x, float y, const glm::vec4& color) override;
+	void DrawSystemFont(const char* text, float x, float y, const glm::vec4& color) override;
 
-	void drawSystemFont(const char* text, float x, float y, const glm::vec4& color) override;
-
-	void flushPrimitives() override;
-
-private:
-	void initPrivate();
+	void FlushPrimitives() override;
 
 private:
-	struct SystemStringDrawInfo
-	{
-		std::string m_string;
-		float m_x;
-		float m_y;
-		glm::vec4 m_color;
-	};
+	void InitPrivate();
 
-	std::vector<SystemStringDrawInfo> m_systemDrawStrings;
-
+private:
 	struct StringDrawInfo
 	{
 		FontImpl* m_font;
@@ -91,8 +81,7 @@ private:
 	std::unordered_map<std::string, FontImpl*> m_fonts;
 
 	// System font
-	stbtt_bakedchar m_systemFontChars[96];
-	ITexture2D* m_systemFontTexture;
+	IFont* m_systemFont;
 	
 	// Shared font data
 	ISamplerState* m_textureSampler;
@@ -102,6 +91,7 @@ private:
 	IShaderProgram* m_shaderProgram;
 	IRasterizerState* m_rasterizerState;
 	IDepthStencilState* m_depthStencilState;
+	IBlendState* m_pBlendState;
 
 };
 

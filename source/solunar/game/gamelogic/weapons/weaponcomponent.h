@@ -3,7 +3,7 @@
 
 #include "engine/entity/logiccomponent.h"
 
-namespace engine {
+namespace solunar {
 
 	enum class WeaponsType
 	{
@@ -14,14 +14,14 @@ namespace engine {
 	
 	class WeaponComponent : public LogicComponent
 	{
-		ImplementObject(WeaponComponent, LogicComponent);
+		DECLARE_OBJECT(WeaponComponent);
 	public:
 		WeaponComponent();
 		virtual ~WeaponComponent();
 
-		static void registerObject();
+		static void RegisterObject();
 
-		virtual void update(float dt);
+		virtual void Update(float dt);
 	};
 }
 #endif // ! WEAPONCOMPONENT_H

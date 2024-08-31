@@ -6,8 +6,10 @@
 #include "graphics/mesh.h"
 #include "game/gamelogic/player/playercontrollercomponent.h"
 
-namespace engine
+namespace solunar
 {
+
+class CameraFirstPersonComponent;
 
 struct ShockPlayerStats
 {
@@ -18,27 +20,28 @@ struct ShockPlayerStats
 
 class ShockPlayerController : public PlayerControllerComponent
 {
-	ImplementObject(ShockPlayerController, PlayerControllerComponent);
+	DECLARE_OBJECT(ShockPlayerController);
+	DECLARE_PROPERTY_REGISTER(ShockPlayerController);
 public:
 	ShockPlayerController();
 	~ShockPlayerController();
 
-	static void registerObject();
+	static void RegisterObject();
 
-	void onEntitySet(Entity* entity) override;
-	void onEntityRemove() override;
+	void OnEntitySet(Entity* entity) override;
+	void OnEntityRemove() override;
 
-	void update(float dt) override;
+	void Update(float dt) override;
 
 	void doHit(float amount);
 
 private:
-	void activateCamera();
-	void initializeCamera();
-	void initializeComponents();
-	void updateCamera(float dt);
-	void updateMovement(float dt);
-	void debugUpdate(float dt);
+	void ActivateCamera();
+	void InitializeCamera();
+	void InitializeComponents();
+	void UpdateCamera(float dt);
+	void UpdateMovement(float dt);
+	void DebugUpdate(float dt);
 
 private:
 	ShockPlayerStats m_playerStats;
@@ -54,6 +57,8 @@ private:
 public:
 	bool m_flyCam;
 };
+
+void shockGamePlayerDebug(bool* open);
 
 }
 

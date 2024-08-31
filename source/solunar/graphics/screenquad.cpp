@@ -5,7 +5,7 @@
 #include "graphics/ShaderProgramManager.h"
 #include "graphics/renderer.h"
 
-namespace engine
+namespace solunar
 {
 	IBufferBase* ScreenQuad::ms_vertexBuffer;
 	IShaderProgram* ScreenQuad::ms_screenQuadShader;
@@ -15,11 +15,9 @@ namespace engine
 		{ "TEXCOORD", 0, ImageFormat::RG32F,   0, (UINT)offsetof(QuadVertex, texcoord),  INPUT_PER_VERTEX_DATA, 0 }
 	};
 
-	void ScreenQuad::init()
+	void ScreenQuad::Init()
 	{
 
-		// OpenGL Buffer
-#if 1
 		float quadVertices[] = {
 			// positions         // texCoords
 			-1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
@@ -30,18 +28,6 @@ namespace engine
 			 1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
 			 1.0f,  1.0f, 0.0f,  1.0f, 1.0f
 		};
-#else
-		// DirectX Buffer
-		float quadVertices[] = {
-			// positions			  // texCoords
-			-1.0f,  1.0f, 0.0f,       0.0f, 0.0f,
-			 1.0f,  1.0f, 0.0f,       1.0f, 0.0f,
-			 1.0f, -1.0f, 0.0f,       1.0f, 1.0f,
-			-1.0f,  1.0f, 0.0f,       0.0f, 0.0f,
-			 1.0f, -1.0f, 0.0f,       1.0f, 1.0f,
-			-1.0f, -1.0f, 0.0f,       0.0f, 1.0f
-		};
-#endif
 
 		BufferDesc bufferDesc;
 		memset(&bufferDesc, 0, sizeof(bufferDesc));
@@ -53,9 +39,9 @@ namespace engine
 		memset(&subresourceDesc, 0, sizeof(subresourceDesc));
 		subresourceDesc.m_memory = quadVertices;
 
-		ms_vertexBuffer = g_renderDevice->createBuffer(bufferDesc, subresourceDesc);
+		ms_vertexBuffer = g_renderDevice->CreateBuffer(bufferDesc, subresourceDesc);
 
-		ms_screenQuadShader = g_shaderManager->createShaderProgram(
+		ms_screenQuadShader = g_shaderManager->CreateShaderProgram(
 			"quad.vsh", 
 			"quad.psh", 
 			nullptr,
@@ -63,7 +49,7 @@ namespace engine
 			sizeof(ms_inputLayout) / sizeof(ms_inputLayout[0]));
 	}
 
-	void ScreenQuad::shutdown()
+	void ScreenQuad::Shutdown()
 	{
 		if (ms_vertexBuffer)
 		{
@@ -72,61 +58,61 @@ namespace engine
 		}
 	}
 
-	void ScreenQuad::render(ITexture2D* texture)
+	void ScreenQuad::Render(ITexture2D* texture)
 	{
 		Assert(texture);
 		
 		//glDisable(GL_DEPTH_TEST);
 
-		g_renderDevice->setVertexBuffer(ms_vertexBuffer, sizeof(QuadVertex), 0);
-		g_renderDevice->setTexture2D(0, texture);
-		g_renderDevice->setSampler(0, g_defaultSampler);
+		g_renderDevice->SetVertexBuffer(ms_vertexBuffer, sizeof(QuadVertex), 0);
+		g_renderDevice->SetTexture2D(0, texture);
+		g_renderDevice->SetSamplerState(0, g_defaultSampler);
 
-		g_shaderManager->setShaderProgram(ms_screenQuadShader);
-		g_renderDevice->draw(PM_TriangleList, 0, 6);
+		g_shaderManager->SetShaderProgram(ms_screenQuadShader);
+		g_renderDevice->Draw(PM_TriangleList, 0, 6);
 	}
 
-	void ScreenQuad::render(ITexture2D* texture, IShaderProgram* shader)
+	void ScreenQuad::Render(ITexture2D* texture, IShaderProgram* shader)
 	{
 		Assert(texture);
 		Assert(shader);
 		
 		//glDisable(GL_DEPTH_TEST);
 
-		g_renderDevice->setVertexBuffer(ms_vertexBuffer, sizeof(QuadVertex), 0);
-		g_renderDevice->setTexture2D(0, texture);
+		g_renderDevice->SetVertexBuffer(ms_vertexBuffer, sizeof(QuadVertex), 0);
+		g_renderDevice->SetTexture2D(0, texture);
 
-		g_shaderManager->setShaderProgram(shader);
-		g_renderDevice->draw(PM_TriangleList, 0, 6);
+		g_shaderManager->SetShaderProgram(shader);
+		g_renderDevice->Draw(PM_TriangleList, 0, 6);
 	}
 
-	void ScreenQuad::renderWithoutShaderBinding(ITexture2D* texture)
+	void ScreenQuad::RenderWithoutShaderBinding(ITexture2D* texture)
 	{
 		Assert(texture);
 
 		/*glDisable(GL_DEPTH_TEST);*/
 
-		g_renderDevice->setVertexBuffer(ms_vertexBuffer, sizeof(QuadVertex), 0);
-		g_renderDevice->setTexture2D(0, texture);
+		g_renderDevice->SetVertexBuffer(ms_vertexBuffer, sizeof(QuadVertex), 0);
+		g_renderDevice->SetTexture2D(0, texture);
 
-		g_renderDevice->draw(PM_TriangleList, 0, 6);
+		g_renderDevice->Draw(PM_TriangleList, 0, 6);
 	}
 
-	void ScreenQuad::renderWithoutTextureBinding(IShaderProgram* shader)
+	void ScreenQuad::RenderWithoutTextureBinding(IShaderProgram* shader)
 	{
 		Assert(shader);
 		
 		//glDisable(GL_DEPTH_TEST);
 
-		g_renderDevice->setVertexBuffer(ms_vertexBuffer, sizeof(QuadVertex), 0);
+		g_renderDevice->SetVertexBuffer(ms_vertexBuffer, sizeof(QuadVertex), 0);
 		
-		g_shaderManager->setShaderProgram(shader);
+		g_shaderManager->SetShaderProgram(shader);
 
-		g_renderDevice->draw(PM_TriangleList, 0, 6);
+		g_renderDevice->Draw(PM_TriangleList, 0, 6);
 	}
 
-	void ScreenQuad::renderWithoutShaderAndTextureBinding()
+	void ScreenQuad::RenderWithoutShaderAndTextureBinding()
 	{
-		g_renderDevice->draw(PM_TriangleList, 0, 6);
+		g_renderDevice->Draw(PM_TriangleList, 0, 6);
 	}
 }

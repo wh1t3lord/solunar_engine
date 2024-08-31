@@ -4,7 +4,7 @@
 #include "engine/physics/bullet_private.h"
 #include "engine/physics/rigidbodycomponent.h"
 
-namespace engine {
+namespace solunar {
 
 	//! Enumeration of shape types.
 	enum class ShapeType
@@ -22,34 +22,34 @@ namespace engine {
 	//! Interface class for any type of rigid body shapes.
 	class ShapeComponent : public Component
 	{
-		ImplementObject(ShapeComponent, Component);
+		DECLARE_OBJECT(ShapeComponent);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 
 	public:
 		ShapeComponent();
 		virtual ~ShapeComponent();
 
-		void onEntitySet(Entity* entity) override;
-		void onEntityRemove() override;
-		void onWorldSet(World* world) override;
+		void OnEntitySet(Entity* entity) override;
+		void OnEntityRemove() override;
+		void OnWorldSet(World* world) override;
 
 		// serialization
-		virtual void loadXML(tinyxml2::XMLElement& element);
-		virtual void saveXML(tinyxml2::XMLElement& element);
+		virtual void LoadXML(tinyxml2::XMLElement& element);
+		virtual void SaveXML(tinyxml2::XMLElement& element);
 
 		//! Public initialization of shape
-		void initializeShape();
+		void InitializeShape();
 
 		//! Get Physics SDK shape.
 		btCollisionShape* getSdkShape() { return m_shape; }
 
 	private:
-		void initializeShapeTransform();
+		void InitializeShapeTransform();
 
 	protected:
 		//! Base virtual function for shape creation.
-		virtual void createShapeInternal();
+		virtual void CreateShapeInternal();
 
 	protected:
 		//! Instance of current entity rigid body component.
@@ -73,21 +73,21 @@ namespace engine {
 
 	class BoxShapeComponent : public ShapeComponent
 	{
-		ImplementObject(BoxShapeComponent, ShapeComponent);
+		DECLARE_OBJECT(BoxShapeComponent);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 
 	public:
 		BoxShapeComponent();
 		~BoxShapeComponent();
 
-		void loadXML(tinyxml2::XMLElement& element) override;
-		void saveXML(tinyxml2::XMLElement& element) override;
+		void LoadXML(tinyxml2::XMLElement& element) override;
+		void SaveXML(tinyxml2::XMLElement& element) override;
 
 		void createShape(const glm::vec3& size);
 
 	private:
-		void createShapeInternal() override;
+		void CreateShapeInternal() override;
 
 	private:
 		glm::vec3 m_size;
@@ -95,19 +95,19 @@ namespace engine {
 
 	class SphereShapeComponent : public ShapeComponent
 	{
-		ImplementObject(SphereShapeComponent, ShapeComponent);
+		DECLARE_OBJECT(SphereShapeComponent);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 
 	public:
 		SphereShapeComponent();
 		~SphereShapeComponent();
 
-		void loadXML(tinyxml2::XMLElement& element) override;
-		void saveXML(tinyxml2::XMLElement& element) override;
+		void LoadXML(tinyxml2::XMLElement& element) override;
+		void SaveXML(tinyxml2::XMLElement& element) override;
 
 	private:
-		void createShapeInternal() override;
+		void CreateShapeInternal() override;
 
 	private:
 		float m_fRadius;
@@ -116,19 +116,19 @@ namespace engine {
 
 	class CylinderShapeComponent : public ShapeComponent
 	{
-		ImplementObject(CylinderShapeComponent, ShapeComponent);
+		DECLARE_OBJECT(CylinderShapeComponent);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 
 	public:
 		CylinderShapeComponent();
 		~CylinderShapeComponent();
 
-		void loadXML(tinyxml2::XMLElement& element) override;
-		void saveXML(tinyxml2::XMLElement& element) override;
+		void LoadXML(tinyxml2::XMLElement& element) override;
+		void SaveXML(tinyxml2::XMLElement& element) override;
 
 	private:
-		void createShapeInternal() override;
+		void CreateShapeInternal() override;
 
 	private:
 		glm::vec3 m_size;
@@ -137,9 +137,9 @@ namespace engine {
 
 	class CapsuleShapeComponent : public ShapeComponent
 	{
-		ImplementObject(CapsuleShapeComponent, ShapeComponent);
+		DECLARE_OBJECT(CapsuleShapeComponent);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 
 	public:
 		CapsuleShapeComponent();
@@ -147,11 +147,11 @@ namespace engine {
 
 		void createCapsule(float _fRadius, float _fHeight);
 
-		void loadXML(tinyxml2::XMLElement& element) override;
-		void saveXML(tinyxml2::XMLElement& element) override;
+		void LoadXML(tinyxml2::XMLElement& element) override;
+		void SaveXML(tinyxml2::XMLElement& element) override;
 
 	private:
-		void createShapeInternal() override;
+		void CreateShapeInternal() override;
 
 	private:
 		float m_fRadius;

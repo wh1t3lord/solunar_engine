@@ -3,7 +3,7 @@
 
 #include "graphics/core/rendertarget.h"
 
-namespace engine {
+namespace solunar {
 
 //! OpenGL implementation of IRenderTarget
 class GLRenderTarget : public IRenderTarget
@@ -12,10 +12,12 @@ public:
 	GLRenderTarget(const RenderTargetCreationDesc& renderTargetDesc);
 	~GLRenderTarget();
 
-	void create(const RenderTargetCreationDesc& renderTargetDesc);
-	void release() override;
+	void Create(const RenderTargetCreationDesc& renderTargetDesc);
+	void Release() override;
 
-	uint32_t getHandle() override;
+	uint32_t getHandle();
+
+	void SetDebugName(const char* debugName) override;
 
 	// Old stuff of IRenderTarget, can be used ;)
 	void attachTexture2D(int slot, ITexture2D* textureHandle);

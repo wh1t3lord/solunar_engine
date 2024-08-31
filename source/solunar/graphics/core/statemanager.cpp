@@ -1,7 +1,7 @@
 #include "graphicspch.h"
 #include "graphics/core/statemanager.h"
 
-namespace engine
+namespace solunar
 {
 
 IStateManager* g_stateManager = nullptr;

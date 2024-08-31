@@ -1,7 +1,7 @@
 #include "gldrv_pch.h"
 #include "gldrv/gltexture2d.h"
 
-namespace engine
+namespace solunar
 {
 
 extern GLenum GetGLFormat(ImageFormat format);
@@ -10,21 +10,21 @@ extern GLenum GetGLTextureDataType(ImageFormat format);
 
 GLTexture2D::GLTexture2D(const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc)
 {
-	create(textureDesc, subresourceDesc);
+	Create(textureDesc, subresourceDesc);
 }
 
 GLTexture2D::~GLTexture2D()
 {
-	destroy();
+	Destroy();
 }
 
-void GLTexture2D::create(const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc)
+void GLTexture2D::Create(const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc)
 {
 	//ASSERT(textureDesc.m_textureType == TextureType::Texture2D);
 	//ASSERT(subresourceDesc.m_memory);
 
 	//////////////////////////
-	// initialize surface desc
+	// Initialize surface desc
 	m_surfaceDesc.m_width = textureDesc.m_width;
 	m_surfaceDesc.m_height = textureDesc.m_height;
 
@@ -34,14 +34,14 @@ void GLTexture2D::create(const TextureDesc& textureDesc, const SubresourceDesc& 
 		GetGLTextureDataType(textureDesc.m_format), subresourceDesc.m_memory);
 
 	///////////////////////////////////
-	// initialize default sampler state
+	// Initialize default sampler state
 	glTextureParameteriEXT(m_textureHandle, GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 	glTextureParameteriEXT(m_textureHandle, GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 	glTextureParameteriEXT(m_textureHandle, GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTextureParameteriEXT(m_textureHandle, GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 }
 
-void GLTexture2D::destroy()
+void GLTexture2D::Destroy()
 {
 	if (m_textureHandle != 0)
 		glDeleteTextures(1, &m_textureHandle);
@@ -50,6 +50,10 @@ void GLTexture2D::destroy()
 SurfaceDesc GLTexture2D::getSurfaceDesc()
 {
 	return m_surfaceDesc;
+}
+
+void GLTexture2D::SetDebugName(const char* debugName)
+{
 }
 
 void GLTexture2D::updateTexture(const void* data, int rowPitch, int depthPitch)

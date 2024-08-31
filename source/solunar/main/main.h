@@ -1,7 +1,7 @@
 #ifndef MAIN_H
 #define MAIN_H
 
-namespace engine {
+namespace solunar {
 	class View;
 
 	void appInit(int argc, char** argv);
@@ -11,7 +11,7 @@ namespace engine {
 	void appPresent();
 	void appFireExit();
 
-	void createEngineView();
+	void CreateEngineView();
 
 	int main(int argc, char* argv[]);
 
@@ -19,8 +19,8 @@ namespace engine {
 	class CommandLine
 	{
 	public:
-		void init(int argc, char* argv[]);
-		void init(const char* str);
+		void Init(int argc, char* argv[]);
+		void Init(const char* str);
 
 		bool hasOption(const char* name);
 

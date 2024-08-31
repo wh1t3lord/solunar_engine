@@ -5,7 +5,7 @@
 
 #include <memory>
 
-namespace engine
+namespace solunar
 {
 	class DataStream
 	{
@@ -13,21 +13,21 @@ namespace engine
 		DataStream();
 		virtual ~DataStream();
 
-		virtual size_t read(void* buffer, size_t count);
-		virtual size_t write(void* buffer, size_t count);
+		virtual size_t Read(void* buffer, size_t count);
+		virtual size_t Write(void* buffer, size_t count);
 
-		virtual void seek(SeekWay dir, long offset);
-		virtual long tell();
+		virtual void Seek(SeekWay dir, long offset);
+		virtual long Tell();
 
-		virtual bool eof();
+		virtual bool Eof();
 
-		virtual void flush();
-
-		template <typename T>
-		size_t read(T* buffer) { return read((void*)buffer, sizeof(T)); }
+		virtual void Flush();
 
 		template <typename T>
-		size_t write(T* buffer) { return write((void*)buffer, sizeof(T)); }
+		size_t Read(T* buffer) { return Read((void*)buffer, sizeof(T)); }
+
+		template <typename T>
+		size_t Write(T* buffer) { return Write((void*)buffer, sizeof(T)); }
 	};
 
 	typedef std::shared_ptr<DataStream> DataStreamPtr;

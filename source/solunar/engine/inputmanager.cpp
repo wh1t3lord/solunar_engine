@@ -1,7 +1,7 @@
 #include "enginepch.h"
 #include "engine/inputmanager.h"
 
-namespace engine
+namespace solunar
 {
 
 InputManager::InputManager() :
@@ -18,17 +18,17 @@ InputManager::~InputManager()
 {
 }
 
-void InputManager::update()
+void InputManager::Update()
 {
 }
 
-bool InputManager::isPressed(uint32_t key)
+bool InputManager::IsPressed(uint32_t key)
 {
 	Assert(key <= KEY_COUNT);
 	return m_keys[key];
 }
 
-bool InputManager::isPressedWithReset(uint32_t key)
+bool InputManager::IsPressedWithReset(uint32_t key)
 {
 	Assert(key <= KEY_COUNT);
 	bool value = m_keys[key];
@@ -36,17 +36,23 @@ bool InputManager::isPressedWithReset(uint32_t key)
 	return value;
 }
 
-void InputManager::setCursorCapture(bool capture)
+bool InputManager::IsMouseButtonPressed(MouseButtons buttonId)
+{
+	Assert(buttonId <= MOUSE_BUTTON_COUNT);
+	return m_mouseButtons[buttonId];
+}
+
+void InputManager::SetCursorCapture(bool capture)
 {
 	m_captureCursor = capture;
 }
 
-void InputManager::setCursorHiding(bool hide)
+void InputManager::SetCursorHiding(bool hide)
 {
 	m_hideCursor = hide;
 }
 
-void InputManager::resetDelta()
+void InputManager::ResetDelta()
 {
 	m_deltaCursorPos.x = 0.0f;
 	m_deltaCursorPos.y = 0.0f;

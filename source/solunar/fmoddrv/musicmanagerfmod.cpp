@@ -3,7 +3,7 @@
 #include "fmoddrv/audiomanagerfmod.h"
 #include "fmoddrv/audiosourcefmod.h"
 
-namespace engine
+namespace solunar
 {
 	MusicManagerFMOD::MusicManagerFMOD()
 	{
@@ -15,21 +15,21 @@ namespace engine
 	{
 	}
 
-	void MusicManagerFMOD::init()
+	void MusicManagerFMOD::Init()
 	{
-		Assert(reinterpret_cast<AudioManagerFMOD*>(AudioManager::getInstance())->getFMODSystem());
-		reinterpret_cast<AudioManagerFMOD*>(AudioManager::getInstance())->getFMODSystem()->createChannelGroup("Music channel group", &m_musicChannel);
+		Assert(reinterpret_cast<AudioManagerFMOD*>(AudioManager::GetInstance())->GetFMODSystem());
+		reinterpret_cast<AudioManagerFMOD*>(AudioManager::GetInstance())->GetFMODSystem()->createChannelGroup("Music channel group", &m_musicChannel);
 
 		m_musicChannel->setVolume(0.3f);
 	}
 
-	void MusicManagerFMOD::shutdown()
+	void MusicManagerFMOD::Shutdown()
 	{
-		if (m_musicSource && m_musicSource->isPlaying())
-			m_musicSource->stop();
+		if (m_musicSource && m_musicSource->IsPlaying())
+			m_musicSource->Stop();
 
 		if (m_musicSource)
-			AudioManager::getInstance()->deleteSource(m_musicSource);
+			AudioManager::GetInstance()->DeleteSource(m_musicSource);
 
 		m_musicSource = nullptr;
 
@@ -37,32 +37,32 @@ namespace engine
 		m_musicChannel = nullptr;
 	}
 
-	void MusicManagerFMOD::play(const std::string& filename, bool looped /*= false*/)
+	void MusicManagerFMOD::Play(const std::string& filename, bool looped /*= false*/)
 	{
 		if (m_musicSource)
-			AudioManager::getInstance()->deleteSource(m_musicSource);
+			AudioManager::GetInstance()->DeleteSource(m_musicSource);
 
-		m_musicSource = AudioManager::getInstance()->createSource(filename);
+		m_musicSource = AudioManager::GetInstance()->CreateSource(filename);
 
 
-		reinterpret_cast<AudioSourceFMOD*>(m_musicSource)->play(m_musicChannel);
+		reinterpret_cast<AudioSourceFMOD*>(m_musicSource)->Play(m_musicChannel);
 
 	}
 
-	void MusicManagerFMOD::stop()
+	void MusicManagerFMOD::Stop()
 	{
 		if (m_musicSource)
 		{
-			m_musicSource->stop();
-			AudioManager::getInstance()->deleteSource(m_musicSource);
+			m_musicSource->Stop();
+			AudioManager::GetInstance()->DeleteSource(m_musicSource);
 			m_musicSource = nullptr;
 		}
 	}
 
-	bool MusicManagerFMOD::isPlaying()
+	bool MusicManagerFMOD::IsPlaying()
 	{
 		if (m_musicSource)
-			return (m_musicSource ? m_musicSource->isPlaying() : false);
+			return m_musicSource->IsPlaying();
 
 		return false;
 	}

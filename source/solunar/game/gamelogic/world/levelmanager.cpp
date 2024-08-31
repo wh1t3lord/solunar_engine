@@ -2,8 +2,10 @@
 #include "game/gamelogic/world/levelmanager.h"
 #include "levelmanager.h"
 
-namespace engine
+namespace solunar
 {
+
+IMPLEMENT_OBJECT(LevelManagerComponent, Component);
 
 LevelManagerComponent::LevelManagerComponent()
 {
@@ -13,13 +15,13 @@ LevelManagerComponent::~LevelManagerComponent()
 {
 }
 
-void LevelManagerComponent::registerObject()
+void LevelManagerComponent::RegisterObject()
 {
-	g_typeManager->registerObject<LevelManagerComponent>();
+	g_typeManager->RegisterObject<LevelManagerComponent>();
 }
 
-void LevelManagerComponent::onWorldSet(World* world)
+void LevelManagerComponent::OnWorldSet(World* world)
 {
-	Component::onWorldSet(world);
+	Component::OnWorldSet(world);
 }
 }

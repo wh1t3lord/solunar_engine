@@ -12,5 +12,6 @@
 #include <string.h>
 #include <memory.h>
 #include <math.h>
+#include <time.h>
 
 #endif // !CORE_PLATFORM_H

@@ -1,24 +1,26 @@
 #ifndef PLAYERCONTROLLER_H
 #define PLAYERCONTROLLER_H
 
-namespace engine {
+#include "engine/entity/logiccomponent.h"
+
+namespace solunar {
 	
 	class PlayerControllerComponent : public LogicComponent
 	{
-		ImplementObject(PlayerControllerComponent, LogicComponent);
+		DECLARE_OBJECT(PlayerControllerComponent);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 		
 	public:
 		PlayerControllerComponent();
 		~PlayerControllerComponent();
 		
-		virtual void loadXML(tinyxml2::XMLElement& element);
-		virtual void saveXML(tinyxml2::XMLElement& element);
+		virtual void LoadXML(tinyxml2::XMLElement& element);
+		virtual void SaveXML(tinyxml2::XMLElement& element);
 
-		virtual void onEntitySet(Entity* entity);
+		virtual void OnEntitySet(Entity* entity);
 		
-		virtual void update(float dt);
+		virtual void Update(float dt);
 		
 	protected:
 	//	std::shared_ptr<Node> m_cameraNode;

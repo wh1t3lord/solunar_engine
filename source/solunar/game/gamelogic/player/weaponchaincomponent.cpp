@@ -1,12 +1,14 @@
 #include "gamepch.h"
 #include "game/gamelogic/player/weaponchaincomponent.h"
 
-namespace engine
+namespace solunar
 {
 
-void WeaponChainComponent::registerObject()
+IMPLEMENT_OBJECT(WeaponChainComponent, Component);
+
+void WeaponChainComponent::RegisterObject()
 {
-	g_typeManager->registerObject<WeaponChainComponent>();
+	g_typeManager->RegisterObject<WeaponChainComponent>();
 }
 
 WeaponChainComponent::WeaponChainComponent() :

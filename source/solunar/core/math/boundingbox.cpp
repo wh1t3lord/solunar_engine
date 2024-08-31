@@ -1,9 +1,9 @@
 #include "core/math/math_types.h"
 #include "core/math/boundingbox.h"
 
-namespace engine {
+namespace solunar {
 
-void BoundingBox::setIdentity()
+void BoundingBox::SetIdentity()
 {
 	m_min = glm::vec3(-1.0f);
 	m_max = glm::vec3(1.0f);

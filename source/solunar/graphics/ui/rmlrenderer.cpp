@@ -16,7 +16,7 @@
 
 #include <glad/glad.h>
 
-namespace engine
+namespace solunar
 {
 
 struct RmlTextureHandle
@@ -47,9 +47,9 @@ RmlRenderer::~RmlRenderer()
 {
 }
 
-void RmlRenderer::init()
+void RmlRenderer::Init()
 {
-	Core::msg("[graphics]: initializing rml renderer");
+	Core::Msg("[graphics]: initializing rml renderer");
 
 	RmlConstants constants;
 	memset(&constants, 0, sizeof(constants));
@@ -65,7 +65,7 @@ void RmlRenderer::init()
 	memset(&subresourceDesc, 0, sizeof(subresourceDesc));
 	subresourceDesc.m_memory = &constants;
 
-	m_constantBuffer = g_renderDevice->createBuffer(bufferDesc, subresourceDesc);
+	m_constantBuffer = g_renderDevice->CreateBuffer(bufferDesc, subresourceDesc);
 
 	// Create sampler state
 
@@ -77,13 +77,13 @@ void RmlRenderer::init()
 	samplerDesc.m_wrapT = TextureWrap::ClampToEdge;
 	samplerDesc.m_anisotropyLevel = 1.0f;
 
-	g_defaultRmlUISampler = g_renderDevice->createSamplerState(samplerDesc);
+	g_defaultRmlUISampler = g_renderDevice->CreateSamplerState(samplerDesc);
 
 	// Load shader
-	m_shaderProgram = g_shaderManager->createShaderProgram("2d_ui.vsh", "2d_ui.psh");
+	m_shaderProgram = g_shaderManager->CreateShaderProgram("2d_ui.vsh", "2d_ui.psh");
 }
 
-void RmlRenderer::shutdown()
+void RmlRenderer::Shutdown()
 {
 	if (g_defaultRmlUISampler)
 	{
@@ -98,7 +98,7 @@ void RmlRenderer::shutdown()
 	}
 }
 
-void RmlRenderer::beginFrame()
+void RmlRenderer::BeginFrame()
 {
 #if 0
 	glClearStencil(0);
@@ -117,7 +117,7 @@ void RmlRenderer::beginFrame()
 #endif
 }
 
-void RmlRenderer::endFrame()
+void RmlRenderer::EndFrame()
 {
 }
 
@@ -145,7 +145,7 @@ Rml::CompiledGeometryHandle RmlRenderer::CompileGeometry(Rml::Vertex* vertices, 
 		SubresourceDesc subresourceDesc = {};
 		subresourceDesc.m_memory = vertices;
 		//subresourceDesc.m_memoryPitch = 
-		geometryHandle->m_vertexBuffer = g_renderDevice->createBuffer(bufferDesc, subresourceDesc);
+		geometryHandle->m_vertexBuffer = g_renderDevice->CreateBuffer(bufferDesc, subresourceDesc);
 	}
 
 	// index buffer creation
@@ -158,7 +158,7 @@ Rml::CompiledGeometryHandle RmlRenderer::CompileGeometry(Rml::Vertex* vertices, 
 		SubresourceDesc subresourceDesc = {};
 		subresourceDesc.m_memory = indices;
 
-		geometryHandle->m_indexBuffer = g_renderDevice->createBuffer(bufferDesc, subresourceDesc);
+		geometryHandle->m_indexBuffer = g_renderDevice->CreateBuffer(bufferDesc, subresourceDesc);
 	}
 
 	geometryHandle->m_textureHandle = texture;
@@ -172,10 +172,10 @@ void RmlRenderer::RenderCompiledGeometry(Rml::CompiledGeometryHandle geometry, c
 	RmlGeometryHandle* geometryHandle = (RmlGeometryHandle*)geometry;
 	ASSERT(geometryHandle);
 
-	View* view = CameraProxy::getInstance()->getView();
+	View* view = CameraProxy::GetInstance()->GetView();
 	Rml::Matrix4f projection = Rml::Matrix4f::ProjectOrtho(0, (float)view->getWidth(), (float)view->getHeight(), 0, -10000, 10000);
 
-	RmlConstants* constants = (RmlConstants*)m_constantBuffer->map(BufferMapping::WriteOnly);
+	RmlConstants* constants = (RmlConstants*)m_constantBuffer->Map(BufferMapping::WriteOnly);
 
 	// translation
 	constants->m_translate.x = translation.x;
@@ -184,11 +184,11 @@ void RmlRenderer::RenderCompiledGeometry(Rml::CompiledGeometryHandle geometry, c
 	// projection matrix
 	constants->m_projectionMatrix = glm::make_mat4(projection.data());
 
-	m_constantBuffer->unmap();
+	m_constantBuffer->Unmap();
 
-	// initialize device state
+	// Initialize device state
 
-	g_shaderManager->setShaderProgram(m_shaderProgram);
+	g_shaderManager->SetShaderProgram(m_shaderProgram);
 
 	VertexFormat vtxf;
 	vtxf.addPosition_Float2();
@@ -196,9 +196,9 @@ void RmlRenderer::RenderCompiledGeometry(Rml::CompiledGeometryHandle geometry, c
 	vtxf.addTexcoord();
 	//g_renderDevice->setVertexFormat(&vtxf);
 
-	g_renderDevice->setVertexBuffer(geometryHandle->m_vertexBuffer, sizeof(Rml::Vertex), 0);
-	g_renderDevice->setIndexBuffer(geometryHandle->m_indexBuffer);
-	g_renderDevice->setConstantBufferIndex(0, m_constantBuffer);
+	g_renderDevice->SetVertexBuffer(geometryHandle->m_vertexBuffer, sizeof(Rml::Vertex), 0);
+	g_renderDevice->SetIndexBuffer(geometryHandle->m_indexBuffer);
+	g_renderDevice->SetConstantBufferIndex(0, m_constantBuffer);
 
 	// get texture handle
 
@@ -207,11 +207,11 @@ void RmlRenderer::RenderCompiledGeometry(Rml::CompiledGeometryHandle geometry, c
 	ASSERT(textureHandle->m_textureMap);
 	ASSERT(textureHandle->m_textureMap->getHWTexture());
 
-	g_renderDevice->setTexture2D(0, textureHandle->m_textureMap->getHWTexture());
-	g_renderDevice->setSampler(0, g_defaultRmlUISampler);
+	g_renderDevice->SetTexture2D(0, textureHandle->m_textureMap->getHWTexture());
+	g_renderDevice->SetSamplerState(0, g_defaultRmlUISampler);
 
 	// render
-	g_renderDevice->drawIndexed(PM_TriangleList, 0, geometryHandle->m_numIndices);
+	g_renderDevice->DrawIndexed(PM_TriangleList, 0, geometryHandle->m_numIndices);
 }
 
 void RmlRenderer::ReleaseCompiledGeometry(Rml::CompiledGeometryHandle geometry)
@@ -238,7 +238,7 @@ bool RmlRenderer::LoadTexture(Rml::TextureHandle& texture_handle, Rml::Vector2i&
 {
 	// Create texture map
 	RmlTextureHandle* textureHandle = mem_new<RmlTextureHandle>();
-	textureHandle->m_textureMap = ContentManager::getInstance()->loadTexture(source);
+	textureHandle->m_textureMap = ContentManager::GetInstance()->LoadTexture(source);
 
 	texture_handle = (Rml::TextureHandle)textureHandle;
 
@@ -261,7 +261,7 @@ bool RmlRenderer::GenerateTexture(Rml::TextureHandle& texture_handle, const Rml:
 	textureSubresourceDesc.m_memory = (void*)source;
 	textureSubresourceDesc.m_memoryPitch = source_dimensions.x * 4;
 
-	ITexture2D* texture2d = g_renderDevice->createTexture2D(textureDesc, textureSubresourceDesc);
+	ITexture2D* texture2d = g_renderDevice->CreateTexture2D(textureDesc, textureSubresourceDesc);
 
 	// Create texture map
 	RmlTextureHandle* textureHandle = mem_new<RmlTextureHandle>();
@@ -278,7 +278,7 @@ void RmlRenderer::ReleaseTexture(Rml::TextureHandle texture)
 
 	// Need check for it because some textures can be cached by Content Manager
 	if (textureHandle->m_textureMap->isManualCreated())
-		textureHandle->m_textureMap->release();
+		textureHandle->m_textureMap->Release();
 
 	// Release texture handle
 	textureHandle->m_textureMap = nullptr;

@@ -4,10 +4,28 @@
 #include "graphics/model.h"
 #include "graphics/animatedmodel.h"
 
-namespace engine
+namespace solunar
 {
 
-static std::unordered_map<std::string, IShaderProgram*> m_pixelVariations[VertexFactory_Count];
+static InputLayoutDesc s_vertexInputLayout[] =
+{
+	{ "POSITION", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(Vertex, m_position), INPUT_PER_VERTEX_DATA, 0 },
+	{ "NORMAL", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(Vertex, m_normal), INPUT_PER_VERTEX_DATA, 0 },
+	{ "TEXCOORD", 0, ImageFormat::RG32F, 0, (UINT)offsetof(Vertex, m_texcoord0), INPUT_PER_VERTEX_DATA, 0 },
+	{ "TANGENT", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(Vertex, m_tangent), INPUT_PER_VERTEX_DATA, 0 },
+	{ "BINORMAL", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(Vertex, m_bitangent), INPUT_PER_VERTEX_DATA, 0 }
+};
+
+static InputLayoutDesc s_animatedVertexInputLayout[] =
+{
+	{ "POSITION", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(AnimatedVertex, m_position), INPUT_PER_VERTEX_DATA, 0 },
+	{ "NORMAL", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(AnimatedVertex, m_normal), INPUT_PER_VERTEX_DATA, 0 },
+	{ "TEXCOORD", 0, ImageFormat::RG32F, 0, (UINT)offsetof(AnimatedVertex, m_texcoord), INPUT_PER_VERTEX_DATA, 0 },
+	{ "TANGENT", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(AnimatedVertex, m_tangent), INPUT_PER_VERTEX_DATA, 0 },
+	{ "BINORMAL", 0, ImageFormat::RGB32F, 0, (UINT)offsetof(AnimatedVertex, m_bitangent), INPUT_PER_VERTEX_DATA, 0 },
+	{ "BLENDWEIGHT", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(AnimatedVertex, m_weights), INPUT_PER_VERTEX_DATA, 0 },
+	{ "BLENDINDICES", 0, ImageFormat::RGBA32F, 0, (UINT)offsetof(AnimatedVertex, m_boneIDs), INPUT_PER_VERTEX_DATA, 0 }
+};
 
 std::string getPixelVariationDefine(uint32_t pixelVariation)
 {
@@ -29,8 +47,20 @@ std::string getPixelVariationName(const std::string& instanceName, uint32_t pixe
 	return shaderName;
 }
 
+IShaderProgram* MaterialInstance_Generic::ms_pixelVariations[VertexFactory_Count][512];
+
 MaterialInstance_Generic::MaterialInstance_Generic()
 {
+	// #TODO: MAKE NORMAL SHADER PRECACHE
+	static bool isInited = false;
+	if (!isInited)
+	{
+		getShaderProgramVariation(VertexFactory_StaticMesh, PixelVariation_Lit);
+		getShaderProgramVariation(VertexFactory_StaticMesh, PixelVariation_Unlit);
+		getShaderProgramVariation(VertexFactory_SkinnedMesh, PixelVariation_Lit);
+		//getShaderProgramVariation(VertexFactory_SkinnedMesh, PixelVariation_Unlit);
+		isInited = true;
+	}
 }
 
 MaterialInstance_Generic::~MaterialInstance_Generic()
@@ -41,14 +71,11 @@ IShaderProgram* MaterialInstance_Generic::getShaderProgramVariation(VertexFactor
 {
 	Assert(vertexFactory <= VertexFactory_Count);
 
+	if (ms_pixelVariations[vertexFactory][pixelVariation])
+		return ms_pixelVariations[vertexFactory][pixelVariation];
+
 	std::string variationName = getPixelVariationName("materialinstance_generic", pixelVariation);
-	auto& pixelVariationMap = m_pixelVariations[vertexFactory];
-
-	auto it = pixelVariationMap.find(variationName);
-	if (it != pixelVariationMap.end())
-		return it->second;
-
-	Core::msg("Graphics: Generation variation '%s' for MaterialInstance_Generic", variationName.c_str());
+	Core::Msg("Graphics: Generation variation '%s' for MaterialInstance_Generic", variationName.c_str());
 
 	std::string defines = getPixelVariationDefine(pixelVariation);
 
@@ -57,22 +84,22 @@ IShaderProgram* MaterialInstance_Generic::getShaderProgramVariation(VertexFactor
 	switch (vertexFactory)
 	{
 	case VertexFactory_StaticMesh:
-		shaderProgram = g_shaderManager->createShaderProgram(
+		shaderProgram = g_shaderManager->CreateShaderProgram(
 			"materialinstance_generic.vsh",
 			"materialinstance_generic.psh",
 			defines.c_str(),
-			g_vertexInputLayout,
-			sizeof(g_vertexInputLayout) / sizeof(g_vertexInputLayout[0]));
+			s_vertexInputLayout,
+			sizeof(s_vertexInputLayout) / sizeof(s_vertexInputLayout[0]));
 		break;
 	case VertexFactory_SkinnedMesh:
 		defines += "SKINNED\n";
 
-		shaderProgram = g_shaderManager->createShaderProgram(
+		shaderProgram = g_shaderManager->CreateShaderProgram(
 			"materialinstance_generic.vsh",
 			"materialinstance_generic.psh",
 			defines.c_str(),
-			g_animatedVertexInputLayout,
-			sizeof(g_animatedVertexInputLayout) / sizeof(g_animatedVertexInputLayout[0]));
+			s_animatedVertexInputLayout,
+			sizeof(s_animatedVertexInputLayout) / sizeof(s_animatedVertexInputLayout[0]));
 		break;
 	//case VertexFactory_Billboard:
 	//	break;
@@ -80,7 +107,7 @@ IShaderProgram* MaterialInstance_Generic::getShaderProgramVariation(VertexFactor
 
 	Assert2(shaderProgram, "Unknowed vertex factory");
 
-	pixelVariationMap.emplace(variationName, shaderProgram);
+	ms_pixelVariations[vertexFactory][pixelVariation] = shaderProgram;
 
 	return shaderProgram;
 }

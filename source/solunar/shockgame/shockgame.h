@@ -3,7 +3,7 @@
 
 #include "engine/gameinterface.h"
 
-namespace engine
+namespace solunar
 {
 
 class ShockGameInterface : public IGameInterface
@@ -12,13 +12,11 @@ public:
 	ShockGameInterface();
 	~ShockGameInterface();
 
-	void initialize() override;
-	void shutdown() override;
+	void Initialize() override;
+	void Shutdown() override;
 };
 
 ShockGameInterface* getShockGameInterface();
-
-void shockGamePlayerDebug(bool* open);
 
 }
 

@@ -3,7 +3,7 @@
 
 #include <fmod_studio.hpp>
 
-namespace engine
+namespace solunar
 {
 	std::string getStringFromFMODResult(FMOD_RESULT result);
 }

@@ -2,10 +2,10 @@
 #include "d3d11drv/d3d11rendertarget.h"
 #include "d3d11drv/d3d11texture2d.h"
 
-namespace engine
+namespace solunar
 {
 
-extern DXGI_FORMAT getDxgiFormat(ImageFormat format);
+extern DXGI_FORMAT GetDXGIFormat(ImageFormat format);
 
 D3D11RenderTarget::D3D11RenderTarget(ID3D11RenderTargetView* renderTargetView, ID3D11DepthStencilView* depthStencilView)
 {
@@ -41,15 +41,15 @@ D3D11RenderTarget::D3D11RenderTarget(D3D11Device* device, const RenderTargetCrea
 	memset(m_renderTargetViews.data(), 0, m_renderTargetViews.size() * sizeof(ID3D11RenderTargetView));
 	memset(m_shaderResourceViews.data(), 0, m_shaderResourceViews.size() * sizeof(ID3D11ShaderResourceView));
 
-	create(device, renderTargetDesc);
+	Create(device, renderTargetDesc);
 }
 
 D3D11RenderTarget::~D3D11RenderTarget()
 {
-	release();
+	Release();
 }
 
-void D3D11RenderTarget::create(D3D11Device* device, const RenderTargetCreationDesc& renderTargetDesc)
+void D3D11RenderTarget::Create(D3D11Device* device, const RenderTargetCreationDesc& renderTargetDesc)
 {
 	for (int i = 0; i < renderTargetDesc.m_textures2DCount; i++)
 	{
@@ -65,7 +65,7 @@ void D3D11RenderTarget::create(D3D11Device* device, const RenderTargetCreationDe
 
 		D3D11_RENDER_TARGET_VIEW_DESC renderTargetViewDesc;
 		memset(&renderTargetViewDesc, 0, sizeof(renderTargetViewDesc));
-		renderTargetViewDesc.Format = getDxgiFormat(textureDesc.m_format);
+		renderTargetViewDesc.Format = GetDXGIFormat(textureDesc.m_format);
 		renderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
 		renderTargetViewDesc.Texture2D.MipSlice = 0;
 
@@ -76,9 +76,10 @@ void D3D11RenderTarget::create(D3D11Device* device, const RenderTargetCreationDe
 
 		// Create shader resource view
 
+#if 0
 		D3D11_SHADER_RESOURCE_VIEW_DESC shaderResourceViewDesc;
 		memset(&shaderResourceViewDesc, 0, sizeof(shaderResourceViewDesc));
-		shaderResourceViewDesc.Format = getDxgiFormat(textureDesc.m_format);
+		shaderResourceViewDesc.Format = GetDXGIFormat(textureDesc.m_format);
 		shaderResourceViewDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		shaderResourceViewDesc.Texture2D.MipLevels = 1;
 		
@@ -86,6 +87,8 @@ void D3D11RenderTarget::create(D3D11Device* device, const RenderTargetCreationDe
 		D3D11_CHECK(device->getDevice()->CreateShaderResourceView(d3dTexture, &shaderResourceViewDesc, &shaderResourceView));
 		
 		m_shaderResourceViews[i] = shaderResourceView;
+#endif
+		m_shaderResourceViews[i] = texture2D->getTextureSRV();
 	}
 
 	// Create depth render target
@@ -120,33 +123,15 @@ void D3D11RenderTarget::create(D3D11Device* device, const RenderTargetCreationDe
 	}
 }
 
-void D3D11RenderTarget::release()
+void D3D11RenderTarget::Release()
 {
-	//for (ID3D11ShaderResourceView** it = m_shaderResourceViews.begin(); it != m_shaderResourceViews.end(); ++it)
-	//{
-	//	ID3D11ShaderResourceView* handle = (*it);
-	//	if (handle)
-	//	{
-	//		handle->Release();
-	//		handle = nullptr;
-	//	}
-	//}
-
-	//for (ID3D11RenderTargetView** it = m_renderTargetViews.begin(); it != m_renderTargetViews.end(); ++it)
-	//{
-	//	ID3D11RenderTargetView* handle = (*it);
-	//	if (handle)
-	//	{
-	//		handle->Release();
-	//		handle = nullptr;
-	//	}
-	//}
-
+#if 0
 	for (auto& it : m_shaderResourceViews)
 	{
 		if (it)
 			it->Release();
 	}
+#endif
 
 	for (auto& it : m_renderTargetViews)
 	{
@@ -161,6 +146,15 @@ void D3D11RenderTarget::release()
 	}
 }
 
+void D3D11RenderTarget::SetDebugName(const char* debugName)
+{
+	for (auto it : m_renderTargetViews)
+	{
+		if (it)
+			it->SetPrivateData(WKPDID_D3DDebugObjectName, strlen(debugName), debugName);
+	}
+}
+
 void D3D11RenderTarget::bind(D3D11Device* device)
 {
 	ID3D11DeviceContext* deviceContext = device->getDeviceContext();
@@ -169,7 +163,7 @@ void D3D11RenderTarget::bind(D3D11Device* device)
 	{
 		// #TODO: Hack with depth stencil installation
 		deviceContext->OMSetRenderTargets(1, &m_renderTargetViews[i], (i == 0) ? m_depthStencilView : nullptr);
-		deviceContext->PSGetShaderResources(i, 1, &m_shaderResourceViews[i]);
+		//deviceContext->PSSetShaderResources(i, 1, &m_shaderResourceViews[i]);
 	}
 
 	// #TODO: !!!

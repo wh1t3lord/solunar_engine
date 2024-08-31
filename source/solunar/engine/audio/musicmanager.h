@@ -1,20 +1,20 @@
 #ifndef MUSICMANAGER_H
 #define MUSICMANAGER_H
 
-namespace engine
+namespace solunar
 {
 	class AudioSource;
 
 	class MusicManager : public Singleton<MusicManager>
 	{
 	public:
-		virtual void init() = 0;
-		virtual void shutdown() = 0;
+		virtual void Init() = 0;
+		virtual void Shutdown() = 0;
 
-		virtual void play(const std::string& filename, bool looped = false) = 0;
-		virtual void stop() = 0;
+		virtual void Play(const std::string& filename, bool looped = false) = 0;
+		virtual void Stop() = 0;
 
-		virtual bool isPlaying() = 0;
+		virtual bool IsPlaying() = 0;
 	};
 }
 

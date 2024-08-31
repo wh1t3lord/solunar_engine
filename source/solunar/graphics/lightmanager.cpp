@@ -5,35 +5,57 @@
 
 #include <imgui.h>
 
-namespace engine
+namespace solunar
 {
-	void LightManager::addLight(LightComponent* light)
+	void LightManager::AddLight(LightComponent* light)
 	{
 		Assert(light);
 		m_lights.push_back(light);
+
+		if (PointLightComponent* pointLight = dynamicCast<PointLightComponent>(light))
+			m_pointLights.push_back(pointLight);
+		else if (SpotLightComponent* spotLight = dynamicCast<SpotLightComponent>(light))
+			m_spotLights.push_back(spotLight);
 	}
 
-	void LightManager::removeLight(LightComponent* light)
+	void LightManager::RemoveLight(LightComponent* light)
 	{
 		Assert(light);
-		
-		typedef std::vector<LightComponent*>::iterator LT;
 
-		LT I = m_lights.begin();
-		LT E = m_lights.end();
+		auto it = std::find(m_lights.begin(), m_lights.end(), light);
+		if (it != m_lights.end())
+		{
+			m_lights.erase(it);
+		}
 
-		for (; I != E;)
-			if (*I == light)
-				break;
+		// clean from point light array
+		if (PointLightComponent* pointLight = dynamicCast<PointLightComponent>(light))
+		{
+			// find in array
+			auto it2 = std::find(m_pointLights.begin(), m_pointLights.end(), pointLight);
+			if (it2 != m_pointLights.end())
+			{
+				m_pointLights.erase(it2);
+			}
+		}
 
-		m_lights.erase(I);
+		// clean from spot light array
+		if (SpotLightComponent* spotLight = dynamicCast<SpotLightComponent>(light))
+		{
+			// find in array
+			auto it2 = std::find(m_spotLights.begin(), m_spotLights.end(), spotLight);
+			if (it2 != m_spotLights.end())
+			{
+				m_spotLights.erase(it2);
+			}
+		}
 	}
 
-	DirectionalLightComponent* LightManager::getDirectionalLight()
+	DirectionalLightComponent* LightManager::GetDirectionalLight()
 	{
 		for (auto it : m_lights)
 		{
-			if (it->isA<DirectionalLightComponent>())
+			if (it->IsA<DirectionalLightComponent>())
 				return dynamicCast<DirectionalLightComponent>(it);
 		}
 
@@ -45,22 +67,22 @@ namespace engine
 		if (ImGui::Begin("Light Editor", open))
 		{
 			DirectionalLightComponent* directionalLight = nullptr;
-			if (LightManager::getInstance()) directionalLight = LightManager::getInstance()->getDirectionalLight();
+			if (LightManager::GetInstance()) directionalLight = LightManager::GetInstance()->GetDirectionalLight();
 			if (directionalLight)
 			{
-				Entity* entity = directionalLight->getEntity();
+				Entity* entity = directionalLight->GetEntity();
 				ImGui::Text("DirectionalLightComponent at entity 0x%p", entity);
 
-				g_debugRender.drawBoundingBox(entity->getBoundingBox(), glm::vec3(1.f, 1.f, 0.f));
+				g_debugRender.drawBoundingBox(entity->GetBoundingBox(), glm::vec3(1.f, 1.f, 0.f));
 			
 				static glm::vec3 position = glm::vec3(0.f);
 				ImGui::DragFloat3("Position", &position[0], 0.2f, -20.f, 20.f);
-				entity->setPosition(position);
+				entity->SetPosition(position);
 
 #if 1
 				static glm::vec3 rotation = glm::vec3(0.0f);
 				ImGui::DragFloat3("Euler Rotation", &rotation[0], 1.0f, -360.f, 360.f);
-				entity->setEulerRotation(glm::radians(glm::vec3(rotation)));
+				entity->SetEulerRotation(glm::radians(glm::vec3(rotation)));
 #else
 				
 				ImGui::DragFloat3("Euler Rotation", &directionalLight->m_direction[0], 1.0f, -360.f, 360.f);
@@ -69,9 +91,9 @@ namespace engine
 				ImGui::DragFloat4("Color (R, G, B, A)", &color[0], 0.1f, 0.f, 1.f);
 				directionalLight->m_color = color;
 
-				g_debugRender.pushModelMatrix(entity->getWorldTranslation());
+				g_debugRender.PushModelMatrix(entity->GetWorldTranslation());
 				g_debugRender.drawAxis(glm::vec3(0.0f));
-				g_debugRender.popModelMatrix();
+				g_debugRender.PopModelMatrix();
 
 			}
 		}

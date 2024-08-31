@@ -1,7 +1,7 @@
 #include "d3d12drv_pch.h"
 #include "d3d12drv/d3d12bufferimpl.h"
 
-namespace engine
+namespace solunar
 {
 
 #if 0
@@ -72,15 +72,18 @@ D3D12BufferImpl::D3D12BufferImpl(D3D12Device* device, const BufferDesc& bufferDe
 	m_device(nullptr),
 	m_bufferDesc(bufferDesc)
 {
-	create(device, bufferDesc, subresourceDesc);
+	memset(&m_vertexBufferView, 0, sizeof(m_vertexBufferView));
+	memset(&m_indexBufferView, 0, sizeof(m_indexBufferView));
+
+	Create(device, bufferDesc, subresourceDesc);
 }
 
 D3D12BufferImpl::~D3D12BufferImpl()
 {
-	destroy();
+	Destroy();
 }
 
-void D3D12BufferImpl::create(D3D12Device* device, const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc)
+void D3D12BufferImpl::Create(D3D12Device* device, const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc)
 {
 	Assert2(device, "Failed to create buffer without initialized device.");
 	m_device = device;
@@ -122,14 +125,22 @@ void D3D12BufferImpl::create(D3D12Device* device, const BufferDesc& bufferDesc, 
 	memcpy(pDataBegin, subresourceDesc.m_memory, bufferDesc.m_bufferMemorySize);
 	m_buffer->Unmap(0, nullptr);
 
-	m_bufferView.BufferLocation = m_buffer->GetGPUVirtualAddress();
-	m_bufferView.StrideInBytes = subresourceDesc.m_memoryPitch;
-	m_bufferView.SizeInBytes = bufferDesc.m_bufferMemorySize;
+	if (bufferDesc.m_bufferType == BufferType::VertexBuffer)
+	{
+		m_vertexBufferView.BufferLocation = m_buffer->GetGPUVirtualAddress();
+		m_vertexBufferView.StrideInBytes = subresourceDesc.m_memoryPitch;
+		m_vertexBufferView.SizeInBytes = bufferDesc.m_bufferMemorySize;
+	}
+	else if (bufferDesc.m_bufferType == BufferType::IndexBuffer)
+	{
+		m_indexBufferView.BufferLocation = m_buffer->GetGPUVirtualAddress();
+		m_indexBufferView.SizeInBytes = bufferDesc.m_bufferMemorySize;
+	}
 }
 
-void D3D12BufferImpl::destroy()
+void D3D12BufferImpl::Destroy()
 {
-	memset(&m_bufferView, 0, sizeof(m_bufferView));
+	memset(&m_vertexBufferView, 0, sizeof(m_vertexBufferView));
 
 	if (m_buffer)
 	{
@@ -140,7 +151,7 @@ void D3D12BufferImpl::destroy()
 	m_device = nullptr;
 }
 
-void* D3D12BufferImpl::map(BufferMapping mapping)
+void* D3D12BufferImpl::Map(BufferMapping mapping)
 {
 	UINT8* data = nullptr;
 	D3D12_RANGE readRange = { 0, 0 };        // We do not intend to read from this resource on the CPU.
@@ -148,15 +159,20 @@ void* D3D12BufferImpl::map(BufferMapping mapping)
 	return data;
 }
 
-void D3D12BufferImpl::unmap()
+void D3D12BufferImpl::Unmap()
 {
 	m_buffer->Unmap(0, nullptr);
 }
 
-void D3D12BufferImpl::updateSubresource(void* data, size_t size)
+void D3D12BufferImpl::UpdateSubresource(void* data, size_t size)
 {
 	Assert2(0, "Implement please");
 //	m_device->getDeviceContext()->UpdateSubresource(m_buffer, 0, NULL, data, 0, 0);
+}
+
+void D3D12BufferImpl::setIndexFormat(bool is16BitIndices)
+{
+	m_indexBufferView.Format = is16BitIndices ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT;
 }
 
 }

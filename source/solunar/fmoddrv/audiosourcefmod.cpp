@@ -6,7 +6,7 @@
 
 #include "fmoddrv/audiosourcefmod.h"
 
-namespace engine
+namespace solunar
 {
 	AudioSourceFMOD::AudioSourceFMOD(const std::string& filename, FMOD::System* system)
 	{
@@ -15,14 +15,14 @@ namespace engine
 		Assert(system);
 		m_system = system;
 
-		DataStreamPtr file = g_contentManager->openStream(filename);
+		DataStreamPtr file = g_contentManager->OpenStream(filename);
 
-		file->seek(Seek_End, 0);
-		size_t size = file->tell();
-		file->seek(Seek_Begin, 0);
+		file->Seek(Seek_End, 0);
+		size_t size = file->Tell();
+		file->Seek(Seek_Begin, 0);
 
 		char* data = (char*)malloc(size * sizeof(char));
-		file->read(data, size);
+		file->Read(data, size);
 
 		FMOD_CREATESOUNDEXINFO exinfo;
 		memset(&exinfo, 0, sizeof(exinfo));
@@ -32,7 +32,7 @@ namespace engine
 		FMOD_RESULT result = m_system->createSound(data, FMOD_OPENMEMORY, &exinfo, &m_sound);
 		if (result != FMOD_OK)
 		{
-			Core::error("[audio]: failed to create sound! FMOD ERROR: %s", getStringFromFMODResult(result).c_str());
+			Core::Error("[audio]: failed to create sound! FMOD ERROR: %s", getStringFromFMODResult(result).c_str());
 		}
 
 		free(data);
@@ -43,18 +43,18 @@ namespace engine
 
 	}
 
-	bool AudioSourceFMOD::isPlaying()
+	bool AudioSourceFMOD::IsPlaying()
 	{
 		bool playing = false;
 		FMOD_RESULT result = m_soundChannel->isPlaying(&playing);
 		if ((result != FMOD_OK) && (result != FMOD_ERR_INVALID_HANDLE) && (result != FMOD_ERR_CHANNEL_STOLEN))
 		{
-			Core::error("[audio]: AudioSourceFMOD::isPlaying: %s", getStringFromFMODResult(result).c_str());
+			Core::Error("[audio]: AudioSourceFMOD::IsPlaying: %s", getStringFromFMODResult(result).c_str());
 		}
 		return playing;
 	}
 
-	void AudioSourceFMOD::play()
+	void AudioSourceFMOD::Play()
 	{
 		Assert(m_system);
 		Assert(m_sound);
@@ -66,24 +66,26 @@ namespace engine
 			result = m_system->playSound(m_sound, 0, false, &m_soundChannel);
 			if (result != FMOD_OK)
 			{
-				Core::error("[audio]: failed to play sound! [audio]: FMOD ERROR: %s", getStringFromFMODResult(result));
+				Core::Error("[audio]: failed to Play sound! [audio]: FMOD ERROR: %s", 
+				getStringFromFMODResult(result).c_str());
 			}
 		}
 
 		if (m_soundChannel)
 		{
-			if (isPlaying())
-				stop();
+			if (IsPlaying())
+				Stop();
 
 			result = m_system->playSound(m_sound, 0, false, &m_soundChannel);
 			if (result != FMOD_OK)
 			{
-				Core::error("[audio]: failed to play sound![audio]: FMOD ERROR: %s", getStringFromFMODResult(result));
+				Core::Error("[audio]: failed to Play sound![audio]: FMOD ERROR: %s", 
+				getStringFromFMODResult(result).c_str());
 			}
 		}
 	}
 
-	void AudioSourceFMOD::play(FMOD::ChannelGroup* channelGroup, bool looped /*= false*/)
+	void AudioSourceFMOD::Play(FMOD::ChannelGroup* channelGroup, bool looped /*= false*/)
 	{
 		Assert(channelGroup);
 		Assert(m_system);
@@ -96,7 +98,8 @@ namespace engine
 			result = m_system->playSound(m_sound, channelGroup, false, &m_soundChannel);
 			if (result != FMOD_OK)
 			{
-				Core::error("[audio]: failed to play sound! [audio]: FMOD ERROR: %s", getStringFromFMODResult(result));
+				Core::Error("[audio]: failed to Play sound! [audio]: FMOD ERROR: %s", 
+				getStringFromFMODResult(result).c_str());
 			}
 
 			m_soundChannel->setLoopCount(-1);
@@ -104,22 +107,23 @@ namespace engine
 
 		if (m_soundChannel)
 		{
-			if (isPlaying())
-				stop();
+			if (IsPlaying())
+				Stop();
 
 			result = m_system->playSound(m_sound, channelGroup, false, &m_soundChannel);
 			if (result != FMOD_OK)
 			{
-				Core::error("[audio]: failed to play sound![audio]: FMOD ERROR: %s", getStringFromFMODResult(result));
+				Core::Error("[audio]: failed to Play sound![audio]: FMOD ERROR: %s", 
+				getStringFromFMODResult(result).c_str());
 			}
 		}
 	}
 
-	void AudioSourceFMOD::stop()
+	void AudioSourceFMOD::Stop()
 	{
 		if (!m_soundChannel)
 		{
-			Core::error("[audio]: trying to stop sound when his sounds channel is not created!");
+			Core::Error("[audio]: trying to Stop sound when his sounds channel is not created!");
 		}
 
 		m_soundChannel->stop();

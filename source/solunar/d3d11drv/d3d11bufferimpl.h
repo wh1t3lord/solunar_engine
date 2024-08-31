@@ -3,7 +3,7 @@
 
 #include "d3d11drv/d3d11device.h"
 
-namespace engine
+namespace solunar
 {
 
 class D3D11BufferImpl : public IBufferBase
@@ -12,13 +12,13 @@ public:
 	D3D11BufferImpl(D3D11Device* device, const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc);
 	~D3D11BufferImpl();
 
-	void create(D3D11Device* device, const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc);
-	void destroy();
+	void Create(D3D11Device* device, const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc);
+	void Destroy();
 
-	void* map(BufferMapping mapping) override;
-	void unmap() override;
+	void* Map(BufferMapping mapping) override;
+	void Unmap() override;
 
-	void updateSubresource(void * data, size_t size) override;
+	void UpdateSubresource(void * data, size_t size) override;
 
 	BufferDesc getBufferDesc() override { return m_bufferDesc; }
 

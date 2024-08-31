@@ -5,7 +5,7 @@
 
 #include "engine/eventmanager.h"
 
-namespace engine
+namespace solunar
 {
 
 class ShockEventListener : public IEventListener

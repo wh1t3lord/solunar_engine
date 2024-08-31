@@ -24,7 +24,9 @@
 		<AnimatedMeshComponent>
 			<Model filename="models/test_enemy.glb"/>
 		</AnimatedMeshComponent>
-		<TestAnimationComponent/>
+		<TestAnimationComponent>
+			<AnimationName value="idle"/>
+		</TestAnimationComponent>
 	</Entity> 
 	
 	<!-- Test point light -->

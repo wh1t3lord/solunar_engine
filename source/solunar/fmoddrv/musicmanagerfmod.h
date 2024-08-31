@@ -3,7 +3,7 @@
 
 #include "engine/audio/musicmanager.h"
 
-namespace engine
+namespace solunar
 {
 	class AudioSource;
 
@@ -13,13 +13,13 @@ namespace engine
 		MusicManagerFMOD();
 		~MusicManagerFMOD();
 
-		void init();
-		void shutdown();
+		void Init();
+		void Shutdown();
 
-		void play(const std::string& filename, bool looped = false);
-		void stop();
+		void Play(const std::string& filename, bool looped = false);
+		void Stop();
 
-		bool isPlaying();
+		bool IsPlaying();
 
 	private:
 		FMOD::ChannelGroup* m_musicChannel;

@@ -8,7 +8,7 @@
 #include "graphics/rendercontext.h"
 #include "graphics/graphicsworld.h"
 
-namespace engine
+namespace solunar
 {
 	enum class ShaderConstantType
 	{
@@ -20,6 +20,16 @@ namespace engine
 		Matrix3x3,
 //		Matrix3x4,
 		Matrix4x4,
+	};
+
+	enum ConstantBufferBindings
+	{
+		CBBindings_Scene,
+		CBBindings_Skinning,
+		CBBindings_DirectionalLight,
+		CBBindings_PointLights,
+		CBBindings_SpotLights,
+		CBBindings_LightData,
 	};
 
 	struct StaticMeshGlobalData
@@ -59,6 +69,7 @@ namespace engine
 	extern ConstantBufferProxy g_staticMeshConstantBuffer;
 	extern ConstantBufferProxy g_directionalLightConstantBuffer;
 	extern ConstantBufferProxy g_pointLightConstantBuffer;
+	extern ConstantBufferProxy g_spotLightConstantBuffer;
 	extern ConstantBufferProxy g_lightDataConstantBuffer;
 
 	class ShaderConstantManager : public Singleton<ShaderConstantManager>
@@ -67,11 +78,11 @@ namespace engine
 		ShaderConstantManager();
 		~ShaderConstantManager();
 
-		void init();
-		void shutdown();
+		void Init();
+		void Shutdown();
 
 		template <typename BufferStructureData>
-		ConstantBufferProxy create(const std::string& name);
+		ConstantBufferProxy Create(const std::string& name);
 	
 		ConstantBufferProxy get(const std::string& name);
 
@@ -84,7 +95,7 @@ namespace engine
 	};
 
 	template<typename BufferStructureData>
-	inline ConstantBufferProxy ShaderConstantManager::create(const std::string& name)
+	inline ConstantBufferProxy ShaderConstantManager::Create(const std::string& name)
 	{
 		// Create constant buffer
 
@@ -95,11 +106,11 @@ namespace engine
 
 		SubresourceDesc subresourceDesc = {};
 
-		IBufferBase* buffer = g_renderDevice->createBuffer(bufferDesc, subresourceDesc);
+		IBufferBase* buffer = g_renderDevice->CreateBuffer(bufferDesc, subresourceDesc);
 
 		m_constantBuffers.emplace(name, buffer);
 
-		Core::msg("ShaderConstantManager: created constant buffer %s (%i bytes)", name.c_str(), bufferDesc.m_bufferMemorySize);
+		Core::Msg("ShaderConstantManager: created constant buffer %s (%i bytes)", name.c_str(), bufferDesc.m_bufferMemorySize);
 
 		return ConstantBufferProxy(buffer);
 	}

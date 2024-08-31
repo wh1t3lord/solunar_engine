@@ -1,7 +1,7 @@
 #ifndef VIEW_H
 #define VIEW_H
 
-namespace engine
+namespace solunar
 {
 	class View
 	{

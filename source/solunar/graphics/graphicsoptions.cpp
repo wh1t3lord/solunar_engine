@@ -3,7 +3,7 @@
 
 #include "core/utils/iniFile.h"
 
-namespace engine
+namespace solunar
 {
 	GraphicsOptions g_graphicsOptions;
 
@@ -27,7 +27,7 @@ namespace engine
 		return true;
 	}
 
-	void GraphicsOptions::saveSettings(const std::string& filename)
+	void GraphicsOptions::SaveSettings(const std::string& filename)
 	{
 		CIniFile settingsFile(filename.c_str());
 		if (settingsFile.ReadFile())

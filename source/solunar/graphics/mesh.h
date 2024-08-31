@@ -3,13 +3,13 @@
 
 #include "graphics/model.h"
 
-namespace engine {
+namespace solunar {
 
 	//class MeshResource : public Content
 	//{
-	//	ImplementObject(MeshResource, Content);
+	//	IMPLEMENT_OBJECT(MeshResource, Content);
 	//public:
-	//	static void registerObject();
+	//	static void RegisterObject();
 
 	//public:
 	//	MeshResource();
@@ -18,19 +18,24 @@ namespace engine {
 
 	class MeshComponent : public Component
 	{
-		ImplementObject(MeshComponent, Component);
+		DECLARE_OBJECT(MeshComponent);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 
 	public:
 		MeshComponent();
 		~MeshComponent();
 
-		virtual void loadXML(tinyxml2::XMLElement& element) override;
-		virtual void saveXML(tinyxml2::XMLElement& element) override;
-		void loadModel(const std::string& filename);
+		virtual void LoadXML(tinyxml2::XMLElement& element) override;
+		virtual void SaveXML(tinyxml2::XMLElement& element) override;
 
-		virtual void render();
+		virtual void OnWorldSet(World* world) override;
+
+		virtual void OnEntityRemove() override;
+
+		void LoadModel(const std::string& filename);
+
+		virtual void Render();
 
 		std::shared_ptr<ModelBase> lockModel();
 		std::weak_ptr<ModelBase> getModel();
@@ -41,13 +46,13 @@ namespace engine {
 
 	class AnimatedMeshComponent : public MeshComponent
 	{
-		ImplementObject(AnimatedMeshComponent, MeshComponent);
+		DECLARE_OBJECT(AnimatedMeshComponent);
 	public:
 		AnimatedMeshComponent();
 		~AnimatedMeshComponent();
 
-		void loadXML(tinyxml2::XMLElement& element) override;
-		void loadModel(const std::string& filename);
+		void LoadXML(tinyxml2::XMLElement& element) override;
+		void LoadModel(const std::string& filename);
 	};
 
 }

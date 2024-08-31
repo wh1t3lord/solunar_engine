@@ -20,6 +20,7 @@
 #include "core/object/object.h"
 #include "core/object/serializableobject.h"
 #include "core/object/typemanager.h"
+#include "core/object/propertymanager.h"
 
 #include "engine/entity/entity.h"
 #include "engine/entity/component.h"

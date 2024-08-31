@@ -1,11 +1,13 @@
 #include "gamepch.h"
 #include "game/gamelogic/player/playercontrollercomponent.h"
 
-namespace engine {
+namespace solunar {
 	
-	void PlayerControllerComponent::registerObject()
+	IMPLEMENT_OBJECT(PlayerControllerComponent, LogicComponent);
+
+	void PlayerControllerComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<PlayerControllerComponent>();
+		g_typeManager->RegisterObject<PlayerControllerComponent>();
 	}
 	
 	PlayerControllerComponent::PlayerControllerComponent()
@@ -18,9 +20,9 @@ namespace engine {
 		
 	}
 
-	void PlayerControllerComponent::loadXML(tinyxml2::XMLElement& element)
+	void PlayerControllerComponent::LoadXML(tinyxml2::XMLElement& element)
 	{
-		SerializableObject::loadXML(element);
+		SerializableObject::LoadXML(element);
 
 		tinyxml2::XMLElement* onGroundProperty = element.FirstChildElement("OnGround");
 		if (onGroundProperty)
@@ -33,18 +35,18 @@ namespace engine {
 		}
 	}
 
-	void PlayerControllerComponent::saveXML(tinyxml2::XMLElement& element)
+	void PlayerControllerComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
-		SerializableObject::saveXML(element);
+		SerializableObject::SaveXML(element);
 	}
 	
-	void PlayerControllerComponent::onEntitySet(Entity* entity)
+	void PlayerControllerComponent::OnEntitySet(Entity* entity)
 	{
-		LogicComponent::onEntitySet(entity);
+		LogicComponent::OnEntitySet(entity);
 	}
 	
-	void PlayerControllerComponent::update(float dt)
+	void PlayerControllerComponent::Update(float dt)
 	{
-		LogicComponent::update(dt);
+		LogicComponent::Update(dt);
 	}
 }

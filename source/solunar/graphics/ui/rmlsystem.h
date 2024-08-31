@@ -10,7 +10,7 @@
 #include <RmlUi/Core.h>
 #include <RmlUi/Debugger.h>
 
-namespace engine
+namespace solunar
 {
 
 class RmlSystem : public Singleton<RmlSystem>
@@ -20,14 +20,14 @@ public:
 	RmlSystem();
 	~RmlSystem();
 
-	void init();
-	void shutdown();
+	void Init();
+	void Shutdown();
 
 	void createContext(int width, int height);
 
-	void render();
+	void Render();
 
-	Rml::Context* getContext();
+	Rml::Context* GetContext();
 
 private:
 	// Backend

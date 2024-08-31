@@ -1,7 +1,7 @@
 #include "d3d11drv_pch.h"
 #include "d3d11drv/d3d11bufferimpl.h"
 
-namespace engine
+namespace solunar
 {
 
 UINT getD3D11BindFlags(const BufferDesc& bufferDesc)
@@ -70,15 +70,15 @@ D3D11BufferImpl::D3D11BufferImpl(D3D11Device* device, const BufferDesc& bufferDe
 	m_device(nullptr),
 	m_bufferDesc(bufferDesc)
 {
-	create(device, bufferDesc, subresourceDesc);
+	Create(device, bufferDesc, subresourceDesc);
 }
 
 D3D11BufferImpl::~D3D11BufferImpl()
 {
-	destroy();
+	Destroy();
 }
 
-void D3D11BufferImpl::create(D3D11Device* device, const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc)
+void D3D11BufferImpl::Create(D3D11Device* device, const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc)
 {
 	Assert2(device, "Failed to create buffer without initialized device.");
 	m_device = device;
@@ -100,7 +100,7 @@ void D3D11BufferImpl::create(D3D11Device* device, const BufferDesc& bufferDesc, 
 	D3D11_CHECK(device->getDevice()->CreateBuffer(&d3d11BufferDesc, subresourceDesc.m_memory ? &subresourceData : NULL, &m_buffer));
 }
 
-void D3D11BufferImpl::destroy()
+void D3D11BufferImpl::Destroy()
 {
 	if (m_buffer)
 	{
@@ -111,7 +111,7 @@ void D3D11BufferImpl::destroy()
 	m_device = nullptr;
 }
 
-void* D3D11BufferImpl::map(BufferMapping mapping)
+void* D3D11BufferImpl::Map(BufferMapping mapping)
 {
 	D3D11_MAPPED_SUBRESOURCE mappedSubresource;
 	memset(&mappedSubresource, 0, sizeof(mappedSubresource));
@@ -121,12 +121,12 @@ void* D3D11BufferImpl::map(BufferMapping mapping)
 	return mappedSubresource.pData;
 }
 
-void D3D11BufferImpl::unmap()
+void D3D11BufferImpl::Unmap()
 {
 	m_device->getDeviceContext()->Unmap(m_buffer, 0);
 }
 
-void D3D11BufferImpl::updateSubresource(void* data, size_t size)
+void D3D11BufferImpl::UpdateSubresource(void* data, size_t size)
 {
 	m_device->getDeviceContext()->UpdateSubresource(m_buffer, 0, NULL, data, 0, 0);
 }

@@ -3,7 +3,7 @@
 
 #include "graphics/core/texture.h"
 
-namespace engine
+namespace solunar
 {
 
 class GLSamplerState : public ISamplerState

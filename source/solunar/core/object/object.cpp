@@ -8,54 +8,56 @@
 #include <string>
 #include <functional>
 
-namespace engine
+namespace solunar
 {
-	TypeInfo::TypeInfo(const char* name, StaticConstructor_t staticConstructor, size_t classSize, size_t classAlign, const TypeInfo* baseInfo)
-	{
-		m_name = name;
-		m_staticConstructor = staticConstructor;
-		m_classSize = classSize;
-		m_classAlign = classAlign;
-		m_baseInfo = baseInfo;
-		m_stringHash = std::hash<std::string>{}(name);
-	}
 
-	TypeInfo::~TypeInfo()
-	{
-		m_baseInfo = nullptr;
-		m_name = nullptr;
-	}
+TypeInfo::TypeInfo(const char* name, StaticConstructor_t staticConstructor, size_t classSize, size_t classAlign, const TypeInfo* baseInfo)
+{
+	m_name = name;
+	m_staticConstructor = staticConstructor;
+	m_classSize = classSize;
+	m_classAlign = classAlign;
+	m_baseInfo = baseInfo;
+	m_stringHash = std::hash<std::string>{}(name);
+}
 
-	const bool TypeInfo::isA(const TypeInfo* typeInfo) const
-	{
-		Assert(typeInfo);
+TypeInfo::~TypeInfo()
+{
+	m_baseInfo = nullptr;
+	m_name = nullptr;
+}
 
-		for (const TypeInfo* it = this; it != nullptr; it = it->m_baseInfo)
-			if (it->getStringHash() == typeInfo->getStringHash())
-				return true;
+const bool TypeInfo::IsA(const TypeInfo* typeInfo) const
+{
+	Assert(typeInfo);
 
-		return false;
-	}
+	for (const TypeInfo* it = this; it != nullptr; it = it->m_baseInfo)
+		if (it->GetStringHash() == typeInfo->GetStringHash())
+			return true;
 
-	const bool TypeInfo::isExactly(const TypeInfo* typeInfo) const
-	{
-		Assert(typeInfo);
-		return (getStringHash() == typeInfo->getStringHash());
-	}
+	return false;
+}
 
+const bool TypeInfo::IsExactly(const TypeInfo* typeInfo) const
+{
+	Assert(typeInfo);
+	return (GetStringHash() == typeInfo->GetStringHash());
+}
 
-	Object::Object()
-	{
-	}
+IMPLEMENT_ROOT_OBJECT(Object);
 
-	Object::~Object()
-	{
-	}
+Object::Object()
+{
+}
 
-	void objectDeleter(Object* p)
-	{
-		mem_delete(p);
-		p = nullptr;
-	}
+Object::~Object()
+{
+}
+
+void ObjectDeleter(Object* p)
+{
+	mem_delete(p);
+	p = nullptr;
+}
 
 }

@@ -1,7 +1,7 @@
 #ifndef GRAPHICS_CORE_TEXTURE_H
 #define GRAPHICS_CORE_TEXTURE_H
 
-namespace engine
+namespace solunar
 {
 
 class ITexture
@@ -12,6 +12,9 @@ public:
 	virtual void updateTexture(const void* data, int rowPitch, int depthPitch) = 0;
 
 	virtual SurfaceDesc getSurfaceDesc() = 0;
+
+	//! Set debug name.
+	virtual void SetDebugName(const char* debugName) = 0;
 };
 
 class ITexture2D : public ITexture

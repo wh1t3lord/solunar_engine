@@ -2,18 +2,18 @@
 #include "core/memory/memorymanager.h"
 #include "core/memory/mallocallocator.h"
 
-namespace engine
+namespace solunar
 {
 	
 IAllocator* MemoryManager::ms_pDefaultAllocator = nullptr;
 
-void MemoryManager::initialize()
+void MemoryManager::Initialize()
 {
 	static MallocAllocator s_mallocAllocator;
 	ms_pDefaultAllocator = &s_mallocAllocator;
 }
 
-void MemoryManager::shutdown()
+void MemoryManager::Shutdown()
 {
 	ms_pDefaultAllocator = nullptr;
 }

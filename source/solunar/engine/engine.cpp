@@ -1,5 +1,7 @@
 #include "enginepch.h"
 #include "core/file/contentmanager.h"
+#include "core/timer.h"
+
 #include "engine/engine.h"
 #include "engine/entity/entity.h"
 #include "engine/entity/component.h"
@@ -10,49 +12,10 @@
 #include "engine/physics/shapescomponent.h"
 #include "engine/physics/rigidbodycomponent.h"
 #include "engine/physics/trianglemeshshape.h"
+#include "engine/physics/triggercomponent.h"
 
-namespace engine
+namespace solunar
 {
-
-	//void registerEngineObjects()
-	//{
-	//	// TODO: Rewrite to Class::registerObject()
-
-	//	TypeManager::getInstance()->registerObject<Entity>();
-	//	TypeManager::getInstance()->registerObject<Component>();
-	//	TypeManager::getInstance()->registerObject<World>();
-
-	//	TypeManager::getInstance()->registerObject<CameraComponent>();
-	//	TypeManager::getInstance()->registerObject<CameraYawPitchRollComponent>();
-	//	TypeManager::getInstance()->registerObject<CameraFirstPersonComponent>();
-
-	//	TypeManager::getInstance()->registerObject<LogicComponent>();
-
-	//	// Physics
-	//	ShapeComponent::registerObject();
-	//	BoxShapeComponent::registerObject();
-	//	SphereShapeComponent::registerObject();
-	//	CylinderShapeComponent::registerObject();
-	//	CapsuleShapeComponent::registerObject();
-	//	TriangleMeshShapeComponent::registerObject();
-	//	RigidBodyComponent::registerObject();
-	//	RigidBodyProxyComponent::registerObject();
-
-	//	/*Node::registerObject();
-	//	CameraNode::registerObject();
-
-	//	Component::registerObject();
-	//	TransformComponent::registerObject();
-	//	LogicComponent::registerObject();
-
-
-	//	WorldComponent::registerObject();
-	//	WorldEnvironmentComponent::registerObject();
-
-	//	World::registerObject();
-	//	LoadingRoomManager::registerObject();*/
-	//}
-
 	EngineData g_engineData;
 
 	// There is more nice looking object registration
@@ -61,32 +24,33 @@ namespace engine
 		const TypeInfo* engineClasses[] = 
 		{
 			// base types
-			Entity::getStaticTypeInfo(),
-			Component::getStaticTypeInfo(),
-			World::getStaticTypeInfo(),
+			Entity::GetStaticTypeInfo(),
+			Component::GetStaticTypeInfo(),
+			World::GetStaticTypeInfo(),
 
 			// camera
-			CameraComponent::getStaticTypeInfo(),
-			CameraYawPitchRollComponent::getStaticTypeInfo(),
-			CameraFirstPersonComponent::getStaticTypeInfo(),
+			CameraComponent::GetStaticTypeInfo(),
+			CameraYawPitchRollComponent::GetStaticTypeInfo(),
+			CameraFirstPersonComponent::GetStaticTypeInfo(),
 
 			// logic
-			LogicComponent::getStaticTypeInfo(),
+			LogicComponent::GetStaticTypeInfo(),
 
 			// physics
-			ShapeComponent::getStaticTypeInfo(),
-			BoxShapeComponent::getStaticTypeInfo(),
-			SphereShapeComponent::getStaticTypeInfo(),
-			CylinderShapeComponent::getStaticTypeInfo(),
-			CapsuleShapeComponent::getStaticTypeInfo(),
-			TriangleMeshShapeComponent::getStaticTypeInfo(),
-			RigidBodyComponent::getStaticTypeInfo(),
-			RigidBodyProxyComponent::getStaticTypeInfo()
+			ShapeComponent::GetStaticTypeInfo(),
+			BoxShapeComponent::GetStaticTypeInfo(),
+			SphereShapeComponent::GetStaticTypeInfo(),
+			CylinderShapeComponent::GetStaticTypeInfo(),
+			CapsuleShapeComponent::GetStaticTypeInfo(),
+			TriangleMeshShapeComponent::GetStaticTypeInfo(),
+			RigidBodyComponent::GetStaticTypeInfo(),
+			RigidBodyProxyComponent::GetStaticTypeInfo(),
+			TriggerComponent::GetStaticTypeInfo()
 		};
 
 		// register types
 		for (int i = 0; i < sizeof(engineClasses) / sizeof(engineClasses[0]); i++)
-			TypeManager::getInstance()->registerType(engineClasses[i]);
+			TypeManager::GetInstance()->RegisterType(engineClasses[i]);
 	}
 
 	bool g_harakiriLogicThread = false;
@@ -118,42 +82,42 @@ namespace engine
 		{
 			if (g_worldIsReady)
 			{
-				Assert2(Engine::ms_world, "Trying to update nullptr world. Check g_worldIsReady!");
+				Assert2(Engine::ms_world, "Trying to Update nullptr world. Check g_worldIsReady!");
 
-				Engine::ms_world->updateLogicWorld();
+				Engine::ms_world->Update_LogicEntity();
 			}
 
 			Sleep(10);
 		}
 
-		Core::msg("LogicThread: exiting ...");
+		Core::Msg("LogicThread: exiting ...");
 	}
 
 	LogicThread g_logicThread;
 
 	World* Engine::ms_world = nullptr;
 
-	void Engine::init()
+	void Engine::Init()
 	{
-		Core::msg("Initializing engine");
+		Core::Msg("Initializing engine");
 
 		registerEngineObjects();
 
 		// Start logic thread
 //		g_logicThread.start();
 
-		//ScriptManager::getInstance()->init();
+		//ScriptManager::GetInstance()->Init();
 
 		// initalize console
-		//g_console->init();
+		//g_console->Init();
 
-		//WorldManager::init();
+		//WorldManager::Init();
 
 		//g_harakiriLogicThread = true;
 		//g_logicThread.stop();
 	}
 
-	void Engine::shutdown()
+	void Engine::Shutdown()
 	{
 		// harakiri logic thread
 	//	g_harakiriLogicThread = true;
@@ -161,21 +125,21 @@ namespace engine
 
 		if (ms_world)
 		{
-			Core::msg("Engine: world is present on engine shutdown, deleting ...");
+			Core::Msg("Engine: world is present on engine shutdown, deleting ...");
 
 			mem_delete(ms_world);
 			ms_world = nullptr;
 		}
 
-		// shutdown console
-	//	g_console->shutdown();
+		// Shutdown console
+	//	g_console->Shutdown();
 
-		//ScriptManager::getInstance()->shutdown();
+		//ScriptManager::GetInstance()->Shutdown();
 
 		//destroyComponentCacheSystem();
 	}
 
-	void Engine::loadWorld(const std::string& filename)
+	void Engine::LoadWorld(const std::string& filename)
 	{
 		if (ms_world)
 		{
@@ -183,16 +147,21 @@ namespace engine
 			ms_world = nullptr;
 		}
 
-		Core::msg("Engine: Loading world %s", filename.c_str());
+		Core::Msg("Engine: Loading world %s", filename.c_str());
 
-		std::shared_ptr<DataStream> stream = g_contentManager->openStream(filename);
+		std::shared_ptr<DataStream> stream = g_contentManager->OpenStream(filename);
+		if (!stream)
+		{
+			Core::Msg("Engine::loadWorld: Failed to load world %s. File not exist!", filename.c_str());
+			return;
+		}
 
-		stream->seek(Seek_End, 0);
-		size_t length = stream->tell();
-		stream->seek(Seek_Begin, 0);
+		stream->Seek(Seek_End, 0);
+		size_t length = stream->Tell();
+		stream->Seek(Seek_Begin, 0);
 
 		char* data = new char[length + 1];
-		stream->read((void*)data, length);
+		stream->Read((void*)data, length);
 		data[length] = '\0';
 
 		tinyxml2::XMLDocument doc;
@@ -200,20 +169,24 @@ namespace engine
 		
 		if (error != tinyxml2::XML_SUCCESS)
 		{
-			Core::error("Engine::loadWorld: Failed to parse world %s.", filename.c_str());
+			Core::Error("Engine::loadWorld: Failed to parse world %s. %s", filename.c_str(), doc.ErrorStr());
 		}
 		
 		tinyxml2::XMLElement* worldElement = doc.FirstChildElement("World");;
 
-		World* world = g_typeManager->createObject<World>();
-		world->loadXML(*worldElement);
+		World* world = g_typeManager->CreateObject<World>();
+		world->LoadXML(*worldElement);
 		
 		ms_world = world;
 		
 		delete[] data;
+
+		// #TODO: RESET TIMER AND RUN ONE FRAME INSTEAD
+		Timer::GetInstance()->Update();
+		Timer::GetInstance()->Update();
 	}
 
-	void Engine::loadEmptyWorld()
+	void Engine::LoadEmptyWorld()
 	{
 		if (ms_world)
 		{
@@ -221,34 +194,38 @@ namespace engine
 			ms_world = nullptr;
 		}
 
-		Core::msg("Engine: Creating empty world");
+		Core::Msg("Engine: Creating empty world");
 
-		World* world = g_typeManager->createObject<World>();
+		World* world = g_typeManager->CreateObject<World>();
 		ms_world = world;
+
+		// #TODO: RESET TIMER AND RUN ONE FRAME INSTEAD
+		Timer::GetInstance()->Update();
+		Timer::GetInstance()->Update();
 	}
 
-	void Engine::update()
+	void Engine::Update()
 	{
 		//OPTICK_EVENT("Engine::update");
 
-		EngineStateManager::getInstance()->update();
+		EngineStateManager::GetInstance()->Update();
 
-		//g_eventManager.update();
+		//g_eventManager.Update();
 
 		World* world = Engine::ms_world;
 		if (world)
 		{
-			world->update_PreEntityUpdate();
-			world->updatePhysicsWorld();
-			world->updateLogicWorld();
+			world->Update_PreEntityUpdate();
+			world->Update_PhysicsEntity();
+			world->Update_LogicEntity();
 		}
 	}
 
-	void Engine::setGameInterface(IGameInterface* gameInterface)
+	void Engine::SetGameInterface(IGameInterface* gameInterface)
 	{
 	}
 
-	IGameInterface* Engine::getGameInterface()
+	IGameInterface* Engine::GetGameInterface()
 	{
 		return nullptr;
 	}
@@ -265,28 +242,28 @@ namespace engine
 	{
 	}
 
-	void EngineStateManager::loadWorld(const std::string& filename)
+	void EngineStateManager::LoadWorld(const std::string& filename)
 	{
 		m_nextState = EngineState::LoadWorld;
 		m_worldName = filename;
 	}
 
-	void EngineStateManager::loadEmptyWorld()
+	void EngineStateManager::LoadEmptyWorld()
 	{
 		m_nextState = EngineState::LoadWorld;
 		m_worldName.clear();
 	}
 
-	void EngineStateManager::update()
+	void EngineStateManager::Update()
 	{
 		if (m_currentState == m_nextState)
 			return;
 
 		m_currentState = m_nextState;
-		onStateSwitch();
+		OnStateSwitch();
 	}
 
-	void EngineStateManager::onStateSwitch()
+	void EngineStateManager::OnStateSwitch()
 	{
 		static const char* s_stateNames[(int)EngineState::Count] =
 		{
@@ -295,7 +272,7 @@ namespace engine
 			"LoadWorld"
 		};
 
-		Core::msg("Engine: Switching to state %s", s_stateNames[(int)m_nextState]);
+		Core::Msg("Engine: Switching to state %s", s_stateNames[(int)m_nextState]);
 
 		switch (m_currentState)
 		{
@@ -303,9 +280,9 @@ namespace engine
 			break;
 		case EngineState::LoadWorld:
 			if (m_worldName.empty())
-				Engine::loadEmptyWorld();
+				Engine::LoadEmptyWorld();
 			else
-				Engine::loadWorld(m_worldName);
+				Engine::LoadWorld(m_worldName);
 
 			m_nextState = EngineState::Running;
 

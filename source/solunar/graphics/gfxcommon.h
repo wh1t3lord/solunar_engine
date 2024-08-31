@@ -1,7 +1,7 @@
 #ifndef GFXCOMMON_H
 #define GFXCOMMON_H
 
-namespace engine
+namespace solunar
 {
 	enum class ImageFormat
 	{
@@ -26,7 +26,10 @@ namespace engine
 		RGBA32F,
 		DEPTH32F,
 
-		RGBA32_UNORM
+		RGBA32_UNORM,
+
+		// not used, just for counting
+		LAST
 	};
 
 	enum class BufferMapping
@@ -88,10 +91,10 @@ namespace engine
 	{
 		virtual ~IBufferBase() {}
 
-		virtual void* map(BufferMapping mapping) = 0;
-		virtual void  unmap() = 0;
+		virtual void* Map(BufferMapping mapping) = 0;
+		virtual void  Unmap() = 0;
 
-		virtual void updateSubresource(void* data, size_t size) = 0;
+		virtual void UpdateSubresource(void* data, size_t size) = 0;
 
 		virtual BufferDesc getBufferDesc() = 0;
 	};

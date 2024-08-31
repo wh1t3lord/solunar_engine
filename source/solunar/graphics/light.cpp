@@ -5,13 +5,24 @@
 #include "graphics/lightmanager.h"
 #include "graphics/graphicsworld.h"
 
-namespace engine
+namespace solunar
 {
+	IMPLEMENT_OBJECT(LightComponent, Component);
+
+	BEGIN_PROPERTY_REGISTER(LightComponent)
+	{
+		REGISTER_PROPERTY(LightComponent, PropertyVector3, m_color);
+		REGISTER_PROPERTY(LightComponent, PropertyVector3, m_ambientColor);
+		REGISTER_PROPERTY(LightComponent, PropertyVector3, m_specularColor);
+		REGISTER_PROPERTY(LightComponent, PropertyFloat, m_radius);
+	}
+	END_PROPERTY_REGISTER(LightComponent)
+
 	LightComponent::LightComponent()
 	{
-		m_color = glm::vec3(2.0);
-		m_ambientColor = glm::vec3(0.2);
-		m_specularColor = glm::vec3(1.0);
+		m_color = glm::vec3(2.0f);
+		m_ambientColor = glm::vec3(0.2f);
+		m_specularColor = glm::vec3(1.0f);
 	//	m_shininess = 128;
 		m_radius = 5.0f;
 	}
@@ -20,42 +31,42 @@ namespace engine
 	{
 	}
 
-	void LightComponent::registerObject()
+	void LightComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<LightComponent>();
+		g_typeManager->RegisterObject<LightComponent>();
 	}
 
-	void LightComponent::onEntitySet(Entity* entity)
+	void LightComponent::OnEntitySet(Entity* entity)
 	{
-		Component::onEntitySet(entity);
+		Component::OnEntitySet(entity);
 
-		World* world = getWorld();
+		World* world = GetWorld();
 		if (world)
 		{
-			if (GraphicsWorld* gfxWorld = world->getGraphicsWorld())
+			if (GraphicsWorld* gfxWorld = world->GetGraphicsWorld())
 			{
-				gfxWorld->getLightManager()->addLight(this);
+				gfxWorld->GetLightManager()->AddLight(this);
 			}
 		}
 	}
 
-	void LightComponent::onEntityRemove()
+	void LightComponent::OnEntityRemove()
 	{
-		World* world = getWorld();
+		World* world = GetWorld();
 		if (world)
 		{
-			if (GraphicsWorld* gfxWorld = world->getGraphicsWorld())
+			if (GraphicsWorld* gfxWorld = world->GetGraphicsWorld())
 			{
-				gfxWorld->getLightManager()->removeLight(this);
+				gfxWorld->GetLightManager()->RemoveLight(this);
 			}
 		}
 		
-		Component::onEntityRemove();
+		Component::OnEntityRemove();
 	}
 
-	void LightComponent::loadXML(tinyxml2::XMLElement& element)
+	void LightComponent::LoadXML(tinyxml2::XMLElement& element)
 	{
-		Component::loadXML(element);
+		Component::LoadXML(element);
 
 		tinyxml2::XMLElement* ambientColorElement = element.FirstChildElement("AmbientColor");
 		if (ambientColorElement)
@@ -95,18 +106,23 @@ namespace engine
 		}
 	}
 
-	void LightComponent::saveXML(tinyxml2::XMLElement& element)
+	void LightComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
 	}
 
-	void PointLightComponent::registerObject()
+	/////////////////////////////////////////////////////////////////////
+	// Point Light
+
+	IMPLEMENT_OBJECT(PointLightComponent, LightComponent);
+
+	void PointLightComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<PointLightComponent>();
+		g_typeManager->RegisterObject<PointLightComponent>();
 	}
 
-	void PointLightComponent::loadXML(tinyxml2::XMLElement& element)
+	void PointLightComponent::LoadXML(tinyxml2::XMLElement& element)
 	{
-		LightComponent::loadXML(element);
+		LightComponent::LoadXML(element);
 
 		tinyxml2::XMLElement* radiusElement = element.FirstChildElement("Radius");
 		Assert(radiusElement && "Point light require radius element!");
@@ -117,13 +133,58 @@ namespace engine
 		m_radius = radiusValue->FloatValue();
 	}
 
-	void PointLightComponent::saveXML(tinyxml2::XMLElement& element)
+	void PointLightComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
 	}
 
-	void DirectionalLightComponent::registerObject()
+
+	/////////////////////////////////////////////////////////////////////
+	// Directional Light
+
+	IMPLEMENT_OBJECT(DirectionalLightComponent, LightComponent);
+
+	BEGIN_PROPERTY_REGISTER(DirectionalLightComponent)
 	{
-		g_typeManager->registerObject<DirectionalLightComponent>();
+		REGISTER_PROPERTY(DirectionalLightComponent, PropertyVector3, m_direction);
+	}
+	END_PROPERTY_REGISTER(DirectionalLightComponent)
+
+	void DirectionalLightComponent::RegisterObject()
+	{
+		g_typeManager->RegisterObject<DirectionalLightComponent>();
+	}
+
+	/////////////////////////////////////////////////////////////////////
+	// Spot Light
+
+	IMPLEMENT_OBJECT(SpotLightComponent, LightComponent);
+
+	BEGIN_PROPERTY_REGISTER(SpotLightComponent)
+	{
+		REGISTER_PROPERTY(SpotLightComponent, PropertyFloat, m_cutoff);
+	}
+	END_PROPERTY_REGISTER(SpotLightComponent)
+
+	void SpotLightComponent::RegisterObject()
+	{
+		g_typeManager->RegisterObject<SpotLightComponent>();
+	}
+
+	void SpotLightComponent::LoadXML(tinyxml2::XMLElement& element)
+	{
+		LightComponent::LoadXML(element);
+
+		tinyxml2::XMLElement* cutoffElement = element.FirstChildElement("Cutoff");
+		Assert(cutoffElement && "Spot light require cutoff element!");
+
+		const tinyxml2::XMLAttribute* cutoffValue = cutoffElement->FindAttribute("value");
+		Assert(cutoffValue && "Spot light require value attribute in cutoff element!");
+
+		m_cutoff = cutoffValue->FloatValue();
+	}
+
+	void SpotLightComponent::SaveXML(tinyxml2::XMLElement& element)
+	{
 	}
 
 }

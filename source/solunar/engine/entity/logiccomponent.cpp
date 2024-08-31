@@ -1,21 +1,23 @@
 #include "enginepch.h"
 #include "engine/entity/logiccomponent.h"
 
-namespace engine
+namespace solunar
 {
-	LogicComponent::LogicComponent()
-	{
 
-	}
+IMPLEMENT_OBJECT(LogicComponent, Component);
 
-	LogicComponent::~LogicComponent()
-	{
+LogicComponent::LogicComponent()
+{
 
-	}
+}
 
-	void LogicComponent::update(float delta)
-	{
+LogicComponent::~LogicComponent()
+{
 
-	}
+}
+
+void LogicComponent::Update(float delta)
+{
+}
 
 }

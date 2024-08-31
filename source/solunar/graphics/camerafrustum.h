@@ -3,23 +3,40 @@
 
 #include "core/math/boundingbox.h"
 
-namespace engine
+#define CAMERA_FRUSTUM_PLANE_COUNT 6
+
+namespace solunar
 {
+	enum Halfspace
+	{
+		Halfspace_Negative = -1,
+		Halfspace_OnPlane = 0,
+		Halfspace_Positive = 1
+	};
+
 	struct Plane
 	{
 		float a, b, c;
 		float d;
+
+		void SetIdentity();
+		
+		Plane& normalize();
+
+		float distanceToPoint(const glm::vec3& pt);
+
+		Halfspace classifyPoint(const glm::vec3& pt);
 	};
 
 	class CameraFrustum
 	{
 	public:
-		void update(glm::mat4& vp);
+		void Update(glm::mat4& vp);
 
 		bool isBoundingBoxInside(const BoundingBox& boundingBox);
 
 	private:
-		Plane m_plane[6];
+		Plane m_planes[CAMERA_FRUSTUM_PLANE_COUNT];
 	};
 }
 

@@ -1,7 +1,7 @@
 #ifndef INPUTMANAGER_H
 #define INPUTMANAGER_H
 
-namespace engine
+namespace solunar
 {
 	enum KeyboardKeys
 	{
@@ -129,39 +129,52 @@ namespace engine
 		KEY_COUNT
 	};
 
-	class InputManager : public Singleton<InputManager> //public Object, public Singleton<InputManager>
+	enum MouseButtons
 	{
-		//ImplementObject(InputManager, Object);
+		MOUSE_BUTTON_UNKNOWN = -1,
+		MOUSE_BUTTON_LEFT,
+		MOUSE_BUTTON_MIDDLE,
+		MOUSE_BUTTON_RIGHT,
+
+		MOUSE_BUTTON_COUNT,
+	};
+
+	class InputManager : public Singleton<InputManager>
+	{
 	public:
 		InputManager();
 		virtual ~InputManager();
 
 		// Update the input manager
-		virtual void update();
+		virtual void Update();
 
 		// Get is key pressed. 
-		virtual bool isPressed(uint32_t key);
+		virtual bool IsPressed(uint32_t key);
 
 		// Get is key pressed and reset it. 
-		virtual bool isPressedWithReset(uint32_t key);
+		virtual bool IsPressedWithReset(uint32_t key);
+
+		// Get is mouse button pressed. 
+		virtual bool IsMouseButtonPressed(MouseButtons buttonId);
 
 		// Set cursor capture
-		virtual void setCursorCapture(bool capture);
+		virtual void SetCursorCapture(bool capture);
 
 		// Show or hide cursor
-		virtual void setCursorHiding(bool hide);
+		virtual void SetCursorHiding(bool hide);
 
 		// Reset mouse delta
-		void resetDelta();
+		void ResetDelta();
 
 		// Get cursor position.
-		const glm::vec2& getCursorPos() const { return m_cursorPos; }
+		const glm::vec2& GetCursorPos() const { return m_cursorPos; }
 
 		// Get delta cursor position.
-		const glm::vec2& getDeltaCursorPos() const { return m_deltaCursorPos; }
+		const glm::vec2& GetDeltaCursorPos() const { return m_deltaCursorPos; }
 
 	protected:
 		bool m_keys[KEY_COUNT];
+		bool m_mouseButtons[MOUSE_BUTTON_COUNT];
 		glm::vec2 m_cursorPos;
 		glm::vec2 m_lastCursorPos;
 		glm::vec2 m_deltaCursorPos;

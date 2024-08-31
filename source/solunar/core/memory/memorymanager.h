@@ -6,14 +6,14 @@
 
 #include <new>
 
-namespace engine
+namespace solunar
 {
 
 class MemoryManager
 {
 public:
-	static void initialize();
-	static void shutdown();
+	static void Initialize();
+	static void Shutdown();
 	
 	static IAllocator* getDefaultAllocator();
 

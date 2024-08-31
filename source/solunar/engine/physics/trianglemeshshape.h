@@ -3,7 +3,7 @@
 
 #include "engine/physics/shapescomponent.h"
 
-namespace engine
+namespace solunar
 {
 
 #define CM_MAGIC	"CollisionFile"
@@ -51,18 +51,18 @@ private:
 //! Trimesh collision shape
 class TriangleMeshShapeComponent : public ShapeComponent
 {
-	ImplementObject(TriangleMeshShapeComponent, ShapeComponent);
+	DECLARE_OBJECT(TriangleMeshShapeComponent);
 public:
 	TriangleMeshShapeComponent();
 	~TriangleMeshShapeComponent();
 
-	static void registerObject();
+	static void RegisterObject();
 
-	void loadXML(tinyxml2::XMLElement& element) override;
-	void saveXML(tinyxml2::XMLElement& element) override;
+	void LoadXML(tinyxml2::XMLElement& element) override;
+	void SaveXML(tinyxml2::XMLElement& element) override;
 
 private:
-	void createShapeInternal() override;
+	void CreateShapeInternal() override;
 };
 
 }

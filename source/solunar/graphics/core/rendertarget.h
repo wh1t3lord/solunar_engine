@@ -1,7 +1,7 @@
 #ifndef GRAPHICS_CORE_RENDERTARGET_H
 #define GRAPHICS_CORE_RENDERTARGET_H
 
-namespace engine {
+namespace solunar {
 
 	class ITexture2D;
 
@@ -21,10 +21,10 @@ namespace engine {
 		virtual ~IRenderTarget() {}
 
 		//! Release the render target.
-		virtual void release() = 0;
+		virtual void Release() = 0;
 
-		//! Get the GAPI handle.
-		virtual uint32_t getHandle() = 0;
+		//! Set debug name.
+		virtual void SetDebugName(const char* debugName) = 0;
 	};
 
 }

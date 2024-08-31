@@ -5,7 +5,7 @@
 
 #include "core/object/object.h"
 
-namespace engine
+namespace solunar
 {
 
 class TypeInfo;
@@ -14,40 +14,42 @@ class ITypedObject;
 class TypeManager
 {
 public:
-	static TypeManager* getInstance();
+	static TypeManager* GetInstance();
 
 public:
-	const TypeInfo* getTypeInfoByName(const char* name);
-	const TypeInfo* getTypeInfoById(size_t hash);
+	const TypeInfo* GetTypeInfoByName(const char* name);
+	const TypeInfo* GetTypeInfoById(size_t hash);
 
-	Object* createObjectByName(const char* name);
-	Object* createObjectByTypeInfo(const TypeInfo* typeInfo);
+	Object* CreateObjectByName(const char* name);
+	Object* CreateObjectByTypeInfo(const TypeInfo* typeInfo);
+
+	void RegisterType(const TypeInfo* typeInfo);
+
+	void GetRegisteredTypes(std::vector<const TypeInfo*>& registeredTypes);
 
 	template <typename T>
-	T* createObject();
-
-	void registerType(const TypeInfo* typeInfo);
+	T* CreateObject();
 
 	template <typename T>
-	void registerObject();
+	void RegisterObject();
 
 private:
 	std::vector<const TypeInfo*> m_registeredTypes;
 };
 
 template<typename T>
-inline T* TypeManager::createObject()
+inline T* TypeManager::CreateObject()
 {
-	return (T*)createObjectByTypeInfo(T::getStaticTypeInfo());
+	return (T*)CreateObjectByTypeInfo(T::GetStaticTypeInfo());
 }
 
 template<typename T>
-inline void TypeManager::registerObject()
+inline void TypeManager::RegisterObject()
 {
-	registerType( T::getStaticTypeInfo() );
+	RegisterType( T::GetStaticTypeInfo() );
 }
 
-#define g_typeManager TypeManager::getInstance()
+#define g_typeManager TypeManager::GetInstance()
 
 }
 

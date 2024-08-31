@@ -4,7 +4,7 @@
 #include "core/math/boundingbox.h"
 #include "graphics/graphicsobject.h"
 
-namespace engine
+namespace solunar
 {
 	struct Vertex
 	{
@@ -33,9 +33,9 @@ namespace engine
 
 		~SubMesh();
 
-		void destroy();
+		void Destroy();
 
-		void render();
+		void Render();
 
 		IBufferBase* getVertexBuffer() { return m_vertexBuffer; }
 		IBufferBase* getIndexBuffer() { return m_indexBuffer; }
@@ -66,22 +66,21 @@ namespace engine
 
 	class ModelBase : public GraphicsObject
 	{
-		ImplementObject(ModelBase, GraphicsObject);
+		DECLARE_OBJECT(ModelBase);
 	public:
 		ModelBase();
-		ModelBase(const std::string& name);
 		~ModelBase();
 
-		static void registerObject();
+		static void RegisterObject();
 
-		virtual void load(const std::shared_ptr<DataStream>& dataStream);
+		virtual void Load(const std::shared_ptr<DataStream>& dataStream);
 		
-		virtual void destroy();
+		virtual void Destroy();
 
 		virtual void renderObjects();
 
-		virtual void createHw() override;
-		virtual void releaseHw() override;
+		virtual void CreateHw() override;
+		virtual void ReleaseHw() override;
 
 		void saveBinary(const std::string& filename);
 
@@ -124,22 +123,22 @@ namespace engine
 	//! Model submesh class
 	class ModelSubmesh : public GraphicsObject
 	{
-		ImplementObject(ModelSubmesh, GraphicsObject);
+		DECLARE_OBJECT(ModelSubmesh);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 
 		//! NOTE: The file pointer must be set before any ModelFileSubmeshData entries!
 		void load(DataStreamPtr stream);
-		void save(DataStreamPtr stream);
+		void Save(DataStreamPtr stream);
 
-		void createHw() override;
-		void releaseHw() override;
+		void CreateHw() override;
+		void ReleaseHw() override;
 
 		// Accessors
 		IBufferBase* getVerticesBuffer() const { return m_verticesBuffer; }
 		IBufferBase* getIndicesBuffer() const { return m_indicesBuffer; }
-		const size_t getVerticesCount() const { return m_verticesCount; }
-		const size_t getIndicesCount() const { return m_indicesCount; }
+		const uint32_t getVerticesCount() const { return m_verticesCount; }
+		const uint32_t getIndicesCount() const { return m_indicesCount; }
 		std::weak_ptr<Material> getMaterial() const { return m_material; }
 
 	private:
@@ -153,27 +152,27 @@ namespace engine
 		IBufferBase* m_verticesBuffer;
 		IBufferBase* m_indicesBuffer;
 
-		size_t m_verticesCount;
-		size_t m_indicesCount;
+		uint32_t m_verticesCount;
+		uint32_t m_indicesCount;
 
 	};
 
 	//! Model class
 	class Model : public GraphicsObject
 	{
-		ImplementObject(Model, GraphicsObject);
+		DECLARE_OBJECT(Model);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 		
 	public:
 		Model();
 		~Model();
 
-		void load(const std::shared_ptr<DataStream>& stream) override;
-		void save(const std::shared_ptr<DataStream>& stream) override;
+		void Load(const std::shared_ptr<DataStream>& stream) override;
+		void Save(const std::shared_ptr<DataStream>& stream) override;
 
-		void createHw() override;
-		void releaseHw() override;
+		void CreateHw() override;
+		void ReleaseHw() override;
 
 	private:
 		std::vector<std::shared_ptr<ModelSubmesh>> m_submeshes;

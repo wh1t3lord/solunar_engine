@@ -2,11 +2,11 @@
 #include "gldrv/glrendertarget.h"
 #include "gldrv/gltexture2d.h"
 
-namespace engine {
+namespace solunar {
 
 	GLRenderTarget::GLRenderTarget(const RenderTargetCreationDesc& renderTargetDesc)
 	{
-		create(renderTargetDesc);
+		Create(renderTargetDesc);
 	}
 
 	GLRenderTarget::~GLRenderTarget()
@@ -14,7 +14,7 @@ namespace engine {
 		m_handle = 0;
 	}
 
-	void GLRenderTarget::create(const RenderTargetCreationDesc& renderTargetDesc)
+	void GLRenderTarget::Create(const RenderTargetCreationDesc& renderTargetDesc)
 	{
 		Assert(renderTargetDesc.m_textures2DCount != 0);
 
@@ -40,14 +40,14 @@ namespace engine {
 		glDrawBuffers(colorAttachments.size(), colorAttachments.data());
 
 		if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-			Core::error("GLRenderTarget::create: Framebuffer is not complete.");
+			Core::Error("GLRenderTarget::create: Framebuffer is not complete.");
 		}
 	
 		//unbind
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
-	void GLRenderTarget::release()
+	void GLRenderTarget::Release()
 	{
 		glDeleteFramebuffers(1, &m_handle);
 	}
@@ -55,6 +55,10 @@ namespace engine {
 	uint32_t GLRenderTarget::getHandle()
 	{
 		return m_handle;
+	}
+
+	void GLRenderTarget::SetDebugName(const char* debugName)
+	{
 	}
 
 	void GLRenderTarget::attachTexture2D(int slot, ITexture2D* textureHandle)

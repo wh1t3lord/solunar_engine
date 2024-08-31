@@ -1,5 +1,5 @@
 Texture2D g_texture 	: register(t0);
-SamplerState g_sampler 	: register(s0);
+SamplerState g_sampler { AddressU = Clamp; AddressV = Wrap; };
 
 float4 PSMain(float4 position : SV_POSITION, float2 texcoord : TEXCOORD) : SV_Target
 {
@@ -10,7 +10,7 @@ float4 PSMain(float4 position : SV_POSITION, float2 texcoord : TEXCOORD) : SV_Ta
     float3 color = g_texture.Sample(g_sampler, texcoord).rgb;
     
     // black by default
-    fragColor = vec4(0.0, 0.0, 0.0, 1.0);
+    fragColor = float4(0.0, 0.0, 0.0, 1.0);
     
     float brightness = dot(color, float3(0.2126, 0.7152, 0.0722));
     if (brightness > 1.0)

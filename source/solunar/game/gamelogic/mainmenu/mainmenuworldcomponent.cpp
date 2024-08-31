@@ -3,11 +3,13 @@
 
 #include "engine/entity/world.h"
 
-namespace engine {
+namespace solunar {
 	
-	void MainMenuWorldComponent::registerObject()
+	IMPLEMENT_OBJECT(MainMenuWorldComponent, LogicComponent);
+
+	void MainMenuWorldComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<MainMenuWorldComponent>();
+		g_typeManager->RegisterObject<MainMenuWorldComponent>();
 	}
 	
 	MainMenuWorldComponent::MainMenuWorldComponent()
@@ -18,12 +20,12 @@ namespace engine {
 	{	
 	}
 	
-	void MainMenuWorldComponent::onWorldSet(World* world)
+	void MainMenuWorldComponent::OnWorldSet(World* world)
 	{
-		Component::onWorldSet(world);
+		Component::OnWorldSet(world);
 		
-		// Initialize game state to draw menu and release mouse pointer
-		// GameState::getInstance()->setGameState(GameState::GAME_STATE_MAIN_MENU);
+		// Initialize game state to draw menu and Release mouse pointer
+		// GameState::GetInstance()->setGameState(GameState::GAME_STATE_MAIN_MENU);
 	}
 
 }

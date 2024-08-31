@@ -5,7 +5,7 @@
 
 #include <RmlUi/Core/RenderInterface.h>
 
-namespace engine
+namespace solunar
 {
 
 class IShaderProgram;
@@ -23,11 +23,11 @@ public:
 	RmlRenderer();
 	~RmlRenderer();
 
-	void init();
-	void shutdown();
+	void Init();
+	void Shutdown();
 
-	void beginFrame();
-	void endFrame();
+	void BeginFrame();
+	void EndFrame();
 
 	// Rml::RenderInterface interface
 

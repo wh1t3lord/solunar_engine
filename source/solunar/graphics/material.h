@@ -6,7 +6,7 @@
 #include "graphics/texturemap.h"
 #include "graphics/graphicsobject.h"
 
-namespace engine
+namespace solunar
 {
 	enum MAT_TEX
 	{
@@ -20,41 +20,6 @@ namespace engine
 	class IShaderProgram;
 	struct IRasterizerState;
 	struct IBlendState;
-
-	struct MaterialUniforms
-	{
-		// Material data
-		uint32_t m_albedoColor;
-
-		// Samplers
-		uint32_t m_albedoTexture;
-		uint32_t m_normalTexture;
-		uint32_t m_hasNormalTexture;
-		uint32_t m_specularTexture;
-		uint32_t m_hasSpecularTexture;
-
-		
-		uint32_t m_selfillum;
-		uint32_t m_viewPos;
-
-		// Matrices
-		uint32_t m_modelViewProjection;
-		uint32_t m_modelMatrix;
-		uint32_t m_viewMatrix;
-		uint32_t m_projectionMatrix;
-
-		// #TODO: Lights
-		uint32_t m_lightsCount;
-
-		// #TODO: CAMERA
-		uint32_t m_znear;
-		uint32_t m_zfar;
-
-		// Constant buffers
-		uint32_t m_perWorldMatricesLocation;
-		uint32_t m_perObjectMatricesLocation;
-		
-	};
 
 	class Material;
 	
@@ -71,7 +36,7 @@ namespace engine
 	{
 		friend IShaderProgram* createShaderProgramFromMaterial(Material* material);
 		
-		ImplementObject(Material, GraphicsObject);
+		DECLARE_OBJECT(Material);
 	public:
 		static void createMaterialFromImport(const char* name, const char* diffuseName, const char* normalName);
 
@@ -79,16 +44,16 @@ namespace engine
 		Material();
 		~Material();
 
-		void load(const std::shared_ptr<DataStream>& dataStream) override;
+		void Load(const std::shared_ptr<DataStream>& dataStream) override;
 
-		void loadXML(tinyxml2::XMLElement& element) override;
-		void saveXML(tinyxml2::XMLElement& element) override;
+		void LoadXML(tinyxml2::XMLElement& element) override;
+		void SaveXML(tinyxml2::XMLElement& element) override;
 
 	public:
 		void setName(const std::string& name) { m_materialName = name; }
 
-		void createHw() override;
-		void releaseHw() override;
+		void CreateHw() override;
+		void ReleaseHw() override;
 
 		void bindSamplers();
 
@@ -96,7 +61,7 @@ namespace engine
 
 		void bind();
 
-		std::string& getName() { return m_materialName; }
+		std::string& GetName() { return m_materialName; }
 
 		std::weak_ptr<TextureMap> getTexture(MAT_TEX tex);
 		MaterialType getMaterialType() { return m_materialType; }
@@ -120,8 +85,6 @@ namespace engine
 		std::string m_normalTextureName;
 		std::string m_specularTextureName;
 
-		MaterialUniforms m_uniforms;
-
 		glm::vec3 m_albedoColor;
 
 		MaterialType m_materialType;
@@ -137,32 +100,32 @@ namespace engine
 
 	class NullMaterial : public Material
 	{
-		ImplementObject(NullMaterial, Material);
+		DECLARE_OBJECT(NullMaterial);
 	public:
 		NullMaterial();
 		~NullMaterial();
 
-		static void registerObject();
+		static void RegisterObject();
 	};
 
 	class GenericMaterial : public Material
 	{
-		ImplementObject(GenericMaterial, Material);
+		DECLARE_OBJECT(GenericMaterial);
 	public:
 		GenericMaterial();
 		~GenericMaterial();
 
-		static void registerObject();
+		static void RegisterObject();
 	};
 
 	class LayeredMaskedMaterial : public Material
 	{
-		ImplementObject(LayeredMaskedMaterial, Material);
+		DECLARE_OBJECT(LayeredMaskedMaterial);
 	public:
 		LayeredMaskedMaterial();
 		~LayeredMaskedMaterial();
 
-		static void registerObject();
+		static void RegisterObject();
 	};
 }
 

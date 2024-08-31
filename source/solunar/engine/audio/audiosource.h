@@ -1,17 +1,17 @@
 #ifndef AUDIOSOURCE_H
 #define AUDIOSOURCE_H
 
-namespace engine
+namespace solunar
 {
 	class AudioSource
 	{
 	public:
 		virtual ~AudioSource() {}
 
-		virtual bool isPlaying();
+		virtual bool IsPlaying();
 
-		virtual void play();
-		virtual void stop();
+		virtual void Play();
+		virtual void Stop();
 	};
 }
 

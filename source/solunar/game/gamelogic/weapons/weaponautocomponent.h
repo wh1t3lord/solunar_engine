@@ -3,19 +3,19 @@
 
 #include "game/gamelogic/weapons/weaponcomponent.h"
 
-namespace engine
+namespace solunar
 {
 
 class WeaponAutoComponent : public WeaponComponent
 {
-    ImplementObject(WeaponAutoComponent, WeaponComponent);
+    DECLARE_OBJECT(WeaponAutoComponent);
 public:
-    static void registerObject();
+    static void RegisterObject();
 
     WeaponAutoComponent();
     ~WeaponAutoComponent();
 
-    virtual void update(float dt);
+    virtual void Update(float dt);
 };
     
 }

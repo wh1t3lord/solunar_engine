@@ -1,12 +1,14 @@
 #include "gamepch.h"
 #include "weaponautocomponent.h"
 
-namespace engine
+namespace solunar
 {
 
-void WeaponAutoComponent::registerObject()
+IMPLEMENT_OBJECT(WeaponAutoComponent, WeaponComponent);
+
+void WeaponAutoComponent::RegisterObject()
 {
-    g_typeManager->registerObject<WeaponAutoComponent>();
+    g_typeManager->RegisterObject<WeaponAutoComponent>();
 }
 
 WeaponAutoComponent::WeaponAutoComponent()
@@ -17,9 +19,9 @@ WeaponAutoComponent::~WeaponAutoComponent()
 {
 }
 
-void WeaponAutoComponent::update(float dt)
+void WeaponAutoComponent::Update(float dt)
 {
-    WeaponComponent::update(dt);
+    WeaponComponent::Update(dt);
 }
     
 }

@@ -1,7 +1,7 @@
 #ifndef COMMON_SYSEVENT_H
 #define COMMON_SYSEVENT_H
 
-namespace engine {
+namespace solunar {
 
 	typedef void* EventHandle_t;
 

@@ -3,18 +3,18 @@
 
 #include "engine/entity/component.h"
 
-namespace engine
+namespace solunar
 {
 
 class CameraComponent : public Component
 {
-	ImplementObject(CameraComponent, Component);
+	DECLARE_OBJECT(CameraComponent);
 public:
 	CameraComponent();
 	virtual ~CameraComponent();
 
-	void setDirection(const glm::vec3& direction);
-	glm::vec3 getDirection();
+	void SetDirection(const glm::vec3& direction);
+	glm::vec3 GetDirection();
 
 protected:
 	glm::vec3 m_direction;
@@ -24,16 +24,16 @@ protected:
 // Yaw pitch roll camera
 class CameraYawPitchRollComponent : public CameraComponent
 {
-	ImplementObject(CameraYawPitchRollComponent, CameraComponent);
+	DECLARE_OBJECT(CameraYawPitchRollComponent);
 public:
 	CameraYawPitchRollComponent();
 	virtual ~CameraYawPitchRollComponent();
 
 	//! Update yaw, pitch and roll angle from mouse position.
-	virtual void updateFromMousePosition(const glm::vec2 mousePos);
+	virtual void updateFromMousePosition(const glm::vec2& mousePos);
 
 	//! Set directly your euler angles
-	void setEulerRotation(float yaw, float pitch, float roll);
+	void SetEulerRotation(float yaw, float pitch, float roll);
 
 	// #TODO: make getters 
 public:
@@ -45,13 +45,13 @@ public:
 // First person camera
 class CameraFirstPersonComponent : public CameraYawPitchRollComponent
 {
-	ImplementObject(CameraFirstPersonComponent, CameraYawPitchRollComponent);
+	DECLARE_OBJECT(CameraFirstPersonComponent);
 public:
 	CameraFirstPersonComponent();
 	virtual ~CameraFirstPersonComponent();
 
 	//! Update yaw, pitch and roll angle from mouse position.
-	virtual void updateFromMousePosition(const glm::vec2 mousePos);
+	virtual void updateFromMousePosition(const glm::vec2& mousePos);
 };
 
 }

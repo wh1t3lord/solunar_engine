@@ -4,11 +4,15 @@
 #include "graphics/renderer.h"
 #include "graphics/animatedmodel.h"
 
-namespace engine {
+#include "engine/entity/world.h"
 
-	void MeshComponent::registerObject()
+namespace solunar {
+
+	IMPLEMENT_OBJECT(MeshComponent, Component);
+
+	void MeshComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<MeshComponent>();
+		g_typeManager->RegisterObject<MeshComponent>();
 	}
 
 	MeshComponent::MeshComponent()
@@ -20,7 +24,7 @@ namespace engine {
 		m_model.reset();
 	}
 
-	void MeshComponent::loadXML(tinyxml2::XMLElement& element)
+	void MeshComponent::LoadXML(tinyxml2::XMLElement& element)
 	{
 		tinyxml2::XMLElement* modelElement = element.FirstChildElement("Model");
 		if (modelElement)
@@ -29,30 +33,41 @@ namespace engine {
 			if (filenameAttribute && strlen( filenameAttribute->Value())>0)
 			{
 				std::string filename = filenameAttribute->Value();
-				m_model = g_contentManager->loadObject<ModelBase>(filename);
+				m_model = g_contentManager->LoadObject<ModelBase>(filename);
 			}
 			else
 			{
-				Core::msg("WARNING: MeshComponent at entity(0x%p) has empty filename attribute in Model element!", getEntity());
+				Core::Msg("WARNING: MeshComponent at entity(0x%p) has empty filename attribute in Model element!", GetEntity());
 			}
 		}
 	}
 
-	void MeshComponent::saveXML(tinyxml2::XMLElement& element)
+	void MeshComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
 	}
 
-	void MeshComponent::render()
+	void MeshComponent::OnWorldSet(World* world)
 	{
-#ifndef FINAL_BUILD
-		BoundingBox boundingBox = getEntity()->getBoundingBox();
+		world->GetGraphicsWorld()->AddMesh(this);
+	}
+
+	void MeshComponent::OnEntityRemove()
+	{
+		if (GetWorld())
+			GetWorld()->GetGraphicsWorld()->RemoveMesh(this);
+	}
+
+	void MeshComponent::Render()
+	{
+#if 0//ndef FINAL_BUILD
+		BoundingBox boundingBox = GetEntity()->GetBoundingBox();
 		g_debugRender.drawBoundingBox(boundingBox, glm::vec3(1.f));
 #endif // !FINAL_BUILD
 	}
 
-	void MeshComponent::loadModel(const std::string& filename)
+	void MeshComponent::LoadModel(const std::string& filename)
 	{
-		m_model = g_contentManager->loadObject<ModelBase>(filename);
+		m_model = g_contentManager->LoadObject<ModelBase>(filename);
 	}
 
 	std::shared_ptr<ModelBase> MeshComponent::lockModel()
@@ -67,6 +82,8 @@ namespace engine {
 
 	// animated mesh component
 
+	IMPLEMENT_OBJECT(AnimatedMeshComponent, MeshComponent);
+
 	AnimatedMeshComponent::AnimatedMeshComponent()
 	{
 	}
@@ -76,7 +93,7 @@ namespace engine {
 		// m_model.reset();
 	}
 
-	void AnimatedMeshComponent::loadXML(tinyxml2::XMLElement& element)
+	void AnimatedMeshComponent::LoadXML(tinyxml2::XMLElement& element)
 	{
 		tinyxml2::XMLElement* modelElement = element.FirstChildElement("Model");
 		if (modelElement)
@@ -85,38 +102,38 @@ namespace engine {
 			if (filenameAttribute && strlen(filenameAttribute->Value()) > 0)
 			{
 				std::string filename = filenameAttribute->Value();
-				m_model = g_contentManager->loadObject<AnimatedModel>(filename);
+				m_model = g_contentManager->LoadObject<AnimatedModel>(filename);
 
 				// guarantee cast, trust me 
 				std::weak_ptr<AnimatedModel> animatedModel = dynamicCastWeakPtr<AnimatedModel, ModelBase>(m_model);
 
-				Entity* entity = getEntity();
+				Entity* entity = GetEntity();
 				if (entity)
-					entity->setBoundingBox(animatedModel.lock()->getBoundingBox()); // #TODO: too shitty usage, lock and unlock on stack :(
+					entity->SetBoundingBox(animatedModel.lock()->GetBoundingBox()); // #TODO: too shitty usage, lock and unlock on stack :(
 			}
 			else
 			{
-				Core::msg("WARNING: AnimatedMeshComponent at entity(0x%p) has empty filename attribute in Model element!", getEntity());
+				Core::Msg("WARNING: AnimatedMeshComponent at entity(0x%p) has empty filename attribute in Model element!", GetEntity());
 			}
 		}
 	}
 
-	void AnimatedMeshComponent::loadModel(const std::string& filename)
+	void AnimatedMeshComponent::LoadModel(const std::string& filename)
 	{
 		if (!filename.empty())
 		{
-			m_model = g_contentManager->loadObject<AnimatedModel>(filename);
+			m_model = g_contentManager->LoadObject<AnimatedModel>(filename);
 
 			// guarantee cast, trust me 
 			std::weak_ptr<AnimatedModel> animatedModel = dynamicCastWeakPtr<AnimatedModel, ModelBase>(m_model);
 
-			Entity* entity = getEntity();
+			Entity* entity = GetEntity();
 			if (entity)
-				entity->setBoundingBox(animatedModel.lock()->getBoundingBox()); // #TODO: too shitty usage, lock and unlock on stack :(
+				entity->SetBoundingBox(animatedModel.lock()->GetBoundingBox()); // #TODO: too shitty usage, lock and unlock on stack :(
 		}
 		else
 		{
-			Core::msg("WARNING: AnimatedMeshComponent at entity(0x%p) has empty filename!", getEntity());
+			Core::Msg("WARNING: AnimatedMeshComponent at entity(0x%p) has empty filename!", GetEntity());
 		}
 	}
 }

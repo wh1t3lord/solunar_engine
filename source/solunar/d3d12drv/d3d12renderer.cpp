@@ -29,7 +29,7 @@
 
 #include <dxgidebug.h>
 
-namespace engine
+namespace solunar
 {
 
 void createD3D12Renderer()
@@ -58,11 +58,11 @@ void reportD3D12RenderDevice()
 	DXGI_ADAPTER_DESC adapterDesc;
 	dxgiAdapter->GetDesc(&adapterDesc);
 
-	Core::msg("D3D12RenderDevice: GPU: %S, Video Memory: %zu MB",
+	Core::Msg("D3D12RenderDevice: GPU: %S, Video Memory: %zu MB",
 		adapterDesc.Description,
 		adapterDesc.DedicatedVideoMemory / 1024 / 1024);
 
-	// release stuff
+	// Release stuff
 	dxgiAdapter->Release();
 	dxgiDevice->Release();
 #endif
@@ -84,13 +84,13 @@ D3D12Renderer::~D3D12Renderer()
 	m_takeScreenshot = false;
 }
 
-void D3D12Renderer::init()
+void D3D12Renderer::Init()
 {
-	Core::msg("D3D12Renderer: Creating rendering device");
+	Core::Msg("D3D12Renderer: Creating rendering device");
 
 	// Initialize render device
 	g_renderDevice = (IRenderDevice*)mem_new<D3D12Device>();
-	g_d3d12Device->create();
+	g_d3d12Device->Create();
 
 	// report about device
 	reportD3D12RenderDevice();
@@ -98,18 +98,18 @@ void D3D12Renderer::init()
 	// initalize swap chain
 	createSwapChain();
 
-	// initialize device state manager
+	// Initialize device state manager
 	//g_stateManager = mem_new<D3D11StateManager>();
-	//g_d3d11StateManager->init();
+	//g_d3d11StateManager->Init();
 
-	createRasterizerState();
+	CreateRasterizerState();
 
 	// Initialize shader manager with current api
 	//g_shaderManager = mem_new<D3D11ShaderProgramManager>();
-	//g_shaderManager->init("shaders/d3d11");
+	//g_shaderManager->Init("shaders/d3d11");
 
-	// initialize base renderer
-	Renderer::init();
+	// Initialize base renderer
+	Renderer::Init();
 }
 
 void D3D12Renderer::createSwapChain()
@@ -219,7 +219,7 @@ void D3D12Renderer::createSwapChain()
 	//device->getDeviceContext()->OMSetDepthStencilState(m_depthStencilState, 0);
 }
 
-void D3D12Renderer::createRasterizerState()
+void D3D12Renderer::CreateRasterizerState()
 {
 	RasterizerStateDesc rasterizerState;
 	memset(&rasterizerState, 0, sizeof(rasterizerState));
@@ -227,13 +227,13 @@ void D3D12Renderer::createRasterizerState()
 	rasterizerState.m_frontCCW = true;
 	rasterizerState.m_fillMode = FillMode::Solid;
 
-	//m_rasterizerState = g_stateManager->createRasterizerState(rasterizerState);
-	//g_stateManager->setRasterizerState(m_rasterizerState);
+	//m_rasterizerState = g_stateManager->CreateRasterizerState(rasterizerState);
+	//g_stateManager->SetRasterizerState(m_rasterizerState);
 }
 
-void D3D12Renderer::shutdown()
+void D3D12Renderer::Shutdown()
 {
-	Renderer::shutdown();
+	Renderer::Shutdown();
 
 	//if (g_shaderManager)
 	//{
@@ -241,7 +241,7 @@ void D3D12Renderer::shutdown()
 	//	g_shaderManager = nullptr;
 	//}
 	//
-	//g_d3d11StateManager->shutdown();
+	//g_d3d11StateManager->Shutdown();
 	//
 	//if (m_swapChainRenderTarget)
 	//{
@@ -286,14 +286,14 @@ void D3D12Renderer::shutdown()
 	g_renderDevice = nullptr;
 }
 
-void D3D12Renderer::endFrame()
+void D3D12Renderer::EndFrame()
 {
-	//OPTICK_EVENT("D3D12Renderer::endFrame");
+	//OPTICK_EVENT("D3D12Renderer::EndFrame");
 
 	if (m_takeScreenshot)
 		takeScreenshotInternal();
 
-	Renderer::endFrame();
+	Renderer::EndFrame();
 
 	m_swapChain->Present(0, 0);
 }
@@ -319,7 +319,7 @@ void D3D12Renderer::bindMaterialForMesh(MeshComponent* mesh, Material* material,
 
 	IShaderProgram* shaderProgram = nullptr;
 
-	if (mesh->isA<AnimatedMeshComponent>())
+	if (mesh->IsA<AnimatedMeshComponent>())
 		shaderProgram = materialInstance->getShaderProgramVariation(VertexFactory_SkinnedMesh, pixelVariation);
 	else
 		shaderProgram = materialInstance->getShaderProgramVariation(VertexFactory_StaticMesh, pixelVariation);
@@ -327,7 +327,7 @@ void D3D12Renderer::bindMaterialForMesh(MeshComponent* mesh, Material* material,
 	Assert2(shaderProgram, "Unknowed mesh component type!");
 
 	// bind material instance shader and material uniforms
-	g_shaderManager->setShaderProgram(shaderProgram);
+	g_shaderManager->SetShaderProgram(shaderProgram);
 #endif
 
 #if 0
@@ -337,22 +337,22 @@ void D3D12Renderer::bindMaterialForMesh(MeshComponent* mesh, Material* material,
 	// Initialize shader
 	IShaderProgram* shaderProgram = nullptr;
 
-	//if (mesh->isA<StaticMeshComponent>())
+	//if (mesh->IsA<StaticMeshComponent>())
 	shaderProgram = materialInstance->getStaticMeshShaderProgram();
 
 	Assert2(shaderProgram, "Unknowed mesh component type!");
 
 	// bind material instance shader and material uniforms
-	g_shaderManager->setShaderProgram(shaderProgram);
+	g_shaderManager->SetShaderProgram(shaderProgram);
 
 	material->bindUniformsCustom(shaderProgram);
 
 	// bind point lights
 //	if (StaticMeshComponent* staticMesh = dynamicCast<StaticMeshComponent>(mesh))
-//		ShaderConstantManager::getInstance()->setStaticMeshGlobalData(staticMesh, view, )
+//		ShaderConstantManager::GetInstance()->setStaticMeshGlobalData(staticMesh, view, )
 
 	//shaderProgram->setInteger("u_lightsCount", mesh->m_world->getWorldComponent<GraphicsWorld>()->getLightManager()->getLights().size());
-	//ShaderConstantManager::getInstance()->setPointLightConstantBuffer();
+	//ShaderConstantManager::GetInstance()->setPointLightConstantBuffer();
 
 #endif
 }
@@ -363,12 +363,12 @@ void D3D12Renderer::renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshCom
 
 	// Set depth stencil state
 	//g_d3d11Device->getDeviceContext()->OMSetDepthStencilState(m_depthStencilState, 0);
-	//g_stateManager->setRasterizerState(m_rasterizerState);
+	//g_stateManager->SetRasterizerState(m_rasterizerState);
 
 	// setup lights
-	setupLights(graphicsWorld);
+	SetupLights(graphicsWorld);
 
-	if (mesh->isA<AnimatedMeshComponent>())
+	if (mesh->IsA<AnimatedMeshComponent>())
 		renderAnimatedMesh(graphicsWorld, view, mesh);
 	else
 		renderStaticMesh(graphicsWorld, view, mesh);
@@ -383,10 +383,10 @@ void D3D12Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 	for (const auto& submesh : model->getSubmehes())
 	{
 		// create saved render ctx as previous model.
-		RenderContext savedCtx = RenderContext::getContext();
+		RenderContext savedCtx = RenderContext::GetContext();
 
 		// create local copy of render context
-		RenderContext localCtx = RenderContext::getContext();
+		RenderContext localCtx = RenderContext::GetContext();
 
 		// and overwrite model matrix
 		localCtx.model = savedCtx.model * submesh->getTransform();
@@ -395,18 +395,18 @@ void D3D12Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 		//localCtx.model = glm::transpose(localCtx.model);
 
 		// set our local render ctx
-		RenderContext::setContext(localCtx);
+		RenderContext::SetContext(localCtx);
 
-		g_renderDevice->setVertexBuffer(submesh->getVertexBuffer(), sizeof(Vertex), 0);
+		g_renderDevice->SetVertexBuffer(submesh->getVertexBuffer(), sizeof(Vertex), 0);
 
-		//g_renderDevice->setIndexBuffer(it->getIndexBuffer());
+		//g_renderDevice->SetIndexBuffer(it->getIndexBuffer());
 
 		//it->getMaterial()->bind();
 
 		std::shared_ptr<Material> material = submesh->lockMaterial();
 		bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
 
-		ShaderConstantManager::getInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
+		ShaderConstantManager::GetInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
 
 		// install polygon fill mode based on which mode set now
 
@@ -423,7 +423,7 @@ void D3D12Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 			// hack view
 			RenderContext hackHackHack = localCtx;
 			hackHackHack.proj[2][3] -= 0.0001f;
-			RenderContext::setContext(hackHackHack);
+			RenderContext::SetContext(hackHackHack);
 
 			// hack the view
 			RendererViewMode savedViewMode = m_currentViewMode;
@@ -433,7 +433,7 @@ void D3D12Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 			bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
 
 			// draw with lines
-			g_renderDevice->draw(PM_TriangleList, 0, submesh->getVerticesCount());
+			g_renderDevice->Draw(PM_TriangleList, 0, submesh->getVerticesCount());
 			//glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
 			//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
 
@@ -448,7 +448,7 @@ void D3D12Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 			//	if (getRenderMode() == RendererViewMode::Wireframe)
 			//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-			g_renderDevice->draw(PM_TriangleList, 0, submesh->getVerticesCount());
+			g_renderDevice->Draw(PM_TriangleList, 0, submesh->getVerticesCount());
 			//	glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
 				//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
 
@@ -458,7 +458,7 @@ void D3D12Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 		}
 
 		// return what have been
-		RenderContext::setContext(savedCtx);
+		RenderContext::SetContext(savedCtx);
 	}
 }
 
@@ -469,31 +469,31 @@ void D3D12Renderer::renderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view,
 	std::shared_ptr<ModelBase> model = mesh->lockModel();
 	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(model.get());
 
-	for (const auto& submesh : animatedModel->getAnimatedSubmehes())
+	for (const auto& submesh : animatedModel->GetAnimatedSubmehes())
 	{
 		// create saved render ctx as previous model.
-		RenderContext savedCtx = RenderContext::getContext();
+		RenderContext savedCtx = RenderContext::GetContext();
 
 		// create local copy of render context
-		RenderContext localCtx = RenderContext::getContext();
+		RenderContext localCtx = RenderContext::GetContext();
 
 		// transpose matrices for D3D11
 		//localCtx.model = glm::transpose(localCtx.model);
 
 		// set our local render ctx
-		RenderContext::setContext(localCtx);
+		RenderContext::SetContext(localCtx);
 
-		g_renderDevice->setVertexBuffer(submesh->m_vertexBuffer, sizeof(AnimatedVertex), 0);
-		g_renderDevice->setIndexBuffer(submesh->m_indexBuffer, false);
+		g_renderDevice->SetVertexBuffer(submesh->m_vertexBuffer, sizeof(AnimatedVertex), 0);
+		g_renderDevice->SetIndexBuffer(submesh->m_indexBuffer, false);
 
-		//g_renderDevice->setIndexBuffer(it->getIndexBuffer());
+		//g_renderDevice->SetIndexBuffer(it->getIndexBuffer());
 
 		//it->getMaterial()->bind();
 
 		std::shared_ptr<Material> material = submesh->m_material.lock();
 		bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
 
-		ShaderConstantManager::getInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
+		ShaderConstantManager::GetInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
 
 		// install polygon fill mode based on which mode set now
 
@@ -510,7 +510,7 @@ void D3D12Renderer::renderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view,
 			// hack view
 			RenderContext hackHackHack = localCtx;
 			hackHackHack.proj[2][3] -= 0.0001f;
-			RenderContext::setContext(hackHackHack);
+			RenderContext::SetContext(hackHackHack);
 
 			// hack the view
 			RendererViewMode savedViewMode = m_currentViewMode;
@@ -520,8 +520,8 @@ void D3D12Renderer::renderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view,
 			bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
 
 			// draw with lines
-			g_renderDevice->drawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
-			//g_renderDevice->draw(PM_TriangleList, 0, submesh->m_verticesCount);
+			g_renderDevice->DrawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
+			//g_renderDevice->Draw(PM_TriangleList, 0, submesh->m_verticesCount);
 			//glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
 			//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
 
@@ -536,8 +536,8 @@ void D3D12Renderer::renderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view,
 			//	if (getRenderMode() == RendererViewMode::Wireframe)
 			//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-			g_renderDevice->drawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
-			//g_renderDevice->draw(PM_TriangleList, 0, submesh->m_verticesCount);
+			g_renderDevice->DrawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
+			//g_renderDevice->Draw(PM_TriangleList, 0, submesh->m_verticesCount);
 			//	glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
 				//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
 
@@ -547,7 +547,7 @@ void D3D12Renderer::renderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view,
 		}
 
 		// return what have been
-		RenderContext::setContext(savedCtx);
+		RenderContext::SetContext(savedCtx);
 	}
 }
 
@@ -555,15 +555,15 @@ void D3D12Renderer::renderShadows(View* view)
 {
 }
 
-void D3D12Renderer::takeScreenshot()
+void D3D12Renderer::TakeScreenshot()
 {
 	m_takeScreenshot = true;
 }
 
 void D3D12Renderer::takeScreenshotInternal()
 {
-	int width = getView()->m_width;
-	int height = getView()->m_height;
+	int width = GetView()->m_width;
+	int height = GetView()->m_height;
 	int slicePitch = width * height;
 
 	size_t bufferSize = 4 * width * height;
@@ -610,18 +610,18 @@ void D3D12Renderer::takeScreenshotInternal()
 	{
 		sprintf(buffer, "sshot_%i.png", i);
 
-		FileHandle fh = g_fileSystem->open(buffer);
+		FileHandle fh = g_fileSystem->Open(buffer);
 		if (!fh)
 		{
 			break;
 		}
 		else
 		{
-			g_fileSystem->close(fh);
+			g_fileSystem->Close(fh);
 		}
 	}
 
-	image.save(buffer);
+	image.Save(buffer);
 
 	delete[] screenBuffer;
 

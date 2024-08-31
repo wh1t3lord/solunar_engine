@@ -1,9 +1,11 @@
 #include "gamepch.h"
 #include "weaponpistolcomponent.h"
 
-namespace engine
+namespace solunar
 {
-    
+
+IMPLEMENT_OBJECT(WeaponPistolComponent, WeaponAutoComponent);
+
 WeaponPistolComponent::WeaponPistolComponent()
 {
 }
@@ -12,9 +14,9 @@ WeaponPistolComponent::~WeaponPistolComponent()
 {
 }
 
-void WeaponPistolComponent::registerObject()
+void WeaponPistolComponent::RegisterObject()
 {
-    g_typeManager->registerObject<WeaponPistolComponent>();
+    g_typeManager->RegisterObject<WeaponPistolComponent>();
 }
     
 }

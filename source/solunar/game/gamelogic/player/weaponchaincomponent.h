@@ -3,15 +3,15 @@
 
 #include "game/gamelogic/weapons/weaponcomponent.h"
 
-namespace engine
+namespace solunar
 {
 
 // Компонент цепи оружия
 class WeaponChainComponent : public Component
 {
-	ImplementObject(WeaponChainComponent, Component);
+	DECLARE_OBJECT(WeaponChainComponent);
 public:
-	static void registerObject();
+	static void RegisterObject();
 	
 	WeaponChainComponent();
 	~WeaponChainComponent();

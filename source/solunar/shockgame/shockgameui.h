@@ -3,20 +3,33 @@
 
 #include "engine/entity/logiccomponent.h"
 
-namespace engine
+namespace solunar
 {
 
 class ShockGameMainMenuComponent : public LogicComponent
 {
-	ImplementObject(ShockGameMainMenuComponent, LogicComponent);
+	DECLARE_OBJECT(ShockGameMainMenuComponent);
 
 public:
 	ShockGameMainMenuComponent();
 	~ShockGameMainMenuComponent();
 
-	void onWorldSet(World* world) override;
+	void OnWorldSet(World* world) override;
 
-	void update(float dt) override;
+	void Update(float dt) override;
+};
+
+class DemoGameMainMenuComponent : public LogicComponent
+{
+	DECLARE_OBJECT(DemoGameMainMenuComponent);
+
+public:
+	DemoGameMainMenuComponent();
+	~DemoGameMainMenuComponent();
+
+	void OnWorldSet(World* world) override;
+
+	void Update(float dt) override;
 };
 
 }

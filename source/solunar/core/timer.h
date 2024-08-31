@@ -3,24 +3,24 @@
 
 #include "core/core.h"
 
-namespace engine
+namespace solunar
 {
 
 #ifdef WIN32
 class Timer
 {
 public:
-	static Timer* getInstance();
+	static Timer* GetInstance();
 
 public:
 	Timer();
 	~Timer();
 
-	void init();
+	void Init();
 	
-	void update();
+	void Update();
 
-	float getDelta();
+	float GetDelta();
 	float getTime();
 
 private:
@@ -28,6 +28,27 @@ private:
 	INT64 m_startTime;
 	INT64 m_endTime;
 
+	float m_deltaTime;
+};
+#else
+class Timer
+{
+public:
+	static Timer* GetInstance();
+
+public:
+	Timer();
+	~Timer();
+
+	void Init();
+
+	void Update();
+
+	float GetDelta();
+	float getTime();
+private:
+	clock_t m_startTime;
+	clock_t m_endTime;
 	float m_deltaTime;
 };
 #endif // WIN32

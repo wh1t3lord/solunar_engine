@@ -4,7 +4,7 @@
 #include "engine/entity/entitymanager.h"
 #include "graphics/graphicsworld.h"
 
-namespace engine
+namespace solunar
 {
 	class PhysicsWorld;
 
@@ -18,35 +18,34 @@ namespace engine
 	class World : public SerializableObject
 	{
 	public:
-		ImplementObject(World, SerializableObject);
+		DECLARE_OBJECT(World);
 
 	public:
 		World();
 		~World();
 
-		void loadXML(tinyxml2::XMLElement& element) override;
-		void saveXML(tinyxml2::XMLElement& element) override;
+		void LoadXML(tinyxml2::XMLElement& element) override;
+		void SaveXML(tinyxml2::XMLElement& element) override;
 
-		void postInitializeEntity(Entity* entity);
+		void PostInitializeEntity(Entity* entity);
 
-		void update_PreEntityUpdate();
-		void updateLogicWorld();
-		void updatePhysicsWorld();
+		void Update_PreEntityUpdate();
+		void Update_LogicEntity();
+		void Update_PhysicsEntity();
 
-		Entity* createEntity();
-		Entity* createEntityEx(const TypeInfo* typeInfo);
+		Entity* CreateEntity();
+		Entity* CreateEntityEx(const TypeInfo* typeInfo);
 
-		EntityManager& getEntityManager() { return m_entityManager; }
+		EntityManager&	GetEntityManager()	{ return m_entityManager; }
+		GraphicsWorld*	GetGraphicsWorld()	{ return m_graphicsWorld; }
+		PhysicsWorld*	GetPhysicsWorld()	{ return m_physicsWorld; }
 
-		GraphicsWorld* getGraphicsWorld() { return m_graphicsWorld; }
-		PhysicsWorld* getPhysicsWorld() { return m_physicsWorld; }
-
-		void togglePhysicsDebugDraw();
+		void TogglePhysicsDebugDraw();
 
 		// Casting functions
 
-		bool rayCast(RayCastResult& rayResult, const glm::vec3& rayStart, const glm::vec3& rayEnd);
-		std::vector<Entity*> boxCast(const glm::vec3& boxPos, const glm::vec3& boxSize);
+		bool RayCast(RayCastResult& rayResult, const glm::vec3& rayStart, const glm::vec3& rayEnd);
+		std::vector<Entity*> BoxCast(const glm::vec3& boxPos, const glm::vec3& boxSize);
 
 	private:
 		EntityManager m_entityManager;

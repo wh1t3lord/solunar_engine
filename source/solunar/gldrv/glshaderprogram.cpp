@@ -2,29 +2,38 @@
 #include "gldrv/glshaderprogram.h"
 #include "core/file/contentmanager.h"
 
-namespace engine
+namespace solunar
 {
 
 GLuint createShader(GLenum target, const char* filename, const char* defines = nullptr)
 {
 	std::string content;
 
-	DataStreamPtr f = g_contentManager->openStream(filename);
+	DataStreamPtr f = g_contentManager->OpenStream(filename);
 
-	f->seek(Seek_End, 0);
-	size_t fileLength = f->tell();
-	f->seek(Seek_Begin, 0);
+	f->Seek(Seek_End, 0);
+	size_t fileLength = f->Tell();
+	f->Seek(Seek_Begin, 0);
 
 	content.resize(fileLength + 1);
-	f->read((void*)content.data(), fileLength);
+	f->Read((void*)content.data(), fileLength);
 	content[fileLength] = '\0';
 
 	if (defines && strlen(defines) > 0) {
+		std::string newDefines;
+
+		//std::size_t pos = 0;
+		//while (pos != std::string::npos)
+		//{
+		//	
+		//}
+
 		size_t versionLocation = content.find("#version 330 core");
 
 		size_t definesStringLength = versionLocation + strlen("#version 330 core") + 2;
 		std::string newContentString = content.substr(0, definesStringLength);
 
+		newContentString.append("#define ");
 		newContentString.append(defines);
 		newContentString.append(content.substr(definesStringLength));
 
@@ -42,18 +51,18 @@ GLuint createShader(GLenum target, const char* filename, const char* defines = n
 	glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
 	if (!success) {
 		glGetShaderInfoLog(shader, 512, NULL, infoLog);
-		Core::msg("=== SHADER COMPILE ERROR ===");
-		Core::msg("%s", contentCStr);
-		Core::msg("============================");
-		Core::error("createShader: failed to compile shader %s\n%s", filename, infoLog);
+		Core::Msg("=== SHADER COMPILE ERROR ===");
+		Core::Msg("%s", contentCStr);
+		Core::Msg("============================");
+		Core::Error("createShader: failed to compile shader %s\n%s", filename, infoLog);
 	}
 
-	Core::msg("[graphics]: created %s shader from file %s", (target == GL_VERTEX_SHADER) ? "vertex" : "fragment", filename);
+	Core::Msg("[graphics]: created %s shader from file %s", (target == GL_VERTEX_SHADER) ? "vertex" : "fragment", filename);
 
 	return shader;
 }
 
-GLShaderProgram::GLShaderProgram(const std::string& vsfilename, const std::string& fsfilename)
+GLShaderProgram::GLShaderProgram(const std::string& vsfilename, const std::string& fsfilename, InputLayoutDesc* inputLayout /*= nullptr*/, int inputLayoutCount /*= 0*/)
 {
 	m_defines = "";
 
@@ -73,11 +82,14 @@ GLShaderProgram::GLShaderProgram(const std::string& vsfilename, const std::strin
 	glGetProgramiv(m_program, GL_LINK_STATUS, &success);
 	if (!success) {
 		glGetProgramInfoLog(m_program, 512, NULL, infoLog);
-		Core::error("IShaderProgram::IShaderProgram: failed to link program %s", infoLog);
+		Core::Error("IShaderProgram::IShaderProgram: failed to link program %s", infoLog);
 	}
+
+	m_inputLayout.resize(inputLayoutCount);
+	memcpy(m_inputLayout.data(), inputLayout, inputLayoutCount * sizeof(InputLayoutDesc));
 }
 
-GLShaderProgram::GLShaderProgram(const std::string& vsfilename, const std::string& fsfilename, const char* defines)
+GLShaderProgram::GLShaderProgram(const std::string& vsfilename, const std::string& fsfilename, const char* defines, InputLayoutDesc* inputLayout /*= nullptr*/, int inputLayoutCount /*= 0*/)
 {
 	m_defines = defines ? defines : "";
 
@@ -97,8 +109,11 @@ GLShaderProgram::GLShaderProgram(const std::string& vsfilename, const std::strin
 	glGetProgramiv(m_program, GL_LINK_STATUS, &success);
 	if (!success) {
 		glGetProgramInfoLog(m_program, 512, NULL, infoLog);
-		Core::error("IShaderProgram::IShaderProgram: failed to link program %s", infoLog);
+		Core::Error("IShaderProgram::IShaderProgram: failed to link program %s", infoLog);
 	}
+
+	m_inputLayout.resize(inputLayoutCount);
+	memcpy(m_inputLayout.data(), inputLayout, inputLayoutCount * sizeof(InputLayoutDesc));
 }
 
 GLShaderProgram::~GLShaderProgram()
@@ -109,6 +124,11 @@ GLShaderProgram::~GLShaderProgram()
 GLuint GLShaderProgram::getProgramhandle()
 {
 	return m_program;
+}
+
+const std::vector<InputLayoutDesc>& GLShaderProgram::getInputLayout()
+{
+	return m_inputLayout;
 }
 
 }

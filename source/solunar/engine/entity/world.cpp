@@ -9,8 +9,10 @@
 #include "engine/physics/rigidbodycomponent.h"
 #include "engine/physics/shapescomponent.h"
 
-namespace engine
+namespace solunar
 {
+	IMPLEMENT_OBJECT(World, SerializableObject);
+
 	World::World() :
 		m_physicsWorld(nullptr), m_graphicsWorld(nullptr)
 	{
@@ -21,7 +23,7 @@ namespace engine
 	World::~World()
 	{
 		// Delete all entities before physics world destruction
-		m_entityManager.deleteEntities();
+		m_entityManager.Destroy();
 
 		if (m_physicsWorld)
 		{
@@ -34,114 +36,114 @@ namespace engine
 		}
 	}
 
-	void World::loadXML(tinyxml2::XMLElement& element)
+	void World::LoadXML(tinyxml2::XMLElement& element)
 	{
 		if (strcmp(element.Name(), "World") != 0)
-			Core::error("World::loadXML: '%s' is not a world element.", element.Name());
+			Core::Error("World::LoadXML: '%s' is not a world element.", element.Name());
 
 		tinyxml2::XMLElement* entityElement = element.FirstChildElement("Entity");
 		while (entityElement)
 		{
-			const TypeInfo* entityTypeInfo = Entity::getStaticTypeInfo();
+			const TypeInfo* entityTypeInfo = Entity::GetStaticTypeInfo();
 
 			// if classid
 			if (const tinyxml2::XMLAttribute* nodeClassId = entityElement->FindAttribute("classId"))
 			{
-				entityTypeInfo = g_typeManager->getTypeInfoById(nodeClassId->IntValue());
+				entityTypeInfo = g_typeManager->GetTypeInfoById(nodeClassId->IntValue());
 			}
 			// if classname
 			else if (const tinyxml2::XMLAttribute* nodeClassName = entityElement->FindAttribute("className"))
 			{
-				entityTypeInfo = g_typeManager->getTypeInfoByName(nodeClassId->Value());
+				entityTypeInfo = g_typeManager->GetTypeInfoByName(nodeClassId->Value());
 			}
 
-			Entity* entity = createEntityEx(entityTypeInfo);
-			entity->loadXML(*entityElement);
+			Entity* entity = CreateEntityEx(entityTypeInfo);
+			entity->LoadXML(*entityElement);
 
-			postInitializeEntity(entity);
+			PostInitializeEntity(entity);
 
 			entityElement = entityElement->NextSiblingElement("Entity");
 		}
 	}
 
-	void World::saveXML(tinyxml2::XMLElement& element)
+	void World::SaveXML(tinyxml2::XMLElement& element)
 	{
 	}
 
-	void World::postInitializeEntity(Entity* entity)
+	void World::PostInitializeEntity(Entity* entity)
 	{
-		// initialize physics shapes
-		std::vector<ShapeComponent*> shapes = entity->getComponents<ShapeComponent>();
+		// Initialize physics shapes
+		std::vector<ShapeComponent*> shapes = entity->GetComponents<ShapeComponent>();
 		if (!shapes.empty())
 		{
 			for (auto it : shapes)
-				it->initializeShape();
+				it->InitializeShape();
 		}
 	}
 
-	void World::update_PreEntityUpdate()
+	void World::Update_PreEntityUpdate()
 	{
-		const std::vector<Entity*>& entities = m_entityManager.getEntities();
+		const std::vector<Entity*>& entities = m_entityManager.GetEntities();
 		for (auto it : entities)
 		{
-			it->updateWorldTransform();
-			it->transformBBox();
+			it->UpdateWorldTransform();
+			it->TransformBBox();
 		}
 	}
 
-	void World::updateLogicWorld()
+	void World::Update_LogicEntity()
 	{
-		std::vector<Entity*> logicEntities = m_entityManager.getEntitiesWithComponent<LogicComponent>();
+		std::vector<Entity*> logicEntities = m_entityManager.GetEntitiesWithComponent<LogicComponent>();
 		for (auto entity : logicEntities)
 		{
-			LogicComponent* logicComponent = entity->getComponent<LogicComponent>();
-			logicComponent->update(Timer::getInstance()->getDelta());
+			LogicComponent* logicComponent = entity->GetComponent<LogicComponent>();
+			logicComponent->Update(Timer::GetInstance()->GetDelta());
 		}
 	}
 
-	void World::updatePhysicsWorld()
+	void World::Update_PhysicsEntity()
 	{
-		float delta = Timer::getInstance()->getDelta();
-		m_physicsWorld->step(delta);
+		float delta = Timer::GetInstance()->GetDelta();
+		m_physicsWorld->Step(delta);
 
-		std::vector<Entity*> physicsEntities = m_entityManager.getEntitiesWithComponent<RigidBodyComponent>();
+		std::vector<Entity*> physicsEntities = m_entityManager.GetEntitiesWithComponent<RigidBodyComponent>();
 
 		for (auto it : physicsEntities)
 		{
-			RigidBodyComponent* rigidBody = it->getComponent<RigidBodyComponent>();
+			RigidBodyComponent* rigidBody = it->GetComponent<RigidBodyComponent>();
 			if (rigidBody)
 			{
-				rigidBody->updateBodyTranslationDirty();
+				rigidBody->UpdateBodyTranslationDirty();
 				//rigidBody->updateNodeTranslationDirty();
 			}
 		}
 	}
 
-	Entity* World::createEntity()
+	Entity* World::CreateEntity()
 	{
-		Entity* entity = m_entityManager.createEntity();
-		entity->onWorldSet(this);
+		Entity* entity = m_entityManager.CreateEntity();
+		entity->OnWorldSet(this);
 		return entity;
 	}
 
-	Entity* World::createEntityEx(const TypeInfo* typeInfo)
+	Entity* World::CreateEntityEx(const TypeInfo* typeInfo)
 	{
-		Entity* entity = m_entityManager.createEntityEx(typeInfo);
-		entity->onWorldSet(this);
+		Entity* entity = m_entityManager.CreateEntityEx(typeInfo);
+		entity->OnWorldSet(this);
 		return entity;
 	}
 
-	void World::togglePhysicsDebugDraw()
+	void World::TogglePhysicsDebugDraw()
 	{
-		m_physicsWorld->toggleDebugDraw();
+		m_physicsWorld->ToggleDebugDraw();
 	}
 
-	bool World::rayCast(RayCastResult& rayResult, const glm::vec3& rayStart, const glm::vec3& rayEnd)
+	bool World::RayCast(RayCastResult& rayResult, const glm::vec3& rayStart, const glm::vec3& rayEnd)
 	{
 		Assert2(m_physicsWorld, "Physics world is not initialized for ray casting");
 
 		btDynamicsWorld::ClosestRayResultCallback rayCallback(glmVectorToBt(rayStart), glmVectorToBt(rayEnd));
-		m_physicsWorld->getWorld()->rayTest(glmVectorToBt(rayStart), glmVectorToBt(rayEnd), rayCallback);
+		m_physicsWorld->GetWorld()->rayTest(glmVectorToBt(rayStart), glmVectorToBt(rayEnd), rayCallback);
 		if (rayCallback.hasHit())
 		{
 			// Query entity
@@ -149,19 +151,19 @@ namespace engine
 			RigidBodyComponent* rigidbody = reinterpret_cast<RigidBodyComponent*>(rayCallback.m_collisionObject->getUserPointer());
 			Assert2(rigidbody, "Critital skill issue, rigid body component is nullptr!");
 
-			Entity* entity = rigidbody->getEntity();
+			Entity* entity = rigidbody->GetEntity();
 			Assert2(entity, "Critital skill issue, rigid body component assigned to nullptr entity!");
 			
 			rayResult.m_entity = entity;
 			rayResult.m_hitPosition = btVectorToGlm(rayCallback.m_hitPointWorld);
-			rayResult.m_hitPosition = btVectorToGlm(rayCallback.m_hitNormalWorld);
+			rayResult.m_hitNormal = btVectorToGlm(rayCallback.m_hitNormalWorld);
 			return true;
 		}
 
 		return false;
 	}
 
-	std::vector<Entity*> World::boxCast(const glm::vec3& boxPos, const glm::vec3& boxSize)
+	std::vector<Entity*> World::BoxCast(const glm::vec3& boxPos, const glm::vec3& boxSize)
 	{
 		std::vector<Entity*> entities;
 		

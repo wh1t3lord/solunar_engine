@@ -15,7 +15,7 @@
 
 #include <GLFW/glfw3.h>
 
-namespace engine
+namespace solunar
 {
 
 	// #TODO: !!! REMOVE !!!
@@ -25,7 +25,7 @@ namespace engine
 class RmlSystemInteface : public SystemInterface_GLFW
 {
 public:
-	static RmlSystemInteface* getInstance()
+	static RmlSystemInteface* GetInstance()
 	{
 		static RmlSystemInteface instance;
 		return &instance;
@@ -34,7 +34,7 @@ public:
 public:
 	double GetElapsedTime() override
 	{
-		return (double)Timer::getInstance()->getTime();
+		return (double)Timer::GetInstance()->getTime();
 	}
 
 	bool LogMessage(Rml::Log::Type type, const Rml::String& message) override
@@ -53,7 +53,7 @@ public:
 			break;
 		}
 
-		Core::msg("[RmlUI]: %s: %s", logType.c_str(), message.c_str());
+		Core::Msg("[RmlUI]: %s: %s", logType.c_str(), message.c_str());
 
 		return true;
 	}
@@ -80,16 +80,16 @@ RmlSystem::~RmlSystem()
 {
 }
 
-void RmlSystem::init()
+void RmlSystem::Init()
 {
 	// create file system and renderer
 	m_filesystem = mem_new<RmlFileSystem>();
 
 	m_renderer = mem_new<RmlRenderer>();
-	m_renderer->init();
+	m_renderer->Init();
 
 	// assing
-	Rml::SetSystemInterface(RmlSystemInteface::getInstance());
+	Rml::SetSystemInterface(RmlSystemInteface::GetInstance());
 	Rml::SetFileInterface(m_filesystem);
 	Rml::SetRenderInterface(m_renderer);
 
@@ -106,13 +106,13 @@ void RmlSystem::init()
 	Rml::Initialise();
 }
 
-void RmlSystem::shutdown()
+void RmlSystem::Shutdown()
 {
 	// Shutdown rml
 	Rml::Shutdown();
 
 	// destroy everything
-	m_renderer->shutdown();
+	m_renderer->Shutdown();
 	mem_delete(m_renderer); m_renderer = nullptr;
 	mem_delete(m_filesystem); m_filesystem = nullptr;
 }
@@ -149,22 +149,22 @@ void RmlSystem::createContext(int width, int height)
 		Rml::LoadFontFace(directory + face.filename, face.fallback_face);
 }
 
-void RmlSystem::render()
+void RmlSystem::Render()
 {
-	OPTICK_EVENT("RmlSystem::render");
+	OPTICK_EVENT("RmlSystem::Render");
 
 	m_context->Update();
 
-	m_renderer->beginFrame();
+	m_renderer->BeginFrame();
 	m_context->Render();
-	m_renderer->endFrame();
+	m_renderer->EndFrame();
 
 	//m_context->Update();
 
-	//g_renderDevice->setTexture2D(0, nullptr);
-	//g_renderDevice->setTexture2D(1, nullptr);
-	//g_renderDevice->setTexture2D(2, nullptr);
-	//g_renderDevice->setTexture2D(3, nullptr);
+	//g_renderDevice->SetTexture2D(0, nullptr);
+	//g_renderDevice->SetTexture2D(1, nullptr);
+	//g_renderDevice->SetTexture2D(2, nullptr);
+	//g_renderDevice->SetTexture2D(3, nullptr);
 
 	//g_renderInterface_GL3->BeginFrame();
 	//g_renderInterface_GL3->Clear();
@@ -174,7 +174,7 @@ void RmlSystem::render()
 	//g_renderInterface_GL3->EndFrame();
 }
 
-Rml::Context* RmlSystem::getContext()
+Rml::Context* RmlSystem::GetContext()
 {
 	ASSERT(m_context);
 	return m_context;

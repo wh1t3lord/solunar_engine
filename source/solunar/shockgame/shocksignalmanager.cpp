@@ -1,18 +1,18 @@
 #include "shockgamepch.h"
 #include "shockgame/shocksignalmanager.h"
 
-namespace engine
+namespace solunar
 {
 
 ShockSignalManager* ShockSignalManager::ms_instance = nullptr;
 
-void ShockSignalManager::createInstance()
+void ShockSignalManager::CreateInstance()
 {
 	Assert2(!ms_instance, "Canno't create signal manager twice");
 	ms_instance = mem_new<ShockSignalManager>();
 }
 
-void ShockSignalManager::destroyInstance()
+void ShockSignalManager::DestroyInstance()
 {
 	if (ms_instance)
 	{
@@ -21,9 +21,9 @@ void ShockSignalManager::destroyInstance()
 	}
 }
 
-ShockSignalManager* ShockSignalManager::getInstance()
+ShockSignalManager* ShockSignalManager::GetInstance()
 {
-	return Singleton<ShockSignalManager>::getInstance();
+	return Singleton<ShockSignalManager>::GetInstance();
 }
 
 ShockSignalManager::ShockSignalManager()
@@ -38,6 +38,8 @@ ShockSignalManager::~ShockSignalManager()
 // Shock signal implementation
 //////////////////////////////
 
+IMPLEMENT_OBJECT(ShockSignal, Object);
+
 ShockSignal::ShockSignal()
 {
 }
@@ -46,9 +48,9 @@ ShockSignal::~ShockSignal()
 {
 }
 
-void ShockSignal::registerObject()
+void ShockSignal::RegisterObject()
 {
-	g_typeManager->registerObject<ShockSignal>();
+	g_typeManager->RegisterObject<ShockSignal>();
 }
 
 }

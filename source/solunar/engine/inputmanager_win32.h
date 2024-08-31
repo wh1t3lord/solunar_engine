@@ -3,11 +3,11 @@
 
 #include "engine/inputmanager.h"
 
-namespace engine
+namespace solunar
 {
 	class InputManager_Win32 : public InputManager
 	{
-		//ImplementObject(InputManager_Win32, InputManager);
+		//IMPLEMENT_OBJECT(InputManager_Win32, InputManager);
 	private:
 		static InputManager_Win32 ms_inputManager;
 
@@ -16,10 +16,13 @@ namespace engine
 		~InputManager_Win32();
 
 		// Update the input manager
-		void update() override;
+		void Update() override;
 
 		// keyboard action
-		void keyboardAction(uint32_t keyId, bool state);
+		void KeyboardAction(uint32_t keyId, bool state);
+
+		// mouse button action
+		void MouseButtonAction(MouseButtons buttonId, bool state);
 
 	private:
 		bool m_lastCursorHiding;

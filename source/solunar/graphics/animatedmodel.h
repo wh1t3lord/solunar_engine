@@ -4,7 +4,7 @@
 #include "graphics/model.h"
 #include "graphics/material.h"
 
-namespace engine
+namespace solunar
 {
 
 // the upper limit for joint palette size is 256 (because the mesh joint indices
@@ -20,7 +20,7 @@ namespace engine
 // Forward declaration
 class ITexture2D;
 class ISamplerState;
-class IBufferBase;
+struct IBufferBase;
 
 enum InterpolationType
 {
@@ -47,8 +47,8 @@ struct AnimatedVertex
 	glm::vec2 m_texcoord;
 	glm::vec3 m_tangent;
 	glm::vec3 m_bitangent;
-	glm::vec4 m_boneIDs;
 	glm::vec4 m_weights;
+	glm::vec4 m_boneIDs;
 };
 
 struct AnimatedSubMesh
@@ -61,6 +61,8 @@ struct AnimatedSubMesh
 	std::string m_materialName;
 	uint32_t m_verticesCount;
 	uint32_t m_indicesCount;
+
+	void Create();
 };
 
 struct AnimationSampler
@@ -116,36 +118,38 @@ struct BoneInfo
 
 class AnimatedModel : public ModelBase
 {
-	ImplementObject(AnimatedModel, ModelBase);
+	DECLARE_OBJECT(AnimatedModel);
 public:
 	AnimatedModel();
 	~AnimatedModel();
 
-	static void registerObject();
+	static void RegisterObject();
 
-	void load(const std::shared_ptr<DataStream>& dataStream) override;
-	void load_GLTF(const std::shared_ptr<DataStream>& dataStream);
+	void Load(const std::shared_ptr<DataStream>& dataStream) override;
+	void Load_GLTF(const std::shared_ptr<DataStream>& dataStream);
 
-	void createHw() override;
-	void releaseHw() override;
+	void CreateHw() override;
+	void ReleaseHw() override;
 
-	std::vector<AnimatedSubMesh*>& getAnimatedSubmehes() { return m_subMeshes; }
+	std::vector<AnimatedSubMesh*>& GetAnimatedSubmehes() { return m_subMeshes; }
 
-	int getAnimationByName(const std::string& name);
-	void setPlayAnimation(int index, bool looped = false);
+	/** Animation accessing */
+	int GetAnimationByName(const std::string& name);
+	void PlayAnimation(int index, bool looped = false);
+	void PauseAnimation();
 
-	void testPlay(float dt);
+	void Update(float dt);
 
-	void updateNode(int node_id);
-	void updateNodePreCasheFrow(int node_id);
+	void UpdateNode(int node_id);
+	void UpdateNodeTransform(int node_id);
 
-	glm::mat4 getNodeMatrix(int nodeId);
+	glm::mat4 GetNodeMatrix(int nodeId);
 
-	const BoundingBox& getBoundingBox();
+	const BoundingBox& GetBoundingBox();
 
 	/** Node accessing */
-	int getNodeByName(const std::string& name);
-	void setNodeScale(int nodeid, const glm::vec3& scale);
+	int GetNodeByName(const std::string& name);
+	void SetNodeScale(int nodeid, const glm::vec3& scale);
 
 private:
 	std::vector<AnimatedSubMesh*> m_subMeshes;
@@ -157,7 +161,10 @@ private:
 	Animation* m_currentAnimation;
 	bool m_playLooped = false;
 	float m_currentTime = 0.0f;
+	float m_speed = 1.0f;
 	
+	int m_rootNodeId;
+
 	BoundingBox m_boundingBox;
 
 public:
@@ -175,10 +182,10 @@ public:
 	AnimatedModelRenderer();
 	~AnimatedModelRenderer();
 
-	void init();
-	void shutdown();
+	void Init();
+	void Shutdown();
 
-	void render(AnimatedMeshComponent* model);
+	void Render(AnimatedMeshComponent* model);
 
 private:
 	ITexture2D* m_jointTexture;

@@ -11,7 +11,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
 
-namespace engine
+namespace solunar
 {
 	namespace maths {
 

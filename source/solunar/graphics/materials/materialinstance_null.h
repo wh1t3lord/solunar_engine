@@ -3,7 +3,7 @@
 
 #include "graphics/materials/materialinstance.h"
 
-namespace engine
+namespace solunar
 {
 
 class MaterialInstance_Null : public IMaterialInstance

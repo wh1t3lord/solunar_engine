@@ -10,7 +10,7 @@
 
 #define MAX_LINES_IN_VB 2048
 
-namespace engine {
+namespace solunar {
 
 DebugRender g_debugRender;
 
@@ -29,7 +29,7 @@ DebugRender::~DebugRender()
 	m_shaderProgram = nullptr;
 }
 
-void DebugRender::initialize()
+void DebugRender::Initialize()
 {
 	// Vertex buffer
 
@@ -42,7 +42,7 @@ void DebugRender::initialize()
 	SubresourceDesc linesSubresourceDesc;
 	memset(&linesSubresourceDesc, 0, sizeof(linesSubresourceDesc));
 
-	m_verticesBuffer = g_renderDevice->createBuffer(linesBufferDesc, linesSubresourceDesc);
+	m_verticesBuffer = g_renderDevice->CreateBuffer(linesBufferDesc, linesSubresourceDesc);
 
 	// Matrix buffer
 
@@ -55,7 +55,7 @@ void DebugRender::initialize()
 	SubresourceDesc matrixSubresourceDesc;
 	memset(&matrixSubresourceDesc, 0, sizeof(matrixSubresourceDesc));
 
-	m_matrixBuffer = g_renderDevice->createBuffer(matrixBufferDesc, matrixSubresourceDesc);
+	m_matrixBuffer = g_renderDevice->CreateBuffer(matrixBufferDesc, matrixSubresourceDesc);
 
 	// create input layout
 	InputLayoutDesc layoutDesc[] =
@@ -65,7 +65,7 @@ void DebugRender::initialize()
 	};
 
 	// create shader
-	m_shaderProgram = g_shaderManager->createShaderProgram(
+	m_shaderProgram = g_shaderManager->CreateShaderProgram(
 		"debug_draw.vsh", 
 		"debug_draw.psh",
 		nullptr,
@@ -73,7 +73,7 @@ void DebugRender::initialize()
 		sizeof(layoutDesc) / sizeof(layoutDesc[0]));
 }
 
-void DebugRender::shutdown()
+void DebugRender::Shutdown()
 {
 	//glDeleteVertexArrays(1, &m_vao);
 
@@ -92,7 +92,7 @@ void DebugRender::shutdown()
 	//g_varDebugDraw = nullptr;
 }
 
-void DebugRender::drawLine(const glm::vec3& from, const glm::vec3& to, const glm::vec3& color)
+void DebugRender::DrawLine(const glm::vec3& from, const glm::vec3& to, const glm::vec3& color)
 {
 	Line line;
 	line.from = glm::vec3(m_modelMatrix * glm::vec4(from, 1.0f));
@@ -126,7 +126,7 @@ void DebugRender::drawBoundingBox(const BoundingBox& box, const glm::vec3& color
 				edgecoord[2] * halfExtents[2]);
 			pb += center;
 
-			drawLine(pa, pb, color);
+			DrawLine(pa, pb, color);
 		}
 
 		edgecoord = glm::vec3(-1.f, -1.f, -1.f);
@@ -152,18 +152,18 @@ void DebugRender::drawArc(const glm::vec3& center, const glm::vec3& normal, cons
 	glm::vec3 prev = center + radiusA * vx * cos(minAngle) + radiusB * vy * sin(minAngle);
 	if (drawSect)
 	{
-		drawLine(center, prev, color);
+		DrawLine(center, prev, color);
 	}
 	for (int i = 1; i <= nSteps; i++)
 	{
 		float angle = minAngle + (maxAngle - minAngle) * float(i) / float(nSteps);
 		glm::vec3 next = center + radiusA * vx * cos(angle) + radiusB * vy * sin(angle);
-		drawLine(prev, next, color);
+		DrawLine(prev, next, color);
 		prev = next;
 	}
 	if (drawSect)
 	{
-		drawLine(center, prev, color);
+		DrawLine(center, prev, color);
 	}
 }
 
@@ -188,13 +188,13 @@ void DebugRender::drawCone(float radius, float height, int upAxis, const glm::ve
 	{
 		capEnd[(upAxis + 1) % 3] = btSin(btScalar(i) * SIMD_RADS_PER_DEG) * radius;
 		capEnd[(upAxis + 2) % 3] = btCos(btScalar(i) * SIMD_RADS_PER_DEG) * radius;
-		drawLine(start + transform.getBasis() * (offsetHeight), start + transform.getBasis() * capEnd, color);
+		DrawLine(start + transform.getBasis() * (offsetHeight), start + transform.getBasis() * capEnd, color);
 	}
 
-	drawLine(start + transform.getBasis() * (offsetHeight), start + transform.getBasis() * (-offsetHeight + offsetRadius), color);
-	drawLine(start + transform.getBasis() * (offsetHeight), start + transform.getBasis() * (-offsetHeight - offsetRadius), color);
-	drawLine(start + transform.getBasis() * (offsetHeight), start + transform.getBasis() * (-offsetHeight + offset2Radius), color);
-	drawLine(start + transform.getBasis() * (offsetHeight), start + transform.getBasis() * (-offsetHeight - offset2Radius), color);
+	DrawLine(start + transform.getBasis() * (offsetHeight), start + transform.getBasis() * (-offsetHeight + offsetRadius), color);
+	DrawLine(start + transform.getBasis() * (offsetHeight), start + transform.getBasis() * (-offsetHeight - offsetRadius), color);
+	DrawLine(start + transform.getBasis() * (offsetHeight), start + transform.getBasis() * (-offsetHeight + offset2Radius), color);
+	DrawLine(start + transform.getBasis() * (offsetHeight), start + transform.getBasis() * (-offsetHeight - offset2Radius), color);
 
 	// Drawing the base of the cone
 	btVector3 yaxis(0, 0, 0);
@@ -205,7 +205,7 @@ void DebugRender::drawCone(float radius, float height, int upAxis, const glm::ve
 #endif
 }
 
-void DebugRender::renderFrame(View* view)
+void DebugRender::RenderFrame(View* view)
 {
 	beginDraw();
 
@@ -218,12 +218,12 @@ void DebugRender::renderFrame(View* view)
 	endDraw();
 }
 
-void DebugRender::pushModelMatrix(const glm::mat4& model)
+void DebugRender::PushModelMatrix(const glm::mat4& model)
 {
 	m_modelMatrix = model;
 }
 
-void DebugRender::popModelMatrix()
+void DebugRender::PopModelMatrix()
 {
 	m_modelMatrix = glm::identity<glm::mat4>();
 }
@@ -231,9 +231,9 @@ void DebugRender::popModelMatrix()
 void DebugRender::drawAxis(const glm::vec3& vec)
 {
 	const float length = 0.2f;
-	drawLine(vec, glm::vec3(vec.x + length, vec.y, vec.z), glm::vec3(1.0f, 0.0, 0.0f));
-	drawLine(vec, glm::vec3(vec.x, vec.y + length, vec.z), glm::vec3(0.0f, 0.0f, 1.0f));
-	drawLine(vec, glm::vec3(vec.x, vec.y, vec.z + length), glm::vec3(0.0f, 1.0f, 0.0f));
+	DrawLine(vec, glm::vec3(vec.x + length, vec.y, vec.z), glm::vec3(1.0f, 0.0, 0.0f));
+	DrawLine(vec, glm::vec3(vec.x, vec.y + length, vec.z), glm::vec3(0.0f, 0.0f, 1.0f));
+	DrawLine(vec, glm::vec3(vec.x, vec.y, vec.z + length), glm::vec3(0.0f, 1.0f, 0.0f));
 }
 
 void DebugRender::beginDraw()
@@ -250,9 +250,9 @@ void DebugRender::endDraw()
 
 void updateMatrixBuffer(IBufferBase* buffer, const glm::mat4& viewProjection)
 {
-	glm::mat4* matrix = (glm::mat4*)buffer->map(BufferMapping::WriteOnly);
+	glm::mat4* matrix = (glm::mat4*)buffer->Map(BufferMapping::WriteOnly);
 	memcpy(matrix, &viewProjection[0], sizeof(viewProjection));
-	buffer->unmap();
+	buffer->Unmap();
 }
 
 void DebugRender::drawLinesInternal(View* view)
@@ -260,24 +260,24 @@ void DebugRender::drawLinesInternal(View* view)
 	if (m_lines.size() < 1)
 		return;
 
-	g_renderDevice->setVertexBuffer(m_verticesBuffer, sizeof(LineVertex), 0);
+	g_renderDevice->SetVertexBuffer(m_verticesBuffer, sizeof(LineVertex), 0);
 	
-	//m_verticesBuffer->updateSubresource(m_lines.data(), m_lines.size() * sizeof(Line));
+	//m_verticesBuffer->UpdateSubresource(m_lines.data(), m_lines.size() * sizeof(Line));
 
-	LineVertex* vertices = (LineVertex*)m_verticesBuffer->map(BufferMapping::WriteOnly);
+	LineVertex* vertices = (LineVertex*)m_verticesBuffer->Map(BufferMapping::WriteOnly);
 	memcpy(vertices, m_lines.data(), m_lines.size() * sizeof(Line));
-	m_verticesBuffer->unmap();
+	m_verticesBuffer->Unmap();
 
-	g_shaderManager->setShaderProgram(m_shaderProgram);
+	g_shaderManager->SetShaderProgram(m_shaderProgram);
 
 	glm::mat4 mVP = glm::mat4(1.0f);
 	mVP = view->m_projection * view->m_view;
 
 	//updateMatrixBuffer(m_matrixBuffer, mVP);
-	m_matrixBuffer->updateSubresource(&mVP[0], sizeof(mVP));
-	g_renderDevice->setConstantBufferIndex(0, m_matrixBuffer);
+	m_matrixBuffer->UpdateSubresource(&mVP[0], sizeof(mVP));
+	g_renderDevice->SetConstantBufferIndex(0, m_matrixBuffer);
 
-	g_renderDevice->draw(PM_LineList, 0, m_lines.size() * 2);
+	g_renderDevice->Draw(PM_LineList, 0, m_lines.size() * 2);
 }
 
 }

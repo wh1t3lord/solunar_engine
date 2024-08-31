@@ -9,5 +9,5 @@ int APIENTRY WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	if (GetLastError() == ERROR_ALREADY_EXISTS)
 		return 1;
 
-	return engine::main(__argc, __argv);
+	return solunar::main(__argc, __argv);
 }

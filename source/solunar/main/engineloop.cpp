@@ -6,11 +6,14 @@
 #include "core/timer.h"
 #include "core/utils/iniFile.h"
 #include "core/file/contentmanager.h"
+#include "core/object/typemanager.h"
+#include "core/object/propertymanager.h"
 
 #include "engine/engine.h"
 #include "engine/inputmanager.h"
 #include "engine/gameinterface.h"
 #include "engine/camera.h"
+#include "engine/entity/component.h"
 #include "engine/entity/world.h"
 #include "engine/audio/audiomanager.h"
 
@@ -21,8 +24,9 @@
 #include "graphics/lightmanager.h"
 
 #include "shockgame/shockgame.h"
+#include "shockgame/shockplayercontroller.h"
 
-namespace engine {
+namespace solunar {
 
 	extern void graphicsShowConstantBuffers(bool* open);
 
@@ -37,7 +41,7 @@ namespace engine {
 	bool g_modelConvert = false;
 	std::string g_modelConvertName;
 
-	void initEngineCommandLine()
+	void InitEngineCommandLine()
 	{
 		if (g_commandLine.hasOption("-quit"))
 			g_quitAtStart = true;
@@ -67,13 +71,94 @@ namespace engine {
 		g_forceQuit = true;
 	}
 
-	void engineDebugOverlay()
+	void ExportClassesForEditor()
+	{
+		tinyxml2::XMLDocument doc;
+
+		tinyxml2::XMLNode* pRoot = doc.NewElement("Classes");
+		doc.InsertFirstChild(pRoot);
+
+		std::vector<const TypeInfo*> registeredTypes;
+		TypeManager::GetInstance()->GetRegisteredTypes(registeredTypes);
+
+		for (auto it : registeredTypes)
+		{
+			if (!it->IsA<Component>())
+				continue;
+
+			tinyxml2::XMLElement* component = doc.NewElement("Class");
+			component->SetAttribute("classname", it->GetClassName());
+			
+			if (it->m_baseInfo)
+				component->SetAttribute("baseClassname", it->m_baseInfo->GetClassName());
+			
+			pRoot->InsertFirstChild(component);
+
+			std::vector<IProperty*> properties;
+			PropertyManager::GetInstance()->GetProperties(it, properties);
+			if (!properties.empty())
+			{
+				tinyxml2::XMLElement* propertiesElement = doc.NewElement("Properties");
+				component->InsertFirstChild(propertiesElement);
+
+				for (auto prop : properties)
+				{
+					tinyxml2::XMLElement* propertyElement = doc.NewElement("Property");
+					propertiesElement->InsertFirstChild(propertyElement);
+
+					propertyElement->SetAttribute("name", prop->GetName());
+
+					PropertyType propertyType = prop->GetType();
+					switch (propertyType)
+					{
+					case PropertyType_Bool:
+						propertyElement->SetAttribute("type", "Bool");
+						break;
+					case PropertyType_Integer:
+						propertyElement->SetAttribute("type", "Integer");
+						break;
+					case PropertyType_Float:
+						propertyElement->SetAttribute("type", "Float");
+						break;
+					case PropertyType_Vector2:
+						propertyElement->SetAttribute("type", "Vector2");
+						break;
+					case PropertyType_Vector3:
+						propertyElement->SetAttribute("type", "Vector3");
+						break;
+					case PropertyType_Vector4:
+						propertyElement->SetAttribute("type", "Vector4");
+						break;
+					case PropertyType_Quaternion:
+						propertyElement->SetAttribute("type", "Quaternion");
+						break;
+					case PropertyType_Matrix4x4:
+						propertyElement->SetAttribute("type", "Matrix4x4");
+						break;
+					case PropertyType_BoundingBox:
+						propertyElement->SetAttribute("type", "BoundingBox");
+						break;
+					case PropertyType_String:
+						propertyElement->SetAttribute("type", "String");
+						break;
+					default:
+						Assert2(0, "!!!");
+						break;
+					}
+				}
+			}
+		}
+
+		doc.SaveFile("editor_classes.xml");
+	}
+
+	void ShowEngineDebugOverlay()
 	{
 		if (ImGui::BeginMainMenuBar())
 		{
 			if (ImGui::BeginMenu("Engine"))
 			{
-				if (ImGui::MenuItem("Toggle Physics Debug Draw")) { if (Engine::ms_world) Engine::ms_world->togglePhysicsDebugDraw(); }
+				if (ImGui::MenuItem("Toggle Physics Debug Draw")) { if (Engine::ms_world) Engine::ms_world->TogglePhysicsDebugDraw(); }
 				if (ImGui::MenuItem("Entity list")) { g_showEntityList = !g_showEntityList; }
 				if (ImGui::MenuItem("Quit")) { g_forceQuit = true; }
 
@@ -115,7 +200,7 @@ namespace engine {
 
 	static std::string g_startWorldFilename;
 
-	void loadEnvironmentConfig()
+	void LoadEnvironmentConfig()
 	{
 		CIniFile environment("environment.ini");
 		if (!environment.ReadFile())
@@ -124,102 +209,107 @@ namespace engine {
 		g_startWorldFilename = environment.GetValue("Global_PC", "StartWorld");
 	}
 
-	void EngineLoop::initialize()
+	void EngineLoop::Initialize()
 	{
-		initEngineCommandLine();
+		InitEngineCommandLine();
 
 		//appInit2();
 
 		// create engine view
-		createEngineView();
+		CreateEngineView();
 		//appInitInput();
 
-		// initialize engine
-		Engine::init();
+		// Initialize engine
+		Engine::Init();
 		
 		graphicsInit();
 		
-		// initialize audio manager
-		AudioManager* audioManager = AudioManager::createInstance();
-		audioManager->init();
+		// Initialize audio manager
+		AudioManager* audioManager = AudioManager::CreateInstance();
+		audioManager->Init();
 
 		// game init
-		//Game::init();
+		//Game::Init();
 
 		// Game interface init
-		g_gameInterface->initialize();
+		g_gameInterface->Initialize();
 
 		//if (g_commandLine.hasOption("-saveClassIds"))
 		//	saveClassIds();
 
 		//if (g_modelConvert)
 		//{
-		//	std::shared_ptr<ModelBase> model = g_contentManager->loadModelOld(g_modelConvertName);
+		//	std::shared_ptr<ModelBase> model = g_contentManager->LoadModelOld(g_modelConvertName);
 		//	model->saveBinary(g_modelConvertName);
 		//}
+
+		// Register properties #TODO: PLEASE MAKE IT MORE NORMAL
+		PropertyRegistrator::GetInstance()->RegisterClasses();
+
+		//ExportClassesForEditor();
 
 		if (g_commandLine.hasOption("-world"))
 		{
 			const char* worldFileName = g_commandLine.getOptionParameter("-world");
 			char stringBuffer[256];
 			snprintf(stringBuffer, sizeof(stringBuffer), "worlds/%s.xml", worldFileName);
-			EngineStateManager::getInstance()->loadWorld(stringBuffer);
+			EngineStateManager::GetInstance()->LoadWorld(stringBuffer);
 		}
 
-		loadEnvironmentConfig();
+		LoadEnvironmentConfig();
 
 		if (!g_startWorldFilename.empty() && !g_commandLine.hasOption("-world"))
 		{
 			char stringBuffer[256];
 			snprintf(stringBuffer, sizeof(stringBuffer), "worlds/%s.xml", g_startWorldFilename.c_str());
-			EngineStateManager::getInstance()->loadWorld(stringBuffer);
+			EngineStateManager::GetInstance()->LoadWorld(stringBuffer);
 		}
 
 		//if (g_commandLine.hasOption("-world"))
 		//{
 		//	// #TODO: Refactor this
-		//	GameState* gameState = GameState::getInstance();
+		//	GameState* gameState = GameState::GetInstance();
 		//	gameState->setGameState(GameState::GAME_STATE_RUNNING);
 		//	loadLevel();
 		//}
 		//else
 		//{
 		//	// #TODO: Refactor this
-		//	GameState* gameState = GameState::getInstance();
+		//	GameState* gameState = GameState::GetInstance();
 		//	gameState->setGameState(GameState::GAME_STATE_RUNNING);
 		//	loadLevel("entry");
 		//}
 	}
 
-	void EngineLoop::shutdown()
+	void EngineLoop::Shutdown()
 	{
-		g_gameInterface->shutdown();
+		g_gameInterface->Shutdown();
 
-		//Game::shutdown();
+		//Game::Shutdown();
 
-		AudioManager::getInstance()->shutdown();
-		AudioManager::destroyInstance();
+		AudioManager::GetInstance()->Shutdown();
+		AudioManager::DestroyInstance();
 
-		//ImguiManager::getInstance()->shutdown();
+		//ImguiManager::GetInstance()->Shutdown();
 
-		// release content manager (because some objects allocated by renderer, and after
+		// Release content manager (because some objects allocated by renderer, and after
 		//							renderer destroying, render device is unavaliable)
-		g_contentManager->shutdown();
+		g_contentManager->Shutdown();
 
 		graphicsShutdown();
 
-		g_graphicsOptions.saveSettings("GameSettings.ini");
+		g_graphicsOptions.SaveSettings("GameSettings.ini");
 
-		Engine::shutdown();
+		Engine::Shutdown();
 
 		//appShutdown2();
 	}
 
-	bool EngineLoop::update()
+	bool EngineLoop::Update()
 	{
 //		OPTICK_EVENT("EngineLoop::update");
 
-		InputManager* input = InputManager::getInstance();
+		InputManager* input = InputManager::GetInstance();
 
 		if (g_quitAtStart)
 			return true;
@@ -234,46 +324,46 @@ namespace engine {
 			Sleep(200);
 			
 		// update delta cursor pos and others input stuff
-		input->update();
+		input->Update();
 
 		// update timer
-		Timer::getInstance()->update();
+		Timer::GetInstance()->Update();
 
 		// Begin ImGui frame
-		ImGuiManager::getInstance()->beginFrame();
+		ImGuiManager::GetInstance()->BeginFrame();
 
 		// update camera
-		CameraProxy::getInstance()->updateProxy();
+		CameraProxy::GetInstance()->UpdateProxy();
 
 		// run engine frame
-		Engine::update();
+		Engine::Update();
 
 		// sound
-		AudioManager::getInstance()->update();
+		AudioManager::GetInstance()->Update();
 
 		// install current view
-		g_renderer->setView(CameraProxy::getInstance()->getView());
+		g_renderer->SetView(CameraProxy::GetInstance()->GetView());
 
 		// Begin renderer frame
-		g_renderer->beginFrame();
+		g_renderer->BeginFrame();
 		
 		// Render view
-		g_renderer->renderView(appGetView());
+		g_renderer->RenderView(appGetView());
 
 #ifndef FINAL_BUILD
 		// Draw the engine debug overlay
-		engineDebugOverlay();
+		ShowEngineDebugOverlay();
 #endif // !FINAL_BUILD
 		
 		// End and render ImGui
-		ImGuiManager::getInstance()->endFrame();
+		ImGuiManager::GetInstance()->EndFrame();
 
 		// End renderer frame
-		g_renderer->endFrame();
+		g_renderer->EndFrame();
 
 		// Take screenshot
-		if (input->isPressedWithReset(KeyboardKeys::KEY_F12))
-			g_renderer->takeScreenshot();
+		if (input->IsPressedWithReset(KeyboardKeys::KEY_F12))
+			g_renderer->TakeScreenshot();
 
 		return true;
 	}

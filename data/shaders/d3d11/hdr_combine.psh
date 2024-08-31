@@ -2,11 +2,8 @@
 Texture2D g_hdrTexture		: register(t0);
 Texture2D g_bloomTexture	: register(t1);
 
-SamplerState g_sampler { AddressU = Clamp; AddressV = Wrap; };
-
-//uniform float exposure = 0.75f;
-float exposure = 0.125f;
-float bloomScale = 0.1f;
+SamplerState g_hdrSampler		: register(s0);
+SamplerState g_bloomSampler		: register(s1);
 
 float3 toneMapping(float3 v)
 {
@@ -15,13 +12,17 @@ float3 toneMapping(float3 v)
 
 float4 PSMain(float4 position : SV_POSITION, float2 texcoord : TEXCOORD) : SV_Target
 {
-	float4 fragColor = float4(0.f, 0.f, 0.f, 0.f);
+	//float exposure = 0.125f;
+	float exposure = 0.75f;
+	float bloomScale = 0.1f;
+
+	float4 fragColor = float4(0.f, 0.f, 0.f, 1.f);
 	
     // hdr buffer texture
-    float3 color = g_hdrTexture.Sample(g_sampler, texcoord).rgb;
-    
+    float3 color = g_hdrTexture.Sample(g_hdrSampler, texcoord).rgb;
+	
     // bloom buffer texture
-    float3 bloomColor = g_bloomTexture.Sample(g_sampler, texcoord).rgb * bloomScale;
+    float3 bloomColor = g_bloomTexture.Sample(g_bloomSampler, texcoord).rgb * bloomScale;
 	color += bloomColor;
 	
 	color *= exposure;

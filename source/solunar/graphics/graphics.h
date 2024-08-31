@@ -1,7 +1,7 @@
 #ifndef GRAPHICS_GRAPHICS_H
 #define GRAPHICS_GRAPHICS_H
 
-namespace engine
+namespace solunar
 {
 	void graphicsInit();
 	void graphicsShutdown();

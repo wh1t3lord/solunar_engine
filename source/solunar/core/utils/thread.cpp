@@ -34,7 +34,7 @@ void SetThreadName(DWORD dwThreadID, const char* threadName)
 #pragma warning(pop)
 }
 
-namespace engine
+namespace solunar
 {
 
 void setCurrentThreadName(const char* name)
@@ -47,7 +47,7 @@ void Thread::setThreadName(const char* name)
 	::SetThreadName(GetCurrentThreadId(), name);
 }
 
-void Thread::stop()
+void Thread::Stop()
 {
 	if (!m_isRunning)
 		return;
@@ -93,7 +93,7 @@ Thread::Thread()
 Thread::~Thread()
 {
 	if (m_isRunning)
-		stop();
+		Stop();
 }
 
 }

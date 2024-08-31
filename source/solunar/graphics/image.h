@@ -3,7 +3,7 @@
 
 #include "graphics/gfxcommon.h"
 
-namespace engine
+namespace solunar
 {
 	// wrapper on image loading and other stuff
 	class Image
@@ -26,8 +26,8 @@ namespace engine
 		void createRaw(void* data, int width, int height, int channels);
 
 		// saving
-		void save(const std::string& filename);
-		//void save(const std::shared_ptr<DataStream>& stream);
+		void Save(const std::string& filename);
+		//void Save(const std::shared_ptr<DataStream>& stream);
 
 		int getWidth();
 		int getHeight();

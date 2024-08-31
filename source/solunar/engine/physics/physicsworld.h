@@ -1,9 +1,9 @@
 #ifndef PHYSICSWORLD_H
 #define PHYSICSWORLD_H
 
-#include "physics/bullet_private.h"
+#include "engine/physics/bullet_private.h"
 
-namespace engine
+namespace solunar
 {
 	class RigidBodyComponent;
 
@@ -13,17 +13,20 @@ namespace engine
 		PhysicsWorld();
 		~PhysicsWorld();
 
-		void addRigidBody(RigidBodyComponent* body);
+		void AddRigidBody(RigidBodyComponent* body);
+		void RemoveRigidBody(RigidBodyComponent* body);
 
-		void step(float delta);
+		void Step(float delta);
 
-		btDynamicsWorld* getWorld() { return m_world; }
+		btDynamicsWorld* GetWorld() { return m_world; }
 
-		float getFixedTimeStep() { return m_stepTime; }
+		float GetFixedTimeStep() { return m_stepTime; }
 
-		void toggleDebugDraw();
+		void ToggleDebugDraw();
 
-		void internalTick();
+		void InternalTick();
+
+		void DebugDrawTriggers();
 
 	private:
 		btDefaultCollisionConfiguration* m_collisionConfiguration;

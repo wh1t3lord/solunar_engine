@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<World>
+	<!-- Level Geometry -->
+	<Entity>
+		<Position x="0" y="0" z="0"/>
+		<Rotation x="180" y="90" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		<MeshComponent>
+			<Model filename="models/common_floor.dae"/>
+		</MeshComponent>
+		<RigidBodyComponent>
+			<Static value="true"/>
+		</RigidBodyComponent>
+		<BoxShapeComponent>
+			<Size x="20" y="1" z="20"/>
+		</BoxShapeComponent>
+	</Entity>
+	
+	<!-- Test point light -->
+	<Entity>
+		<Position x="0" y="1" z="0"/>
+		<Rotation x="0" y="0" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		<PointLightComponent>
+			<AmbientColor r="1.0" g="0.8" b="0.0"/>
+			<Color r="1.0" g="0.8" b="0.0"/>
+			<SpecularColor r="1.0" g="0.8" b="0.0"/>
+			<Radius value="2"/>
+		</PointLightComponent>
+	</Entity> 
+	
+	<!-- Trigger -->
+	<Entity>
+		<Position x="0" y="3" z="0"/>
+		<Rotation x="0" y="0" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		<RigidBodyComponent>
+			<Trigger value="true"/>
+		</RigidBodyComponent>
+		<BoxShapeComponent>
+			<Size x="2" y="2" z="2"/>
+		</BoxShapeComponent>
+		<TriggerComponent/>
+	</Entity> 
+	
+	<!-- Test entity with directional light -->
+	<Entity>
+		<Position x="0" y="0" z="0"/>
+		<Rotation x="0" y="20" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		
+		<DirectionalLightComponent>
+			<AmbientColor r="0.5" g="0.5" b="0.5"/>
+			<Color r="1" g="1" b="1"/>
+		</DirectionalLightComponent>
+	</Entity>
+	
+	<!-- Player -->
+	<Entity>
+		<Position x="10" y="10" z="10"/>
+		<Rotation x="0" y="0" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		<ShockPlayerController/>
+	</Entity>
+</World>

@@ -3,7 +3,7 @@
 #include "core/platform/core_platform.h"
 #include "core/file/filesystem_posix.h"
 
-namespace engine
+namespace solunar
 {
 
 static int s_stdioSeekDir[] = { SEEK_SET, SEEK_CUR, SEEK_END };
@@ -22,13 +22,13 @@ FileHandle FileSystem_Posix::open(const char* filename)
 	return fp;
 }
 
-FileHandle FileSystem_Posix::create(const char* filename)
+FileHandle FileSystem_Posix::Create(const char* filename)
 {
 	FILE* fp = fopen(filename, "wb");
 	return fp;
 }
 
-void FileSystem_Posix::close(FileHandle handle)
+void FileSystem_Posix::Close(FileHandle handle)
 {
 	if (handle)
 	{
@@ -36,27 +36,27 @@ void FileSystem_Posix::close(FileHandle handle)
 	}
 }
 
-bool FileSystem_Posix::exist(const char* filename)
+bool FileSystem_Posix::Exist(const char* filename)
 {
 	return (access(filename, F_OK) != -1);
 }
 
-size_t FileSystem_Posix::tell(FileHandle handle)
+size_t FileSystem_Posix::Tell(FileHandle handle)
 {
 	return static_cast<size_t>( ftell((FILE*)handle) );
 }
 
-void FileSystem_Posix::seek(FileHandle handle, SeekWay seekway, long offset)
+void FileSystem_Posix::Seek(FileHandle handle, SeekWay seekway, long offset)
 {
 	fseek((FILE*)handle, offset, s_stdioSeekDir[(int)seekway]);
 }
 
-size_t FileSystem_Posix::read(FileHandle handle, void* data, size_t size)
+size_t FileSystem_Posix::Read(FileHandle handle, void* data, size_t size)
 {
 	return static_cast<size_t>(fread(data, 1, size, (FILE*)handle));
 }
 
-size_t FileSystem_Posix::write(FileHandle handle, const void* data, size_t size)
+size_t FileSystem_Posix::Write(FileHandle handle, const void* data, size_t size)
 {
 	return static_cast<size_t>(fwrite(data, 1, size, (FILE*)handle));
 }

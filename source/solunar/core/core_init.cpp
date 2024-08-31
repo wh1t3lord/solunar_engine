@@ -7,36 +7,40 @@
 #include "core/object/typemanager.h"
 #include "core/object/object.h"
 #include "core/object/serializableobject.h"
+#include "core/object/propertymanager.h"
 
-namespace engine
+namespace solunar
 {
 	
-void registerCoreTypes()
+void RegisterCoreTypes()
 {
-	TypeManager::getInstance()->registerObject<Object>();
-	TypeManager::getInstance()->registerObject<SerializableObject>();
+	TypeManager::GetInstance()->RegisterObject<Object>();
+	TypeManager::GetInstance()->RegisterObject<SerializableObject>();
 }
 
-void Core::init()
+void Core::Init()
 {
-	Logger::init();
-	Logger::logPrint("Core builted at %s %s", __TIME__, __DATE__);
+	// Initialize random
+	srand(time(NULL));
 
-	MemoryManager::initialize();
+	Logger::Init();
+	Logger::LogPrint("Core builted at %s %s", __TIME__, __DATE__);
 
-	Timer::getInstance()->init();
+	MemoryManager::Initialize();
+
+	Timer::GetInstance()->Init();
 
 	// Allocate native filesystem
 	g_fileSystem = mem_new<FileSystem_Win32>();
 
 	g_contentManager = mem_new<ContentManager>();
-	g_contentManager->init();
+	g_contentManager->Init();
 
 	// register core types
-	registerCoreTypes();
+	RegisterCoreTypes();
 }
 
-void Core::shutdown()
+void Core::Shutdown()
 {
 	if (g_contentManager)
 	{
@@ -50,9 +54,11 @@ void Core::shutdown()
 		g_fileSystem = nullptr;
 	}
 
-	MemoryManager::shutdown();
+	PropertyManager::GetInstance()->Shutdown();
 
-	Logger::shutdown();
+	MemoryManager::Shutdown();
+
+	Logger::Shutdown();
 }
 
 }

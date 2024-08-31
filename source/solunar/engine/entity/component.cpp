@@ -1,8 +1,16 @@
 #include "enginepch.h"
 #include "engine/entity/component.h"
 
-namespace engine
+namespace solunar
 {
+
+IMPLEMENT_OBJECT(Component, SerializableObject);
+
+BEGIN_PROPERTY_REGISTER(Component)
+{
+	REGISTER_PROPERTY(Component, PropertyBool, m_isActive);
+}
+END_PROPERTY_REGISTER(Component)
 
 Component::Component() :
 	m_entity(nullptr),
@@ -18,32 +26,32 @@ Component::~Component()
 	m_world = nullptr;
 }
 
-void Component::setActive(bool active)
+void Component::SetActive(bool active)
 {
 	m_isActive = active;
 }
 
-bool Component::isActive()
+bool Component::IsActive()
 {
 	return m_isActive;
 }
 
-void Component::onEntitySet(Entity* entity)
+void Component::OnEntitySet(Entity* entity)
 {
 	m_entity = entity;
 }
 
-void Component::onWorldSet(World* world)
+void Component::OnWorldSet(World* world)
 {
 	m_world = world;
 }
 
-void Component::onEntityRemove()
+void Component::OnEntityRemove()
 {
 	m_entity = nullptr;
 }
 
-void Component::setSerializable(bool value)
+void Component::SetSerializable(bool value)
 {
 	m_isSerializable = value;
 }

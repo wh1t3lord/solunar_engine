@@ -18,9 +18,9 @@
 #include "backends/imgui_impl_win32.h"
 #include <engine/inputmanager_win32.h>
 
-extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
-namespace engine
+namespace solunar
 {
 	View* g_engineView = nullptr;
 	HWND g_engineWindow = nullptr;
@@ -38,15 +38,15 @@ namespace engine
 
 	void appInit(int argc, char** argv)
 	{
-		g_commandLine.init(argc, argv);
+		g_commandLine.Init(argc, argv);
 
-		Core::init();
+		Core::Init();
 
 		// create game content device
 		g_gameContentDevice = mem_new<ContentDevice>("data");
 
 		// mount game content device
-		g_contentManager->mountDevice(g_gameContentDevice, "game");
+		g_contentManager->MountDevice(g_gameContentDevice, "game");
 	}
 
 	void appShutdown()
@@ -65,7 +65,7 @@ namespace engine
 
 		UnregisterClassA("EngineWindowClass", NULL);
 
-		g_contentManager->unountDevice("game");
+		g_contentManager->UnmountDevice("game");
 
 		if (g_gameContentDevice)
 		{
@@ -73,7 +73,7 @@ namespace engine
 			g_gameContentDevice = nullptr;
 		}
 
-		Core::shutdown();
+		Core::Shutdown();
 	}
 
 	BOOL g_fMouseInClient;
@@ -81,26 +81,26 @@ namespace engine
 
 	void onLostFocus()
 	{
-		InputManager::getInstance()->setCursorCapture(false);
-		InputManager::getInstance()->setCursorHiding(false);
+		InputManager::GetInstance()->SetCursorCapture(false);
+		InputManager::GetInstance()->SetCursorHiding(false);
 
 		g_fGainedFocus = false;
 	}
 
-	void onGainedFocus()
+	void OnGainedFocus()
 	{
 		g_fGainedFocus = true;
 
 		if (g_engineData.m_shouldCaptureMouse)
-			InputManager::getInstance()->setCursorCapture(true);
+			InputManager::GetInstance()->SetCursorCapture(true);
 
 		if (g_engineData.m_shouldHideMouse)
-			InputManager::getInstance()->setCursorHiding(true);
+			InputManager::GetInstance()->SetCursorHiding(true);
 	}
 
 	LRESULT CALLBACK wndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
 	{
-		InputManager_Win32* inputManager = (InputManager_Win32*)InputManager::getInstance();
+		InputManager_Win32* inputManager = (InputManager_Win32*)InputManager::GetInstance();
 
 		switch (Msg)
 		{
@@ -111,16 +111,42 @@ namespace engine
 		case WM_KEYDOWN:
 		{
 			Win32Keys::Keys key = static_cast<Win32Keys::Keys>(wParam);
-			inputManager->keyboardAction(static_cast<int>(getKeyFromWin32(key)), true);
+			inputManager->KeyboardAction(static_cast<int>(getKeyFromWin32(key)), true);
 			break;
 		}
 
 		case WM_KEYUP:
 		{
 			Win32Keys::Keys key = static_cast<Win32Keys::Keys>(wParam);
-			inputManager->keyboardAction(static_cast<int>(getKeyFromWin32(key)), false);
+			inputManager->KeyboardAction(static_cast<int>(getKeyFromWin32(key)), false);
 			break;
 		}
+
+		/////////////////////////////////////////////////////////
+		// Mouse Buttons 
+		// #TODO: REWRITE PLEASE TO WM_MBUTTONUP / WM_MBUTTONDOWN
+
+		case WM_LBUTTONDOWN:
+			inputManager->MouseButtonAction(MOUSE_BUTTON_LEFT, true);
+			break;
+		case WM_RBUTTONDOWN:
+			inputManager->MouseButtonAction(MOUSE_BUTTON_RIGHT, true);
+			break;
+		case WM_MBUTTONDOWN:
+			inputManager->MouseButtonAction(MOUSE_BUTTON_MIDDLE, true);
+			break;
+
+		case WM_LBUTTONUP:
+			inputManager->MouseButtonAction(MOUSE_BUTTON_LEFT, false);
+			break;
+		case WM_RBUTTONUP:
+			inputManager->MouseButtonAction(MOUSE_BUTTON_RIGHT, false);
+			break;
+		case WM_MBUTTONUP:
+			inputManager->MouseButtonAction(MOUSE_BUTTON_MIDDLE, false);
+			break;
+
+		/////////////////////////////////////////////////////////
 
 		case WM_MOUSEMOVE:
 		{
@@ -148,7 +174,7 @@ namespace engine
 		}
 
 		//case WM_KILLFOCUS:
-		//	InputManager::getInstance()->setCursorCapture(false);
+		//	InputManager::GetInstance()->setCursorCapture(false);
 		//	break;
 
 		case WM_ACTIVATE:
@@ -156,7 +182,7 @@ namespace engine
 			if (LOWORD(wParam) == WA_INACTIVE)
 				onLostFocus();
 			else
-				onGainedFocus();
+				OnGainedFocus();
 			
 			break;
 		}
@@ -170,25 +196,25 @@ namespace engine
 		return DefWindowProcA(hWnd, Msg, wParam, lParam);
 	}
 
-	void inputUpdate()
+	void InputUpdate()
 	{
 		if (g_fGainedFocus)
 		{
 			if (g_engineData.m_shouldCaptureMouse)
-				InputManager::getInstance()->setCursorCapture(true);
+				InputManager::GetInstance()->SetCursorCapture(true);
 
 			if (g_engineData.m_shouldHideMouse)
-				InputManager::getInstance()->setCursorHiding(true);
+				InputManager::GetInstance()->SetCursorHiding(true);
 		}
 	}
 
-	void createEngineView()
+	void CreateEngineView()
 	{
 		std::string optionsFilename = "GameSettings.ini";
 		if (!g_graphicsOptions.loadSettings(optionsFilename))
 		{
 			g_graphicsOptions.applyDefaultOptions();
-			g_graphicsOptions.saveSettings(optionsFilename);
+			g_graphicsOptions.SaveSettings(optionsFilename);
 		}
 
 		// create window
@@ -212,6 +238,7 @@ namespace engine
 		g_engineWindow = CreateWindowA("EngineWindowClass", title, windowStyle, 0, 0, rc.right - rc.left, rc.bottom - rc.top, NULL, NULL, NULL, NULL);
 		ShowWindow(g_engineWindow, SW_SHOW);
 		UpdateWindow(g_engineWindow);
+		SetForegroundWindow(g_engineWindow);
 
 		g_engineView = mem_new<View>();
 		g_engineView->m_width = width;
@@ -221,7 +248,7 @@ namespace engine
 		g_engineView->m_zfar = 10000.0f;
 		g_engineView->updateInternalValues();
 
-		CameraProxy::getInstance()->setView(g_engineView);
+		CameraProxy::GetInstance()->SetView(g_engineView);
 	}
 
 	void appPresent()
@@ -239,21 +266,21 @@ namespace engine
 		return g_engineView;
 	}
 
-	void mainLoop(EngineLoop* engineLoop)
+	void MainLoop(EngineLoop* engineLoop)
 	{
-		MSG msg = {};
-		while (msg.message != WM_QUIT)
+		MSG Msg = {};
+		while (Msg.message != WM_QUIT)
 		{
-			if (PeekMessageA(&msg, 0, 0, 0, PM_REMOVE))
+			if (PeekMessageA(&Msg, 0, 0, 0, PM_REMOVE))
 			{
-				TranslateMessage(&msg);
-				DispatchMessageA(&msg);
+				TranslateMessage(&Msg);
+				DispatchMessageA(&Msg);
 			}
 			else
 			{
-				inputUpdate();
+				InputUpdate();
 
-				if (!engineLoop->update())
+				if (!engineLoop->Update())
 					break;
 			}
 		}
@@ -269,9 +296,9 @@ namespace engine
 		appInit(argc, argv);
 		
 		EngineLoop engineLoop;
-		engineLoop.initialize();
+		engineLoop.Initialize();
 
-		mainLoop(&engineLoop);
+		MainLoop(&engineLoop);
 #if 0
 		/*while (!glfwWindowShouldClose(g_engineWindow))
 		{
@@ -282,9 +309,9 @@ namespace engine
 		}*/
 #endif
 
-		Core::msg("Quiting from engine loop ...");
+		Core::Msg("Quiting from engine loop ...");
 
-		engineLoop.shutdown();
+		engineLoop.Shutdown();
 		
 		appShutdown();
 

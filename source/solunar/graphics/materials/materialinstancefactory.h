@@ -3,7 +3,7 @@
 
 #include "graphics/material.h"
 
-namespace engine
+namespace solunar
 {
 
 class Material;
@@ -13,8 +13,8 @@ class MaterialInstanceFactory : public Singleton<MaterialInstanceFactory>
 {
 	static MaterialInstanceFactory* ms_instance;
 public:
-	static MaterialInstanceFactory* createInstance();
-	static void destroyInstance();
+	static MaterialInstanceFactory* CreateInstance();
+	static void DestroyInstance();
 
 public:
 	IMaterialInstance* createMaterialInstance(Material* material);

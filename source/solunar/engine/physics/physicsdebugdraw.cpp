@@ -2,7 +2,7 @@
 #include "engine/physics/physicsdebugdraw.h"
 #include "graphics/debugrenderer.h"
 
-namespace engine {
+namespace solunar {
 
 PhysicsDebugDraw g_physicsDebugDraw;
 
@@ -11,7 +11,7 @@ void PhysicsDebugDraw::drawLine(const btVector3& from, const btVector3& to, cons
 	glm::vec3 btFrom = glm::vec3(from.x(), from.y(), from.z());
 	glm::vec3 btTo = glm::vec3(to.x(), to.y(), to.z());
 	glm::vec3 btColor = glm::vec3(color.x(), color.y(), color.z());
-	g_debugRender.drawLine(btFrom, btTo, btColor);
+	g_debugRender.DrawLine(btFrom, btTo, btColor);
 }
 
 void PhysicsDebugDraw::drawContactPoint(const btVector3& PointOnB, const btVector3& normalOnB, btScalar distance, int lifeTime, const btVector3& color)

@@ -4,8 +4,8 @@
 // C++ defines:
 //	UNLIT
 
-// NOTE: Please note this macro should be up to date with C++ code: graphics\light.h
-#define MAX_POINT_LIGHTS 32
+#include "common.h"
+#include "cbuffers.h"
 
 struct VSOutput
 {
@@ -17,74 +17,20 @@ struct VSOutput
 	float3 bitangent	: BINORMAL;
 };
 
-cbuffer GlobalData : register(b0)
-{
-	row_major float4x4 g_modelMatrix;
-	row_major float4x4 g_viewMatrix;
-	row_major float4x4 g_projectionMatrix;
-	row_major float4x4 g_modelViewProjection;
-
-	float4 g_viewPos;
-	float4 g_viewDir;
-};
-
-cbuffer DirectionalLightCB : register(b2)
-{
-	float4 g_DirLight_direction;
-	float4 g_DirLight_ambientColor;
-	float4 g_DirLight_color;
-};
-
-struct PointLight
-{
-	float4 position;
-	float4 color;
-	float4 specular;
-	float4 lightData; // r - radius
-};
-
-cbuffer PointLightCB : register(b3)
-{
-	PointLight g_pointLights[MAX_POINT_LIGHTS];
-};
-
-cbuffer LightGlobalDataCB : register(b4)
-{
-	uint g_pointLightCount;
-	uint g_spotLightCount;
-	uint padding0;
-	uint padding1;
-};
-
-Texture2D g_albedoTexture;
-SamplerState g_albedoSampler;
-
-float3 pointLightPhong(float3 diffuseColor, float3 specularColor, float specularPower, float3 L, float3 N, float3 R)
-{
-	float diffuseLigthing = max(dot(N, L), 0);
-
-	float specularStrength = 2.0;
-	float specularLigthing = pow(max(dot(R, L), 0.0), specularPower);
-	
-	return diffuseColor * diffuseLigthing + specularLigthing * specularColor * specularStrength;
-}
-
-float lightAttenuation(float3 lightPosition, float3 position, float radius)
-{
-	float3 distance = (lightPosition - position) / radius;
-	float attenuation = 1.0f - dot(distance, distance);
-	return attenuation;
-}
+Texture2D 			g_albedoTexture : register(t0);
+SamplerState		g_albedoSampler : register(s0);
+Texture2D 			g_normalTexture : register(t1);
+SamplerState		g_normalSampler : register(s1);
 
 float4 PSMain(VSOutput input) : SV_Target
 {
 	//return float4(input.normal, 1.0f);
 
-	const float3 kSpecColor = float3(2.0f, 2.0f, 2.0f);
+	const float3 kSpecColor = float3(4.0f, 4.0f, 4.0f);
 	const float kSpecPower = 256.0f;
 
 	float3 ambientColor = g_DirLight_ambientColor.xyz;
-	float3 albedoColor = g_albedoTexture.Sample(g_albedoSampler, input.texcoord).rgb;
+	float3 albedoColor = materialAlbedo(g_albedoTexture, g_albedoSampler, input.texcoord);
 
 #ifdef UNLIT
 	return float4(albedoColor, 1.0f);
@@ -114,10 +60,42 @@ float4 PSMain(VSOutput input) : SV_Target
 		float radius = pointLight.lightData.r;
 		
 		// light attenuation
-		float lightDistance = length(pointLight.position.xyz - input.worldPos) / radius;
-		float attenuation = 1.0 / (1.0 + lightDistance * lightDistance);
+		//float lightDistance = length(pointLight.position.xyz - input.worldPos) / radius;
+		//float attenuation = 1.0 / (1.0 + lightDistance * lightDistance);
+		//
+		//ligthing += pointLightPhong(pointLight.color.rgb, pointLight.specular.rgb, 2.0, PL, input.normal, R) * attenuation;
 		
-		ligthing += pointLightPhong(pointLight.color.rgb, pointLight.specular.rgb, 2.0, PL, input.normal, R) * attenuation;
+		// normal falloff
+		
+		float3 distance = length(pointLight.position.xyz - input.worldPos);
+		float falloff = pow(saturate(1.0f - pow(distance / radius, 4.0f)), 2.0f) / ( pow(distance, 2.0f) + 1.0f) ;
+		
+		ligthing += pointLightPhong(pointLight.color.rgb, pointLight.specular.rgb, 2.0, PL, input.normal, R) * falloff;
+	}
+	
+	for (int i = 0; i < g_spotLightCount; i++)
+	{
+		// get local copy of spot light from ubo
+		SpotLight spotLight = g_spotLights[i];
+		
+		// we store spot light cutoff in r component
+		float cutoff = cos(spotLight.lightData.r);
+		
+		// we store spot light direction in gba component
+		float3 lightDirection = spotLight.lightData.gba;
+		
+		float3 PL = normalize(spotLight.position.xyz - input.worldPos);
+		float3 R = reflect(-PL, input.normal);
+		
+		float theta = dot( normalize( lightDirection ), normalize( -lightDirection ) );
+		
+		if (theta > cutoff)
+		{
+			float3 distance = length(spotLight.position.xyz - input.worldPos);
+			float falloff = pow(saturate(1.0f - pow(distance, 4.0f)), 2.0f) / ( pow(distance, 2.0f) + 1.0f);
+			ligthing += float3(1.0f, 0.0f, 0.0f);
+			//ligthing += pointLightPhong(spotLight.color.rgb, spotLight.specular.rgb, 2.0, PL, input.normal, R) * falloff;
+		}
 	}
 	
 	//float3 finalColor = albedoColor * (diffuseColor + specularColor);

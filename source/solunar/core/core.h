@@ -3,17 +3,17 @@
 
 #include "core/platform/core_platform.h"
 
-namespace engine
+namespace solunar
 {
 	class Core
 	{
 	public:
-		static void init();
-		static void shutdown();
+		static void Init();
+		static void Shutdown();
 
-		static void msg(const char* msg, ...);
-		static void error(const char* msg, ...);
-		static void warning(const char* msg, ...);
+		static void Msg(const char* msg, ...);
+		static void Error(const char* msg, ...);
+		static void Warning(const char* msg, ...);
 	};
 }
 

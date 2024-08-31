@@ -3,33 +3,31 @@
 
 #include "graphics/lightmanager.h"
 
-namespace engine {
+namespace solunar {
 	
-	class DrawableComponent;
+	class MeshComponent;
 	
 	class GraphicsWorld : public Object
 	{
-		ImplementObject(GraphicsWorld, Object);
+		DECLARE_OBJECT(GraphicsWorld);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 		
 	public:
 		GraphicsWorld();
 		~GraphicsWorld();
 
-		void onWorldSet(World* world);
+		void AddMesh(MeshComponent* mesh);
+		void RemoveMesh(MeshComponent* mesh);
 
-		void addDrawable(DrawableComponent* drawable);
-		void removeDrawable(DrawableComponent* drawable);
+		LightManager* GetLightManager() { return &m_lightManager; }
 
-		LightManager* getLightManager() { return &m_lightManager; }
+		const std::vector<MeshComponent*>& GetMeshes() { return m_meshes; }
 
-		const std::vector<DrawableComponent*>& getDrawables() { return m_drawables; }
-
-		void updateDrawables();
+		void Update();
 		
 	private:
-		std::vector<DrawableComponent*> m_drawables;
+		std::vector<MeshComponent*> m_meshes;
 
 		LightManager m_lightManager;
 	};

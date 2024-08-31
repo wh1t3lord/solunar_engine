@@ -1,19 +1,19 @@
 #ifndef GAMELOGIC_LEVELMANAGER_H
 #define GAMELOGIC_LEVELMANAGER_H
 
-namespace engine
+namespace solunar
 {
 	
 class LevelManagerComponent : public Component
 {
-	ImplementObject(LevelManagerComponent, Component);
+	DECLARE_OBJECT(LevelManagerComponent);
 public:
 	LevelManagerComponent();
 	~LevelManagerComponent();
 
-	static void registerObject();
+	static void RegisterObject();
 	
-	void onWorldSet(World* world) override;
+	void OnWorldSet(World* world) override;
 
 
 private:

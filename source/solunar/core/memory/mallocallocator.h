@@ -3,7 +3,7 @@
 
 #include "core/memory/allocator.h"
 
-namespace engine
+namespace solunar
 {
 
 class MallocAllocator : public IAllocator

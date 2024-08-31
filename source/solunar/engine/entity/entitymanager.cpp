@@ -2,7 +2,7 @@
 #include "engine/entity/entity.h"
 #include "engine/entity/entitymanager.h"
 
-namespace engine
+namespace solunar
 {
 
 EntityManager::EntityManager()
@@ -11,10 +11,10 @@ EntityManager::EntityManager()
 
 EntityManager::~EntityManager()
 {
-	deleteEntities();
+	Destroy();
 }
 
-void EntityManager::deleteEntities()
+void EntityManager::Destroy()
 {
 	if (!m_entities.empty())
 	{
@@ -30,27 +30,27 @@ void EntityManager::deleteEntities()
 	}
 }
 
-Entity* EntityManager::createEntity()
+Entity* EntityManager::CreateEntity()
 {
-	Entity* entity = g_typeManager->createObject<Entity>();
+	Entity* entity = g_typeManager->CreateObject<Entity>();
 	m_entities.push_back(entity);
 	return entity;
 }
 
-Entity* EntityManager::createEntityEx(const TypeInfo* typeInfo)
+Entity* EntityManager::CreateEntityEx(const TypeInfo* typeInfo)
 {
-	Entity* entity = (Entity*)g_typeManager->createObjectByTypeInfo(typeInfo);
+	Entity* entity = (Entity*)g_typeManager->CreateObjectByTypeInfo(typeInfo);
 	m_entities.push_back(entity);
 	return entity;
 }
 
-std::vector<Entity*> EntityManager::getEntitiesWithComponentTypeInfo(const TypeInfo* typeInfo)
+std::vector<Entity*> EntityManager::GetEntitiesWithComponentTypeInfo(const TypeInfo* typeInfo)
 {
 	std::vector<Entity*> entities;
 
 	for (auto entity : m_entities)
 	{
-		if (entity->getComponentByTypeInfo(typeInfo))
+		if (entity->GetComponentByTypeInfo(typeInfo))
 			entities.push_back(entity);
 	}
 

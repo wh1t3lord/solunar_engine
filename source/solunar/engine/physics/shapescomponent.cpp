@@ -6,11 +6,13 @@
 #include "engine/physics/bullet_private.h"
 #include "engine/physics/physicsworld.h"
 
-namespace engine {
+namespace solunar {
 
-	void ShapeComponent::registerObject()
+	IMPLEMENT_OBJECT(ShapeComponent, Component);
+
+	void ShapeComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<ShapeComponent>();
+		g_typeManager->RegisterObject<ShapeComponent>();
 	}
 
 	ShapeComponent::ShapeComponent() :
@@ -28,27 +30,27 @@ namespace engine {
 
 	}
 
-	void ShapeComponent::onEntitySet(Entity* entity)
+	void ShapeComponent::OnEntitySet(Entity* entity)
 	{
-		Component::onEntitySet(entity);
+		Component::OnEntitySet(entity);
 	}
 
-	void ShapeComponent::onEntityRemove()
+	void ShapeComponent::OnEntityRemove()
 	{
-		if (getEntity())
+		if (GetEntity())
 		{
 			// HACK: I don't know how it's brokes but... hack...
 #if 1
-			if (RigidBodyComponent* rigidBody = getEntity()->getComponent<RigidBodyComponent>())
+			if (RigidBodyComponent* rigidBody = GetEntity()->GetComponent<RigidBodyComponent>())
 			{
-				Assert2(rigidBody->getCompoundShape(), "RigidBody is not initialized!");
-				rigidBody->getCompoundShape()->removeChildShape(m_shape);
+				Assert2(rigidBody->GetCompoundShape(), "RigidBody is not initialized!");
+				rigidBody->GetCompoundShape()->removeChildShape(m_shape);
 			}
 #else
 			if (m_rigidBody)
 			{
-				Assert2(m_rigidBody->getCompoundShape(), "RigidBody is not initialized!");
-				m_rigidBody->getCompoundShape()->removeChildShape(m_shape);
+				Assert2(m_rigidBody->GetCompoundShape(), "RigidBody is not initialized!");
+				m_rigidBody->GetCompoundShape()->removeChildShape(m_shape);
 			}
 #endif
 		}
@@ -57,47 +59,47 @@ namespace engine {
 		mem_delete(m_shape);
 	}
 
-	void ShapeComponent::onWorldSet(World* world)
+	void ShapeComponent::OnWorldSet(World* world)
 	{
-		Component::onWorldSet(world);
-		m_physicsWorld = world->getPhysicsWorld();
+		Component::OnWorldSet(world);
+		m_physicsWorld = world->GetPhysicsWorld();
 	}
 
-	void ShapeComponent::loadXML(tinyxml2::XMLElement& element)
+	void ShapeComponent::LoadXML(tinyxml2::XMLElement& element)
 	{
 		tinyxml2::XMLElement* positionElement = element.FirstChildElement("Position");
 		if (positionElement)
 		{
-			m_localPosition = getVector3FromXMLElement(*positionElement);
+			m_localPosition = GetVector3FromXMLElement(*positionElement);
 		}
 	}
 
-	void ShapeComponent::saveXML(tinyxml2::XMLElement& element)
+	void ShapeComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
 		tinyxml2::XMLElement* positionElement = element.InsertNewChildElement("Position");
-		saveVector3ToXMLElement(*positionElement, m_localPosition);
+		SaveVector3ToXMLElement(*positionElement, m_localPosition);
 	}
 
-	void ShapeComponent::initializeShape()
+	void ShapeComponent::InitializeShape()
 	{
-		m_rigidBody = getEntity()->getComponent<RigidBodyComponent>();
+		m_rigidBody = GetEntity()->GetComponent<RigidBodyComponent>();
 		if (!m_rigidBody)
 		{
-			m_rigidBody = getEntity()->createComponent<RigidBodyComponent>();
+			m_rigidBody = GetEntity()->CreateComponent<RigidBodyComponent>();
 		}
 
-		createShapeInternal();
+		CreateShapeInternal();
 
 		Assert2(m_shape, "Failed to allocate or create shape.");
 
-		initializeShapeTransform();
+		InitializeShapeTransform();
 
 		// apply created shape to rigid body compound shape
-		Assert2(m_rigidBody->getCompoundShape(), "RigidBody is not initialized!");
-		m_rigidBody->getCompoundShape()->addChildShape(m_btLocalTransform, m_shape);
+		Assert2(m_rigidBody->GetCompoundShape(), "RigidBody is not initialized!");
+		m_rigidBody->GetCompoundShape()->addChildShape(m_btLocalTransform, m_shape);
 	}
 
-	void ShapeComponent::initializeShapeTransform()
+	void ShapeComponent::InitializeShapeTransform()
 	{
 		// identity
 		m_btLocalTransform.setIdentity();
@@ -106,7 +108,7 @@ namespace engine {
 		m_btLocalTransform.setOrigin(glmVectorToBt(m_localPosition));
 	}
 
-	void ShapeComponent::createShapeInternal()
+	void ShapeComponent::CreateShapeInternal()
 	{
 		Assert2(0, "Pure virtual call");
 	}
@@ -114,9 +116,11 @@ namespace engine {
 	//////////////////////////////////////////////////////////////////////////
 	// Box Shape Component
 
-	void BoxShapeComponent::registerObject()
+	IMPLEMENT_OBJECT(BoxShapeComponent, ShapeComponent);
+
+	void BoxShapeComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<BoxShapeComponent>();
+		g_typeManager->RegisterObject<BoxShapeComponent>();
 	}
 
 	BoxShapeComponent::BoxShapeComponent()
@@ -128,35 +132,35 @@ namespace engine {
 	{
 	}
 
-	void BoxShapeComponent::loadXML(tinyxml2::XMLElement& element)
+	void BoxShapeComponent::LoadXML(tinyxml2::XMLElement& element)
 	{
-		ShapeComponent::loadXML(element);
+		ShapeComponent::LoadXML(element);
 
 		tinyxml2::XMLElement* sizeElement = element.FirstChildElement("Size");
 		if (sizeElement)
 		{
-			m_size = getVector3FromXMLElement(*sizeElement);
+			m_size = GetVector3FromXMLElement(*sizeElement);
 		}
 	}
 
-	void BoxShapeComponent::saveXML(tinyxml2::XMLElement& element)
+	void BoxShapeComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
-		ShapeComponent::saveXML(element);
+		ShapeComponent::SaveXML(element);
 
 		tinyxml2::XMLElement* sizeElement = element.InsertNewChildElement("Size");
 		if (sizeElement)
 		{
-			saveVector3ToXMLElement(*sizeElement, m_size);
+			SaveVector3ToXMLElement(*sizeElement, m_size);
 		}
 	}
 
 	void BoxShapeComponent::createShape(const glm::vec3& size)
 	{
 		m_size = size;
-		createShapeInternal();
+		CreateShapeInternal();
 	}
 
-	void BoxShapeComponent::createShapeInternal()
+	void BoxShapeComponent::CreateShapeInternal()
 	{
 		m_shape = (btCollisionShape*)mem_new<btBoxShape>(glmVectorToBt(m_size));
 	}
@@ -164,9 +168,11 @@ namespace engine {
 	//////////////////////////////////////////////////////////////////////////
 	// Sphere Shape Component
 
-	void SphereShapeComponent::registerObject()
+	IMPLEMENT_OBJECT(SphereShapeComponent, ShapeComponent);
+
+	void SphereShapeComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<SphereShapeComponent>();
+		g_typeManager->RegisterObject<SphereShapeComponent>();
 	}
 
 	SphereShapeComponent::SphereShapeComponent()
@@ -179,9 +185,9 @@ namespace engine {
 
 	}
 
-	void SphereShapeComponent::loadXML(tinyxml2::XMLElement& element)
+	void SphereShapeComponent::LoadXML(tinyxml2::XMLElement& element)
 	{
-		ShapeComponent::loadXML(element);
+		ShapeComponent::LoadXML(element);
 
 		tinyxml2::XMLElement* sizeElement = element.FirstChildElement("Size");
 		if (sizeElement)
@@ -191,9 +197,9 @@ namespace engine {
 		}
 	}
 
-	void SphereShapeComponent::saveXML(tinyxml2::XMLElement& element)
+	void SphereShapeComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
-		ShapeComponent::saveXML(element);
+		ShapeComponent::SaveXML(element);
 
 		tinyxml2::XMLElement* sizeElement = element.InsertNewChildElement("Size");
 		if (sizeElement)
@@ -202,7 +208,7 @@ namespace engine {
 		}
 	}
 
-	void SphereShapeComponent::createShapeInternal()
+	void SphereShapeComponent::CreateShapeInternal()
 	{
 		m_shape = (btCollisionShape*)mem_new<btSphereShape>(m_fRadius);
 	}
@@ -211,9 +217,11 @@ namespace engine {
 	//////////////////////////////////////////////////////////////////////////
 	// Cylinder Shape Component
 
-	void CylinderShapeComponent::registerObject()
+	IMPLEMENT_OBJECT(CylinderShapeComponent, ShapeComponent);
+
+	void CylinderShapeComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<CylinderShapeComponent>();
+		g_typeManager->RegisterObject<CylinderShapeComponent>();
 	}
 
 	CylinderShapeComponent::CylinderShapeComponent()
@@ -225,29 +233,29 @@ namespace engine {
 	{
 	}
 
-	void CylinderShapeComponent::loadXML(tinyxml2::XMLElement& element)
+	void CylinderShapeComponent::LoadXML(tinyxml2::XMLElement& element)
 	{
-		ShapeComponent::loadXML(element);
+		ShapeComponent::LoadXML(element);
 
 		tinyxml2::XMLElement* sizeElement = element.FirstChildElement("Size");
 		if (sizeElement)
 		{
-			m_size = getVector3FromXMLElement(*sizeElement);
+			m_size = GetVector3FromXMLElement(*sizeElement);
 		}
 	}
 
-	void CylinderShapeComponent::saveXML(tinyxml2::XMLElement& element)
+	void CylinderShapeComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
-		ShapeComponent::saveXML(element);
+		ShapeComponent::SaveXML(element);
 
 		tinyxml2::XMLElement* sizeElement = element.InsertNewChildElement("Size");
 		if (sizeElement)
 		{
-			saveVector3ToXMLElement(*sizeElement, m_size);
+			SaveVector3ToXMLElement(*sizeElement, m_size);
 		}
 	}
 
-	void CylinderShapeComponent::createShapeInternal()
+	void CylinderShapeComponent::CreateShapeInternal()
 	{
 		m_shape = (btCollisionShape*)mem_new<btCylinderShape>(glmVectorToBt(m_size));
 	}
@@ -256,9 +264,11 @@ namespace engine {
 	//////////////////////////////////////////////////////////////////////////
 	// Capsule Shape Component
 
-	void CapsuleShapeComponent::registerObject()
+	IMPLEMENT_OBJECT(CapsuleShapeComponent, ShapeComponent);
+
+	void CapsuleShapeComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<CapsuleShapeComponent>();
+		g_typeManager->RegisterObject<CapsuleShapeComponent>();
 	}
 
 	CapsuleShapeComponent::CapsuleShapeComponent()
@@ -276,12 +286,12 @@ namespace engine {
 	{
 		m_fRadius = _fRadius;
 		m_fHeight = _fHeight;
-		createShapeInternal();
+		CreateShapeInternal();
 	}
 
-	void CapsuleShapeComponent::loadXML(tinyxml2::XMLElement& element)
+	void CapsuleShapeComponent::LoadXML(tinyxml2::XMLElement& element)
 	{
-		ShapeComponent::loadXML(element);
+		ShapeComponent::LoadXML(element);
 
 		tinyxml2::XMLElement* sizeElement = element.FirstChildElement("Size");
 		if (sizeElement)
@@ -294,9 +304,9 @@ namespace engine {
 		}
 	}
 
-	void CapsuleShapeComponent::saveXML(tinyxml2::XMLElement& element)
+	void CapsuleShapeComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
-		ShapeComponent::saveXML(element);
+		ShapeComponent::SaveXML(element);
 
 		tinyxml2::XMLElement* sizeElement = element.InsertNewChildElement("Size");
 		if (sizeElement)
@@ -306,7 +316,7 @@ namespace engine {
 		}
 	}
 
-	void CapsuleShapeComponent::createShapeInternal()
+	void CapsuleShapeComponent::CreateShapeInternal()
 	{
 		m_shape = (btCollisionShape*)mem_new<btCapsuleShape>(m_fRadius, m_fHeight);
 	}

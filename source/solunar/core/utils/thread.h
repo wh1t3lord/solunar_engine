@@ -1,13 +1,13 @@
 #ifndef THREAD_H
 #define THREAD_H
 
-namespace engine
+namespace solunar
 {
 
 #ifdef _WIN32
 typedef unsigned ThreadId;
 #else
-// ???
+typedef unsigned ThreadId;
 #endif // _WIN32
 
 class Thread
@@ -19,7 +19,7 @@ public:
 	bool start();
 	void setThreadName(const char* name);
 
-	void stop();
+	void Stop();
 
 	virtual void execute() = 0;
 

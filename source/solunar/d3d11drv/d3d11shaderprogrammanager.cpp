@@ -5,21 +5,21 @@
 
 #include "core/file/filesystem.h"
 #include "core/file/contentmanager.h"
-namespace engine
+namespace solunar
 {
 
 std::string loadShaderText(const std::string& filename)
 {
 	std::string content;
 
-	DataStreamPtr f = g_contentManager->openStream(filename);
+	DataStreamPtr f = g_contentManager->OpenStream(filename);
 
-	f->seek(Seek_End, 0);
-	size_t fileLength = f->tell();
-	f->seek(Seek_Begin, 0);
+	f->Seek(Seek_End, 0);
+	size_t fileLength = f->Tell();
+	f->Seek(Seek_Begin, 0);
 
 	content.resize(fileLength + 1);
-	f->read((void*)content.data(), fileLength);
+	f->Read((void*)content.data(), fileLength);
 	content[fileLength] = '\0';
 
 	f = nullptr;
@@ -45,13 +45,13 @@ D3D11ShaderProgramManager::~D3D11ShaderProgramManager()
 	m_cachedPrograms.clear();
 }
 
-IShaderProgram* D3D11ShaderProgramManager::createShaderProgram(const char* vsfilename, const char* fsfilename, const char* defines, InputLayoutDesc* inputLayout /*= nullptr*/, int inputLayoutCount /*= 0*/)
+IShaderProgram* D3D11ShaderProgramManager::CreateShaderProgram(const char* vsfilename, const char* fsfilename, const char* defines, InputLayoutDesc* inputLayout /*= nullptr*/, int inputLayoutCount /*= 0*/)
 {
 	Assert(this);
 
 	D3D11Device* device = (D3D11Device*)g_renderDevice;
 
-	Core::msg("D3D11ShaderProgramManager: compile shader program from files %s, %s", vsfilename, fsfilename);
+	Core::Msg("D3D11ShaderProgramManager: compile shader program from files %s, %s", vsfilename, fsfilename);
 
 	std::string vspath = m_shaderPath;
 	vspath += "/";
@@ -65,11 +65,12 @@ IShaderProgram* D3D11ShaderProgramManager::createShaderProgram(const char* vsfil
 	std::string pstext = loadShaderText(pspath);
 
 	D3D11ShaderProgram* shaderProgram = mem_new<D3D11ShaderProgram>(device, vstext.c_str(), pstext.c_str(), defines, inputLayout, inputLayoutCount);
+	shaderProgram->SetDebugName(vsfilename, fsfilename);
 	m_cachedPrograms.push_back(shaderProgram);
 	return shaderProgram;
 }
 
-void D3D11ShaderProgramManager::setShaderProgram(IShaderProgram* program)
+void D3D11ShaderProgramManager::SetShaderProgram(IShaderProgram* program)
 {
 	D3D11Device* device = (D3D11Device*)g_renderDevice;
 	D3D11ShaderProgram* d3dProgram = (D3D11ShaderProgram*)program;
@@ -89,7 +90,7 @@ void D3D11ShaderProgramManager::setShaderProgram(IShaderProgram* program)
 	}
 }
 
-void D3D11ShaderProgramManager::deleteProgram(IShaderProgram* program)
+void D3D11ShaderProgramManager::DeleteProgram(IShaderProgram* program)
 {
 }
 

@@ -1,7 +1,7 @@
 #include "enginepch.h"
 #include "engine/audio/audiomanager.h"
 
-namespace engine
+namespace solunar
 {
 	AudioManager* AudioManager::ms_pInstance = nullptr;
 
@@ -15,27 +15,27 @@ namespace engine
 
 	}
 
-	void AudioManager::init()
+	void AudioManager::Init()
 	{
 
 	}
 
-	void AudioManager::shutdown()
+	void AudioManager::Shutdown()
 	{
 
 	}
 
-	void AudioManager::update()
+	void AudioManager::Update()
 	{
 
 	}
 
-	AudioSource* AudioManager::createSource(const std::string& filename)
+	AudioSource* AudioManager::CreateSource(const std::string& filename)
 	{
 		return nullptr;
 	}
 
-	void AudioManager::deleteSource(AudioSource* source)
+	void AudioManager::DeleteSource(AudioSource* source)
 	{
 
 	}

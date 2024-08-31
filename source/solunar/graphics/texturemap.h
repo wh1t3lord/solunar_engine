@@ -5,12 +5,12 @@
 #include "graphics/image.h"
 #include "graphics/graphicsobject.h"
 
-namespace engine
+namespace solunar
 {
 	class TextureMap : public GraphicsObject
 	{
 	public:
-		ImplementObject(TextureMap, GraphicsObject);
+		DECLARE_OBJECT(TextureMap);
 
 	public:
 		static std::shared_ptr<TextureMap> create2DFromSource(ITexture2D* pTexture2D, const TextureDesc& textureDesc);
@@ -19,14 +19,14 @@ namespace engine
 		TextureMap();
 		virtual ~TextureMap();
 
-		virtual void load(const std::shared_ptr<DataStream>& dataStream) override;
+		virtual void Load(const std::shared_ptr<DataStream>& dataStream) override;
 	
-		void release();
+		void Release();
 		ITexture2D* getHWTexture() { return m_texture2D; }
 
 		void bind();
 
-		void createHw();
+		void CreateHw();
 		void destroyHW();
 
 		void setWrapS(TextureWrap wrap);
@@ -51,14 +51,14 @@ namespace engine
 	// Cubemap
 	class TextureMapCube : public TextureMap
 	{
-		ImplementObject(TextureMapCube, TextureMap);
+		DECLARE_OBJECT(TextureMapCube);
 	public:
 		TextureMapCube();
 		~TextureMapCube();
 
-		static void registerObject();
+		static void RegisterObject();
 
-		void load(const std::shared_ptr<DataStream>& dataStream) override;
+		void Load(const std::shared_ptr<DataStream>& dataStream) override;
 
 		void loadFace(int face, std::shared_ptr<Image> image);
 	};

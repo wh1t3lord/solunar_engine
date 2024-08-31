@@ -1,7 +1,7 @@
 #ifndef GRAPHICS_GRAPHICSOBJECT_H
 #define GRAPHICS_GRAPHICSOBJECT_H
 
-namespace engine
+namespace solunar
 {
 
 enum GraphicsObjectType
@@ -17,16 +17,16 @@ enum GraphicsObjectType
 //! Graphics object, wrapper on any gpu resource.
 class GraphicsObject : public SerializableObject
 {
-	ImplementObject(GraphicsObject, SerializableObject);
+	DECLARE_OBJECT(GraphicsObject);
 public:
 	GraphicsObject();
 	virtual ~GraphicsObject();
 
 	//! Create hardware resource
-	virtual void createHw() = 0;
+	virtual void CreateHw() = 0;
 	
 	//! Release hardware resource
-	virtual void releaseHw() = 0;
+	virtual void ReleaseHw() = 0;
 
 protected:
 	GraphicsObjectType m_type;

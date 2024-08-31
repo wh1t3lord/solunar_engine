@@ -6,12 +6,12 @@
 
 #include "graphics/material.h"
 
-namespace engine
+namespace solunar
 {
 
 MaterialInstanceFactory* MaterialInstanceFactory::ms_instance = nullptr;
 
-MaterialInstanceFactory* MaterialInstanceFactory::createInstance()
+MaterialInstanceFactory* MaterialInstanceFactory::CreateInstance()
 {
 	Assert2(!ms_instance, "Material factory is already created");
 
@@ -19,7 +19,7 @@ MaterialInstanceFactory* MaterialInstanceFactory::createInstance()
 	return ms_instance;
 }
 
-void MaterialInstanceFactory::destroyInstance()
+void MaterialInstanceFactory::DestroyInstance()
 {
 	Assert2(ms_instance, "Material factory is not created");
 

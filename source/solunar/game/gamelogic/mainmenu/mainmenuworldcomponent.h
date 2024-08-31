@@ -3,20 +3,20 @@
 
 #include "engine/entity/logiccomponent.h"
 
-namespace engine {
+namespace solunar {
 	
 	class MainMenuWorldComponent : public LogicComponent
 	{
-		ImplementObject(MainMenuWorldComponent, LogicComponent);
+		DECLARE_OBJECT(MainMenuWorldComponent);
 	public:
-		static void registerObject();
+		static void RegisterObject();
 		
 	public:
 		MainMenuWorldComponent();
 		~MainMenuWorldComponent();
 		
 		// Component inheritance
-		void onWorldSet(World* world);
+		void OnWorldSet(World* world);
 	};
 	
 }

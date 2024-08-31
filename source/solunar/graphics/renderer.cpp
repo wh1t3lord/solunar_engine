@@ -37,7 +37,7 @@
 #include "engine/entity/entitymanager.h"
 #include "engine/entity/entity.h"
 
-namespace engine
+namespace solunar
 {
 	Renderer* g_renderer = nullptr;
 
@@ -67,10 +67,10 @@ namespace engine
 #if 0
 		// check for shaders
 		// #TODO: rewrite to content manager (should return nullptr on stream open failure)
-		if (!g_fileSystem->exist("data/shaders/dx11/quad.vsh") ||
-			!g_fileSystem->exist("data/shaders/dx11/quad.psh"))
+		if (!g_fileSystem->Exist("data/shaders/dx11/quad.vsh") ||
+			!g_fileSystem->Exist("data/shaders/dx11/quad.psh"))
 		{
-			Core::error("Game files is corrupted or incomplete.\nFor devs: wrong working directory???");
+			Core::Error("Game files is corrupted or incomplete.\nFor devs: wrong working directory???");
 		}
 #endif
 
@@ -79,7 +79,7 @@ namespace engine
 		samplerDesc.m_wrapT = TextureWrap::Repeat;
 		samplerDesc.m_minFilter = TextureFilter::Nearest;
 		samplerDesc.m_magFilter = TextureFilter::Nearest;
-		g_defaultSampler = g_renderDevice->createSamplerState(samplerDesc);
+		g_defaultSampler = g_renderDevice->CreateSamplerState(samplerDesc);
 
 		DepthStencilDesc desc = {};
 		desc.m_depthEnable = false;
@@ -89,13 +89,13 @@ namespace engine
 		desc.m_frontFace.m_stencilFailOp = desc.m_frontFace.m_stencilDepthFailOp = desc.m_frontFace.m_stencilPassOp = STENCIL_OP_KEEP;
 		desc.m_frontFace.m_stencilFunc = COMPARISON_ALWAYS;
 		desc.m_backFace = desc.m_frontFace;
-		g_depthStencilState_NoWrite = g_stateManager->createDepthStencilState(desc);
+		g_depthStencilState_NoWrite = g_stateManager->CreateDepthStencilState(desc);
 
-		g_defaultMaterial = g_contentManager->loadObject<Material>("materials/default_material.xml");
+		g_defaultMaterial = g_contentManager->LoadObject<Material>("materials/default_material.xml");
 
-		// load textures
-		//g_defaultTexture = g_contentManager->loadObject<TextureMap>("textures/default.png");
-		//g_notFoundTexture = g_contentManager->loadObject<TextureMap>("textures/notexture.png");
+		// Load textures
+		//g_defaultTexture = g_contentManager->LoadObject<TextureMap>("textures/default.png");
+		//g_notFoundTexture = g_contentManager->LoadObject<TextureMap>("textures/notexture.png");
 	}
 
 	void Renderer::initFramebuffer(View* view)
@@ -110,7 +110,8 @@ namespace engine
 		SubresourceDesc colorTextureSubresourceDesc;
 		memset(&colorTextureSubresourceDesc, 0, sizeof(colorTextureSubresourceDesc));
 
-		m_screenColorTexture = g_renderDevice->createTexture2D(colorTextureDesc, colorTextureSubresourceDesc);
+		m_screenColorTexture = g_renderDevice->CreateTexture2D(colorTextureDesc, colorTextureSubresourceDesc);
+		m_screenColorTexture->SetDebugName("Screen Color Texture");
 
 		TextureDesc depthTextureDesc;
 		memset(&depthTextureDesc, 0, sizeof(depthTextureDesc));
@@ -122,72 +123,74 @@ namespace engine
 		SubresourceDesc depthTextureSubresourceDesc;
 		memset(&depthTextureSubresourceDesc, 0, sizeof(depthTextureSubresourceDesc));
 
-		m_screenDepthTexture = g_renderDevice->createTexture2D(depthTextureDesc, depthTextureSubresourceDesc);
+		m_screenDepthTexture = g_renderDevice->CreateTexture2D(depthTextureDesc, depthTextureSubresourceDesc);
+		m_screenDepthTexture->SetDebugName("Screen Depth Texture");
 
 		RenderTargetCreationDesc renderTargetDesc;
 		memset(&renderTargetDesc, 0, sizeof(renderTargetDesc));
 		renderTargetDesc.m_depthTexture2D = m_screenDepthTexture;
 		renderTargetDesc.m_textures2D[0] = m_screenColorTexture;
 		renderTargetDesc.m_textures2DCount = 1;
-		m_screenRenderTarget = g_renderDevice->createRenderTarget(renderTargetDesc);
+		m_screenRenderTarget = g_renderDevice->CreateRenderTarget(renderTargetDesc);
+		m_screenRenderTarget->SetDebugName("Screen Render Target");
 	}
 
-	void Renderer::init()
+	void Renderer::Init()
 	{
-		View* view = CameraProxy::getInstance()->getView();
+		View* view = CameraProxy::GetInstance()->GetView();
 
-		// initialize default framebuffer
+		// Initialize default framebuffer
 		initFramebuffer(view);
 
 		// shader manager is inited
 		initInplaceResources();
 
-		ImGuiManager::getInstance()->init();
+		ImGuiManager::GetInstance()->Init();
 
 		// set as lit
 		setRenderMode(RendererViewMode::Lit);
 
-		RenderContext::init();
+		RenderContext::Init();
 
-		ShaderConstantManager::getInstance()->init();
+		ShaderConstantManager::GetInstance()->Init();
 
-		ScreenQuad::init();
+		ScreenQuad::Init();
 
-		// initialize font manager
+		// Initialize font manager
 		g_fontManager = mem_new<FontManager>();
-		g_fontManager->initialize();
+		g_fontManager->Initialize();
 
-		// initialize material factory
-		MaterialInstanceFactory::createInstance();
+		// Initialize material factory
+		MaterialInstanceFactory::CreateInstance();
 
-		g_debugRender.initialize();
+		g_debugRender.Initialize();
 
-		// initialize ui renderer
-		// RmlSystem::getInstance()->init();
-		// RmlSystem::getInstance()->createContext(view->getWidth(), view->getHeight());
+		// Initialize ui renderer
+		// RmlSystem::GetInstance()->Init();
+		// RmlSystem::GetInstance()->createContext(view->getWidth(), view->getHeight());
 
-		//initFramebuffer(CameraProxy::getInstance()->getView());
+		//initFramebuffer(CameraProxy::GetInstance()->GetView());
 
-		g_postFxManager.init(CameraProxy::getInstance()->getView());
+		g_postFxManager.Init(CameraProxy::GetInstance()->GetView());
 
-		AnimatedModelRenderer::getInstance()->init();
+		AnimatedModelRenderer::GetInstance()->Init();
 
-		ShadowsRenderer::getInstance()->init();
+//		ShadowsRenderer::GetInstance()->Init();
 	}
 
-	void Renderer::shutdown()
+	void Renderer::Shutdown()
 	{
-		// release inplace resources
+		// Release inplace resources
 
-		ShadowsRenderer::getInstance()->shutdown();
+		ShadowsRenderer::GetInstance()->Shutdown();
 
-		AnimatedModelRenderer::getInstance()->shutdown();
+		AnimatedModelRenderer::GetInstance()->Shutdown();
 
-		g_postFxManager.shutdown();
+		g_postFxManager.Shutdown();
 
-		g_debugRender.shutdown();
+		g_debugRender.Shutdown();
 
-//		RmlSystem::getInstance()->shutdown();
+//		RmlSystem::GetInstance()->Shutdown();
 
 		if (m_screenRenderTarget)
 		{
@@ -211,306 +214,283 @@ namespace engine
 		//Exception thrown at 0x00007FFE0F6EAB89 (KernelBase.dll) in solunar_main_d.exe : 0x0000087D (parameters : 0x0000000000000000, 0x000000F2E33CD930, 0x000000F2E33CD950).
 		//Unhandled exception at 0x00007FFE0F6EAB89 (KernelBase.dll) in solunar_main_d.exe : 0x0000087D (parameters : 0x0000000000000000, 0x000000F2E33CD930, 0x000000F2E33CD950).
 
-		//g_stateManager->destroyDepthStencilState(g_depthStencilState_NoWrite);
+		//g_stateManager->DestroyDepthStencilState(g_depthStencilState_NoWrite);
 		//g_depthStencilState_NoWrite = nullptr;
 
 		mem_delete(g_defaultSampler);
 		g_defaultSampler = nullptr;
 
-		//m_postProcessingRenderer->shutdown();
+		//m_postProcessingRenderer->Shutdown();
 		//m_postProcessingRenderer = nullptr;
 
-		MaterialInstanceFactory::destroyInstance();
+		MaterialInstanceFactory::DestroyInstance();
 
 		// shutdown font manager
-		g_fontManager->shutdown();
+		g_fontManager->Shutdown();
 		mem_delete(g_fontManager);
 
-		ScreenQuad::shutdown();
+		ScreenQuad::Shutdown();
 
-	//	ContentManager::getInstance()->releaseGraphicsObjects();
+	//	ContentManager::GetInstance()->ReleaseGraphicsObjects();
 
-		ShaderConstantManager::getInstance()->shutdown();
+		ShaderConstantManager::GetInstance()->Shutdown();
 
-		RenderContext::shutdown();
+		RenderContext::Shutdown();
 
-		ImGuiManager::getInstance()->shutdown();
+		ImGuiManager::GetInstance()->Shutdown();
 	}
 
-	void Renderer::beginFrame()
+	void Renderer::BeginFrame()
 	{
-		//OPTICK_EVENT("Renderer::beginFrame");
+		//OPTICK_EVENT("Renderer::BeginFrame");
 
 		setSwapChainRenderTarget();
 
 		clearScreen();
 	}
 
-	void Renderer::renderWorld(View* view)
+	void Renderer::RenderWorld(View* view)
 	{
-		//OPTICK_EVENT("Renderer::renderWorld");
+		//OPTICK_EVENT("Renderer::RenderWorld");
 
 		//renderShadows(view);
 	
-		//g_renderDevice->setRenderTarget(m_screenRenderTarget);
-		//clearRenderTarget(m_screenRenderTarget);
+		g_renderDevice->SetRenderTarget(m_screenRenderTarget);
+		clearRenderTarget(m_screenRenderTarget);
 
 		// get camera
-		Camera* camera = CameraProxy::getInstance();
+		Camera* camera = CameraProxy::GetInstance();
 
 		World* world = Engine::ms_world;
 		if (world)
 		{
-			EntityManager& entityManager = world->getEntityManager();
-
-			std::vector<Entity*> drawableEntities = entityManager.getEntitiesWithComponent<MeshComponent>();
-			
-#if 1
-			// shadow map pass
-			ShadowsRenderer::getInstance()->beginRender();
+			const std::vector<MeshComponent*>& drawableEntities = world->GetGraphicsWorld()->GetMeshes();
 
 			// color pass
-			for (auto entity : drawableEntities)
+			for (auto meshComponent : drawableEntities)
 			{
-				MeshComponent* meshComponent = entity->getComponent<MeshComponent>();
-				if (meshComponent)
-				{
-					// call render function
-					//renderMesh(world->getGraphicsWorld(), view, meshComponent);
-					ShadowsRenderer::getInstance()->renderMesh(world->getGraphicsWorld(), view, meshComponent);
-				}
-			}
-
-			ShadowsRenderer::getInstance()->endRender();
-#endif
-			// color pass
-			for (auto entity : drawableEntities)
-			{
-				MeshComponent* meshComponent = entity->getComponent<MeshComponent>();
-				if (meshComponent)
+				Entity* entity = meshComponent->GetEntity();
+				if (entity)
 				{
 					// setup render context
-					RenderContext& renderCtx = RenderContext::getContext();
-					renderCtx.model = entity->getWorldTranslation();
-					RenderContext::setContext(renderCtx);
+					RenderContext& renderCtx = RenderContext::GetContext();
+					renderCtx.model = entity->GetWorldTranslation();
+					RenderContext::SetContext(renderCtx);
 
-					if (meshComponent->isA(AnimatedMeshComponent::getStaticTypeInfo()))
-						AnimatedModelRenderer::getInstance()->render((AnimatedMeshComponent*)meshComponent);
+					if (meshComponent->IsA(AnimatedMeshComponent::GetStaticTypeInfo()))
+						AnimatedModelRenderer::GetInstance()->Render((AnimatedMeshComponent*)meshComponent);
 
 					// call render function
-					renderMesh(world->getGraphicsWorld(), view, meshComponent);
+					renderMesh(world->GetGraphicsWorld(), view, meshComponent);
 
-					meshComponent->render();
+					meshComponent->Render();
 				}
 			}
 		}
-#if 0
-		const std::shared_ptr<World> world = WorldManager::getActiveWorld();
-		if (world)
-		{
-			std::shared_ptr<GraphicsWorld> graphicsWorld = world->getWorldComponent<GraphicsWorld>();
-			if (graphicsWorld)
-			{
-				// update drawables
-				//graphicsWorld->updateDrawables();
 
-				const std::vector<DrawableComponent*>& drawables = graphicsWorld->getDrawables();
-				for (const auto it : drawables)
-				{
-					ASSERT(it);
-
-					if (it->isA(MeshComponent::getStaticTypeInfo()))
-					{
-						// if we see mesh
-						const BoundingBox& aabb = it->getWorldBoundingBox();
-						if (!camera->getFrustum().isBoundingBoxInside(aabb))
-							continue;
-
-						// setup render context
-						RenderContext& renderCtx = RenderContext::getContext();
-						
-						TransformComponent* transformComponent = (TransformComponent*)g_componentCacheSystem->getComponent(it->getNode(), TransformComponent::getStaticTypeInfo());
-						if (transformComponent)
-						{
-							renderCtx.model = transformComponent->getWorldTranslation();
-						}
-						else
-						{
-							renderCtx.model = glm::mat4(1.0f);
-						}
-
-						RenderContext::setContext(renderCtx);
-			
-						// call render function
-						renderMesh(graphicsWorld.get(), view, dynamicCast<MeshComponent>(it));
-					}
-				}
-			}
-
-			if (m_showOctree)
-				world->getSpacePartition()->render();
-		}
-
-#endif
-
-		g_debugRender.renderFrame(view);
-
-		g_fontManager->flushPrimitives();
+		g_debugRender.RenderFrame(view);
 	}
 
-	void Renderer::renderView(View* view)
+	void Renderer::RenderView(View* view)
 	{
-		// OPTICK_EVENT("Renderer::renderView");
+		// OPTICK_EVENT("Renderer::RenderView");
 
 		// make context current
-	/*	glfwMakeContextCurrent(GraphicsDevice::getInstance()->getWindow());*/
+	/*	glfwMakeContextCurrent(GraphicsDevice::GetInstance()->getWindow());*/
 
 		// set viewport
 		Viewport vp = {};
 		vp.m_width = view->m_width;
 		vp.m_height = view->m_height;
-		g_renderDevice->setViewport(&vp);
+		g_renderDevice->SetViewport(&vp);
 
-		// initialize render context
-		RenderContext renderContext = RenderContext::getContext();
+		// Initialize render context
+		RenderContext renderContext = RenderContext::GetContext();
 		renderContext.width = view->m_width;
 		renderContext.height = view->m_height;
 		renderContext.proj = view->m_projection;
 		renderContext.view = view->m_view;
 		renderContext.model = glm::mat4(1.0f);
 
-		RenderContext::setContext(renderContext);
+		RenderContext::SetContext(renderContext);
 
-		renderWorld(view);
+		RenderWorld(view);
 
 		// post processing
-		//g_postFxManager.hdrPass(m_screenColorTexture);
+		g_postFxManager.HDRPass(m_screenColorTexture);
 
 		// reset to swap chain
-	//	setSwapChainRenderTarget();
+		setSwapChainRenderTarget();
 
-	//	g_stateManager->setDepthStencilState(g_depthStencilState_NoWrite, 0);
+		g_stateManager->SetDepthStencilState(g_depthStencilState_NoWrite, 0);
 
 		// draw
-	//	ScreenQuad::render( m_screenColorTexture );
+//		ScreenQuad::render( m_screenColorTexture );
+
+		g_fontManager->FlushPrimitives();
 
 		// draw debug renderer
-	//	g_debugRender.renderFrame(view);
+	//	g_debugRender.RenderFrame(view);
 	}
 
-	void Renderer::renderSky(View* view, SkyMeshComponent* skyMesh)
+	void Renderer::RenderSky(View* view, SkyMeshComponent* skyMesh)
 	{
 #if 0
-		RenderContext& renderCtx = RenderContext::getContext();
-		//renderCtx.model = CameraProxy::getInstance()->getCameraComponent();
-		RenderContext::setContext(renderCtx);
-		skyMesh->render();
+		RenderContext& renderCtx = RenderContext::GetContext();
+		//renderCtx.model = CameraProxy::GetInstance()->GetCameraComponent();
+		RenderContext::SetContext(renderCtx);
+		skyMesh->Render();
 #endif
 	}
 
-	void setupLightData()
+	void SetupLightData()
 	{
-		LightGlobalDataCB* globalData = (LightGlobalDataCB*)g_lightDataConstantBuffer->map(BufferMapping::WriteOnly);
+		LightGlobalDataCB* globalData = (LightGlobalDataCB*)g_lightDataConstantBuffer->Map(BufferMapping::WriteOnly);
 		globalData->m_pointLightCount = 0;
 		globalData->m_spotLightCount = 0;
 
-		g_lightDataConstantBuffer->unmap();
+		g_lightDataConstantBuffer->Unmap();
 
-		g_renderDevice->setConstantBufferIndex(ConstantBufferBinding_LightData, g_lightDataConstantBuffer.get());
+		g_renderDevice->SetConstantBufferIndex(CBBindings_LightData, g_lightDataConstantBuffer.get());
 	}
 
-	void setupDirectionalLight(DirectionalLightComponent* directionalLight)
+	void SetupDirectionalLight(DirectionalLightComponent* directionalLight)
 	{
 		if (!directionalLight)
 			return;
 
-		DirectionalLightCB* data = (DirectionalLightCB*)g_directionalLightConstantBuffer->map(BufferMapping::WriteOnly);
+		DirectionalLightCB* data = (DirectionalLightCB*)g_directionalLightConstantBuffer->Map(BufferMapping::WriteOnly);
 		data->m_ambientColor = glm::vec4(directionalLight->m_ambientColor, 1.0f);
 		data->m_color = glm::vec4(directionalLight->m_color, 1.0f);
 
-		Assert(directionalLight->getEntity());
+		Assert(directionalLight->GetEntity());
 
 		// convert to euler and reorder direction of the light
 #if 0
-		glm::quat quaternion = directionalLight->getEntity()->getRotation();
+		glm::quat quaternion = directionalLight->GetEntity()->GetRotation();
 		glm::vec3 euler = glm::eulerAngles(quaternion) * 3.14159f / 180.f;
 		data->m_direction = glm::vec4(euler.y, euler.x, euler.z, 1.0f);
 #else
-		glm::quat o = directionalLight->getEntity()->getRotation();
+		glm::quat o = directionalLight->GetEntity()->GetRotation();
 		glm::vec3 V;
 		V[0] = 2 * (o.x * o.z - o.w * o.y);
 		V[1] = 2 * (o.y * o.z + o.w * o.x);
 		V[2] = 1 - 2 * (o.x * o.x + o.y * o.y);
 		data->m_direction = glm::vec4(-V, 1.0f);
 
-#ifndef FINAL_BUILD
-		g_debugRender.drawLine(directionalLight->getEntity()->getPosition(),
-			directionalLight->getEntity()->getPosition() + V, glm::vec3(1.0f, 1.0f, 0.0f));
+#if 0//ndef FINAL_BUILD
+		g_debugRender.DrawLine(directionalLight->GetEntity()->GetPosition(),
+			directionalLight->GetEntity()->GetPosition() + V, glm::vec3(1.0f, 1.0f, 0.0f));
 #endif // !FINAL_BUILD
 
 #endif
 		//	data->m_direction = glm::vec4(glm::radians(directionalLight->m_direction), 1.0f);
 
-		g_directionalLightConstantBuffer->unmap();
+		g_directionalLightConstantBuffer->Unmap();
 
-		g_renderDevice->setConstantBufferIndex(CBBindings_DirectionalLight, g_directionalLightConstantBuffer.get());
+		g_renderDevice->SetConstantBufferIndex(CBBindings_DirectionalLight, g_directionalLightConstantBuffer.get());
 	}
 
-	void setupPointLight(GraphicsWorld* graphicsWorld)
+	void UpdatePointLightCB(GraphicsWorld* graphicsWorld)
 	{
-		LightManager* lightMgr = graphicsWorld->getLightManager();
+		LightManager* lightMgr = graphicsWorld->GetLightManager();
 		
-		const std::vector<LightComponent*>& lights = lightMgr->getLights();
+		const std::vector<LightComponent*>& lights = lightMgr->GetLights();
+		const std::vector<PointLightComponent*>& pointLights = lightMgr->GetPointLights();
 
-		std::vector<PointLightComponent*> pointLights;
-		for (auto& it : lights)
+		if (!pointLights.empty())
 		{
-			if (it->isA(PointLightComponent::getStaticTypeInfo()))
-				pointLights.push_back(dynamicCast<PointLightComponent>(it));
+			PointLightCB* pointLightData = (PointLightCB*)g_pointLightConstantBuffer->Map(BufferMapping::WriteOnly);
+			for (int i = 0; i < pointLights.size(); i++)
+			{
+				auto it = pointLights[i];
+				pointLightData->pointLights[i].color = glm::vec4(it->m_color, 1.0f);
+				pointLightData->pointLights[i].position = glm::vec4(it->GetEntity()->GetPosition(), 1.0f);
+				pointLightData->pointLights[i].specular = glm::vec4(it->m_specularColor, 1.0f);
+				pointLightData->pointLights[i].lightData.r = it->m_radius;
+			}
+
+			g_pointLightConstantBuffer->Unmap();
+			pointLightData = nullptr;
 		}
 
-		PointLightCB* globalData = (PointLightCB*)g_pointLightConstantBuffer->map(BufferMapping::WriteOnly);
-		for (int i = 0; i < pointLights.size(); i++)
-		{
-			auto it = pointLights[i];
-			globalData->pointLights[i].color = glm::vec4(it->m_color, 1.0f);
-			globalData->pointLights[i].position = glm::vec4(it->getEntity()->getPosition(), 1.0f);
-			globalData->pointLights[i].specular = glm::vec4(it->m_specularColor, 1.0f);
-			globalData->pointLights[i].lightData.r = it->m_radius;
-		}
-
-		g_pointLightConstantBuffer->unmap();
-		globalData = nullptr;
-
-		LightGlobalDataCB* lightGlobalData = (LightGlobalDataCB*)g_lightDataConstantBuffer->map(BufferMapping::WriteOnly);
-		lightGlobalData->m_pointLightCount = pointLights.size();
-		g_lightDataConstantBuffer->unmap();
-		lightGlobalData = nullptr;
-
-		g_renderDevice->setConstantBufferIndex(ConstantBufferBindings_PointLights, g_pointLightConstantBuffer.get());
-		g_renderDevice->setConstantBufferIndex(ConstantBufferBinding_LightData, g_lightDataConstantBuffer.get());
+		g_renderDevice->SetConstantBufferIndex(CBBindings_PointLights, g_pointLightConstantBuffer.get());	
 	}
 
-	void Renderer::setupLights(GraphicsWorld* graphicsWorld)
+	void UpdateSpotLightCB(GraphicsWorld* graphicsWorld)
 	{
-		LightManager* lightMgr = graphicsWorld->getLightManager();
+		LightManager* lightMgr = graphicsWorld->GetLightManager();
+
+		const std::vector<LightComponent*>& lights = lightMgr->GetLights();
+		const std::vector<SpotLightComponent*>& spotLights = lightMgr->GetSpotLights();
+
+		if (!spotLights.empty())
+		{
+			SpotLightCB* spotLightData = (SpotLightCB*)g_spotLightConstantBuffer->Map(BufferMapping::WriteOnly);
+			for (int i = 0; i < spotLights.size(); i++)
+			{
+				auto it = spotLights[i];
+				spotLightData->spotLights[i].color = glm::vec4(it->m_color, 1.0f);
+				spotLightData->spotLights[i].position = glm::vec4(it->GetEntity()->GetPosition(), 1.0f);
+				spotLightData->spotLights[i].specular = glm::vec4(it->m_specularColor, 1.0f);
+				spotLightData->spotLights[i].lightData.r = it->m_cutoff;
+
+				// #TODO STUPID REFACTOR
+				glm::quat o = it->GetEntity()->GetRotation();
+				glm::vec3 V;
+				V[0] = 2 * (o.x * o.z - o.w * o.y);
+				V[1] = 2 * (o.y * o.z + o.w * o.x);
+				V[2] = 1 - 2 * (o.x * o.x + o.y * o.y);
+
+				spotLightData->spotLights[i].lightData.g = V.x;
+				spotLightData->spotLights[i].lightData.b = V.y;
+				spotLightData->spotLights[i].lightData.a = V.z;
+			}
+
+			g_spotLightConstantBuffer->Unmap();
+			spotLightData = nullptr;
+		}
+
+		g_renderDevice->SetConstantBufferIndex(CBBindings_SpotLights, g_spotLightConstantBuffer.get());
+	}
+
+	void UpdateLightDataCB(GraphicsWorld* graphicsWorld)
+	{
+		LightManager* lightMgr = graphicsWorld->GetLightManager();
+
+		const std::vector<PointLightComponent*>& pointLights = lightMgr->GetPointLights();
+		const std::vector<SpotLightComponent*>& spotLights = lightMgr->GetSpotLights();
+
+		LightGlobalDataCB* lightGlobalData = (LightGlobalDataCB*)g_lightDataConstantBuffer->Map(BufferMapping::WriteOnly);
+		lightGlobalData->m_pointLightCount = (uint32_t)pointLights.size();
+		lightGlobalData->m_spotLightCount = (uint32_t)spotLights.size();
+		g_lightDataConstantBuffer->Unmap();
+
+		g_renderDevice->SetConstantBufferIndex(CBBindings_LightData, g_lightDataConstantBuffer.get());
+	}
+
+	void Renderer::SetupLights(GraphicsWorld* graphicsWorld)
+	{
+		LightManager* lightMgr = graphicsWorld->GetLightManager();
 		if (!lightMgr)
 			return;
 
-		setupLightData();
+		SetupLightData();
 
-		setupDirectionalLight(lightMgr->getDirectionalLight());
-		setupPointLight(graphicsWorld);
+		SetupDirectionalLight(lightMgr->GetDirectionalLight());
+		UpdatePointLightCB(graphicsWorld);
+		UpdateSpotLightCB(graphicsWorld);
+		UpdateLightDataCB(graphicsWorld);
 	}
 
-	void Renderer::endFrame()
+	void Renderer::EndFrame()
 	{
-//		OPTICK_EVENT("Renderer::endFrame");
+//		OPTICK_EVENT("Renderer::EndFrame");
 
 		// resetDeviceState();
 	}
 
-	void Renderer::toggleShowingWireframe()
+	void Renderer::ToggleShowingWireframe()
 	{
 		if (m_currentViewMode == RendererViewMode::Wireframe) {
 			m_meshPolysWireframe = false;
@@ -519,19 +499,19 @@ namespace engine
 		}
 	}
 
-	void Renderer::toggleShowOctree()
+	void Renderer::ToggleShowOctree()
 	{
 		m_showOctree = !m_showOctree;
 	}
 
-	void Renderer::renderLoadscreen()
+	void Renderer::RenderLoadscreen()
 	{
-		beginFrame();
+		BeginFrame();
 		ImGui::Text("Loading ...");
-		endFrame();
+		EndFrame();
 	}
 
-	std::weak_ptr<Material> getDefaultMaterial()
+	std::weak_ptr<Material> GetDefaultMaterial()
 	{
 		return g_defaultMaterial;
 	}

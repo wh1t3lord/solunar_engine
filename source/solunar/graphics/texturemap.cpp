@@ -5,8 +5,10 @@
 #include "graphics/graphicsoptions.h"
 
 
-namespace engine
+namespace solunar
 {
+	IMPLEMENT_OBJECT(TextureMap, GraphicsObject);
+
 	TextureMap::TextureMap() :
 		m_bManualCreated(false)
 	{
@@ -16,13 +18,13 @@ namespace engine
 
 	TextureMap::~TextureMap()
 	{
-		release();
+		Release();
 	}
 
 	std::shared_ptr<TextureMap> TextureMap::create2DFromSource(ITexture2D* pTexture2D, const TextureDesc& textureDesc)
 	{
 		// create object
-		std::shared_ptr<TextureMap> pTextureMap;//= g_typeManager->createObject<TextureMap>();
+		std::shared_ptr<TextureMap> pTextureMap;//= g_typeManager->CreateObject<TextureMap>();
 
 		// Fill private fields
 		pTextureMap->m_texture2D = pTexture2D;
@@ -38,7 +40,7 @@ namespace engine
 		return pTextureMap;
 	}
 
-	void TextureMap::release()
+	void TextureMap::Release()
 	{
 		if (m_texture2D) {
 			mem_delete(m_texture2D);
@@ -54,25 +56,25 @@ namespace engine
 		throw std::logic_error("The method or operation is not implemented.");
 	}
 
-	void TextureMap::createHw()
+	void TextureMap::CreateHw()
 	{
-		m_texture2D = g_renderDevice->createTexture2D(m_textureDesc, m_textureSubresourceDesc);
+		m_texture2D = g_renderDevice->CreateTexture2D(m_textureDesc, m_textureSubresourceDesc);
 		Image::freeImageData(m_textureSubresourceDesc.m_memory);
 		m_textureSubresourceDesc.m_memory = nullptr;
 	}
 
-	void TextureMap::load(const std::shared_ptr<DataStream>& dataStream)
+	void TextureMap::Load(const std::shared_ptr<DataStream>& dataStream)
 	{
 		Image image;
 		image.setFlip(true);
 		// image.createFromFile(dataStream);
 
-		// load header of file
+		// Load header of file
 		unsigned long dwMagic = 0;
-		dataStream->read(&dwMagic);
+		dataStream->Read(&dwMagic);
 
 		// reset stream
-		dataStream->seek(Seek_Begin, 0);
+		dataStream->Seek(Seek_Begin, 0);
 
 		// is not DDS
 		if (dwMagic != 0x20534444) {
@@ -89,7 +91,7 @@ namespace engine
 		m_textureSubresourceDesc.m_memory = image.getData();
 		m_textureSubresourceDesc.m_memoryPitch = image.getWidth() * 4;
 
-		createHw();
+		CreateHw();
 	}
 
 	void TextureMap::setWrapS(TextureWrap wrap)
@@ -132,6 +134,8 @@ namespace engine
 	{
 	}
 
+	IMPLEMENT_OBJECT(TextureMapCube, TextureMap);
+
 	TextureMapCube::TextureMapCube()
 	{
 	}
@@ -140,17 +144,17 @@ namespace engine
 	{
 	}
 
-	void TextureMapCube::registerObject()
+	void TextureMapCube::RegisterObject()
 	{
-		g_typeManager->registerObject<TextureMapCube>();
+		g_typeManager->RegisterObject<TextureMapCube>();
 	}
 
-	void TextureMapCube::load(const std::shared_ptr<DataStream>& dataStream)
+	void TextureMapCube::Load(const std::shared_ptr<DataStream>& dataStream)
 	{
 		//std::shared_ptr<XMLDoc> xml(new XMLDoc(dataStream));
 
 		//// reset stream
-		//dataStream->seek(FileSeek::Begin, 0);
+		//dataStream->Seek(FileSeek::Begin, 0);
 
 		//// read each face
 		//tinyxml2::XMLElement* rootElement = xml->getDocument().FirstChildElement();

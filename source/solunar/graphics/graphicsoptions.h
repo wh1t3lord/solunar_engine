@@ -1,13 +1,13 @@
 #ifndef GRAPHICSSETTINGS_H
 #define GRAPHICSSETTINGS_H
 
-namespace engine
+namespace solunar
 {
 	class GraphicsOptions
 	{
 	public:
 		bool loadSettings(const std::string& filename);
-		void saveSettings(const std::string& filename);
+		void SaveSettings(const std::string& filename);
 
 		void applyDefaultOptions();
 

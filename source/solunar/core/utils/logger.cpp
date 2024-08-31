@@ -9,7 +9,7 @@
 #include <memory.h>
 #include <time.h>
 
-namespace engine
+namespace solunar
 {
 	namespace
 	{
@@ -32,7 +32,7 @@ namespace engine
 		}
 	}
 
-	void Logger::init()
+	void Logger::Init()
 	{
 		s_logFileHandle = fopen("engine_output.txt", "w");
 		assert(s_logFileHandle);
@@ -53,7 +53,7 @@ namespace engine
 		s_logOpenTime = GetTickCount();
 	}
 
-	void Logger::shutdown()
+	void Logger::Shutdown()
 	{
 		if (s_logFileHandle)
 		{
@@ -62,12 +62,12 @@ namespace engine
 		}
 	}
 
-	void Logger::logPrint(const char* msg, ...)
+	void Logger::LogPrint(const char* Msg, ...)
 	{
 		static char buffer[2048 * 2];
 		va_list args;
-		va_start(args, msg);
-		vsnprintf(buffer, sizeof(buffer), msg, args);
+		va_start(args, Msg);
+		vsnprintf(buffer, sizeof(buffer), Msg, args);
 		va_end(args);
 
 		strcat(buffer, "\n");

@@ -1,17 +1,17 @@
 #include "graphicspch.h"
 #include "graphics/rendercontext.h"
 
-namespace engine
+namespace solunar
 {
 	RenderContext* RenderContext::ms_instance = nullptr;
 
-	void RenderContext::init()
+	void RenderContext::Init()
 	{
 		if (!ms_instance)
 			ms_instance = mem_new<RenderContext>();
 	}
 
-	void RenderContext::shutdown()
+	void RenderContext::Shutdown()
 	{
 		if (ms_instance)
 		{
@@ -20,12 +20,12 @@ namespace engine
 		}
 	}
 
-	RenderContext& RenderContext::getContext()
+	RenderContext& RenderContext::GetContext()
 	{
 		return *ms_instance;
 	}
 
-	void RenderContext::setContext(RenderContext& ctx)
+	void RenderContext::SetContext(RenderContext& ctx)
 	{
 		*ms_instance = ctx;
 	}

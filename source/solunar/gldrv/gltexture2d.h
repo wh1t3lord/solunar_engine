@@ -3,7 +3,7 @@
 
 #include "graphics/core/texture.h"
 
-namespace engine
+namespace solunar
 {
 
 class GLTexture2D : public ITexture2D
@@ -12,14 +12,16 @@ public:
 	GLTexture2D(const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc);
 	~GLTexture2D();
 
-	void create(const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc);
-	void destroy();
+	void Create(const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc);
+	void Destroy();
 
 	void updateTexture(const void* data, int rowPitch, int depthPitch) override;
 
 	SurfaceDesc getSurfaceDesc() override;
 
 	uint32_t getHandle() { return m_textureHandle; }
+
+	void SetDebugName(const char* debugName) override;
 
 private:
 	SurfaceDesc m_surfaceDesc;

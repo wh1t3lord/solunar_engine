@@ -1,10 +1,10 @@
 #include "gldrv_pch.h"
 #include "glad/glad.h"
 
-namespace engine
+namespace solunar
 {
 
-GLenum getBufferAccess(BufferAccess access)
+GLenum GetBufferAccess(BufferAccess access)
 {
 	switch (access)
 	{
@@ -16,7 +16,7 @@ GLenum getBufferAccess(BufferAccess access)
 	return 0;
 }
 
-GLenum getBufferMapping(BufferMapping mapping)
+GLenum GetBufferMapping(BufferMapping mapping)
 {
 	switch (mapping)
 	{

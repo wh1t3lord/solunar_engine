@@ -3,7 +3,7 @@
 
 #include "graphics/gfxcommon.h"
 
-namespace engine
+namespace solunar
 {
 	class IRenderTarget;
 	class IRenderTarget;
@@ -17,8 +17,8 @@ namespace engine
 		ShadowsRenderer();
 		~ShadowsRenderer();
 
-		void init();
-		void shutdown();
+		void Init();
+		void Shutdown();
 
 		void beginRender();
 		void renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh);

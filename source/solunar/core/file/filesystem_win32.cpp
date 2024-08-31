@@ -3,7 +3,7 @@
 #include "core/platform/core_platform.h"
 #include "core/file/filesystem_win32.h"
 
-namespace engine
+namespace solunar
 {
 
 FileSystem_Win32::FileSystem_Win32()
@@ -14,7 +14,7 @@ FileSystem_Win32::~FileSystem_Win32()
 {
 }
 
-FileHandle FileSystem_Win32::open(const char* filename)
+FileHandle FileSystem_Win32::Open(const char* filename)
 {
 	DWORD dwDesiredAccess = GENERIC_READ;
 	DWORD dwShareMode = FILE_SHARE_READ;
@@ -28,7 +28,7 @@ FileHandle FileSystem_Win32::open(const char* filename)
 	return handle;
 }
 
-FileHandle FileSystem_Win32::create(const char* filename)
+FileHandle FileSystem_Win32::Create(const char* filename)
 {
 	DWORD dwDesiredAccess = GENERIC_WRITE;
 	DWORD dwShareMode = FILE_SHARE_WRITE;
@@ -42,7 +42,7 @@ FileHandle FileSystem_Win32::create(const char* filename)
 	return handle;
 }
 
-void FileSystem_Win32::close(FileHandle handle)
+void FileSystem_Win32::Close(FileHandle handle)
 {
 	if (handle)
 	{
@@ -50,19 +50,19 @@ void FileSystem_Win32::close(FileHandle handle)
 	}
 }
 
-bool FileSystem_Win32::exist(const char* filename)
+bool FileSystem_Win32::Exist(const char* filename)
 {
 	DWORD dwAttrib = GetFileAttributes(filename);
 	return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
 		!(dwAttrib & FILE_ATTRIBUTE_DIRECTORY));
 }
 
-size_t FileSystem_Win32::tell(FileHandle handle)
+size_t FileSystem_Win32::Tell(FileHandle handle)
 {
 	return static_cast<size_t>(SetFilePointer(handle, 0, NULL, FILE_CURRENT));
 }
 
-void FileSystem_Win32::seek(FileHandle handle, SeekWay seekway, long offset)
+void FileSystem_Win32::Seek(FileHandle handle, SeekWay seekway, long offset)
 {
 	DWORD dwMoveWay = 0;
 
@@ -82,14 +82,14 @@ void FileSystem_Win32::seek(FileHandle handle, SeekWay seekway, long offset)
 	SetFilePointer(static_cast<HANDLE>(handle), static_cast<LONG>(offset), NULL, dwMoveWay);
 }
 
-size_t FileSystem_Win32::read(FileHandle handle, void* data, size_t size)
+size_t FileSystem_Win32::Read(FileHandle handle, void* data, size_t size)
 {
 	DWORD bytesRead = 0;
 	ReadFile(static_cast<HANDLE>(handle), data, static_cast<DWORD>(size), &bytesRead, NULL);
 	return static_cast<size_t>(bytesRead);
 }
 
-size_t FileSystem_Win32::write(FileHandle handle, const void* data, size_t size)
+size_t FileSystem_Win32::Write(FileHandle handle, const void* data, size_t size)
 {
 	DWORD bytesWritten = 0;
 	WriteFile(static_cast<HANDLE>(handle), data, static_cast<DWORD>(size), &bytesWritten, NULL);

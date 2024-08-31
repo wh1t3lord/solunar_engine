@@ -3,7 +3,7 @@
 
 
 
-namespace engine {
+namespace solunar {
 	
 SaveLoadManager g_saveLoadManager;
 	
@@ -13,7 +13,7 @@ void SaveLoadManager::autosave()
 	char buffer[260];
 	snprintf(buffer, 260, "autosave.sav");
 	
-	File* file = FileDevice::getInstance()->openFile(buffer, FileAccess::Write);
+	File* file = FileDevice::GetInstance()->openFile(buffer, FileAccess::Write);
 	
 	// write header
 	beginSave(file);
@@ -21,7 +21,7 @@ void SaveLoadManager::autosave()
 	// write world entities
 	saveActiveWorld(file);
 	
-	FileDevice::getInstance()->closeFile(file);
+	FileDevice::GetInstance()->closeFile(file);
 #endif
 }
 
@@ -31,7 +31,7 @@ void SaveLoadManager::beginSave(FileHandle file)
 	SaveFileHeader h;
 	h.magic = SAVEFILE_MAGIC;
 	h.version = SAVEFILE_VERSION;
-	file->write(&h, sizeof(h));
+	file->Write(&h, sizeof(h));
 #endif
 }
 
@@ -41,7 +41,7 @@ void SaveLoadManager::saveActiveWorld(FileHandle file)
 	SaveFileWorldInformation worldInfo;
 	strcpy(worldInfo.worldName, "Invalid World Name");
 	
-	file->write(&worldInfo, sizeof(worldInfo));
+	file->Write(&worldInfo, sizeof(worldInfo));
 
 	std::shared_ptr<World> world = WorldManager::getActiveWorld();
 
@@ -49,15 +49,15 @@ void SaveLoadManager::saveActiveWorld(FileHandle file)
 	tinyxml2::XMLElement* worldElement = doc.NewElement("World");
 	doc.InsertFirstChild(worldElement);
 	
-	world->saveXML(*worldElement);
+	world->SaveXML(*worldElement);
 
 	tinyxml2::XMLPrinter printer(0, true, 0);
 	doc.Accept(&printer);
 
 	size_t stringLength = strlen(printer.CStr());
-	file->write(&stringLength, sizeof(stringLength));
+	file->Write(&stringLength, sizeof(stringLength));
 	
-	file->write((char*)printer.CStr(), stringLength);
+	file->Write((char*)printer.CStr(), stringLength);
 #endif
 }
 

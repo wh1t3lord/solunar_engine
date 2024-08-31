@@ -6,7 +6,7 @@
 // #include "graphics/shaderconstantmanager.h"
 #include "d3d11drv/d3d11device.h"
 
-namespace engine
+namespace solunar
 {
 
 struct RendererSingletonStorer
@@ -20,21 +20,21 @@ public:
 	D3D11Renderer();
 	~D3D11Renderer();
 
-	void init() override;
-	void shutdown() override;
+	void Init() override;
+	void Shutdown() override;
 
-	void endFrame() override;
+	void EndFrame() override;
 
 	void bindMaterialForMesh(MeshComponent* mesh, Material* material, IMaterialInstance* materialInstance) override;
 
 	void renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh) override;
 	void renderShadows(View* view) override;
 
-	void takeScreenshot() override;
+	void TakeScreenshot() override;
 
 private:
 	void createSwapChain();
-	void createRasterizerState();
+	void CreateRasterizerState();
 
 	void takeScreenshotInternal();
 

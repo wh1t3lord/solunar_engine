@@ -5,7 +5,22 @@
 
 #include "engine/entity/world.h"
 
-namespace engine {
+#include "core/timer.h"
+
+namespace solunar {
+
+	IMPLEMENT_OBJECT(RigidBodyComponent, Component);
+
+	BEGIN_PROPERTY_REGISTER(RigidBodyComponent)
+	{
+		REGISTER_PROPERTY(RigidBodyComponent, PropertyFloat, m_mass);
+		REGISTER_PROPERTY(RigidBodyComponent, PropertyBool, m_isEnable);
+		REGISTER_PROPERTY(RigidBodyComponent, PropertyBool, m_static);
+		REGISTER_PROPERTY(RigidBodyComponent, PropertyBool, m_isKinematic);
+		REGISTER_PROPERTY(RigidBodyComponent, PropertyBool, m_isTrigger);
+	//	RegisterProperty(RigidBodyComponent, PropertyBool, m_inWorld); INTERNAL !!!
+	}
+	END_PROPERTY_REGISTER(RigidBodyComponent)
 
 	RigidBodyComponent::RigidBodyComponent()
 	{
@@ -14,9 +29,10 @@ namespace engine {
 		m_physicsWorld = nullptr;
 
 		m_mass = 0.0f;
-		m_isEnable = 0.0f;
+		m_isEnable = false;
 		m_static = false;
 		m_isKinematic = false;
+		m_isTrigger = false;
 		m_inWorld = false;
 	}
 
@@ -27,44 +43,47 @@ namespace engine {
 		m_rigidBody = nullptr;
 	}
 
-	void RigidBodyComponent::registerObject()
+	void RigidBodyComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<RigidBodyComponent>();
+		g_typeManager->RegisterObject<RigidBodyComponent>();
 	}
 
-	void RigidBodyComponent::onEntitySet(Entity* entity)
+	void RigidBodyComponent::OnEntitySet(Entity* entity)
 	{
-		Component::onEntitySet(entity);
+		Component::OnEntitySet(entity);
 
-		if (m_physicsWorld && !m_rigidBody)
-			createBody();
+		// #TODO: WEIRD STUFF !!!
+		//if (m_physicsWorld && !m_rigidBody)
+		//	CreateBody();
 	}
 
-	void RigidBodyComponent::onWorldSet(World* world)
+	void RigidBodyComponent::OnWorldSet(World* world)
 	{
-		Component::onWorldSet(world);
-		m_physicsWorld = world->getPhysicsWorld();
+		Component::OnWorldSet(world);
+		m_physicsWorld = world->GetPhysicsWorld();
 	}
 
-	void RigidBodyComponent::onEntityRemove()
+	void RigidBodyComponent::OnEntityRemove()
 	{
-		destroyBody();
-		Component::onEntityRemove();
+		DestroyBody();
+		Component::OnEntityRemove();
 	}
 
-	void RigidBodyComponent::loadXML(tinyxml2::XMLElement& element)
+	void RigidBodyComponent::LoadXML(tinyxml2::XMLElement& element)
 	{
 		tinyxml2::XMLElement* staticElement = element.FirstChildElement("Static");
 		if (staticElement)
-		{
 			staticElement->QueryBoolAttribute("value", &m_static);
-		}
 
-		createBody();
-		updateBodyTranslationDirty();
+		tinyxml2::XMLElement* triggerElement = element.FirstChildElement("Trigger");
+		if (triggerElement)
+			triggerElement->QueryBoolAttribute("value", &m_isTrigger);
+
+		CreateBody();
+		UpdateBodyTranslationDirty();
 	}
 
-	void RigidBodyComponent::saveXML(tinyxml2::XMLElement& element)
+	void RigidBodyComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
 		tinyxml2::XMLElement* enableElement = element.InsertNewChildElement("Enable");
 		enableElement->SetAttribute("value", m_isEnable);
@@ -77,20 +96,28 @@ namespace engine {
 
 		tinyxml2::XMLElement* kinematicElement = element.InsertNewChildElement("Kinematic");
 		kinematicElement->SetAttribute("value", m_isKinematic);
+
+		tinyxml2::XMLElement* triggerElement = element.InsertNewChildElement("Trigger");
+		triggerElement->SetAttribute("value", m_isTrigger);
 	}
 
-	void RigidBodyComponent::updateEntityTranslationDirty()
+	void RigidBodyComponent::UpdateEntityTranslationDirty()
 	{
 		btTransform trans = m_rigidBody->getWorldTransform();
-		getEntity()->setPosition(btVectorToGlm(trans.getOrigin()));
+		GetEntity()->SetPosition(btVectorToGlm(trans.getOrigin()));
+
+		// calculate rotation
+		btQuaternion quaternion;
+		trans.getBasis().getRotation(quaternion);
+		GetEntity()->SetRotation(glm::quat(quaternion.getW(), quaternion.getX(), quaternion.getY(), quaternion.getZ()));
 
 		// calculate rotation based on euler angles
-		float roll, pitch, yaw;
-		trans.getRotation().getEulerZYX(yaw, pitch, roll);
-		getEntity()->setEulerRotation(glm::vec3(roll, pitch, yaw));
+		//float roll, pitch, yaw;
+		//trans.getRotation().getEulerZYX(yaw, pitch, roll);
+		//GetEntity()->SetEulerRotation(glm::vec3(roll, pitch, yaw));
 	}
 
-	void RigidBodyComponent::updateBodyTranslationDirty()
+	void RigidBodyComponent::UpdateBodyTranslationDirty()
 	{
 		if (!m_rigidBody)
 			return;
@@ -99,10 +126,10 @@ namespace engine {
 		trans.setIdentity();
 
 		// origin
-		trans.setOrigin(glmVectorToBt(getEntity()->getPosition()));
+		trans.setOrigin(glmVectorToBt(GetEntity()->GetPosition()));
 
 		// rotation
-		glm::quat entityRot = getEntity()->getRotation();
+		glm::quat entityRot = GetEntity()->GetRotation();
 		btQuaternion bodyRot;
 		bodyRot.setX(entityRot.x);
 		bodyRot.setY(entityRot.y);
@@ -123,11 +150,11 @@ namespace engine {
 	{
 		//throw std::logic_error("The method or operation is not implemented.");
 
-		updateBodyTranslationDirty();
+		UpdateBodyTranslationDirty();
 	}
 #endif
 
-	void RigidBodyComponent::createBody()
+	void RigidBodyComponent::CreateBody()
 	{
 		Assert(m_physicsWorld);
 
@@ -139,35 +166,24 @@ namespace engine {
 		btVector3 localInertia(0.0f, 0.0f, 0.0f);
 		btRigidBody::btRigidBodyConstructionInfo rigidBodyCInfo(m_mass, nullptr, m_compoundShape, localInertia);
 		m_rigidBody = mem_new<btRigidBody>(rigidBodyCInfo);
-		
-		// TODO: TO THINK
-		// It is right to assing entity instance to user pointer or entity should have multiply rigid bodies component ???
 		m_rigidBody->setUserPointer(this);
 
-		int bodyCollisionFlags = m_rigidBody->getCollisionFlags();
+		UpdateBodyProperties();
 
-		if (m_static)
-			bodyCollisionFlags |= btRigidBody::CF_STATIC_OBJECT;
-		else
-			bodyCollisionFlags &= ~btRigidBody::CF_STATIC_OBJECT;
-
-		m_rigidBody->setCollisionFlags(bodyCollisionFlags);
-
-		m_physicsWorld->addRigidBody(this);
+		m_physicsWorld->AddRigidBody(this);
 		m_inWorld = m_rigidBody->isInWorld();
 	}
 
-	void RigidBodyComponent::destroyBody()
+	void RigidBodyComponent::DestroyBody()
 	{
 		if (m_physicsWorld)
 		{
-			btDynamicsWorld* physicsWorld = m_physicsWorld->getWorld();
-			physicsWorld->removeRigidBody(m_rigidBody);
+			m_physicsWorld->RemoveRigidBody(this);
 		}
 		else
 		{
-			Core::msg("RigidBodyComponent::destroyBody: Can't remove body. Physics world is already destroyed.");
-			Core::msg("Entity=0x%p", getEntity());
+			Core::Msg("RigidBodyComponent::DestroyBody: Can't remove body. Physics world is already destroyed.");
+			Core::Msg("Entity=0x%p", GetEntity());
 		}
 		
 		// remove user pointer from this component
@@ -180,41 +196,61 @@ namespace engine {
 		m_compoundShape = nullptr;
 	}
 
-	void RigidBodyComponent::updateBodyProperties()
+	void RigidBodyComponent::UpdateBodyProperties()
 	{
+		int bodyCollisionFlags = m_rigidBody->getCollisionFlags();
+
+		if (m_static)
+			bodyCollisionFlags |= btRigidBody::CF_STATIC_OBJECT;
+		else
+			bodyCollisionFlags &= ~btRigidBody::CF_STATIC_OBJECT;
+
+		if (m_isKinematic)
+			bodyCollisionFlags |= btRigidBody::CF_KINEMATIC_OBJECT;
+		else
+			bodyCollisionFlags &= ~btRigidBody::CF_KINEMATIC_OBJECT;
+
+		if (m_isTrigger)
+			bodyCollisionFlags |= btRigidBody::CF_NO_CONTACT_RESPONSE;
+		else
+			bodyCollisionFlags &= ~btRigidBody::CF_NO_CONTACT_RESPONSE;
+
+		m_rigidBody->setCollisionFlags(bodyCollisionFlags);
 	}
 
-	void RigidBodyComponent::disableCollide()
+	void RigidBodyComponent::DisableCollide()
 	{
 		m_rigidBody->setCollisionFlags(m_rigidBody->getCollisionFlags() | btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	}
 
-	void RigidBodyComponent::enableCollide()
+	void RigidBodyComponent::EnableCollide()
 	{
 		m_rigidBody->setCollisionFlags(m_rigidBody->getCollisionFlags() & ~btCollisionObject::CF_NO_CONTACT_RESPONSE);
 	}
 
-	void RigidBodyComponent::attachShape(ShapeComponent* shape)
+	void RigidBodyComponent::AttachShape(ShapeComponent* shape)
 	{
-		shape->initializeShape();
+		shape->InitializeShape();
 	}
 
-	void RigidBodyComponent::dettachShape(ShapeComponent* shape)
+	void RigidBodyComponent::DettachShape(ShapeComponent* shape)
 	{
 		m_compoundShape->removeChildShape(shape->getSdkShape());
 	}
 
-	void RigidBodyComponent::applyImpulse(const glm::vec3& impulse)
+	void RigidBodyComponent::ApplyImpulse(const glm::vec3& impulse)
 	{
 		m_rigidBody->applyCentralImpulse(glmVectorToBt(impulse));
 	}
 
-	void RigidBodyComponent::setLinearVelocity(const glm::vec3& velocity)
+	void RigidBodyComponent::SetLinearVelocity(const glm::vec3& velocity)
 	{
 		m_rigidBody->setLinearVelocity(glmVectorToBt(velocity));
 	}
 
 	/////////////////////////////////////////////////////////////////
+
+	IMPLEMENT_OBJECT(RigidBodyProxyComponent, RigidBodyComponent);
 
 	RigidBodyProxyComponent::RigidBodyProxyComponent() :
 		m_characterController(nullptr),
@@ -226,10 +262,12 @@ namespace engine {
 
 	RigidBodyProxyComponent::~RigidBodyProxyComponent()
 	{
-		getPhysicsWorld()->getWorld()->removeAction(m_characterController);
-		getPhysicsWorld()->getWorld()->removeCollisionObject(m_ghostObject);
+		GetPhysicsWorld()->GetWorld()->removeAction(m_characterController);
+		GetPhysicsWorld()->GetWorld()->removeCollisionObject(m_ghostObject);
 		m_ghostObject->setCollisionShape(nullptr);
-		getPhysicsWorld()->getWorld()->getPairCache()->setInternalGhostPairCallback(nullptr);
+		GetPhysicsWorld()->GetWorld()->getPairCache()->setInternalGhostPairCallback(nullptr);
+
+		m_ghostObject->setUserPointer(nullptr);
 
 		mem_delete(m_capsuleShape);
 		mem_delete(m_ghostCallback);
@@ -237,30 +275,30 @@ namespace engine {
 		mem_delete(m_characterController);
 	}
 
-	void RigidBodyProxyComponent::registerObject()
+	void RigidBodyProxyComponent::RegisterObject()
 	{
-		g_typeManager->registerObject<RigidBodyProxyComponent>();
+		g_typeManager->RegisterObject<RigidBodyProxyComponent>();
 	}
 
-	void RigidBodyProxyComponent::onEntitySet(Entity* entity)
+	void RigidBodyProxyComponent::OnEntitySet(Entity* entity)
 	{
-		Component::onEntitySet(entity);
+		Component::OnEntitySet(entity);
 	}
 
-	void RigidBodyProxyComponent::onWorldSet(World* world)
+	void RigidBodyProxyComponent::OnWorldSet(World* world)
 	{
-		RigidBodyComponent::onWorldSet(world);
+		RigidBodyComponent::OnWorldSet(world);
 	}
 
-	void RigidBodyProxyComponent::onEntityRemove()
+	void RigidBodyProxyComponent::OnEntityRemove()
 	{
-		Component::onEntityRemove();
+		Component::OnEntityRemove();
 	}
 
-	void RigidBodyProxyComponent::createPlayerController()
+	void RigidBodyProxyComponent::CreatePlayerController()
 	{
 		btTransform startTransform; startTransform.setIdentity();
-		startTransform.setOrigin(glmVectorToBt(getEntity()->getPosition()));
+		startTransform.setOrigin(glmVectorToBt(GetEntity()->GetPosition()));
 
 		float fRadius = 0.4f;
 		float fHeight = 0.1f;
@@ -268,9 +306,11 @@ namespace engine {
 
 		m_ghostObject = mem_new<btPairCachingGhostObject>();
 		m_ghostObject->setWorldTransform(startTransform);
+		m_ghostObject->setCollisionFlags(btCollisionObject::CF_CHARACTER_OBJECT);
+		m_ghostObject->setUserPointer(this);
 
 		m_ghostCallback = mem_new<btGhostPairCallback>();
-		getPhysicsWorld()->getWorld()->getPairCache()->setInternalGhostPairCallback(m_ghostCallback);
+		GetPhysicsWorld()->GetWorld()->getPairCache()->setInternalGhostPairCallback(m_ghostCallback);
 
 		m_ghostObject->setCollisionShape(m_capsuleShape);
 
@@ -279,27 +319,30 @@ namespace engine {
 			m_capsuleShape, 
 			0.25f, 
 			btVector3(0.0f, 1.0f, 0.0f));
-		
-		getPhysicsWorld()->getWorld()->addCollisionObject(
-			m_ghostObject//,
-			//getCollisionParameter(eFilterGroup),
-			//getCollisionParameter(eFilterMask)
+
+		m_characterController->setMaxJumpHeight(0.8f);
+		m_characterController->setGravity(GetPhysicsWorld()->GetWorld()->getGravity());
+
+		GetPhysicsWorld()->GetWorld()->addCollisionObject(
+			m_ghostObject,
+			btBroadphaseProxy::CharacterFilter,
+			btBroadphaseProxy::AllFilter
 		);
 
-		getPhysicsWorld()->getWorld()->addAction(m_characterController);
+		GetPhysicsWorld()->GetWorld()->addAction(m_characterController);
 	}
 
-	void RigidBodyProxyComponent::update(float dt)
+	void RigidBodyProxyComponent::Update(float dt)
 	{
-		m_characterController->updateAction(getPhysicsWorld()->getWorld(), dt);
+		m_characterController->updateAction(GetPhysicsWorld()->GetWorld(), dt);
 	}
 
-	void RigidBodyProxyComponent::setDirection(const glm::vec3& direction)
+	void RigidBodyProxyComponent::SetDirection(const glm::vec3& direction)
 	{
 		m_characterController->setWalkDirection(glmVectorToBt(direction));
 	}
 
-	void RigidBodyProxyComponent::setPositionForce(const glm::vec3& position)
+	void RigidBodyProxyComponent::SetPositionForce(const glm::vec3& position)
 	{
 		btTransform trans;
 		trans.setIdentity();

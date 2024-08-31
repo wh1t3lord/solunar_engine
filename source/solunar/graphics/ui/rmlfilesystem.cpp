@@ -7,7 +7,7 @@
 
 #include "engine/content/contentmanager.h"
 
-namespace engine
+namespace solunar
 {
 
 struct RmlFileHandle
@@ -20,7 +20,7 @@ RmlFileSystem* g_rmlFileSystem = nullptr;
 Rml::FileHandle RmlFileSystem::Open(const Rml::String& path)
 {
 	RmlFileHandle* fileHandle = mem_new<RmlFileHandle>();
-	fileHandle->m_dataStream = g_contentManager->openStream(path);
+	fileHandle->m_dataStream = g_contentManager->OpenStream(path);
 	return (Rml::FileHandle)fileHandle;
 }
 
@@ -35,9 +35,9 @@ size_t RmlFileSystem::Read(void* buffer, size_t size, Rml::FileHandle file)
 	RmlFileHandle* fileHandle = (RmlFileHandle*)file;
 	ASSERT(fileHandle->m_dataStream);
 
-	long startRead = fileHandle->m_dataStream->tell();
-	fileHandle->m_dataStream->read(buffer, size);
-	long endRead = fileHandle->m_dataStream->tell();
+	long startRead = fileHandle->m_dataStream->Tell();
+	fileHandle->m_dataStream->Read(buffer, size);
+	long endRead = fileHandle->m_dataStream->Tell();
 
 	return endRead - startRead;
 }
@@ -55,9 +55,9 @@ bool RmlFileSystem::Seek(Rml::FileHandle file, long offset, int origin)
 	else if (origin == SEEK_END)
 		seekDir = FileSeek::End;
 	else
-		Core::error("RmlFileSystem::Seek: unknowed origin value.");
+		Core::Error("RmlFileSystem::Seek: unknowed origin value.");
 
-	fileHandle->m_dataStream->seek(seekDir, offset);
+	fileHandle->m_dataStream->Seek(seekDir, offset);
 
 	return true;
 }
@@ -67,7 +67,7 @@ size_t RmlFileSystem::Tell(Rml::FileHandle file)
 	RmlFileHandle* fileHandle = (RmlFileHandle*)file;
 	ASSERT(fileHandle->m_dataStream);
 
-	return (size_t)fileHandle->m_dataStream->tell();
+	return (size_t)fileHandle->m_dataStream->Tell();
 }
 
 //size_t RmlFileSystem::Length(Rml::FileHandle file)

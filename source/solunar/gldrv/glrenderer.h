@@ -5,11 +5,11 @@
 
 #include "graphics/shaderconstantmanager.h"
 
-namespace engine {
+namespace solunar {
 
 struct RendererSingletonStorer
 {
-	ShaderConstantManager m_constantManager;
+	//ShaderConstantManager m_constantManager;
 };
 
 struct IRasterizerState;
@@ -20,13 +20,13 @@ public:
 	GLRenderer();
 	~GLRenderer();
 
-	void init() override;
-	void shutdown() override;
+	void Init() override;
+	void Shutdown() override;
 
-	void beginFrame() override;
-	void endFrame() override;
+	void BeginFrame() override;
+	void EndFrame() override;
 	
-	void takeScreenshot() override;
+	void TakeScreenshot() override;
 
 	void bindMaterialForMesh(MeshComponent* mesh, Material* material, IMaterialInstance* materialInstance);
 
@@ -35,6 +35,7 @@ public:
 
 private:
 	void renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh);
+	void renderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh);
 	void renderStaticMeshCustomShader(View* view, MeshComponent* mesh, IShaderProgram* customShader); 
 
 	void setRenderModeForShader(IShaderProgram* shaderProgram);
@@ -54,7 +55,7 @@ private:
 	bool m_makeScreenshot;
 
 
-	// Унаследовано через Renderer
+	// пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅ Renderer
 	virtual void clearScreen() override;
 
 

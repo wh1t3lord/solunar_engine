@@ -10,7 +10,7 @@
 //#pragma comment(lib, "d3dcompiler.lib")
 //#pragma comment(lib, "dxguid.lib")
 
-namespace engine
+namespace solunar
 {
 
 D3D12_PRIMITIVE_TOPOLOGY getD3D12PrimitiveTopology(PrimitiveMode primitiveMode)
@@ -46,10 +46,10 @@ D3D12Device::D3D12Device() :
 
 D3D12Device::~D3D12Device()
 {
-	destroy();
+	Destroy();
 }
 
-void D3D12Device::create()
+void D3D12Device::Create()
 {
 	// Find adapter for d3d12 device
 
@@ -88,7 +88,7 @@ void D3D12Device::create()
 	DXGI_ADAPTER_DESC adapterDesc;
 	dxgiAdapter4->GetDesc(&adapterDesc);
 
-	Core::msg("D3D12RenderDevice: GPU: %S, Video Memory: %zu MB",
+	Core::Msg("D3D12RenderDevice: GPU: %S, Video Memory: %zu MB",
 		adapterDesc.Description,
 		adapterDesc.DedicatedVideoMemory / 1024 / 1024);
 
@@ -98,7 +98,7 @@ void D3D12Device::create()
 
 }
 
-void D3D12Device::destroy()
+void D3D12Device::Destroy()
 {
 	if (m_device)
 	{
@@ -107,30 +107,30 @@ void D3D12Device::destroy()
 	}
 }
 
-IRenderTarget* D3D12Device::createRenderTarget(const RenderTargetCreationDesc& renderTargetDesc)
+IRenderTarget* D3D12Device::CreateRenderTarget(const RenderTargetCreationDesc& renderTargetDesc)
 {
 	//return mem_new<D3D12RenderTarget>(this, renderTargetDesc);
 	return nullptr;
 }
 
-IBufferBase* D3D12Device::createBuffer(const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc)
+IBufferBase* D3D12Device::CreateBuffer(const BufferDesc& bufferDesc, const SubresourceDesc& subresourceDesc)
 {
 	return mem_new<D3D12BufferImpl>(this, bufferDesc, subresourceDesc);
 }
 
-ITexture2D* D3D12Device::createTexture2D(const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc)
+ITexture2D* D3D12Device::CreateTexture2D(const TextureDesc& textureDesc, const SubresourceDesc& subresourceDesc)
 {
 //	return mem_new<D3D12Texture2D>(this, textureDesc, subresourceDesc);
 	return nullptr;
 }
 
-ISamplerState* D3D12Device::createSamplerState(const SamplerDesc& samplerDesc)
+ISamplerState* D3D12Device::CreateSamplerState(const SamplerDesc& samplerDesc)
 {
 //	return mem_new<D3D12SamplerState>(this, samplerDesc);
 	return nullptr;
 }
 
-void D3D12Device::setRenderTarget(IRenderTarget* rt)
+void D3D12Device::SetRenderTarget(IRenderTarget* rt)
 {
 #if 0
 	if (rt)
@@ -162,13 +162,13 @@ void D3D12Device::setRenderTarget(IRenderTarget* rt)
 	//}
 }
 
-void D3D12Device::setConstantBuffer(IBufferBase* cb)
+void D3D12Device::SetConstantBuffer(IBufferBase* cb)
 {
-	Assert2(0, "D3D12Device::setConstantBuffer is obsolote. Please use setConstantBufferIndex");
-	setConstantBufferIndex(0, cb);
+	Assert2(0, "D3D12Device::SetConstantBuffer is obsolote. Please use SetConstantBufferIndex");
+	SetConstantBufferIndex(0, cb);
 }
 
-void D3D12Device::setConstantBufferIndex(int slot, IBufferBase* cb)
+void D3D12Device::SetConstantBufferIndex(int slot, IBufferBase* cb)
 {
 	//D3D12BufferImpl* bufferImpl = (D3D12BufferImpl*)cb;
 	//ID3D12Buffer* pD3DBuffer = bufferImpl->getBuffer();
@@ -177,22 +177,37 @@ void D3D12Device::setConstantBufferIndex(int slot, IBufferBase* cb)
 	//m_deviceContext->PSSetConstantBuffers(slot, 1, &pD3DBuffer);
 }
 
-void D3D12Device::setVertexBuffer(IBufferBase* buffer, uint32_t stride, uint32_t offset)
+void D3D12Device::SetVertexBuffer(IBufferBase* buffer, uint32_t stride, uint32_t offset)
 {
-	//D3D12BufferImpl* bufferImpl = (D3D12BufferImpl*)buffer;
-	//ID3D12Buffer* pD3DBuffer = bufferImpl->getBuffer();
-	//m_deviceContext->IASetVertexBuffers(0, 1, &pD3DBuffer, &stride, &offset);
+	D3D12BufferImpl* bufferImpl = (D3D12BufferImpl*)buffer;
+	if (bufferImpl)
+	{
+		const D3D12_VERTEX_BUFFER_VIEW& bufferView = bufferImpl->getVertexBufferView();
+		m_commandList->IASetVertexBuffers(0, 1, &bufferView);
+	}
+	else
+	{
+		m_commandList->IASetVertexBuffers(0, 1, NULL);
+	}
 }
 
-void D3D12Device::setIndexBuffer(IBufferBase* buffer, bool use16bitsIndices)
+void D3D12Device::SetIndexBuffer(IBufferBase* buffer, bool use16bitsIndices)
 {
-	//D3D12BufferImpl* bufferImpl = (D3D12BufferImpl*)buffer;
-	//ID3D12Buffer* pD3DBuffer = bufferImpl->getBuffer();
-	//
-	//m_deviceContext->IASetIndexBuffer(pD3DBuffer, use16bitsIndices ? DXGI_FORMAT_R16_UINT : DXGI_FORMAT_R32_UINT, 0);
+	D3D12BufferImpl* bufferImpl = (D3D12BufferImpl*)buffer;
+	if (bufferImpl)
+	{
+		bufferImpl->setIndexFormat(use16bitsIndices);
+
+		const D3D12_INDEX_BUFFER_VIEW& bufferView = bufferImpl->getIndexBufferView();
+		m_commandList->IASetIndexBuffer(&bufferView);
+	}
+	else
+	{
+		m_commandList->IASetIndexBuffer(NULL);
+	}
 }
 
-void D3D12Device::setTexture2D(int slot, ITexture2D* texture)
+void D3D12Device::SetTexture2D(int slot, ITexture2D* texture)
 {
 #if 0
 	D3D12Texture2D* nativeTexture = (D3D12Texture2D*)texture;
@@ -211,7 +226,7 @@ void D3D12Device::setTexture2D(int slot, ITexture2D* texture)
 #endif
 }
 
-void D3D12Device::setSampler(int slot, ISamplerState* sampler)
+void D3D12Device::SetSamplerState(int slot, ISamplerState* sampler)
 {
 #if 0
 	D3D12SamplerState* samplerImpl = (D3D12SamplerState*)sampler;
@@ -225,9 +240,11 @@ void D3D12Device::setSampler(int slot, ISamplerState* sampler)
 		m_deviceContext->PSSetSamplers(slot, 0, nullptr);
 	}
 #endif
+
+	
 }
 
-void D3D12Device::setViewport(Viewport* viewport)
+void D3D12Device::SetViewport(Viewport* viewport)
 {
 	Assert(viewport);
 
@@ -240,33 +257,33 @@ void D3D12Device::setViewport(Viewport* viewport)
 	vp.Height = viewport->m_height;
 	vp.MinDepth = 0.1f;
 	vp.MaxDepth = 1.0000f;
-//	m_deviceContext->RSSetViewports(1, &vp);
+	m_commandList->RSSetViewports(1, &vp);
 
 	// copy viewport to device
 	m_viewport = *viewport;
 }
 
-Viewport D3D12Device::getViewport()
+Viewport D3D12Device::GetViewport()
 {
 	return m_viewport;
 }
 
-void D3D12Device::setScissors(float x, float y, float w, float h)
+void D3D12Device::SetScissors(float x, float y, float w, float h)
 {
 	D3D12_RECT rect = { static_cast<LONG>(x), static_cast<LONG>(y), static_cast<LONG>(w), static_cast<LONG>(h) };
-	//m_deviceContext->RSSetScissorRects(1, &rect);
+	m_commandList->RSSetScissorRects(1, &rect);
 }
 
-void D3D12Device::draw(PrimitiveMode primitiveMode, size_t verticesStart, size_t verticesCount)
+void D3D12Device::Draw(PrimitiveMode primitiveMode, size_t verticesStart, size_t verticesCount)
 {
-	//m_deviceContext->IASetPrimitiveTopology(getD3D12PrimitiveTopology(primitiveMode));
-	//m_deviceContext->Draw(verticesCount, verticesStart);
+	m_commandList->IASetPrimitiveTopology(getD3D12PrimitiveTopology(primitiveMode));
+	m_commandList->DrawInstanced(verticesCount, 1, verticesStart, 0);
 }
 
-void D3D12Device::drawIndexed(PrimitiveMode primitiveMode, size_t indexStart, size_t indexCount, int baseVertexLocation)
+void D3D12Device::DrawIndexed(PrimitiveMode primitiveMode, size_t indexStart, size_t indexCount, int baseVertexLocation)
 {
-	//m_deviceContext->IASetPrimitiveTopology(getD3D12PrimitiveTopology(primitiveMode));
-	//m_deviceContext->DrawIndexed(indexCount, indexStart, baseVertexLocation);
+	m_commandList->IASetPrimitiveTopology(getD3D12PrimitiveTopology(primitiveMode));
+	m_commandList->DrawIndexedInstanced(indexCount, 1, indexStart, baseVertexLocation, 0);
 }
 
 }

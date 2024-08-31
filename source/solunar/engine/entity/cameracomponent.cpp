@@ -1,8 +1,10 @@
 #include "enginepch.h"
 #include "engine/entity/cameracomponent.h"
 
-namespace engine
+namespace solunar
 {
+
+IMPLEMENT_OBJECT(CameraComponent, Component);
 
 CameraComponent::CameraComponent()
 {
@@ -13,12 +15,12 @@ CameraComponent::~CameraComponent()
 {
 }
 
-void CameraComponent::setDirection(const glm::vec3& direction)
+void CameraComponent::SetDirection(const glm::vec3& direction)
 {
 	m_direction = direction;
 }
 
-glm::vec3 CameraComponent::getDirection()
+glm::vec3 CameraComponent::GetDirection()
 {
 	return m_direction;
 }
@@ -26,6 +28,8 @@ glm::vec3 CameraComponent::getDirection()
 
 ////////////////////////
 // Yaw pitch roll camera
+
+IMPLEMENT_OBJECT(CameraYawPitchRollComponent, CameraComponent);
 
 CameraYawPitchRollComponent::CameraYawPitchRollComponent()
 {
@@ -38,12 +42,12 @@ CameraYawPitchRollComponent::~CameraYawPitchRollComponent()
 {
 }
 
-void CameraYawPitchRollComponent::updateFromMousePosition(const glm::vec2 mousePos)
+void CameraYawPitchRollComponent::updateFromMousePosition(const glm::vec2& mousePos)
 {
 	Assert(0);
 }
 
-void CameraYawPitchRollComponent::setEulerRotation(float yaw, float pitch, float roll)
+void CameraYawPitchRollComponent::SetEulerRotation(float yaw, float pitch, float roll)
 {
 	m_yaw = yaw;
 	m_pitch = pitch;
@@ -52,6 +56,8 @@ void CameraYawPitchRollComponent::setEulerRotation(float yaw, float pitch, float
 
 //////////////////////
 // First Person camera
+
+IMPLEMENT_OBJECT(CameraFirstPersonComponent, CameraYawPitchRollComponent);
 
 CameraFirstPersonComponent::CameraFirstPersonComponent()
 {
@@ -79,7 +85,7 @@ float wrapBetween(float value, float min, float max) {
 	return (float)(value - range * floor((value - min) / range));
 }
 
-void CameraFirstPersonComponent::updateFromMousePosition(const glm::vec2 mousePos)
+void CameraFirstPersonComponent::updateFromMousePosition(const glm::vec2& mousePos)
 {
 	float xoffset = mousePos.x;
 	float yoffset = mousePos.y;

@@ -1,7 +1,7 @@
 #ifndef SINGLETON_H
 #define SINGLETON_H
 
-namespace engine
+namespace solunar
 {
 
 template <typename T>
@@ -15,7 +15,7 @@ protected:
 	}
 
 public:
-	static T* getInstance()
+	static T* GetInstance()
 	{
 		return ms_instance;
 	}

@@ -7,7 +7,7 @@
 #include "core/object/serializableobject.h"
 #include "core/object/typemanager.h"
 
-namespace engine
+namespace solunar
 {
 
 ContentManager* g_contentManager = nullptr;
@@ -20,17 +20,17 @@ ContentManager::~ContentManager()
 {
 }
 
-void ContentManager::init()
+void ContentManager::Init()
 {
 }
 
-void ContentManager::shutdown()
+void ContentManager::Shutdown()
 {
 	for (auto& it : m_content)
 	{
 		if (it.second)
 		{
-			Core::msg("ContentManager: releasing %s", it.first.c_str());
+			Core::Msg("ContentManager: releasing %s", it.first.c_str());
 			it.second.reset();
 			it.second = nullptr;
 		}
@@ -39,17 +39,17 @@ void ContentManager::shutdown()
 	m_content.clear();
 }
 
-void ContentManager::mountDevice(ContentDevice* contentDevice, const std::string& name)
+void ContentManager::MountDevice(ContentDevice* contentDevice, const std::string& name)
 {
 	Assert2(m_devices.find(name) == m_devices.end(), "Failed to mound already mounted device.");
 	Assert2(contentDevice, "Content device is nullptr.");
 
 	m_devices[name] = contentDevice;
 
-	Core::msg("ContentManager: mounted device %s (%s/)", name.c_str(), contentDevice->getPath().c_str());
+	Core::Msg("ContentManager: mounted device %s (%s/)", name.c_str(), contentDevice->GetPath().c_str());
 }
 
-void ContentManager::unountDevice(const std::string& name)
+void ContentManager::UnmountDevice(const std::string& name)
 {
 	Assert2(findContentDevice(name), "Trying to unmount device which was not be mounted or existed.");
 	m_devices.erase(name);
@@ -64,24 +64,24 @@ ContentDevice* ContentManager::findContentDevice(const std::string& name)
 	return m_devices[name];
 }
 
-DataStreamPtr ContentManager::openStream(const std::string& path)
+DataStreamPtr ContentManager::OpenStream(const std::string& path)
 {
 	// return m_devices[""]->openStream(path);
-	return openStream("game", path);
+	return OpenStream("game", path);
 }
 
-DataStreamPtr ContentManager::openStream(const std::string& name, const std::string& path)
+DataStreamPtr ContentManager::OpenStream(const std::string& name, const std::string& path)
 {
 	ContentDevice* contentDevice = findContentDevice(name);
 	Assert3(contentDevice, "Couldn't find content device, probably it's not mounted or unaccessible in retail build.", name.c_str());
 
-	return contentDevice->openStream(path);
+	return contentDevice->OpenStream(path);
 }
 
-std::weak_ptr<SerializableObject> ContentManager::load(const std::string& filename, const TypeInfo* pTypeInfo)
+std::weak_ptr<SerializableObject> ContentManager::Load(const std::string& filename, const TypeInfo* pTypeInfo)
 {
 	Assert(pTypeInfo);
-	Assert2(pTypeInfo->isA(SerializableObject::getStaticTypeInfo()), "Canno't load object because it doesn't inherit from SerializableObject");
+	Assert2(pTypeInfo->IsA(SerializableObject::GetStaticTypeInfo()), "Canno't load object because it doesn't inherit from SerializableObject");
 
 	ContentDevice* contentDevice = findContentDevice("game");
 
@@ -90,20 +90,20 @@ std::weak_ptr<SerializableObject> ContentManager::load(const std::string& filena
 	// we will guess content is not loaded for now
 	if (objectInstance == m_content.end())
 	{
-		DataStreamPtr stream = contentDevice->openStream(filename);
+		DataStreamPtr stream = contentDevice->OpenStream(filename);
 		if (!stream)
 		{
-			Core::msg("ContentManager: failed to load %s from file \"%s\"", pTypeInfo->getClassName(),
+			Core::Msg("ContentManager: failed to load %s from file \"%s\"", pTypeInfo->GetClassName(),
 				filename.c_str());
 
 			return std::weak_ptr<SerializableObject>();
 		}
 
-		SerializableObject* objectInstance = (SerializableObject*)TypeManager::getInstance()->createObjectByTypeInfo(pTypeInfo);
+		SerializableObject* objectInstance = (SerializableObject*)TypeManager::GetInstance()->CreateObjectByTypeInfo(pTypeInfo);
 
-		std::shared_ptr<SerializableObject> object = std::shared_ptr<SerializableObject>(objectInstance, objectDeleter);
-		object->load(stream);
-		Core::msg("ContentManager: loaded %s %s", pTypeInfo->getClassName(), filename.c_str());
+		std::shared_ptr<SerializableObject> object = std::shared_ptr<SerializableObject>(objectInstance, ObjectDeleter);
+		object->Load(stream);
+		Core::Msg("ContentManager: loaded %s %s", pTypeInfo->GetClassName(), filename.c_str());
 		m_content.emplace(filename, object);
 	}
 
@@ -114,14 +114,14 @@ std::weak_ptr<SerializableObject> ContentManager::load(const std::string& filena
 //void ContentManager::loadExisted(const std::string& filename, std::shared_ptr<SerializableObject> object)
 //{
 //	ASSERT(object);
-//	ASSERT2(object->isA(SerializableObject::getStaticTypeInfo()), "Canno't load object because it doesn't inherit from SerializableObject");
+//	ASSERT2(object->IsA(SerializableObject::GetStaticTypeInfo()), "Canno't Load object because it doesn't inherit from SerializableObject");
 //
-//	Core::msg("[content]: loading existed %s %s", object->getTypeInfo()->getClassName(), filename.c_str());
+//	Core::Msg("[content]: loading existed %s %s", object->getTypeInfo()->GetClassName(), filename.c_str());
 //
 //	ContentDevice* contentDevice = findContentDevice();
 //
 //	DataStreamPtr stream = contentDevice->openStream(filename);
-//	object->load(stream);
+//	object->Load(stream);
 //}
 
 }

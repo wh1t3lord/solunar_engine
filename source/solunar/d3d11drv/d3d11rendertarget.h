@@ -6,7 +6,7 @@
 #include "graphics/core/rendertarget.h"
 #include "d3d11drv/d3d11device.h"
 
-namespace engine
+namespace solunar
 {
 
 class D3D11Renderer;
@@ -19,14 +19,14 @@ public:
 	D3D11RenderTarget(D3D11Device* device, const RenderTargetCreationDesc& renderTargetDesc);
 	~D3D11RenderTarget();
 
-	void create(D3D11Device* device, const RenderTargetCreationDesc& renderTargetDesc);
-	void release() override;
+	void Create(D3D11Device* device, const RenderTargetCreationDesc& renderTargetDesc);
+	void Release() override;
+
+	void SetDebugName(const char* debugName) override;
 
 	void bind(D3D11Device* device);
 
 private:
-
-
 	std::array<ID3D11RenderTargetView*, kMaxRenderTargetTextures> m_renderTargetViews;
 	std::array<ID3D11ShaderResourceView*, kMaxRenderTargetTextures> m_shaderResourceViews;
 
@@ -34,7 +34,6 @@ private:
 
 	ID3D11DepthStencilView* m_depthStencilView;
 
-	uint32_t getHandle() override { return 0; }
 };
 
 }
