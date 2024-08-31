@@ -1,6 +1,8 @@
 #ifndef TYPEINFO_H
 #define TYPEINFO_H
 
+#include "core/memory/memorymanager.h"
+
 namespace solunar
 {
 
@@ -8,20 +10,18 @@ namespace solunar
 class Object;
 
 // Object creation procedure
-typedef void (*StaticConstructor_t)(void* ptr);
+typedef Object* (*createObject_t)();
 
 class TypeInfo
 {
 public:
-	TypeInfo(const char* name, StaticConstructor_t staticConstructor, size_t classSize, size_t classAlign, const TypeInfo* baseInfo);
+	TypeInfo(const char* name, createObject_t createObjectProc, const TypeInfo* baseInfo);
 	~TypeInfo();
 
 	const char* GetClassName() const { return m_name; }
 	const size_t GetStringHash() const { return m_stringHash; }
-
-	const StaticConstructor_t GetStaticConstructor() const { return m_staticConstructor; }
-	const size_t GetClassSize() const { return  m_classSize; }
-	const size_t GetClassAlign() const { return  m_classAlign; }
+	const TypeInfo* GetBaseInfo() const { return m_baseInfo; }
+	const createObject_t GetCreateObjectProc() const { return m_createObjectProc; }
 
 	const bool IsA(const TypeInfo* typeInfo) const;
 	const bool IsExactly(const TypeInfo* typeInfo) const;
@@ -38,36 +38,35 @@ public:
 		return IsExactly(T::GetStaticTypeInfo());
 	}
 
-public:
+private:
 	const char* m_name;
-	StaticConstructor_t m_staticConstructor;
-	size_t m_classSize;
-	size_t m_classAlign;
-
 	const TypeInfo* m_baseInfo;
-	size_t m_stringHash;
 
+	createObject_t m_createObjectProc;
+
+	size_t m_stringHash;
 };
 
 #define DECLARE_OBJECT(typeName) \
 	public: \
 		static const TypeInfo s_typeInfo; \
-		static void StaticConstructor(void* ptr) { new(ptr) typeName(); } \
+		static Object* CreateObject() { return (Object*)mem_new<typeName>(); } \
 		static const TypeInfo* GetStaticTypeInfo() { return &typeName::s_typeInfo; } \
 		virtual const TypeInfo* GetTypeInfo() { return GetStaticTypeInfo();  }
 
 #define DECLARE_OBJECT_INTERFACE(typeName) \
 	public: \
 		static const TypeInfo s_typeInfo; \
-		static void StaticConstructor(void* ptr) { } \
+		static Object* CreateObject() { return nullptr; } \
 		static const TypeInfo* GetStaticTypeInfo() { return &typeName::s_typeInfo; } \
 		virtual const TypeInfo* GetTypeInfo() { return GetStaticTypeInfo();  }
 
 #define IMPLEMENT_ROOT_OBJECT(typeName) \
-	const TypeInfo typeName::s_typeInfo(#typeName, typeName::StaticConstructor, sizeof(typeName), alignof(typeName), nullptr)
+	const TypeInfo typeName::s_typeInfo(#typeName, typeName::CreateObject, nullptr)
 
 #define IMPLEMENT_OBJECT(typeName, baseTypeName) \
-	const TypeInfo typeName::s_typeInfo(#typeName, typeName::StaticConstructor, sizeof(typeName), alignof(typeName), baseTypeName::GetStaticTypeInfo())
+	const TypeInfo typeName::s_typeInfo(#typeName, typeName::CreateObject, baseTypeName::GetStaticTypeInfo())
+
 
 #define OBJECT_GET_TYPEINFO(typeName) \
 	typeName::GetStaticTypeInfo()

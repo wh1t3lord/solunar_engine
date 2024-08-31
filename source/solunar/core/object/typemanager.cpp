@@ -9,24 +9,7 @@ namespace solunar
 {
 
 static TypeManager s_typeManager;
-
-Object* createObjectPrivate(const TypeInfo* typeInfo)
-{
-	IAllocator* pAllocator = MemoryManager::getDefaultAllocator();
-	Object* pObject = (Object*)pAllocator->allocate(typeInfo->GetClassSize(), typeInfo->GetClassAlign());
-
-	StaticConstructor_t objectConstructor = typeInfo->GetStaticConstructor();
-	Assert3(objectConstructor, "Failed to create object without static constructor", typeInfo->GetClassName());
-
-	objectConstructor(pObject);
-
-	return pObject;
-}
-
-TypeManager* TypeManager::GetInstance()
-{
-	return &s_typeManager;
-}
+TypeManager* g_typeManager = &s_typeManager;
 
 const TypeInfo* TypeManager::GetTypeInfoByName(const char* name)
 {
@@ -54,8 +37,11 @@ Object* TypeManager::CreateObjectByName(const char* name)
 {
 	for (auto it : m_registeredTypes)
 	{
-		if (strcmp(it->m_name, name) == 0)
-			return createObjectPrivate(it);
+		if (strcmp(it->GetClassName(), name) == 0)
+		{
+			createObject_t createObjectProc = it->GetCreateObjectProc();
+			return createObjectProc();
+		}
 	}
 
 	return nullptr;
@@ -66,7 +52,10 @@ Object* TypeManager::CreateObjectByTypeInfo(const TypeInfo* typeInfo)
 	for (auto it : m_registeredTypes)
 	{
 		if (it->IsExactly(typeInfo))
-			return createObjectPrivate(it);
+		{
+			createObject_t createObjectProc = it->GetCreateObjectProc();
+			return createObjectProc();
+		}
 	}
 
 	return nullptr;
