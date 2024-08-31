@@ -2,6 +2,7 @@
 #define MODEL_H
 
 #include "core/math/boundingbox.h"
+#include "graphics/gfxcommon.h"
 #include "graphics/graphicsobject.h"
 
 namespace solunar

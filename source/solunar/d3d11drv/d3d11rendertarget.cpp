@@ -108,7 +108,7 @@ void D3D11RenderTarget::Create(D3D11Device* device, const RenderTargetCreationDe
 
 		// #TODO: !!!! FIX !!!!!
 		if (texture2D->getTextureDesc().m_format == ImageFormat::DEPTH32F)
-			depthStencilViewDesc.Format = getDxgiFormat(texture2D->getTextureDesc().m_format);
+			depthStencilViewDesc.Format = GetDXGIFormat(texture2D->getTextureDesc().m_format);
 		else
 			depthStencilViewDesc.Format = DXGI_FORMAT_D24_UNORM_S8_UINT;
 

@@ -64,7 +64,7 @@ namespace solunar
 		m_shadowFbo = g_renderDevice->CreateRenderTarget(renderTargetDesc);
 
 		// Create shader for static mesh
-		m_shadowShader_StaticMesh = g_shaderManager->createShaderProgram(
+		m_shadowShader_StaticMesh = g_shaderManager->CreateShaderProgram(
 			"shadowmap.hlsl",
 			"shadowmap.hlsl",
 			nullptr,
@@ -72,7 +72,7 @@ namespace solunar
 			sizeof(g_vertexInputLayout) / sizeof(g_vertexInputLayout[0]));
 
 		// Create shader for animated mesh
-		m_shadowShader_AnimationMesh = g_shaderManager->createShaderProgram(
+		m_shadowShader_AnimationMesh = g_shaderManager->CreateShaderProgram(
 			"shadowmap.hlsl",
 			"shadowmap.hlsl",
 			"SKINNED\n",
@@ -141,37 +141,37 @@ namespace solunar
 		renderContext.height = kShadowMapSize;
 		renderContext.proj = lightProjection;
 		renderContext.view = lightView;
-		renderContext.model = directionalLightEntity->getWorldTranslation();
-		ShaderConstantManager::getInstance()->setStaticMeshGlobalData(mesh, view, renderContext, graphicsWorld);
+		renderContext.model = directionalLightEntity->GetWorldTranslation();
+		ShaderConstantManager::GetInstance()->setStaticMeshGlobalData(mesh, view, renderContext, graphicsWorld);
 
-		if (mesh->isA<AnimatedMeshComponent>())
-			AnimatedModelRenderer::getInstance()->render(dynamicCast<AnimatedMeshComponent>(mesh));
+		if (mesh->IsA<AnimatedMeshComponent>())
+			AnimatedModelRenderer::GetInstance()->Render(dynamicCast<AnimatedMeshComponent>(mesh));
 
 		// shader selection
 		IShaderProgram* shaderProgram = nullptr;
-		if (mesh->isA<AnimatedMeshComponent>())
+		if (mesh->IsA<AnimatedMeshComponent>())
 			shaderProgram = m_shadowShader_AnimationMesh;
 		else
 			shaderProgram = m_shadowShader_StaticMesh;
 
-		g_shaderManager->setShaderProgram(shaderProgram);
+		g_shaderManager->SetShaderProgram(shaderProgram);
 
-		if (mesh->isA<AnimatedMeshComponent>())
+		if (mesh->IsA<AnimatedMeshComponent>())
 		{
 			std::shared_ptr<ModelBase> model = mesh->lockModel();
 			AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(model.get());
 
-			for (const auto& submesh : animatedModel->getAnimatedSubmehes())
+			for (const auto& submesh : animatedModel->GetAnimatedSubmehes())
 			{
 				// transpose matrices for D3D11
 				//localCtx.model = glm::transpose(localCtx.model);
 
-				g_renderDevice->setVertexBuffer(submesh->m_vertexBuffer, sizeof(AnimatedVertex), 0);
-				g_renderDevice->setIndexBuffer(submesh->m_indexBuffer, false);
+				g_renderDevice->SetVertexBuffer(submesh->m_vertexBuffer, sizeof(AnimatedVertex), 0);
+				g_renderDevice->SetIndexBuffer(submesh->m_indexBuffer, false);
 
-				ShaderConstantManager::getInstance()->setStaticMeshGlobalData(mesh, view, renderContext, graphicsWorld);
+				ShaderConstantManager::GetInstance()->setStaticMeshGlobalData(mesh, view, renderContext, graphicsWorld);
 
-				g_renderDevice->drawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
+				g_renderDevice->DrawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
 			}
 		}
 		else
@@ -194,11 +194,11 @@ namespace solunar
 
 			//	RenderContext::setContext(localCtx);
 
-				g_renderDevice->setVertexBuffer(submesh->getVertexBuffer(), sizeof(Vertex), 0);
+				g_renderDevice->SetVertexBuffer(submesh->getVertexBuffer(), sizeof(Vertex), 0);
 
-				ShaderConstantManager::getInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
+				ShaderConstantManager::GetInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
 				
-				g_renderDevice->draw(PM_TriangleList, 0, submesh->getVerticesCount());
+				g_renderDevice->Draw(PM_TriangleList, 0, submesh->getVerticesCount());
 
 				// return what have been
 				renderContext = savedCtx;
