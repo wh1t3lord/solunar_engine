@@ -50,7 +50,7 @@ namespace solunar
 
 		// register types
 		for (int i = 0; i < sizeof(engineClasses) / sizeof(engineClasses[0]); i++)
-			TypeManager::GetInstance()->RegisterType(engineClasses[i]);
+			g_typeManager->RegisterType(engineClasses[i]);
 	}
 
 	bool g_harakiriLogicThread = false;

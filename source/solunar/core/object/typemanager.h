@@ -14,9 +14,6 @@ class ITypedObject;
 class TypeManager
 {
 public:
-	static TypeManager* GetInstance();
-
-public:
 	const TypeInfo* GetTypeInfoByName(const char* name);
 	const TypeInfo* GetTypeInfoById(size_t hash);
 
@@ -49,7 +46,7 @@ inline void TypeManager::RegisterObject()
 	RegisterType( T::GetStaticTypeInfo() );
 }
 
-#define g_typeManager TypeManager::GetInstance()
+extern TypeManager* g_typeManager;
 
 }
 

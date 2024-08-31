@@ -100,7 +100,7 @@ void ShockPlayerController::InitializeCamera()
 	weaponModel.lock()->SetNodeScale(rootNodeIndex, glm::vec3(0.1f));
 
 	// little hack #TODO: please remove ViewmodelAnimationController from shockgame.cpp
-	Component* viewmodelComponent = (Component*)TypeManager::GetInstance()->CreateObjectByName("ViewmodelAnimationController");
+	Component* viewmodelComponent = (Component*)g_typeManager->CreateObjectByName("ViewmodelAnimationController");
 	m_weaponEntity->AddComponent(viewmodelComponent);
 }
 

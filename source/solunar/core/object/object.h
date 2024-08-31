@@ -22,8 +22,8 @@ namespace solunar
 
 		bool IsA(const TypeInfo* classTypeInfo)
 		{
-			for (const TypeInfo* typeInfo = GetTypeInfo(); typeInfo != nullptr; typeInfo = typeInfo->m_baseInfo)
-				if (typeInfo->m_stringHash == classTypeInfo->m_stringHash)
+			for (const TypeInfo* typeInfo = GetTypeInfo(); typeInfo != nullptr; typeInfo = typeInfo->GetBaseInfo())
+				if (typeInfo->GetStringHash() == classTypeInfo->GetStringHash())
 					return true;
 
 			return false;
@@ -38,8 +38,8 @@ namespace solunar
 		template <typename T>
 		bool IsA()
 		{
-			for (const TypeInfo* typeInfo = GetTypeInfo(); typeInfo != nullptr; typeInfo = typeInfo->m_baseInfo)
-				if (typeInfo->m_stringHash == T::GetStaticTypeInfo()->m_stringHash)
+			for (const TypeInfo* typeInfo = GetTypeInfo(); typeInfo != nullptr; typeInfo = typeInfo->GetBaseInfo())
+				if (typeInfo->GetStringHash() == T::GetStaticTypeInfo()->GetStringHash())
 					return true;
 
 			return false;

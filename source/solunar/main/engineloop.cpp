@@ -79,7 +79,7 @@ namespace solunar {
 		doc.InsertFirstChild(pRoot);
 
 		std::vector<const TypeInfo*> registeredTypes;
-		TypeManager::GetInstance()->GetRegisteredTypes(registeredTypes);
+		g_typeManager->GetRegisteredTypes(registeredTypes);
 
 		for (auto it : registeredTypes)
 		{
@@ -89,8 +89,8 @@ namespace solunar {
 			tinyxml2::XMLElement* component = doc.NewElement("Class");
 			component->SetAttribute("classname", it->GetClassName());
 			
-			if (it->m_baseInfo)
-				component->SetAttribute("baseClassname", it->m_baseInfo->GetClassName());
+			if (it->GetBaseInfo())
+				component->SetAttribute("baseClassname", it->GetBaseInfo()->GetClassName());
 			
 			pRoot->InsertFirstChild(component);
 
