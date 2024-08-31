@@ -14,8 +14,8 @@ namespace solunar
 	
 void RegisterCoreTypes()
 {
-	g_typeManager->RegisterObject<Object>();
-	g_typeManager->RegisterObject<SerializableObject>();
+	TypeManager::GetInstance()->RegisterObject<Object>();
+	TypeManager::GetInstance()->RegisterObject<SerializableObject>();
 }
 
 void Core::Init()

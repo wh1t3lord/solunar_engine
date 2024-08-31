@@ -184,7 +184,7 @@ namespace solunar
 
 	void ModelBase::RegisterObject()
 	{
-		g_typeManager->RegisterObject<ModelBase>();
+		TypeManager::GetInstance()->RegisterObject<ModelBase>();
 	}
 
 	unsigned int kAssimpFlags = aiProcess_Triangulate | 
@@ -452,7 +452,7 @@ namespace solunar
 
 	void ModelSubmesh::RegisterObject()
 	{
-		g_typeManager->RegisterObject<ModelSubmesh>();
+		TypeManager::GetInstance()->RegisterObject<ModelSubmesh>();
 	}
 
 	void ModelSubmesh::load(DataStreamPtr stream)
@@ -539,7 +539,7 @@ namespace solunar
 
 	void Model::RegisterObject()
 	{
-		g_typeManager->RegisterObject<Model>();
+		TypeManager::GetInstance()->RegisterObject<Model>();
 	}
 
 	Model::Model()
@@ -587,7 +587,7 @@ namespace solunar
 		for (uint32_t i = 0; i < header.submeshCount; i++)
 		{
 			// Create submesh
-			ModelSubmesh* submeshPtr = (ModelSubmesh*)g_typeManager->CreateObjectByTypeInfo(ModelSubmesh::GetStaticTypeInfo());
+			ModelSubmesh* submeshPtr = (ModelSubmesh*)TypeManager::GetInstance()->CreateObjectByTypeInfo(ModelSubmesh::GetStaticTypeInfo());
 		
 			// Load from current stream
 			submeshPtr->Load(stream);

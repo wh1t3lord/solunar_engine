@@ -270,7 +270,7 @@ namespace solunar {
 		};
 
 		for (int i = 0; i < sizeof(classes) / sizeof(classes[0]); i++)
-			g_typeManager->RegisterType(classes[i]);
+			TypeManager::GetInstance()->RegisterType(classes[i]);
 	}
 
 	GLPlatformContext* g_platformContext = nullptr;
@@ -314,7 +314,7 @@ namespace solunar {
 
 		// Create OpenGL context
 #ifdef WIN32
-		g_platformContext = (GLPlatformContext*)g_typeManager->CreateObjectByName("GLPlatformContext_Win32");
+		g_platformContext = (GLPlatformContext*)TypeManager::GetInstance()->CreateObjectByName("GLPlatformContext_Win32");
 #else
 #error "Please implement context here for you're platform'!"
 #endif // WIN32

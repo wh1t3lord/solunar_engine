@@ -99,7 +99,7 @@ std::weak_ptr<SerializableObject> ContentManager::Load(const std::string& filena
 			return std::weak_ptr<SerializableObject>();
 		}
 
-		SerializableObject* objectInstance = (SerializableObject*)g_typeManager->CreateObjectByTypeInfo(pTypeInfo);
+		SerializableObject* objectInstance = (SerializableObject*)TypeManager::GetInstance()->CreateObjectByTypeInfo(pTypeInfo);
 
 		std::shared_ptr<SerializableObject> object = std::shared_ptr<SerializableObject>(objectInstance, ObjectDeleter);
 		object->Load(stream);

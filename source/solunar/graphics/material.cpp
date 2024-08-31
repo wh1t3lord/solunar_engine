@@ -58,7 +58,7 @@ namespace solunar
 		tinyxml2::XMLDocument doc;
 		tinyxml2::XMLElement* rootElement = doc.NewElement("Material");
 
-		Material* materialToWrite = g_typeManager->CreateObject<Material>();
+		Material* materialToWrite = TypeManager::GetInstance()->CreateObject<Material>();
 		materialToWrite->m_albedoTextureFileName = diffuseName;
 		materialToWrite->m_normalTextureName = normalName;
 		
@@ -470,7 +470,7 @@ namespace solunar
 
 	void GenericMaterial::RegisterObject()
 	{
-		g_typeManager->RegisterObject<GenericMaterial>();
+		TypeManager::GetInstance()->RegisterObject<GenericMaterial>();
 	}
 
 	///////////////////////////////////////////////////////
@@ -489,7 +489,7 @@ namespace solunar
 
 	void LayeredMaskedMaterial::RegisterObject()
 	{
-		g_typeManager->RegisterObject<LayeredMaskedMaterial>();
+		TypeManager::GetInstance()->RegisterObject<LayeredMaskedMaterial>();
 	}
 
 	///////////////////////////////////////////////////////
@@ -508,6 +508,6 @@ namespace solunar
 
 	void NullMaterial::RegisterObject()
 	{
-		g_typeManager->RegisterObject<NullMaterial>();
+		TypeManager::GetInstance()->RegisterObject<NullMaterial>();
 	}
 }

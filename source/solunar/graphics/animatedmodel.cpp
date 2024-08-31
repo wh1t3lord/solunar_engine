@@ -95,7 +95,7 @@ IMPLEMENT_OBJECT(AnimatedModel, ModelBase);
 // Object registering
 void AnimatedModel::RegisterObject()
 {
-	g_typeManager->RegisterObject<AnimatedModel>();
+	TypeManager::GetInstance()->RegisterObject<AnimatedModel>();
 }
 
 AnimatedModel::AnimatedModel()

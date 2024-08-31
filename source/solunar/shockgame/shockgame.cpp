@@ -236,7 +236,7 @@ void registerGameClasses()
 	};
 
 	for (int i = 0; i < sizeof(gameClasses) / sizeof(gameClasses[0]); i++)
-		g_typeManager->RegisterType(gameClasses[i]);
+		TypeManager::GetInstance()->RegisterType(gameClasses[i]);
 }
 
 void registerShockClasses()
@@ -251,7 +251,7 @@ void registerShockClasses()
 	};
 
 	for (int i = 0; i < sizeof(shockClasses) / sizeof(shockClasses[0]); i++)
-		g_typeManager->RegisterType(shockClasses[i]);
+		TypeManager::GetInstance()->RegisterType(shockClasses[i]);
 }
 
 #define DEMO_GAME
@@ -275,7 +275,7 @@ void ShockGameInterface::Initialize()
 	registerShockClasses();
 
 #ifdef DEMO_GAME
-	g_typeManager->RegisterType(DemoGameMainMenuComponent::GetStaticTypeInfo());
+	TypeManager::GetInstance()->RegisterType(DemoGameMainMenuComponent::GetStaticTypeInfo());
 #endif // DEMO_GAME
 
 	// add event listener

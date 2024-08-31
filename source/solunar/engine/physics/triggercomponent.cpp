@@ -18,7 +18,7 @@ TriggerComponent::~TriggerComponent()
 
 void TriggerComponent::RegisterObject()
 {
-	g_typeManager->RegisterObject<TriggerComponent>();
+	TypeManager::GetInstance()->RegisterObject<TriggerComponent>();
 }
 
 void TriggerComponent::LoadXML(tinyxml2::XMLElement& element)
