@@ -9,8 +9,6 @@
 namespace solunar
 {
 
-extern DXGI_FORMAT GetDXGIFormat(ImageFormat format);
-
 enum ShaderType
 {
 	ShaderType_Vertex,

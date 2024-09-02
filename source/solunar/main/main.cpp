@@ -79,7 +79,7 @@ namespace solunar
 	BOOL g_fMouseInClient;
 	BOOL g_fGainedFocus = true;
 
-	void onLostFocus()
+	void OnLostFocus()
 	{
 		InputManager::GetInstance()->SetCursorCapture(false);
 		InputManager::GetInstance()->SetCursorHiding(false);
@@ -180,7 +180,7 @@ namespace solunar
 		case WM_ACTIVATE:
 		{
 			if (LOWORD(wParam) == WA_INACTIVE)
-				onLostFocus();
+				OnLostFocus();
 			else
 				OnGainedFocus();
 			

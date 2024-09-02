@@ -336,7 +336,7 @@ namespace solunar
 		bindSamplers();
 	}
 
-	std::weak_ptr<TextureMap> Material::getTexture(MAT_TEX tex)
+	std::weak_ptr<TextureMap> Material::GetTexture(MAT_TEX tex)
 	{
 		switch (tex)
 		{
@@ -389,6 +389,8 @@ namespace solunar
 			anisotropicQuality = 1;
 
 		albedoSamplerDesc.m_anisotropyLevel = (float)anisotropicQuality;
+
+		albedoSamplerDesc.m_comparisonFunc = COMPARISON_ALWAYS;
 
 		m_albedoSampler = g_stateManager->CreateSamplerState(albedoSamplerDesc); //g_renderDevice->CreateSamplerState(albedoSamplerDesc);
 

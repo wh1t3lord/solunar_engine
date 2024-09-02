@@ -10,17 +10,44 @@
 struct VSOutput
 {
 	float4 position		: SV_Position;
-	float3 worldPos		: TEXCOORD0;
+	float4 worldPos		: TEXCOORD0;
 	float3 normal		: NORMAL;
 	float2 texcoord		: TEXCOORD1;
 	float3 tangent		: TANGENT;
 	float3 bitangent	: BINORMAL;
+	float4 lightSpace	: TEXCOORD2;
 };
 
 Texture2D 			g_albedoTexture : register(t0);
 SamplerState		g_albedoSampler : register(s0);
 Texture2D 			g_normalTexture : register(t1);
 SamplerState		g_normalSampler : register(s1);
+
+Texture2D			g_shadowmapTexture : register(t5);
+SamplerState		g_shadowmapSampler : register(s5);
+
+float ShadowCalculation(float4 fragPosLightSpace)
+{
+    // perform perspective divide
+    float3 projCoords = fragPosLightSpace.xyz;
+	
+	projCoords.x =  fragPosLightSpace.x / fragPosLightSpace.w / 2.0f + 0.5f;
+	projCoords.y = -fragPosLightSpace.y / fragPosLightSpace.w / 2.0f + 0.5f;
+	
+    // get closest depth value from light's perspective (using [0,1] range fragPosLight as coords)
+    float closestDepth = g_shadowmapTexture.Sample(g_shadowmapSampler, projCoords.xy).r; 
+	//return closestDepth;
+	
+	// get depth of current fragment from light's perspective
+    float currentDepth = projCoords.z;
+	//return currentDepth;
+	//return abs(closestDepth-currentDepth);
+	
+    // check whether current frag pos is in shadow
+    float shadow = currentDepth > closestDepth ? 1.0 : 0.0;
+	
+    return shadow;
+}
 
 float4 PSMain(VSOutput input) : SV_Target
 {
@@ -38,14 +65,14 @@ float4 PSMain(VSOutput input) : SV_Target
 
 	float3 N = input.normal;
 	float3 L = -g_DirLight_direction.xyz;
-	float3 V = normalize(g_viewPos.xyz - input.worldPos);
+	float3 V = normalize(g_viewPos.xyz - input.worldPos.xyz);
 	float3 H = normalize(L + V);
 
 	float NdotL = max(0.0f, dot(N, L));
 	float NdotH = max(0.0f, dot(N, H));
 
-	float3 diffuseColor = ambientColor + NdotL * g_DirLight_color.rgb;
-	float3 specularColor  = pow(NdotH, kSpecPower) * kSpecColor;
+	float3 diffuseColor = NdotL * g_DirLight_color.rgb;
+	float3 specularColor = pow(NdotH, kSpecPower) * kSpecColor;
 	
 	float3 ligthing = float3(0.0f, 0.0f, 0.0f);
 	for (int i = 0; i < g_pointLightCount; i++)
@@ -53,21 +80,21 @@ float4 PSMain(VSOutput input) : SV_Target
 		// get local copy of point light from ubo
 		PointLight pointLight = g_pointLights[i];
 		
-		float3 PL = normalize(pointLight.position.xyz - input.worldPos);
+		float3 PL = normalize(pointLight.position.xyz - input.worldPos.xyz);
 		float3 R = reflect(-PL, input.normal);
 		
 		// we store point light radius in r component
 		float radius = pointLight.lightData.r;
 		
 		// light attenuation
-		//float lightDistance = length(pointLight.position.xyz - input.worldPos) / radius;
+		//float lightDistance = length(pointLight.position.xyz - input.worldPos.xyz) / radius;
 		//float attenuation = 1.0 / (1.0 + lightDistance * lightDistance);
 		//
 		//ligthing += pointLightPhong(pointLight.color.rgb, pointLight.specular.rgb, 2.0, PL, input.normal, R) * attenuation;
 		
 		// normal falloff
 		
-		float3 distance = length(pointLight.position.xyz - input.worldPos);
+		float3 distance = length(pointLight.position.xyz - input.worldPos.xyz);
 		float falloff = pow(saturate(1.0f - pow(distance / radius, 4.0f)), 2.0f) / ( pow(distance, 2.0f) + 1.0f) ;
 		
 		ligthing += pointLightPhong(pointLight.color.rgb, pointLight.specular.rgb, 2.0, PL, input.normal, R) * falloff;
@@ -84,22 +111,138 @@ float4 PSMain(VSOutput input) : SV_Target
 		// we store spot light direction in gba component
 		float3 lightDirection = spotLight.lightData.gba;
 		
-		float3 PL = normalize(spotLight.position.xyz - input.worldPos);
+		float3 PL = normalize(spotLight.position.xyz - input.worldPos.xyz);
 		float3 R = reflect(-PL, input.normal);
 		
 		float theta = dot( normalize( lightDirection ), normalize( -lightDirection ) );
 		
 		if (theta > cutoff)
 		{
-			float3 distance = length(spotLight.position.xyz - input.worldPos);
+			float3 distance = length(spotLight.position.xyz - input.worldPos.xyz);
 			float falloff = pow(saturate(1.0f - pow(distance, 4.0f)), 2.0f) / ( pow(distance, 2.0f) + 1.0f);
 			ligthing += float3(1.0f, 0.0f, 0.0f);
 			//ligthing += pointLightPhong(spotLight.color.rgb, spotLight.specular.rgb, 2.0, PL, input.normal, R) * falloff;
 		}
 	}
 	
-	//float3 finalColor = albedoColor * (diffuseColor + specularColor);
-	float3 finalColor = albedoColor * (diffuseColor + specularColor + ligthing);
-	//float3 finalColor = albedoColor * (ligthing);
+	// calculate shadow
+	float shadow = ShadowCalculation(input.lightSpace);
+	
+	// Uncomment to see projected shadow map
+	//float3 finalColor = float3(shadow, shadow, shadow);
+
+	// Final color calculation
+	//float3 finalColor = albedoColor * (ambientColor + (1.0f - shadow)) * (diffuseColor + specularColor + ligthing);
+	float3 finalColor = albedoColor * (ambientColor + (ambientColor - shadow)) * (diffuseColor + specularColor + ligthing);
+	
+	//float3 finalColor = albedoColor * (diffuseColor + (1.0 - shadow) + specularColor + ligthing);
+	//float3 finalColor = albedoColor * (diffuseColor + specularColor + ligthing + (g_DirLight_ambientColor.rgb - shadow));
+	
+	//float3 finalColor = albedoColor * (ambientColor + (1.0 - shadow));
+	//float3 finalColor = albedoColor * (ambientColor + diffuseColor + (shadow));
+	
 	return float4(finalColor, 1.0f);
 }
+
+
+// OLD PS MAIN
+#if 0
+float4 PSMain(VSOutput input) : SV_Target
+{
+	//return float4(input.normal, 1.0f);
+
+	const float3 kSpecColor = float3(4.0f, 4.0f, 4.0f);
+	const float kSpecPower = 256.0f;
+
+	float3 ambientColor = g_DirLight_ambientColor.xyz;
+	float3 albedoColor = materialAlbedo(g_albedoTexture, g_albedoSampler, input.texcoord);
+
+#ifdef UNLIT
+	return float4(albedoColor, 1.0f);
+#endif
+
+	float3 N = input.normal;
+	float3 L = -g_DirLight_direction.xyz;
+	float3 V = normalize(g_viewPos.xyz - input.worldPos.xyz);
+	float3 H = normalize(L + V);
+
+	float NdotL = max(0.0f, dot(N, L));
+	float NdotH = max(0.0f, dot(N, H));
+
+	float3 diffuseColor = ambientColor + NdotL * g_DirLight_color.rgb;
+	float3 specularColor  = pow(NdotH, kSpecPower) * kSpecColor;
+	
+	float3 ligthing = float3(0.0f, 0.0f, 0.0f);
+	for (int i = 0; i < g_pointLightCount; i++)
+	{
+		// get local copy of point light from ubo
+		PointLight pointLight = g_pointLights[i];
+		
+		float3 PL = normalize(pointLight.position.xyz - input.worldPos.xyz);
+		float3 R = reflect(-PL, input.normal);
+		
+		// we store point light radius in r component
+		float radius = pointLight.lightData.r;
+		
+		// light attenuation
+		//float lightDistance = length(pointLight.position.xyz - input.worldPos.xyz) / radius;
+		//float attenuation = 1.0 / (1.0 + lightDistance * lightDistance);
+		//
+		//ligthing += pointLightPhong(pointLight.color.rgb, pointLight.specular.rgb, 2.0, PL, input.normal, R) * attenuation;
+		
+		// normal falloff
+		
+		float3 distance = length(pointLight.position.xyz - input.worldPos.xyz);
+		float falloff = pow(saturate(1.0f - pow(distance / radius, 4.0f)), 2.0f) / ( pow(distance, 2.0f) + 1.0f) ;
+		
+		ligthing += pointLightPhong(pointLight.color.rgb, pointLight.specular.rgb, 2.0, PL, input.normal, R) * falloff;
+	}
+	
+	for (int i = 0; i < g_spotLightCount; i++)
+	{
+		// get local copy of spot light from ubo
+		SpotLight spotLight = g_spotLights[i];
+		
+		// we store spot light cutoff in r component
+		float cutoff = cos(spotLight.lightData.r);
+		
+		// we store spot light direction in gba component
+		float3 lightDirection = spotLight.lightData.gba;
+		
+		float3 PL = normalize(spotLight.position.xyz - input.worldPos.xyz);
+		float3 R = reflect(-PL, input.normal);
+		
+		float theta = dot( normalize( lightDirection ), normalize( -lightDirection ) );
+		
+		if (theta > cutoff)
+		{
+			float3 distance = length(spotLight.position.xyz - input.worldPos.xyz);
+			float falloff = pow(saturate(1.0f - pow(distance, 4.0f)), 2.0f) / ( pow(distance, 2.0f) + 1.0f);
+			ligthing += float3(1.0f, 0.0f, 0.0f);
+			//ligthing += pointLightPhong(spotLight.color.rgb, spotLight.specular.rgb, 2.0, PL, input.normal, R) * falloff;
+		}
+	}
+	
+	// calculate shadow
+	float shadow = ShadowCalculation(input.lightSpace);    
+	//float3 finalColor = float3(shadow, shadow, shadow);
+	
+	// SHADOW MAPPING
+	float3 finalColor = albedoColor * (diffuseColor + (1.0 - shadow) + specularColor + ligthing);
+	
+	// SHADOW MAPPING (DEBUG)
+	//float3 finalColor = albedoColor * (diffuseColor + specularColor + ligthing + (shadow) * float3(1,0,0));
+	
+	// NO SHADOW MAPPING (NEW)
+	//float3 finalColor = albedoColor * (diffuseColor + specularColor + ligthing);
+	
+	// NO SHADOW MAPPING
+	//float3 finalColor = albedoColor * (diffuseColor + specularColor + ligthing);
+	
+	// OLD STUFF
+	//float3 finalColor = albedoColor * (diffuseColor + specularColor);
+	//float3 finalColor = albedoColor * (ligthing);
+	
+	return float4(finalColor, 1.0f);
+}
+#endif

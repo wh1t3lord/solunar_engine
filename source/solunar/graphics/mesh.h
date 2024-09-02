@@ -37,11 +37,14 @@ namespace solunar {
 
 		virtual void Render();
 
-		std::shared_ptr<ModelBase> lockModel();
+		std::shared_ptr<ModelBase> LockModel();
 		std::weak_ptr<ModelBase> getModel();
+
+		bool IsCastingShadow() { return m_castShadows; }
 
 	protected:
 		std::weak_ptr<ModelBase> m_model;
+		bool m_castShadows;
 	};
 
 	class AnimatedMeshComponent : public MeshComponent

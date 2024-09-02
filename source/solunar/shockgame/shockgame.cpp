@@ -166,7 +166,7 @@ void TestAnimationComponent::LoadXML(tinyxml2::XMLElement& element)
 void TestAnimationComponent::Update(float dt)
 {
 	AnimatedMeshComponent* animatedMeshComponent = GetEntity()->GetComponent<AnimatedMeshComponent>();
-	std::shared_ptr<ModelBase> modelBase = animatedMeshComponent->lockModel();
+	std::shared_ptr<ModelBase> modelBase = animatedMeshComponent->LockModel();
 	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
 	if (animatedModel) {
 		if (m_animationIndex == -1) {
@@ -204,17 +204,23 @@ ViewmodelAnimationController::~ViewmodelAnimationController()
 void ViewmodelAnimationController::Update(float dt)
 {
 	AnimatedMeshComponent* animatedMeshComponent = GetEntity()->GetComponent<AnimatedMeshComponent>();
-	std::shared_ptr<ModelBase> modelBase = animatedMeshComponent->lockModel();
-	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
-	if (animatedModel) {
-		if (m_animationIndex == -1) {
-			m_animationIndex = animatedModel->GetAnimationByName("Armature|Armature|Hide");
-			animatedModel->PlayAnimation(m_animationIndex, true);
-			animatedModel->PauseAnimation();
-		}
-	}
+	if (!animatedMeshComponent)
+		return;
 
-	animatedModel->Update(dt);
+	std::shared_ptr<ModelBase> modelBase = animatedMeshComponent->LockModel();
+	if (modelBase)
+	{
+		AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
+		if (animatedModel) {
+			if (m_animationIndex == -1) {
+				m_animationIndex = animatedModel->GetAnimationByName("Armature|Armature|Hide");
+				animatedModel->PlayAnimation(m_animationIndex, true);
+				animatedModel->PauseAnimation();
+			}
+		}
+
+		animatedModel->Update(dt);
+	}
 }
 
 // More beautiful way to register classes

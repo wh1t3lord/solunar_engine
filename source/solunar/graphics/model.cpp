@@ -270,28 +270,28 @@ namespace solunar
 			memset(&submeshData, 0, sizeof(submeshData));
 			//strcpy(submeshData.materialInfo, pSubMesh->getMaterial()->getName().c_str());
 			strcpy(submeshData.materialInfo, "MATERIAL UNNAMED");
-			submeshData.verticesCount = pSubMesh->getVerticesCount();
+			submeshData.verticesCount = pSubMesh->GetVerticesCount();
 			submeshData.indicesCount = pSubMesh->getIndeciesCount();
 			g_fileSystem->Write(file, &submeshData, sizeof(submeshData));
 
-			Vertex* pBufferVertices = (Vertex*)pSubMesh->getVertexBuffer()->Map(BufferMapping::ReadOnly);
+			Vertex* pBufferVertices = (Vertex*)pSubMesh->GetVertexBuffer()->Map(BufferMapping::ReadOnly);
 
 			// Avoid transform in vertex buffer
 			// so we copy vertices to temp buffer and write them to file.
-			Vertex* pVertices = (Vertex*)malloc(pSubMesh->getVerticesCount() * sizeof(Vertex));
-			memcpy(pVertices, (const void*)pBufferVertices, pSubMesh->getVerticesCount() * sizeof(Vertex));
+			Vertex* pVertices = (Vertex*)malloc(pSubMesh->GetVerticesCount() * sizeof(Vertex));
+			memcpy(pVertices, (const void*)pBufferVertices, pSubMesh->GetVerticesCount() * sizeof(Vertex));
 
 			// Unmap buffer
-			pSubMesh->getVertexBuffer()->Unmap();
+			pSubMesh->GetVertexBuffer()->Unmap();
 			pBufferVertices = nullptr;
 
 			// Transform vertices to OpenGL space.
-			for (uint32_t i = 0; i < pSubMesh->getVerticesCount(); i++)
+			for (uint32_t i = 0; i < pSubMesh->GetVerticesCount(); i++)
 			{
-				pVertices[i].m_position = pSubMesh->getTransform() * glm::vec4(pVertices[i].m_position, 0.0f);
+				pVertices[i].m_position = pSubMesh->GetTransform() * glm::vec4(pVertices[i].m_position, 0.0f);
 			}
 
-			g_fileSystem->Write(file, pVertices, pSubMesh->getVerticesCount() * sizeof(Vertex));
+			g_fileSystem->Write(file, pVertices, pSubMesh->GetVerticesCount() * sizeof(Vertex));
 
 			// free temp buffer
 			free(pBufferVertices);
@@ -441,7 +441,7 @@ namespace solunar
 		//m_material->resetAllStates();
 	}
 
-	std::shared_ptr<Material> SubMesh::lockMaterial()
+	std::shared_ptr<Material> SubMesh::LockMaterial()
 	{
 		return m_material.lock();
 	}

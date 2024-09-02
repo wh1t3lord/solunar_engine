@@ -25,25 +25,24 @@ public:
 
 	void EndFrame() override;
 
-	void bindMaterialForMesh(MeshComponent* mesh, Material* material, IMaterialInstance* materialInstance) override;
+	void BindMaterialForMesh(MeshComponent* mesh, Material* material, IMaterialInstance* materialInstance) override;
 
-	void renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh) override;
+	void RenderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh) override;
 	void renderShadows(View* view) override;
 
 	void TakeScreenshot() override;
 
 private:
 	void createSwapChain();
-	void CreateRasterizerState();
 
 	void takeScreenshotInternal();
 
 	void clearScreen() override;
-	void clearRenderTarget(IRenderTarget* renderTarget) override;
+	void ClearRenderTarget(IRenderTarget* renderTarget) override;
 	void setSwapChainRenderTarget() override;
 
-	void renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh);
-	void renderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh);
+	void RenderStaticMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh);
+	void RenderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh);
 
 private:
 	RendererSingletonStorer m_singletonStorer;
@@ -53,8 +52,6 @@ private:
 	ID3D11DepthStencilView* m_depthStencilView;
 	
 	ID3D11DepthStencilState* m_depthStencilState;
-
-	IRasterizerState* m_rasterizerState;
 
 	IDXGISwapChain* m_swapChain;
 

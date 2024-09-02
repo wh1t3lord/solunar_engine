@@ -4,6 +4,7 @@
 #include "graphics/core/texture.h"
 #include "graphics/core/device.h"
 #include "graphics/core/rendertarget.h"
+#include "graphics/core/statemanager.h"
 
 // Graphics classes
 #include "graphics/rendercontext.h"
@@ -18,6 +19,9 @@
 #include "graphics/lightmanager.h"
 #include "graphics/animatedmodel.h"
 #include "graphics/screenquad.h"
+#include "graphics/debugrenderer.h"
+
+#include "graphics/imguimanager.h"
 
 namespace solunar
 {
@@ -27,9 +31,14 @@ namespace solunar
 	{
 		m_shadowMap = nullptr;
 		m_shadowFbo = nullptr;
+		m_shadowMapSampler = nullptr;
 		m_shadowShader_StaticMesh = nullptr;
 		m_shadowShader_AnimationMesh = nullptr;
 		memset(&m_originalViewport, 0, sizeof(m_originalViewport));
+		m_lightViewMatrix = glm::mat4(1.0f);
+
+		m_znear = 1.0f;
+		m_zfar = 16.0f;
 	}
 
 	ShadowsRenderer::~ShadowsRenderer()
@@ -78,6 +87,15 @@ namespace solunar
 			"SKINNED\n",
 			g_animatedVertexInputLayout,
 			sizeof(g_animatedVertexInputLayout) / sizeof(g_animatedVertexInputLayout[0]));
+
+		SamplerDesc samplerDesc = {};
+		samplerDesc.m_minFilter = TextureFilter::LinearMipmapLinear;
+		samplerDesc.m_magFilter = TextureFilter::Linear;
+		samplerDesc.m_wrapS = TextureWrap::ClampToBorder;
+		samplerDesc.m_wrapT = TextureWrap::ClampToBorder;
+		samplerDesc.m_wrapRepeat = TextureWrap::ClampToBorder;
+		samplerDesc.m_comparisonFunc = COMPARISON_LESS_EQUAL;
+		m_shadowMapSampler = g_stateManager->CreateSamplerState(samplerDesc);
 	}
 
 	void ShadowsRenderer::Shutdown()
@@ -95,15 +113,18 @@ namespace solunar
 		}
 	}
 
-	void ShadowsRenderer::beginRender()
+	void ShadowsRenderer::BeginRender()
 	{
+		ImGui::DragFloat("Z Near", &m_znear, 0.1f, 0.0f, 1.0f);
+		ImGui::DragFloat("Z Far", &m_zfar, 1.0f, 1.0f, 100.0f);
+
 		m_originalViewport = g_renderDevice->GetViewport();
 
 		// set framebuffer
 		g_renderDevice->SetRenderTarget(m_shadowFbo);
 
 		// clear target
-		g_renderer->clearRenderTarget(m_shadowFbo);
+		g_renderer->ClearRenderTarget(m_shadowFbo);
 
 		// install shadowmap viewport
 		Viewport vp;
@@ -113,7 +134,7 @@ namespace solunar
 		g_renderDevice->SetViewport(&vp);
 	}
 
-	void ShadowsRenderer::renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
+	void ShadowsRenderer::RenderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
 	{
 		LightManager* lightManager = graphicsWorld->GetLightManager();
 		Assert(lightManager); // uninitialized light manager, critical error
@@ -128,21 +149,21 @@ namespace solunar
 		if (!directionalLightEntity)
 			return;
 
-		float near_plane = 1.0f, far_plane = 70.5f;
-		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, near_plane, far_plane);
+		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, m_znear, m_zfar);
 
 		// calculate view matrix for light
-		glm::mat4 lightView = glm::lookAt(glm::vec3(-2.0f, 4.0f, -1.0f), 
+		m_lightViewMatrix = glm::lookAt(glm::vec3(-2.0f, 2.0f, -1.0f),
 										  glm::vec3( 0.0f, 0.0f,  0.0f), 
 										  glm::vec3( 0.0f, 1.0f,  0.0f));
+
+		m_lightViewProjectionMatrix = lightProjection * m_lightViewMatrix;
 
 		RenderContext renderContext;
 		renderContext.width = kShadowMapSize;
 		renderContext.height = kShadowMapSize;
 		renderContext.proj = lightProjection;
-		renderContext.view = lightView;
-		renderContext.model = directionalLightEntity->GetWorldTranslation();
-		ShaderConstantManager::GetInstance()->setStaticMeshGlobalData(mesh, view, renderContext, graphicsWorld);
+		renderContext.view = m_lightViewMatrix;
+		renderContext.model = mesh->GetEntity()->GetWorldTranslation();
 
 		if (mesh->IsA<AnimatedMeshComponent>())
 			AnimatedModelRenderer::GetInstance()->Render(dynamicCast<AnimatedMeshComponent>(mesh));
@@ -156,9 +177,14 @@ namespace solunar
 
 		g_shaderManager->SetShaderProgram(shaderProgram);
 
+		g_renderer->SetDefaultRenderState();
+
 		if (mesh->IsA<AnimatedMeshComponent>())
 		{
-			std::shared_ptr<ModelBase> model = mesh->lockModel();
+			std::shared_ptr<ModelBase> model = mesh->LockModel();
+			if (!model)
+				return;
+
 			AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(model.get());
 
 			for (const auto& submesh : animatedModel->GetAnimatedSubmehes())
@@ -169,16 +195,16 @@ namespace solunar
 				g_renderDevice->SetVertexBuffer(submesh->m_vertexBuffer, sizeof(AnimatedVertex), 0);
 				g_renderDevice->SetIndexBuffer(submesh->m_indexBuffer, false);
 
-				ShaderConstantManager::GetInstance()->setStaticMeshGlobalData(mesh, view, renderContext, graphicsWorld);
+				ShaderConstantManager::GetInstance()->SetGlobalData(mesh, view, renderContext, graphicsWorld);
 
 				g_renderDevice->DrawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
 			}
 		}
 		else
 		{
-			std::shared_ptr<ModelBase> model = mesh->lockModel();
+			std::shared_ptr<ModelBase> model = mesh->LockModel();
 
-			for (const auto& submesh : model->getSubmehes())
+			for (const auto& submesh : model->GetSubmehes())
 			{
 				// create saved render ctx as previous model.
 				RenderContext savedCtx = renderContext;
@@ -187,18 +213,18 @@ namespace solunar
 				RenderContext localCtx = savedCtx;
 
 				// and overwrite model matrix
-				localCtx.model = savedCtx.model * submesh->getTransform();
+				localCtx.model = savedCtx.model * submesh->GetTransform();
 
 				// transpose matrices for D3D11
 				//localCtx.model = glm::transpose(localCtx.model);
 
 			//	RenderContext::setContext(localCtx);
 
-				g_renderDevice->SetVertexBuffer(submesh->getVertexBuffer(), sizeof(Vertex), 0);
+				g_renderDevice->SetVertexBuffer(submesh->GetVertexBuffer(), sizeof(Vertex), 0);
 
-				ShaderConstantManager::GetInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
+				ShaderConstantManager::GetInstance()->SetGlobalData(mesh, view, localCtx, graphicsWorld);
 				
-				g_renderDevice->Draw(PM_TriangleList, 0, submesh->getVerticesCount());
+				g_renderDevice->Draw(PM_TriangleList, 0, submesh->GetVerticesCount());
 
 				// return what have been
 				renderContext = savedCtx;
@@ -206,10 +232,11 @@ namespace solunar
 		}
 	}
 
-	void ShadowsRenderer::endRender()
+	void ShadowsRenderer::EndRender()
 	{
 		// set framebuffer
-		g_renderDevice->SetRenderTarget(g_renderer->getSwapChainRenderTarget());
+		//g_renderDevice->SetRenderTarget(g_renderer->getSwapChainRenderTarget());
+		g_renderer->setSwapChainRenderTarget();
 
 		// restore viewport
 		g_renderDevice->SetViewport(&m_originalViewport);

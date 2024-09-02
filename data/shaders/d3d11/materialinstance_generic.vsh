@@ -22,11 +22,12 @@ struct VSInput
 struct VSOutput
 {
 	float4 position		: SV_Position;
-	float3 worldPos		: TEXCOORD0;
+	float4 worldPos		: TEXCOORD0;
 	float3 normal		: NORMAL;
 	float2 texcoord		: TEXCOORD1;
 	float3 tangent		: TANGENT;
 	float3 bitangent	: BINORMAL;
+	float4 lightSpace	: TEXCOORD2;
 };
 
 VSOutput VSMain(VSInput input)
@@ -42,7 +43,7 @@ VSOutput VSMain(VSInput input)
 
 	// World position
 	output.worldPos = mul(float4(input.position, 1.0f), skinMatrix);
-	output.worldPos = mul(float4(output.worldPos, 1.0f), g_modelMatrix);
+	output.worldPos = mul(output.worldPos, g_modelMatrix);
 #else
 	// World position
 	output.worldPos = mul(float4(input.position, 1.0f), g_modelMatrix);
@@ -51,7 +52,7 @@ VSOutput VSMain(VSInput input)
 	// #TODO: multiply output.worldPos by g_viewProjection matrix.
 
 	// Position
-	output.position = mul(float4(output.worldPos, 1.0f), g_viewMatrix);
+	output.position = mul(output.worldPos, g_viewMatrix);
 	output.position = mul(output.position, g_projectionMatrix);
 
 	// texcoord
@@ -65,6 +66,9 @@ VSOutput VSMain(VSInput input)
 	// normal
 	output.normal = mul(float4(input.normal, 0.0f), g_modelMatrix);
 #endif
+
+	// Light space position
+	output.lightSpace = mul(output.worldPos, g_LightViewProjection);
 	
 	return output;
 }

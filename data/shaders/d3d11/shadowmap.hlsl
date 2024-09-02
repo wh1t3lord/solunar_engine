@@ -5,6 +5,8 @@
 //	BILLBOARD
 //	SKINNED
 
+#include "cbuffers.h"
+
 struct VSInput
 {
 	float3 position		: POSITION;
@@ -27,45 +29,30 @@ struct VSOutput
 	float4 position		: SV_Position;
 };
 
-cbuffer GlobalData : register(b0)
-{
-	row_major float4x4 g_modelMatrix;
-	row_major float4x4 g_viewMatrix;
-	row_major float4x4 g_projectionMatrix;
-	row_major float4x4 g_modelViewProjection;
-
-	float4 g_viewPos;
-	float4 g_viewDir;
-};
-
-cbuffer SkinningData : register(b1)
-{
-	row_major float4x4 g_bonesMatrices[256];
-};
-
-#ifndef SKINNED
 VSOutput VSMain(VSInput input)
 {
 	VSOutput output = (VSOutput)0;
 
-	// Position
-	output.position = mul(float4(input.position, 1.0f), g_modelMatrix);
-	output.position = mul(output.position, g_viewMatrix);	
-	output.position = mul(output.position, g_projectionMatrix);	
-	return output;
-}
+#ifdef SKINNED
+	// calculate bone transform
+	row_major float4x4 skinMatrix = input.weights.x * g_bonesMatrices[int(input.boneIds.x)]
+		+ input.weights.y * g_bonesMatrices[int(input.boneIds.y)]
+		+ input.weights.z * g_bonesMatrices[int(input.boneIds.z)]
+		+ input.weights.w * g_bonesMatrices[int(input.boneIds.w)];
+
+	// World position
+	output.position = mul(float4(input.position, 1.0f), skinMatrix);
+	output.position = mul(output.position, g_modelMatrix);
 #else
-VSOutput VSMain(VSInput input)
-{
-	VSOutput output = (VSOutput)0;
-
-	// Position
+	// World position
 	output.position = mul(float4(input.position, 1.0f), g_modelMatrix);
-	output.position = mul(output.position, g_viewMatrix);	
-	output.position = mul(output.position, g_projectionMatrix);	
+#endif
+
+	output.position = mul(output.position, g_LightViewProjection);
+	//output.position = mul(output.position, g_viewMatrix);	
+	//output.position = mul(output.position, g_projectionMatrix);	
 	return output;
 }
-#endif
 
 void PSMain(VSOutput input)
 {

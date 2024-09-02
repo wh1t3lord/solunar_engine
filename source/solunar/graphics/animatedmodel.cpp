@@ -779,7 +779,10 @@ void AnimatedModelRenderer::Shutdown()
 
 void AnimatedModelRenderer::Render(AnimatedMeshComponent* model)
 {
-	std::shared_ptr<ModelBase> modelBase = model->lockModel();
+	std::shared_ptr<ModelBase> modelBase = model->LockModel();
+	if (!modelBase)
+		return;
+
 	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
 
 	glm::mat4* data = (glm::mat4*)g_bonesConstantBuffer->Map(BufferMapping::WriteOnly);
@@ -797,7 +800,7 @@ void AnimatedModelRenderer::Render(AnimatedMeshComponent* model)
 #endif
 
 #if 0
-	//std::shared_ptr<ModelBase> modelBase = model->lockModel();
+	//std::shared_ptr<ModelBase> modelBase = model->LockModel();
 	//AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
 
 	// compute skinning matrices and write to joint texture upload buffer

@@ -31,6 +31,8 @@ public:
 	glm::quat GetRotation()	const	{ return m_rotation; }
 	glm::vec3 GetScale()	const	{ return m_scale; }
 
+	glm::vec3 GetWorldPosition() const;
+
 	void SetPosition(const glm::vec3& pos) { m_position = pos; }
 	void SetRotation(const glm::quat& rot) { m_rotation = rot; }
 	void SetEulerRotation(const glm::vec3& rot);

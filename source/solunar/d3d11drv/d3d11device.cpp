@@ -12,30 +12,6 @@
 namespace solunar
 {
 
-D3D11_PRIMITIVE_TOPOLOGY getD3D11PrimitiveTopology(PrimitiveMode primitiveMode)
-{
-	switch (primitiveMode)
-	{
-	case PM_LineList:
-		return D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
-
-	case PM_LineStrip:
-		return D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP;
-
-	case PM_TriangleList:
-		return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
-
-	case PM_TriangleStrip:
-		return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
-	
-	default:
-		break;
-	}
-
-	Assert2(0, "Unknowed or unsupported primitive mode");
-	return (D3D11_PRIMITIVE_TOPOLOGY)0;
-}
-
 D3D11Device::D3D11Device() :
 	m_device(nullptr),
 	m_deviceContext(nullptr)
@@ -251,13 +227,13 @@ void D3D11Device::SetScissors(float x, float y, float w, float h)
 
 void D3D11Device::Draw(PrimitiveMode primitiveMode, size_t verticesStart, size_t verticesCount)
 {
-	m_deviceContext->IASetPrimitiveTopology(getD3D11PrimitiveTopology(primitiveMode));
+	m_deviceContext->IASetPrimitiveTopology(GetD3D11PrimitiveTopology(primitiveMode));
 	m_deviceContext->Draw(verticesCount, verticesStart);
 }
 
 void D3D11Device::DrawIndexed(PrimitiveMode primitiveMode, size_t indexStart, size_t indexCount, int baseVertexLocation)
 {
-	m_deviceContext->IASetPrimitiveTopology(getD3D11PrimitiveTopology(primitiveMode));
+	m_deviceContext->IASetPrimitiveTopology(GetD3D11PrimitiveTopology(primitiveMode));
 	m_deviceContext->DrawIndexed(indexCount, indexStart, baseVertexLocation);
 }
 

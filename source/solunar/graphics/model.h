@@ -38,16 +38,16 @@ namespace solunar
 
 		void Render();
 
-		IBufferBase* getVertexBuffer() { return m_vertexBuffer; }
+		IBufferBase* GetVertexBuffer() { return m_vertexBuffer; }
 		IBufferBase* getIndexBuffer() { return m_indexBuffer; }
 
-		const uint32_t getVerticesCount() const { return m_verticesCount; }
+		const uint32_t GetVerticesCount() const { return m_verticesCount; }
 		const uint32_t getIndeciesCount() const { return m_indeciesCount; }
 
-		const glm::mat4 getTransform() const { return m_transform; }
+		const glm::mat4 GetTransform() const { return m_transform; }
 
 		std::weak_ptr<Material> getMaterial() { return m_material; }
-		std::shared_ptr<Material> lockMaterial();
+		std::shared_ptr<Material> LockMaterial();
 
 	private:
 		std::weak_ptr<Material> m_material;
@@ -85,7 +85,7 @@ namespace solunar
 
 		void saveBinary(const std::string& filename);
 
-		std::vector<SubMesh*>& getSubmehes() { return m_subMeshes; }
+		std::vector<SubMesh*>& GetSubmehes() { return m_subMeshes; }
 
 	private:
 		std::vector<SubMesh*> m_subMeshes;

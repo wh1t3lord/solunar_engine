@@ -9,6 +9,7 @@ namespace solunar
 	class IRenderTarget;
 	class ITexture2D;
 	class IShaderProgram;
+	class ISamplerState;
 
 	class ShadowsRenderer : public Singleton<ShadowsRenderer>
 	{
@@ -20,19 +21,30 @@ namespace solunar
 		void Init();
 		void Shutdown();
 
-		void beginRender();
-		void renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh);
-		void endRender();
+		void BeginRender();
+		void RenderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh);
+		void EndRender();
 
-		ITexture2D*			getTexture()				{ return m_shadowMap; }
+		ITexture2D*			GetTexture()				{ return m_shadowMap; }
+		ISamplerState*		GetSamplerState()			{ return m_shadowMapSampler; }
 		IShaderProgram*		getShader_StaticMesh()		{ return m_shadowShader_StaticMesh; }
 		IShaderProgram*		getShader_AnimationMesh()	{ return m_shadowShader_AnimationMesh; }
 
+		const glm::mat4&	GetLightViewMatrix()		{ return m_lightViewMatrix; }
+		const glm::mat4&	GetLightViewProjection()	{ return m_lightViewProjectionMatrix; }
+
 	private:
 		ITexture2D* m_shadowMap;
+		ISamplerState* m_shadowMapSampler;
 		IRenderTarget* m_shadowFbo;
 		IShaderProgram* m_shadowShader_StaticMesh;
 		IShaderProgram* m_shadowShader_AnimationMesh;
+
+		glm::mat4 m_lightViewMatrix;
+		glm::mat4 m_lightViewProjectionMatrix;
+
+		float m_znear;
+		float m_zfar;
 
 		Viewport m_originalViewport;
 	};
