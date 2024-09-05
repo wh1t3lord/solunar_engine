@@ -190,21 +190,8 @@ void ShockPlayerController::Update(float dt)
 	if (!s_font)
 		s_font = g_fontManager->CreateFont("textures/ui/RobotoMono-Bold.ttf", 32.0f);
 
-	static bool s_captureInput = true;
-
-	if (InputManager::GetInstance()->IsPressedWithReset(KEY_LEFT_CONTROL))
-		s_captureInput = !s_captureInput;
-
-	if (s_captureInput)
-	{
-		g_engineData.m_shouldCaptureMouse = true;
-		g_engineData.m_shouldHideMouse = true;
-	}
-	else
-	{
-		g_engineData.m_shouldCaptureMouse = false;
-		g_engineData.m_shouldHideMouse = false;
-	}
+	g_engineData.m_shouldCaptureMouse = true;
+	//g_engineData.m_shouldHideMouse = false;
 
 #if 0
 	// set position
@@ -238,7 +225,7 @@ void ShockPlayerController::Update(float dt)
 	UpdateCamera(dt);
 
 	// update player movement
-	//UpdateMovement(dt);
+	UpdateMovement(dt);
 
 	// update debug
 	DebugUpdate(dt);
@@ -267,9 +254,9 @@ void ShockPlayerController::UpdateCamera(float dt)
 	glm::quat rot = glm::eulerAngleYX(glm::radians(-m_camera->m_yaw), glm::radians(m_camera->m_pitch));
 
 	//m_weaponEntity->setRotation(glm::slerp(rot, m_weaponEntity->getRotation(), 55.0f * dt));
-//	m_weaponEntity->SetRotation(rot);
+	m_weaponEntity->SetRotation(rot);
 
-#if 1
+#if 0
 	 glm::vec3 cameraDirection = CameraProxy::GetInstance()->GetDirection();
 	 glm::vec3 pos = GetEntity()->GetPosition();
 	 float camSpeed = 8.0f * dt;
