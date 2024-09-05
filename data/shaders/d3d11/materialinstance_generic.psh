@@ -23,7 +23,7 @@ SamplerState		g_albedoSampler : register(s0);
 Texture2D 			g_normalTexture : register(t1);
 SamplerState		g_normalSampler : register(s1);
 
-Texture2D			g_shadowmapTexture : register(t5);
+Texture2D<float>	g_shadowmapTexture : register(t5);
 SamplerState		g_shadowmapSampler : register(s5);
 
 float ShadowCalculation(float4 fragPosLightSpace)
@@ -45,7 +45,9 @@ float ShadowCalculation(float4 fragPosLightSpace)
 	
     // check whether current frag pos is in shadow
     float shadow = currentDepth > closestDepth ? 1.0 : 0.0;
-	
+	if(closestDepth > 0.999999)
+		shadow = 0.0;
+
     return shadow;
 }
 

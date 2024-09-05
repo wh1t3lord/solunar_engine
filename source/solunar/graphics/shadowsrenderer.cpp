@@ -38,7 +38,7 @@ namespace solunar
 		m_lightViewMatrix = glm::mat4(1.0f);
 
 		m_znear = 1.0f;
-		m_zfar = 16.0f;
+		m_zfar = 4.0f;
 	}
 
 	ShadowsRenderer::~ShadowsRenderer()
@@ -89,11 +89,11 @@ namespace solunar
 			sizeof(g_animatedVertexInputLayout) / sizeof(g_animatedVertexInputLayout[0]));
 
 		SamplerDesc samplerDesc = {};
-		samplerDesc.m_minFilter = TextureFilter::LinearMipmapLinear;
-		samplerDesc.m_magFilter = TextureFilter::Linear;
-		samplerDesc.m_wrapS = TextureWrap::ClampToBorder;
-		samplerDesc.m_wrapT = TextureWrap::ClampToBorder;
-		samplerDesc.m_wrapRepeat = TextureWrap::ClampToBorder;
+		samplerDesc.m_minFilter = TextureFilter::Nearest;
+		samplerDesc.m_magFilter = TextureFilter::Nearest;
+		samplerDesc.m_wrapS = TextureWrap::ClampToEdge;
+		samplerDesc.m_wrapT = TextureWrap::ClampToEdge;
+		samplerDesc.m_wrapRepeat = TextureWrap::ClampToEdge;
 		samplerDesc.m_comparisonFunc = COMPARISON_LESS_EQUAL;
 		m_shadowMapSampler = g_stateManager->CreateSamplerState(samplerDesc);
 	}
@@ -113,10 +113,13 @@ namespace solunar
 		}
 	}
 
+	static glm::vec3 pos = glm::vec3(-2.0f, 2.0f, -1.0f);
+
 	void ShadowsRenderer::BeginRender()
 	{
 		ImGui::DragFloat("Z Near", &m_znear, 0.1f, 0.0f, 1.0f);
 		ImGui::DragFloat("Z Far", &m_zfar, 1.0f, 1.0f, 100.0f);
+		ImGui::DragFloat3("Pos", glm::value_ptr(pos), 1.0f, -100.0f, 100.0f);
 
 		m_originalViewport = g_renderDevice->GetViewport();
 
@@ -152,7 +155,7 @@ namespace solunar
 		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, m_znear, m_zfar);
 
 		// calculate view matrix for light
-		m_lightViewMatrix = glm::lookAt(glm::vec3(-2.0f, 2.0f, -1.0f),
+		m_lightViewMatrix = glm::lookAt(pos,
 										  glm::vec3( 0.0f, 0.0f,  0.0f), 
 										  glm::vec3( 0.0f, 1.0f,  0.0f));
 
