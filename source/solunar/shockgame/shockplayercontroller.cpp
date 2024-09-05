@@ -85,19 +85,19 @@ void ShockPlayerController::InitializeCamera()
 	ActivateCamera();
 
 	// create weapon
-	Entity* hackEntity = GetWorld()->CreateEntity();// GetEntity()->CreateChild();
+	Entity* hackEntity = GetEntity()->CreateChild();
 	hackEntity->QuaternionRotate(glm::vec3(0.0f, 1.0f, 0.0f), -90.0f);
 
 	m_weaponEntity = hackEntity->CreateChild();
-	m_weaponEntity->SetPosition(glm::vec3(0.2f, 3.5f, -0.3f));
+	m_weaponEntity->SetPosition(glm::vec3(0.2f, -3.5f, -0.3f));
 
 	// Load model
-	//m_weaponMesh = m_weaponEntity->CreateComponent<AnimatedMeshComponent>();
-	//m_weaponMesh->LoadModel("models/viewmodel_test.glb");
-	//
-	//std::weak_ptr<AnimatedModel> weaponModel = dynamicCastWeakPtr<AnimatedModel, ModelBase>(m_weaponMesh->getModel());
-	//int rootNodeIndex = weaponModel.lock()->GetNodeByName("Root Node");
-	//weaponModel.lock()->SetNodeScale(rootNodeIndex, glm::vec3(0.1f));
+	m_weaponMesh = m_weaponEntity->CreateComponent<AnimatedMeshComponent>();
+	m_weaponMesh->LoadModel("models/viewmodel_test.glb");
+
+	std::weak_ptr<AnimatedModel> weaponModel = dynamicCastWeakPtr<AnimatedModel, ModelBase>(m_weaponMesh->getModel());
+	int rootNodeIndex = weaponModel.lock()->GetNodeByName("Root Node");
+	weaponModel.lock()->SetNodeScale(rootNodeIndex, glm::vec3(0.1f));
 
 	// little hack #TODO: please remove ViewmodelAnimationController from shockgame.cpp
 	Component* viewmodelComponent = (Component*)TypeManager::GetInstance()->CreateObjectByName("ViewmodelAnimationController");
@@ -123,21 +123,8 @@ void ShockPlayerController::Update(float dt)
 	if (!s_font)
 		s_font = g_fontManager->CreateFont("textures/ui/RobotoMono-Bold.ttf", 32.0f);
 
-	static bool s_captureInput = true;
-
-	if (InputManager::GetInstance()->IsPressedWithReset(KEY_LEFT_CONTROL))
-		s_captureInput = !s_captureInput;
-
-	if (s_captureInput)
-	{
-		g_engineData.m_shouldCaptureMouse = true;
-		g_engineData.m_shouldHideMouse = true;
-	}
-	else
-	{
-		g_engineData.m_shouldCaptureMouse = false;
-		g_engineData.m_shouldHideMouse = false;
-	}
+	g_engineData.m_shouldCaptureMouse = true;
+	//g_engineData.m_shouldHideMouse = false;
 
 #if 0
 	// set position
@@ -171,7 +158,7 @@ void ShockPlayerController::Update(float dt)
 	UpdateCamera(dt);
 
 	// update player movement
-	//UpdateMovement(dt);
+	UpdateMovement(dt);
 
 	// update debug
 	DebugUpdate(dt);
@@ -228,9 +215,9 @@ void ShockPlayerController::UpdateCamera(float dt)
 
 	glm::quat rot = glm::eulerAngleYX(glm::radians(-m_camera->m_yaw), glm::radians(m_camera->m_pitch));
 	//m_weaponEntity->setRotation(glm::slerp(rot, m_weaponEntity->getRotation(), 55.0f * dt));
-//	m_weaponEntity->SetRotation(rot);
+	m_weaponEntity->SetRotation(rot);
 
-#if 1
+#if 0
 	 glm::vec3 cameraDirection = CameraProxy::GetInstance()->GetDirection();
 	 glm::vec3 pos = GetEntity()->GetPosition();
 	 float camSpeed = 8.0f * dt;
