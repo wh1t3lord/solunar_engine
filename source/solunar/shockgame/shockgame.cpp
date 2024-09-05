@@ -204,7 +204,7 @@ ViewmodelAnimationController::~ViewmodelAnimationController()
 void ViewmodelAnimationController::Update(float dt)
 {
 	AnimatedMeshComponent* animatedMeshComponent = GetEntity()->GetComponent<AnimatedMeshComponent>();
-	std::shared_ptr<ModelBase> modelBase = animatedMeshComponent->lockModel();
+	std::shared_ptr<ModelBase> modelBase = animatedMeshComponent->LockModel();
 	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
 	if (animatedModel) {
 		if (m_animationIndex == -1) {
