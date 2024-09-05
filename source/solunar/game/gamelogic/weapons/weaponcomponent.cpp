@@ -40,7 +40,7 @@ namespace solunar
 		static IFont* s_font = nullptr;
 
 		AnimatedMeshComponent* mesh = GetEntity()->GetComponent<AnimatedMeshComponent>();
-		std::shared_ptr<ModelBase> modelBase = mesh->lockModel();
+		std::shared_ptr<ModelBase> modelBase = mesh->LockModel();
 		AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
 		if (!m_inited) {
 			s_fireSound = AudioManager::GetInstance()->CreateSource("sounds/sfx/weapons/shotgun_fire.wav");

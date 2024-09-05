@@ -174,16 +174,6 @@ void Entity::SaveXML(tinyxml2::XMLElement& element)
 	}
 }
 
-glm::vec3 Entity::GetWorldPosition() const
-{
-	if (m_rootEntity) {
-		m_rootEntity->UpdateWorldTransform();
-		return glm::vec3(m_rootEntity->GetWorldTranslation() * glm::vec4(m_position, 1.0f));
-	}
-
-	return m_position;
-}
-
 void Entity::SetEulerRotation(const glm::vec3& rot)
 {
 	m_rotation = glm::quat_cast(glm::yawPitchRoll(rot.x, rot.y, rot.z));
