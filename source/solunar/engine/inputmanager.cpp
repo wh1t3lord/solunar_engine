@@ -31,9 +31,14 @@ bool InputManager::IsPressed(uint32_t key)
 bool InputManager::IsPressedWithReset(uint32_t key)
 {
 	Assert(key <= KEY_COUNT);
-	bool value = m_keys[key];
-	m_keys[key] = false;
-	return value;
+
+	if (m_keys[key])
+	{
+		m_keys[key] = false;
+		return true;
+	}
+
+	return false;
 }
 
 bool InputManager::IsMouseButtonPressed(MouseButtons buttonId)

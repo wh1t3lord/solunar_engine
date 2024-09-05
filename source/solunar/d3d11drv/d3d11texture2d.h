@@ -23,7 +23,7 @@ public:
 	SurfaceDesc getSurfaceDesc() override { return m_surfaceDesc; }
 	TextureDesc getTextureDesc() { return m_textureDesc; }
 
-	ID3D11Texture2D* getTexture() { return m_texture; }
+	ID3D11Texture2D* GetTexture() { return m_texture; }
 	ID3D11ShaderResourceView* getTextureSRV() { return m_textureSRV; }
 
 private:

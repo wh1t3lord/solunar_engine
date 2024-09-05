@@ -156,63 +156,34 @@ namespace solunar
 		TextureCubemap
 	};
 
-	struct TextureDesc
+	enum ComparsionFunction
 	{
-		TextureType m_textureType;
-		uint32_t m_width = 1;
-		uint32_t m_height = 1;
-		uint32_t m_mipmapLevel = 0;
-		ImageFormat m_format;
-		bool m_renderTargetUsage;
-		bool m_isStreamTexture = false;
+		COMPARISON_NEVER = 1,
+		COMPARISON_LESS = 2,
+		COMPARISON_EQUAL = 3,
+		COMPARISON_LESS_EQUAL = 4,
+		COMPARISON_GREATER = 5,
+		COMPARISON_NOT_EQUAL = 6,
+		COMPARISON_GREATER_EQUAL = 7,
+		COMPARISON_ALWAYS = 8
 	};
 
-	struct SurfaceDesc
+	enum DepthWriteMask
 	{
-		uint32_t m_width;
-		uint32_t m_height;
-		ImageFormat m_format;
+		DEPTH_WRITE_MASK_ZERO = 0,
+		DEPTH_WRITE_MASK_ALL = 1
 	};
 
-	struct SamplerDesc
+	enum StencilOperation
 	{
-		TextureFilter m_minFilter;
-		TextureFilter m_magFilter;
-		TextureWrap m_wrapS;
-		TextureWrap m_wrapT;
-		TextureWrap m_wrapRepeat;
-		float m_anisotropyLevel;
-	};
-
-	struct RasterizerStateDesc
-	{
-		FillMode m_fillMode;
-		CullMode m_cullMode;
-		bool m_frontCCW;
-		int m_depthBias;
-		float m_depthBiasClamp;
-		float m_slopeScaledDepthBias;
-		bool m_depthClipEnable;
-		bool m_scissorEnable;
-		bool m_multisampleEnable;
-		bool m_antialiasedLineEnable;
-	};
-
-	enum InputAligment
-	{
-		INPUT_PER_VERTEX_DATA = 0,
-		INPUT_PER_INSTANCE_DATA = 1
-	};
-
-	struct InputLayoutDesc
-	{
-		const char* m_semanticName;
-		uint32_t m_semanticIndex;
-		ImageFormat m_format;
-		uint32_t m_inputSlot;
-		uint32_t m_alignedByteOffset;
-		InputAligment m_inputSlotClass;
-		uint32_t m_instanceDataStepRate;
+		STENCIL_OP_KEEP = 1,
+		STENCIL_OP_ZERO = 2,
+		STENCIL_OP_REPLACE = 3,
+		STENCIL_OP_INCR_SAT = 4,
+		STENCIL_OP_DECR_SAT = 5,
+		STENCIL_OP_INVERT = 6,
+		STENCIL_OP_INCR = 7,
+		STENCIL_OP_DECR = 8
 	};
 
 	enum Blend
@@ -254,6 +225,66 @@ namespace solunar
 		COLOR_WRITE_ENABLE_ALL = (((COLOR_WRITE_ENABLE_RED | COLOR_WRITE_ENABLE_GREEN) | COLOR_WRITE_ENABLE_BLUE) | COLOR_WRITE_ENABLE_ALPHA)
 	};
 
+	enum InputAligment
+	{
+		INPUT_PER_VERTEX_DATA = 0,
+		INPUT_PER_INSTANCE_DATA = 1
+	};
+
+	struct TextureDesc
+	{
+		TextureType m_textureType;
+		uint32_t m_width = 1;
+		uint32_t m_height = 1;
+		uint32_t m_mipmapLevel = 0;
+		ImageFormat m_format;
+		bool m_renderTargetUsage;
+		bool m_isStreamTexture = false;
+	};
+
+	struct SurfaceDesc
+	{
+		uint32_t m_width;
+		uint32_t m_height;
+		ImageFormat m_format;
+	};
+
+	struct SamplerDesc
+	{
+		TextureFilter m_minFilter;
+		TextureFilter m_magFilter;
+		TextureWrap m_wrapS;
+		TextureWrap m_wrapT;
+		TextureWrap m_wrapRepeat;
+		ComparsionFunction m_comparisonFunc;
+		float m_anisotropyLevel;
+	};
+
+	struct RasterizerStateDesc
+	{
+		FillMode m_fillMode;
+		CullMode m_cullMode;
+		bool m_frontCCW;
+		int m_depthBias;
+		float m_depthBiasClamp;
+		float m_slopeScaledDepthBias;
+		bool m_depthClipEnable;
+		bool m_scissorEnable;
+		bool m_multisampleEnable;
+		bool m_antialiasedLineEnable;
+	};
+
+	struct InputLayoutDesc
+	{
+		const char* m_semanticName;
+		uint32_t m_semanticIndex;
+		ImageFormat m_format;
+		uint32_t m_inputSlot;
+		uint32_t m_alignedByteOffset;
+		InputAligment m_inputSlotClass;
+		uint32_t m_instanceDataStepRate;
+	};
+
 	struct RenderTargetBlendDesc
 	{
 		bool m_blendEnable;
@@ -271,36 +302,6 @@ namespace solunar
 		bool m_alphaToCoverageEnable;
 		bool m_independentBlendEnable;
 		RenderTargetBlendDesc m_renderTarget[8];
-	};
-
-	enum ComparsionFunction
-	{
-		COMPARISON_NEVER = 1,
-		COMPARISON_LESS = 2,
-		COMPARISON_EQUAL = 3,
-		COMPARISON_LESS_EQUAL = 4,
-		COMPARISON_GREATER = 5,
-		COMPARISON_NOT_EQUAL = 6,
-		COMPARISON_GREATER_EQUAL = 7,
-		COMPARISON_ALWAYS = 8
-	};
-
-	enum DepthWriteMask
-	{
-		DEPTH_WRITE_MASK_ZERO = 0,
-		DEPTH_WRITE_MASK_ALL = 1
-	};
-
-	enum StencilOperation
-	{
-		STENCIL_OP_KEEP = 1,
-		STENCIL_OP_ZERO = 2,
-		STENCIL_OP_REPLACE = 3,
-		STENCIL_OP_INCR_SAT = 4,
-		STENCIL_OP_DECR_SAT = 5,
-		STENCIL_OP_INVERT = 6,
-		STENCIL_OP_INCR = 7,
-		STENCIL_OP_DECR = 8
 	};
 
 	struct DepthStencilOperationDesc

@@ -48,6 +48,9 @@ namespace solunar
 	ISamplerState* g_defaultSampler = nullptr;
 	IDepthStencilState* g_depthStencilState_NoWrite = nullptr;
 
+	IDepthStencilState* g_depthStencilState_Default = nullptr;
+	IRasterizerState* g_rasterizerState_Default = nullptr;
+
 	Renderer::Renderer()
 	{
 		m_meshPolysWireframe	= false;
@@ -79,6 +82,7 @@ namespace solunar
 		samplerDesc.m_wrapT = TextureWrap::Repeat;
 		samplerDesc.m_minFilter = TextureFilter::Nearest;
 		samplerDesc.m_magFilter = TextureFilter::Nearest;
+		samplerDesc.m_comparisonFunc = COMPARISON_ALWAYS;
 		g_defaultSampler = g_renderDevice->CreateSamplerState(samplerDesc);
 
 		DepthStencilDesc desc = {};
@@ -92,6 +96,48 @@ namespace solunar
 		g_depthStencilState_NoWrite = g_stateManager->CreateDepthStencilState(desc);
 
 		g_defaultMaterial = g_contentManager->LoadObject<Material>("materials/default_material.xml");
+
+
+
+
+
+
+
+		RasterizerStateDesc rasterizerState;
+		memset(&rasterizerState, 0, sizeof(rasterizerState));
+		rasterizerState.m_cullMode = CullMode::Back;
+		rasterizerState.m_frontCCW = true;
+		rasterizerState.m_fillMode = FillMode::Solid;
+		g_rasterizerState_Default = g_stateManager->CreateRasterizerState(rasterizerState);
+
+
+
+		DepthStencilDesc depthStencilDesc;
+		memset(&depthStencilDesc, 0, sizeof(depthStencilDesc));
+
+		// Depth test parameters
+		depthStencilDesc.m_depthEnable = true;
+		depthStencilDesc.m_depthWriteMask = DEPTH_WRITE_MASK_ALL;
+		depthStencilDesc.m_depthFunc = COMPARISON_LESS;
+
+		// Stencil test parameters
+		depthStencilDesc.m_stencilEnable = true;
+		depthStencilDesc.m_stencilReadMask = 0xFF;
+		depthStencilDesc.m_stencilWriteMask = 0xFF;
+
+		// Stencil operations if pixel is front-facing
+		depthStencilDesc.m_frontFace.m_stencilFailOp = STENCIL_OP_KEEP;
+		depthStencilDesc.m_frontFace.m_stencilDepthFailOp = STENCIL_OP_INCR;
+		depthStencilDesc.m_frontFace.m_stencilPassOp = STENCIL_OP_KEEP;
+		depthStencilDesc.m_frontFace.m_stencilFunc = COMPARISON_ALWAYS;
+
+		// Stencil operations if pixel is back-facing
+		depthStencilDesc.m_backFace.m_stencilFailOp = STENCIL_OP_KEEP;
+		depthStencilDesc.m_backFace.m_stencilDepthFailOp = STENCIL_OP_DECR;
+		depthStencilDesc.m_backFace.m_stencilPassOp = STENCIL_OP_KEEP;
+		depthStencilDesc.m_backFace.m_stencilFunc = COMPARISON_ALWAYS;
+
+		g_depthStencilState_Default = g_stateManager->CreateDepthStencilState(depthStencilDesc);
 
 		// Load textures
 		//g_defaultTexture = g_contentManager->LoadObject<TextureMap>("textures/default.png");
@@ -175,7 +221,7 @@ namespace solunar
 
 		AnimatedModelRenderer::GetInstance()->Init();
 
-//		ShadowsRenderer::GetInstance()->Init();
+		ShadowsRenderer::GetInstance()->Init();
 	}
 
 	void Renderer::Shutdown()
@@ -253,10 +299,10 @@ namespace solunar
 	{
 		//OPTICK_EVENT("Renderer::RenderWorld");
 
-		//renderShadows(view);
+		RenderShadows(view);
 	
 		g_renderDevice->SetRenderTarget(m_screenRenderTarget);
-		clearRenderTarget(m_screenRenderTarget);
+		ClearRenderTarget(m_screenRenderTarget);
 
 		// get camera
 		Camera* camera = CameraProxy::GetInstance();
@@ -281,7 +327,7 @@ namespace solunar
 						AnimatedModelRenderer::GetInstance()->Render((AnimatedMeshComponent*)meshComponent);
 
 					// call render function
-					renderMesh(world->GetGraphicsWorld(), view, meshComponent);
+					RenderMesh(world->GetGraphicsWorld(), view, meshComponent);
 
 					meshComponent->Render();
 				}
@@ -289,6 +335,40 @@ namespace solunar
 		}
 
 		g_debugRender.RenderFrame(view);
+	}
+
+	void Renderer::RenderShadows(View* view)
+	{
+		//OPTICK_EVENT("Renderer::RenderShadows");
+
+		ShadowsRenderer::GetInstance()->BeginRender();
+
+		// get camera
+		Camera* camera = CameraProxy::GetInstance();
+
+		World* world = Engine::ms_world;
+		if (world)
+		{
+			const std::vector<MeshComponent*>& drawableEntities = world->GetGraphicsWorld()->GetMeshes();
+
+			// color pass
+			for (auto meshComponent : drawableEntities)
+			{
+				if (!meshComponent->IsCastingShadow())
+					continue;
+
+				Entity* entity = meshComponent->GetEntity();
+				if (entity)
+				{
+					ShadowsRenderer::GetInstance()->RenderMesh(
+						world->GetGraphicsWorld(),
+						view,
+						meshComponent);
+				}
+			}
+		}
+
+		ShadowsRenderer::GetInstance()->EndRender();
 	}
 
 	void Renderer::RenderView(View* view)
@@ -325,7 +405,9 @@ namespace solunar
 		g_stateManager->SetDepthStencilState(g_depthStencilState_NoWrite, 0);
 
 		// draw
-//		ScreenQuad::render( m_screenColorTexture );
+		//ScreenQuad::Render( m_screenColorTexture );
+
+		//ScreenQuad::Render(ShadowsRenderer::GetInstance()->GetTexture());
 
 		g_fontManager->FlushPrimitives();
 
@@ -509,6 +591,12 @@ namespace solunar
 		BeginFrame();
 		ImGui::Text("Loading ...");
 		EndFrame();
+	}
+
+	void Renderer::SetDefaultRenderState()
+	{
+		g_stateManager->SetDepthStencilState(g_depthStencilState_Default, 0);
+		g_stateManager->SetRasterizerState(g_rasterizerState_Default);
 	}
 
 	std::weak_ptr<Material> GetDefaultMaterial()

@@ -44,20 +44,21 @@ namespace solunar
 		virtual void EndFrame();
 
 		void RenderWorld(View* view);
+		void RenderShadows(View* view);
 
 		void RenderView(View* view);
 		void RenderSky(View* view, SkyMeshComponent* skyMesh);
 		void SetupLights(GraphicsWorld* graphicsWorld);
 	
-		virtual void bindMaterialForMesh(MeshComponent* mesh, Material* material, IMaterialInstance* materialInstance) = 0;
+		virtual void BindMaterialForMesh(MeshComponent* mesh, Material* material, IMaterialInstance* materialInstance) = 0;
 
-		virtual void renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh) = 0;
+		virtual void RenderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh) = 0;
 		virtual void renderShadows(View* view) = 0;
 
 		virtual void TakeScreenshot() = 0;
 		
 		virtual void clearScreen() = 0;
-		virtual void clearRenderTarget( IRenderTarget* renderTarget ) = 0;
+		virtual void ClearRenderTarget( IRenderTarget* renderTarget ) = 0;
 	 
 		virtual void setSwapChainRenderTarget() = 0;
 
@@ -71,6 +72,10 @@ namespace solunar
 		IRenderTarget* getSwapChainRenderTarget() { return m_swapChainRenderTarget; }
 
 		void RenderLoadscreen();
+
+		// New API
+
+		void SetDefaultRenderState();
 
 	protected:
 		ITexture2D* m_screenColorTexture;

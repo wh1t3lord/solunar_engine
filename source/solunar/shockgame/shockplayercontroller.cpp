@@ -190,8 +190,21 @@ void ShockPlayerController::Update(float dt)
 	if (!s_font)
 		s_font = g_fontManager->CreateFont("textures/ui/RobotoMono-Bold.ttf", 32.0f);
 
-	g_engineData.m_shouldCaptureMouse = true;
-	//g_engineData.m_shouldHideMouse = false;
+	static bool s_captureInput = true;
+
+	if (InputManager::GetInstance()->IsPressedWithReset(KEY_LEFT_CONTROL))
+		s_captureInput = !s_captureInput;
+
+	if (s_captureInput)
+	{
+		g_engineData.m_shouldCaptureMouse = true;
+		g_engineData.m_shouldHideMouse = true;
+	}
+	else
+	{
+		g_engineData.m_shouldCaptureMouse = false;
+		g_engineData.m_shouldHideMouse = false;
+	}
 
 #if 0
 	// set position
@@ -225,7 +238,7 @@ void ShockPlayerController::Update(float dt)
 	UpdateCamera(dt);
 
 	// update player movement
-	UpdateMovement(dt);
+	//UpdateMovement(dt);
 
 	// update debug
 	DebugUpdate(dt);
@@ -252,24 +265,26 @@ void ShockPlayerController::UpdateCamera(float dt)
 	 m_camera->updateFromMousePosition(deltaMousePos);
 
 	glm::quat rot = glm::eulerAngleYX(glm::radians(-m_camera->m_yaw), glm::radians(m_camera->m_pitch));
-	m_weaponEntity->SetRotation(rot);
 
-#if 0
+	//m_weaponEntity->setRotation(glm::slerp(rot, m_weaponEntity->getRotation(), 55.0f * dt));
+//	m_weaponEntity->SetRotation(rot);
+
+#if 1
 	 glm::vec3 cameraDirection = CameraProxy::GetInstance()->GetDirection();
 	 glm::vec3 pos = GetEntity()->GetPosition();
 	 float camSpeed = 8.0f * dt;
 
-	 if (input->getKey(KeyboardKeys::KEY_LEFT_SHIFT))
+	 if (input->IsPressed(KeyboardKeys::KEY_LEFT_SHIFT))
 		 camSpeed = 18.0f * dt;
 	 
-	 if (input->getKey(KeyboardKeys::KEY_W))
+	 if (input->IsPressed(KeyboardKeys::KEY_W))
 	 	pos += camSpeed * cameraDirection;
-	 if (input->getKey(KeyboardKeys::KEY_S))
+	 if (input->IsPressed(KeyboardKeys::KEY_S))
 	 	pos -= camSpeed * cameraDirection;
 	 
-	 if (input->getKey(KeyboardKeys::KEY_A))
+	 if (input->IsPressed(KeyboardKeys::KEY_A))
 	 	pos -= glm::normalize(glm::cross(cameraDirection, glm::vec3(0.0f, 1.0f, 0.0f))) * camSpeed;
-	 if (input->getKey(KeyboardKeys::KEY_D))
+	 if (input->IsPressed(KeyboardKeys::KEY_D))
 	 	pos += glm::normalize(glm::cross(cameraDirection, glm::vec3(0.0f, 1.0f, 0.0f))) * camSpeed;
 	 
 	 GetEntity()->SetPosition(pos);

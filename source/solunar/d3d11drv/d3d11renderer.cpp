@@ -24,6 +24,7 @@
 // Graphics managers
 #include "graphics/ShaderProgramManager.h"
 #include "graphics/shaderconstantmanager.h"
+#include "graphics/shadowsrenderer.h"
 
 #include "main/main.h"
 
@@ -74,7 +75,6 @@ D3D11Renderer::D3D11Renderer() :
 	m_depthStencilTexture(nullptr),
 	m_depthStencilView(nullptr),
 	m_depthStencilState(nullptr),
-	m_rasterizerState(nullptr),
 	m_swapChain(nullptr),
 	m_takeScreenshot(false)
 {
@@ -102,8 +102,6 @@ void D3D11Renderer::Init()
 	// Initialize device state manager
 	g_stateManager = mem_new<D3D11StateManager>();
 	g_d3d11StateManager->Init();
-
-	CreateRasterizerState();
 
 	// Initialize shader manager with current api
 	g_shaderManager = mem_new<D3D11ShaderProgramManager>();
@@ -220,18 +218,6 @@ void D3D11Renderer::createSwapChain()
 	device->getDeviceContext()->OMSetDepthStencilState(m_depthStencilState, 0);
 }
 
-void D3D11Renderer::CreateRasterizerState()
-{
-	RasterizerStateDesc rasterizerState;
-	memset(&rasterizerState, 0, sizeof(rasterizerState));
-	rasterizerState.m_cullMode = CullMode::Back;
-	rasterizerState.m_frontCCW = true;
-	rasterizerState.m_fillMode = FillMode::Solid;
-
-	m_rasterizerState = g_stateManager->CreateRasterizerState(rasterizerState);
-	g_stateManager->SetRasterizerState(m_rasterizerState);
-}
-
 void D3D11Renderer::Shutdown()
 {
 	Renderer::Shutdown();
@@ -299,9 +285,9 @@ void D3D11Renderer::EndFrame()
 	m_swapChain->Present(0, 0);
 }
 
-void D3D11Renderer::bindMaterialForMesh(MeshComponent* mesh, Material* material, IMaterialInstance* materialInstance)
+void D3D11Renderer::BindMaterialForMesh(MeshComponent* mesh, Material* material, IMaterialInstance* materialInstance)
 {
-	// OPTICK_EVENT("D3D11Renderer::bindMaterialForMesh");
+	// OPTICK_EVENT("D3D11Renderer::BindMaterialForMesh");
 
 	Assert(mesh);
 	Assert(material);
@@ -350,7 +336,7 @@ void D3D11Renderer::bindMaterialForMesh(MeshComponent* mesh, Material* material,
 
 	// bind point lights
 //	if (StaticMeshComponent* staticMesh = dynamicCast<StaticMeshComponent>(mesh))
-//		ShaderConstantManager::GetInstance()->setStaticMeshGlobalData(staticMesh, view, )
+//		ShaderConstantManager::GetInstance()->SetGlobalData(staticMesh, view, )
 
 	//shaderProgram->setInteger("u_lightsCount", mesh->m_world->getWorldComponent<GraphicsWorld>()->getLightManager()->getLights().size());
 	//ShaderConstantManager::GetInstance()->setPointLightConstantBuffer();
@@ -358,32 +344,41 @@ void D3D11Renderer::bindMaterialForMesh(MeshComponent* mesh, Material* material,
 #endif
 }
 
-void D3D11Renderer::renderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
+void D3D11Renderer::RenderMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
 {
-	// OPTICK_EVENT("D3D11Renderer::renderMesh");
+	// OPTICK_EVENT("D3D11Renderer::RenderMesh");
 
 	// Set depth stencil state
 	g_d3d11Device->getDeviceContext()->OMSetDepthStencilState(m_depthStencilState, 0);
-	g_stateManager->SetRasterizerState(m_rasterizerState);
+	
+	SetDefaultRenderState();
+	
+	// set shadowmap
+
+	const int kShadowMapIndex = 5;
+	g_renderDevice->SetTexture2D(kShadowMapIndex, ShadowsRenderer::GetInstance()->GetTexture());
+	g_renderDevice->SetSamplerState(kShadowMapIndex, ShadowsRenderer::GetInstance()->GetSamplerState());
+
+	//g_stateManager->SetRasterizerState(m_rasterizerState);
 
 	// setup lights
 	SetupLights(graphicsWorld);
 
 	if (mesh->IsA<AnimatedMeshComponent>())
-		renderAnimatedMesh(graphicsWorld, view, mesh);
+		RenderAnimatedMesh(graphicsWorld, view, mesh);
 	else
-		renderStaticMesh(graphicsWorld, view, mesh);
+		RenderStaticMesh(graphicsWorld, view, mesh);
 }
 
-void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
+void D3D11Renderer::RenderStaticMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
 {
-	// OPTICK_EVENT("D3D11Renderer::renderStaticMesh");
+	// OPTICK_EVENT("D3D11Renderer::RenderStaticMesh");
 
 	D3DPERF_BeginEvent(D3DCOLOR_XRGB(255, 0, 0), L"RenderStaticMesh");
 
-	std::shared_ptr<ModelBase> model = mesh->lockModel();
+	std::shared_ptr<ModelBase> model = mesh->LockModel();
 
-	for (const auto& submesh : model->getSubmehes())
+	for (const auto& submesh : model->GetSubmehes())
 	{
 		// create saved render ctx as previous model.
 		RenderContext savedCtx = RenderContext::GetContext();
@@ -392,7 +387,7 @@ void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 		RenderContext localCtx = RenderContext::GetContext();
 
 		// and overwrite model matrix
-		localCtx.model = savedCtx.model * submesh->getTransform();
+		localCtx.model = savedCtx.model * submesh->GetTransform();
 
 		// transpose matrices for D3D11
 		//localCtx.model = glm::transpose(localCtx.model);
@@ -400,16 +395,16 @@ void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 		// set our local render ctx
 		RenderContext::SetContext(localCtx);
 
-		g_renderDevice->SetVertexBuffer(submesh->getVertexBuffer(), sizeof(Vertex), 0);
+		g_renderDevice->SetVertexBuffer(submesh->GetVertexBuffer(), sizeof(Vertex), 0);
 
 		//g_renderDevice->SetIndexBuffer(it->getIndexBuffer());
 
 		//it->getMaterial()->bind();
 
-		std::shared_ptr<Material> material = submesh->lockMaterial();
-		bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
+		std::shared_ptr<Material> material = submesh->LockMaterial();
+		BindMaterialForMesh(mesh, material.get(), material->GetMaterialInstance());
 
-		ShaderConstantManager::GetInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
+		ShaderConstantManager::GetInstance()->SetGlobalData(mesh, view, localCtx, graphicsWorld);
 
 		// install polygon fill mode based on which mode set now
 
@@ -418,7 +413,7 @@ void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 		{
 			// render mesh normaly
 			//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
-			//glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
+			//glDrawArrays(GL_TRIANGLES, 0, it->GetVerticesCount());
 
 			// set polygon fill to lines
 		//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -433,11 +428,11 @@ void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 			m_currentViewMode = RendererViewMode::Wireframe;
 
 			// bind material again
-			bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
+			BindMaterialForMesh(mesh, material.get(), material->GetMaterialInstance());
 
 			// draw with lines
-			g_renderDevice->Draw(PM_TriangleList, 0, submesh->getVerticesCount());
-			//glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
+			g_renderDevice->Draw(PM_TriangleList, 0, submesh->GetVerticesCount());
+			//glDrawArrays(GL_TRIANGLES, 0, it->GetVerticesCount());
 			//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
 
 			// reset view mode
@@ -451,8 +446,8 @@ void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 		//	if (getRenderMode() == RendererViewMode::Wireframe)
 		//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-			g_renderDevice->Draw(PM_TriangleList, 0, submesh->getVerticesCount());
-		//	glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
+			g_renderDevice->Draw(PM_TriangleList, 0, submesh->GetVerticesCount());
+		//	glDrawArrays(GL_TRIANGLES, 0, it->GetVerticesCount());
 			//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
 
 			// reset
@@ -467,13 +462,16 @@ void D3D11Renderer::renderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 	D3DPERF_EndEvent();
 }
 
-void D3D11Renderer::renderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
+void D3D11Renderer::RenderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view, MeshComponent* mesh)
 {
-	// OPTICK_EVENT("D3D11Renderer::renderAnimatedMesh");
+	// OPTICK_EVENT("D3D11Renderer::RenderAnimatedMesh");
+
+	std::shared_ptr<ModelBase> model = mesh->LockModel();
+	if (!model)
+		return;
 
 	D3DPERF_BeginEvent(D3DCOLOR_XRGB(255, 0, 0), L"RenderAnimatedMesh");
 
-	std::shared_ptr<ModelBase> model = mesh->lockModel();
 	AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(model.get());
 
 	for (const auto& submesh : animatedModel->GetAnimatedSubmehes())
@@ -498,9 +496,9 @@ void D3D11Renderer::renderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view,
 		//it->getMaterial()->bind();
 
 		std::shared_ptr<Material> material = submesh->m_material.lock();
-		bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
+		BindMaterialForMesh(mesh, material.get(), material->GetMaterialInstance());
 
-		ShaderConstantManager::GetInstance()->setStaticMeshGlobalData(mesh, view, localCtx, graphicsWorld);
+		ShaderConstantManager::GetInstance()->SetGlobalData(mesh, view, localCtx, graphicsWorld);
 
 		// install polygon fill mode based on which mode set now
 
@@ -509,7 +507,7 @@ void D3D11Renderer::renderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view,
 		{
 			// render mesh normaly
 			//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
-			//glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
+			//glDrawArrays(GL_TRIANGLES, 0, it->GetVerticesCount());
 
 			// set polygon fill to lines
 		//	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -524,12 +522,12 @@ void D3D11Renderer::renderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view,
 			m_currentViewMode = RendererViewMode::Wireframe;
 
 			// bind material again
-			bindMaterialForMesh(mesh, material.get(), material->getMaterialInstance());
+			BindMaterialForMesh(mesh, material.get(), material->GetMaterialInstance());
 
 			// draw with lines
 			g_renderDevice->DrawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
 			//g_renderDevice->Draw(PM_TriangleList, 0, submesh->m_verticesCount);
-			//glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
+			//glDrawArrays(GL_TRIANGLES, 0, it->GetVerticesCount());
 			//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
 
 			// reset view mode
@@ -545,7 +543,7 @@ void D3D11Renderer::renderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view,
 
 			g_renderDevice->DrawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
 			//g_renderDevice->Draw(PM_TriangleList, 0, submesh->m_verticesCount);
-			//	glDrawArrays(GL_TRIANGLES, 0, it->getVerticesCount());
+			//	glDrawArrays(GL_TRIANGLES, 0, it->GetVerticesCount());
 				//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
 
 				// reset
@@ -647,7 +645,7 @@ void D3D11Renderer::clearScreen()
 	}
 }
 
-void D3D11Renderer::clearRenderTarget(IRenderTarget* renderTarget)
+void D3D11Renderer::ClearRenderTarget(IRenderTarget* renderTarget)
 {
 	D3D11RenderTarget* d3dRenderTarget = (D3D11RenderTarget*)renderTarget;
 	if (d3dRenderTarget)

@@ -13,6 +13,7 @@
 #include "graphics/imguimanager.h"
 #include "graphics/graphicsworld.h"
 #include "graphics/light.h"
+#include "graphics/shadowsrenderer.h"
 
 namespace solunar
 {
@@ -110,9 +111,9 @@ namespace solunar
 	}
 
 
-	void ShaderConstantManager::setStaticMeshGlobalData(MeshComponent* meshComponent, View* view, RenderContext& renderContext, GraphicsWorld* graphicsWorld)
+	void ShaderConstantManager::SetGlobalData(MeshComponent* meshComponent, View* view, RenderContext& renderContext, GraphicsWorld* graphicsWorld)
 	{
-		// OPTICK_EVENT("ShaderConstantManager::setStaticMeshGlobalData");
+		// OPTICK_EVENT("ShaderConstantManager::SetGlobalData");
 
 		StaticMeshGlobalData* globalData = (StaticMeshGlobalData*)g_staticMeshConstantBuffer->Map(BufferMapping::WriteOnly);
 		globalData->m_modelMatrix = renderContext.model;
@@ -123,6 +124,10 @@ namespace solunar
 		modelViewProjection = renderContext.proj * renderContext.view * renderContext.model;
 
 		globalData->m_modelViewProjection = modelViewProjection;
+
+		globalData->m_LightView				= ShadowsRenderer::GetInstance()->GetLightViewMatrix();
+		globalData->m_LightViewProjection	= ShadowsRenderer::GetInstance()->GetLightViewProjection();
+		globalData->m_inverseViewProjection = glm::inverse(renderContext.proj * renderContext.view);
 
 		Camera* camera = CameraProxy::GetInstance();
 		globalData->m_viewPos = glm::vec4(camera->GetPosition(), 0.0f);

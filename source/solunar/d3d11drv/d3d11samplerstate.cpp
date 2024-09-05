@@ -7,7 +7,7 @@ namespace solunar
 // ANGLE - renderer11_utils.cpp - ConvertFilter
 // https://chromium.googlesource.com/angle/angle/+/563e45aabaed2bba173236f0b9d47eaacb2a813a/src/libANGLE/renderer/d3d/d3d11/renderer11_utils.cpp
 
-D3D11_FILTER getD3D11Filter(const SamplerDesc& samplerDesc)
+D3D11_FILTER GetD3D11Filter(const SamplerDesc& samplerDesc)
 {
 	if (samplerDesc.m_anisotropyLevel > 1.0f)
 		return D3D11_ENCODE_ANISOTROPIC_FILTER(FALSE);
@@ -75,7 +75,7 @@ D3D11_FILTER getD3D11Filter(const SamplerDesc& samplerDesc)
 	return D3D11_ENCODE_BASIC_FILTER(minFilter, magFilter, mipFilter, FALSE);
 }
 
-D3D11_TEXTURE_ADDRESS_MODE getD3D11AddressMode(TextureWrap textureWrap)
+D3D11_TEXTURE_ADDRESS_MODE GetD3D11AddressMode(TextureWrap textureWrap)
 {
 	switch (textureWrap)
 	{
@@ -114,13 +114,23 @@ void D3D11SamplerState::Create(D3D11Device* device, const SamplerDesc& samplerDe
 {
 	Assert2(device, "Failed to create sampler state without initialized device.");
 
+	Assert2(samplerDesc.m_comparisonFunc != 0, "SamplerDesc doesn't have comprassion function.");
+
 	D3D11_SAMPLER_DESC d3d11SamplerDesc;
 	memset(&d3d11SamplerDesc, 0, sizeof(d3d11SamplerDesc));
-	d3d11SamplerDesc.Filter			= getD3D11Filter(samplerDesc);
-	d3d11SamplerDesc.AddressU		= getD3D11AddressMode(samplerDesc.m_wrapS);
-	d3d11SamplerDesc.AddressV		= getD3D11AddressMode(samplerDesc.m_wrapT);
-	d3d11SamplerDesc.AddressW		= getD3D11AddressMode(samplerDesc.m_wrapRepeat);
+	d3d11SamplerDesc.Filter			= GetD3D11Filter(samplerDesc);
+	d3d11SamplerDesc.AddressU		= GetD3D11AddressMode(samplerDesc.m_wrapS);
+	d3d11SamplerDesc.AddressV		= GetD3D11AddressMode(samplerDesc.m_wrapT);
+	d3d11SamplerDesc.AddressW		= GetD3D11AddressMode(samplerDesc.m_wrapRepeat);
 	d3d11SamplerDesc.MaxAnisotropy	= samplerDesc.m_anisotropyLevel;
+	d3d11SamplerDesc.ComparisonFunc = GetD3DComparsionFunc(samplerDesc.m_comparisonFunc);
+	d3d11SamplerDesc.MaxLOD			= D3D11_FLOAT32_MAX;
+
+	// #TODO: HACK FOR SHADOW MAPPING!!!! MOVE TO SamplerDesc and ShadowsRenderer !!!! 
+	d3d11SamplerDesc.BorderColor[0] =
+		d3d11SamplerDesc.BorderColor[1] =
+		d3d11SamplerDesc.BorderColor[2] =
+		d3d11SamplerDesc.BorderColor[3] = 10000.0f;
 
 	D3D11_CHECK(device->getDevice()->CreateSamplerState(&d3d11SamplerDesc, &m_samplerState));
 }

@@ -38,6 +38,9 @@ namespace solunar
 		glm::mat4 m_viewMatrix;
 		glm::mat4 m_projectionMatrix;
 		glm::mat4 m_modelViewProjection;
+		glm::mat4 m_LightView;
+		glm::mat4 m_LightViewProjection;
+		glm::mat4 m_inverseViewProjection;
 
 		glm::vec4 m_viewPos;
 		glm::vec4 m_viewDir;
@@ -86,7 +89,7 @@ namespace solunar
 	
 		ConstantBufferProxy get(const std::string& name);
 
-		void setStaticMeshGlobalData(MeshComponent* meshComponent, View* view, RenderContext& renderContext, GraphicsWorld* graphicsWorld);
+		void SetGlobalData(MeshComponent* meshComponent, View* view, RenderContext& renderContext, GraphicsWorld* graphicsWorld);
 
 		void getConstantBuffers(std::unordered_map<std::string, IBufferBase*>& map);
 

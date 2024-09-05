@@ -63,10 +63,10 @@ namespace solunar
 
 		std::string& GetName() { return m_materialName; }
 
-		std::weak_ptr<TextureMap> getTexture(MAT_TEX tex);
+		std::weak_ptr<TextureMap> GetTexture(MAT_TEX tex);
 		MaterialType getMaterialType() { return m_materialType; }
 
-		IMaterialInstance* getMaterialInstance() { return m_materialInstance; }
+		IMaterialInstance* GetMaterialInstance() { return m_materialInstance; }
 
 		// #TODO: VERY BAD, LIKE GETTERS
 	public:

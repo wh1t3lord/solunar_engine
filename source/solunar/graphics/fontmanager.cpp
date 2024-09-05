@@ -68,7 +68,7 @@ void FontManager::InitPrivate()
 	fontSamplerDesc.m_wrapS = TextureWrap::ClampToEdge;
 	fontSamplerDesc.m_wrapT = TextureWrap::ClampToEdge;
 	fontSamplerDesc.m_anisotropyLevel = 1.0f;
-
+	fontSamplerDesc.m_comparisonFunc = COMPARISON_ALWAYS;
 	m_textureSampler = g_renderDevice->CreateSamplerState(fontSamplerDesc);
 
 	// create characters buffer

@@ -142,6 +142,7 @@ void PostFxManager::initBlur(View* view)
 	hdrPinPongSamplerDesc.m_wrapT = TextureWrap::ClampToEdge;
 	hdrPinPongSamplerDesc.m_wrapRepeat = TextureWrap::ClampToEdge;
 	hdrPinPongSamplerDesc.m_anisotropyLevel = 1.0f;
+	hdrPinPongSamplerDesc.m_comparisonFunc = COMPARISON_ALWAYS;
 	m_hdrPinPongSampler = g_renderDevice->CreateSamplerState(hdrPinPongSamplerDesc);
 
 	m_blurPassProgram = g_shaderManager->CreateShaderProgram(

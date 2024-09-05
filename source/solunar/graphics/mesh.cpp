@@ -15,7 +15,8 @@ namespace solunar {
 		g_typeManager->RegisterObject<MeshComponent>();
 	}
 
-	MeshComponent::MeshComponent()
+	MeshComponent::MeshComponent() :
+		m_castShadows(true)
 	{
 	}
 
@@ -40,6 +41,10 @@ namespace solunar {
 				Core::Msg("WARNING: MeshComponent at entity(0x%p) has empty filename attribute in Model element!", GetEntity());
 			}
 		}
+
+		tinyxml2::XMLElement* castShadowElement = element.FirstChildElement("CastShadow");
+		if (castShadowElement)
+			castShadowElement->QueryBoolAttribute("value", &m_castShadows);
 	}
 
 	void MeshComponent::SaveXML(tinyxml2::XMLElement& element)
@@ -70,7 +75,7 @@ namespace solunar {
 		m_model = g_contentManager->LoadObject<ModelBase>(filename);
 	}
 
-	std::shared_ptr<ModelBase> MeshComponent::lockModel()
+	std::shared_ptr<ModelBase> MeshComponent::LockModel()
 	{
 		return m_model.lock();
 	}

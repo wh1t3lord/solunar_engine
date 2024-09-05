@@ -250,7 +250,7 @@ namespace solunar
 			desc.m_wrapT = TextureWrap::Repeat;
 			desc.m_wrapRepeat = TextureWrap::Repeat;
 			desc.m_anisotropyLevel = 1.0f;
-
+			desc.m_comparisonFunc = COMPARISON_ALWAYS;
 			m_pFontSampler = g_stateManager->CreateSamplerState(desc);
 		}
 	}

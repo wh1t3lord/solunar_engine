@@ -201,6 +201,8 @@ private:
 
 };
 
+extern InputLayoutDesc g_animatedVertexInputLayout[7];
+
 }
 
 #endif // !ANIMATEDMODEL_H
