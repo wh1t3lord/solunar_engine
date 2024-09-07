@@ -20,8 +20,8 @@ public:
 	void SetDebugName(const char* debugName) override;
 
 	// Old stuff of IRenderTarget, can be used ;)
-	void attachTexture2D(int slot, ITexture2D* textureHandle);
-	void attachDepth(ITexture2D* depthTextureHandle);
+	void AttachTexture2D(int slot, ITexture2D* textureHandle);
+	void AttachDepth(ITexture2D* depthTextureHandle);
 
 private:
 	uint32_t m_handle;

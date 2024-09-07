@@ -16,7 +16,7 @@ namespace solunar {
 
 	void GLRenderTarget::Create(const RenderTargetCreationDesc& renderTargetDesc)
 	{
-		Assert(renderTargetDesc.m_textures2DCount != 0);
+		//Assert(renderTargetDesc.m_textures2DCount != 0);
 
 		glGenFramebuffers(1, &m_handle);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_handle);
@@ -27,13 +27,13 @@ namespace solunar {
 		for (int i = 0; i < renderTargetDesc.m_textures2DCount; i++)
 		{
 			Assert(renderTargetDesc.m_textures2D[i]);
-			attachTexture2D(i, renderTargetDesc.m_textures2D[i]);
+			AttachTexture2D(i, renderTargetDesc.m_textures2D[i]);
 			colorAttachments.push_back(GL_COLOR_ATTACHMENT0 + i);
 		}
 
 		if (renderTargetDesc.m_depthTexture2D)
 		{
-			attachDepth(renderTargetDesc.m_depthTexture2D);
+			AttachDepth(renderTargetDesc.m_depthTexture2D);
 		}
 		
 		// Initialize draw bufferz
@@ -61,13 +61,13 @@ namespace solunar {
 	{
 	}
 
-	void GLRenderTarget::attachTexture2D(int slot, ITexture2D* textureHandle)
+	void GLRenderTarget::AttachTexture2D(int slot, ITexture2D* textureHandle)
 	{
 		GLTexture2D* glTex = reinterpret_cast<GLTexture2D*>(textureHandle);
 		glNamedFramebufferTextureEXT(m_handle, GL_COLOR_ATTACHMENT0 + slot, glTex->getHandle(), 0);
 	}
 
-	void GLRenderTarget::attachDepth(ITexture2D* depthTextureHandle)
+	void GLRenderTarget::AttachDepth(ITexture2D* depthTextureHandle)
 	{
 		GLTexture2D* glTex = reinterpret_cast<GLTexture2D*>(depthTextureHandle);
 		glNamedFramebufferTextureEXT(m_handle, GL_DEPTH_ATTACHMENT, glTex->getHandle(), 0);

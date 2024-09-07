@@ -19,6 +19,8 @@ GLuint createShader(GLenum target, const char* filename, const char* defines = n
 	f->Read((void*)content.data(), fileLength);
 	content[fileLength] = '\0';
 
+	f = nullptr;
+
 	if (defines && strlen(defines) > 0) {
 		std::string newDefines;
 

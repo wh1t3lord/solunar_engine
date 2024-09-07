@@ -40,6 +40,9 @@ layout(std140, binding = 0) uniform GlobalData
 	mat4 u_viewMatrix;
 	mat4 u_projectionMatrix;
 	mat4 u_modelViewProjection;
+	mat4 u_LightView;
+	mat4 u_LightViewProjection;
+	mat4 u_inverseViewProjection;
 
 	vec4 u_viewPos;
 	vec4 u_viewDir;
@@ -50,6 +53,19 @@ layout(std140, binding = 2) uniform DirectionalLightCB
 	vec4 u_DirLight_direction;
 	vec4 u_DirLight_ambientColor;
 	vec4 u_DirLight_color;
+};
+
+layout(std140, binding = 3) uniform PointLightCB
+{
+	PointLight g_pointLights[MAX_POINT_LIGHTS];
+};
+
+layout(std140, binding = 5) uniform LightGlobalDataCB
+{
+	uint g_pointLightCount;
+	uint g_spotLightCount;
+	uint padding0;
+	uint padding1;
 };
 
 vec4 gammaCorrection(vec4 color)
@@ -103,6 +119,10 @@ void main()
 	return;
 #endif
 
+#ifdef SKINNED
+	fragColor = vec4(albedo + v_normal * 0.5, 1.0);
+	return;
+#endif
 	const vec3 kSpecColor = vec3(2.0f, 2.0f, 2.0f);
 	const float kSpecPower = 256.0f;
 

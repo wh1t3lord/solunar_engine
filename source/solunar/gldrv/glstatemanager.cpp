@@ -172,7 +172,7 @@ void GLStateManager::SetRasterizerState(IRasterizerState* rasterizerState)
     static IRasterizerState* previousRasterizerState = nullptr;
     if (previousRasterizerState != rasterizerState) {
         const RasterizerStateDesc& desc = rasterizerState->m_desc;
-        glPolygonMode(getGLCullMode(desc.m_cullMode), getGLFillMode(desc.m_fillMode)); // #TODO: INSPECT PLEASE
+        //glPolygonMode(getGLCullMode(desc.m_cullMode), getGLFillMode(desc.m_fillMode)); // #TODO: INSPECT PLEASE
         glCullFace(getGLCullMode(desc.m_cullMode));
         glFrontFace(desc.m_frontCCW ? GL_CCW : GL_CW); // #TODO: INSPECT PLEASE
 

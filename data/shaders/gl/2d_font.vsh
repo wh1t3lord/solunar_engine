@@ -1,26 +1,22 @@
 #version 330 core
 
-layout(location=0) in vec2 position;
-layout(location=1) in vec2 texcoord;
+layout(location = 0) in vec2 position;
+layout(location = 1) in vec2 texcoord;
+layout(location = 2) in vec4 color;
 
 out vec2 v_texcoord;
+out vec4 v_color;
 
-uniform mat4 u_orthoMatrix;
+// Uniforms
+
+layout(std140) uniform GlobalData
+{
+	mat4 u_modelViewProjection;
+};
 
 void main()
 {
 	v_texcoord = texcoord;
-	
-	// Kirill: Another stupid hack
-	vec2 hackedPosition = position;
-	//hackedPosition.y = -hackedPosition.y;
-	
-	// Kirill: This is literally stupid hack
-	vec2 posHomo = 	vec2(hackedPosition) - vec2(400, 300);
-	posHomo /= vec2(400, 300);
-	gl_Position = vec4(posHomo, 0, 1);
-	
-	//gl_Position = u_orthoMatrix * vec4(position, 0.0, 1.0);
-	
-	//gl_Position = vec4(position, 0.0, 1.0);
+	v_color = color;
+	gl_Position = u_modelViewProjection * vec4(position, 0.0, 1.0);
 }

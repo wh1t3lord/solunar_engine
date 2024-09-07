@@ -74,16 +74,16 @@ namespace solunar
 
 		// Create shader for static mesh
 		m_shadowShader_StaticMesh = g_shaderManager->CreateShaderProgram(
-			"shadowmap.hlsl",
-			"shadowmap.hlsl",
+			"shadowmap.vsh",
+			"shadowmap.psh",
 			nullptr,
 			g_vertexInputLayout,
 			sizeof(g_vertexInputLayout) / sizeof(g_vertexInputLayout[0]));
 
 		// Create shader for animated mesh
 		m_shadowShader_AnimationMesh = g_shaderManager->CreateShaderProgram(
-			"shadowmap.hlsl",
-			"shadowmap.hlsl",
+			"shadowmap.vsh",
+			"shadowmap.psh",
 			"SKINNED\n",
 			g_animatedVertexInputLayout,
 			sizeof(g_animatedVertexInputLayout) / sizeof(g_animatedVertexInputLayout[0]));

@@ -36,19 +36,19 @@
 namespace solunar
 {
 
-void createRenderer()
-{
-	g_renderer = mem_new<D3D11Renderer>();
-}
-
-void destroyRenderer()
-{
-	if (g_renderer)
-	{
-		mem_delete(g_renderer);
-		g_renderer = nullptr;
-	}
-}
+//void createRenderer()
+//{
+//	g_renderer = mem_new<D3D11Renderer>();
+//}
+//
+//void destroyRenderer()
+//{
+//	if (g_renderer)
+//	{
+//		mem_delete(g_renderer);
+//		g_renderer = nullptr;
+//	}
+//}
 
 void reportRenderDevice()
 {

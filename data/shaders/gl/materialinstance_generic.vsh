@@ -45,17 +45,18 @@ layout(std140, binding = 0) uniform GlobalData
 	mat4 u_viewMatrix;
 	mat4 u_projectionMatrix;
 	mat4 u_modelViewProjection;
+	mat4 u_LightView;
+	mat4 u_LightViewProjection;
+	mat4 u_inverseViewProjection;
 
 	vec4 u_viewPos;
 	vec4 u_viewDir;
 };
 
-#ifdef SKINNED
 layout(std140, binding = 1) uniform SkinningData
 {
 	mat4 u_bonesMatrices[256];
 };
-#endif
 
 #ifndef SKINNED
 void main()
@@ -96,10 +97,12 @@ void main()
 	v_texcoord = texcoord;
 	
 	// tangent & bitanget & normal
+	//v_tangent = normalize( (mat3) )
+	
+	
 	//v_tangent = normalMatrix * tangent;
 	//v_bitangent = normalMatrix * bitangent;
 	//v_normal = normalMatrix * normal;
-
 	v_normal = normalize(vec3(skinMatrix * vec4(normal, 0.0f)));
 	v_normal = vec3(u_modelMatrix * vec4(v_normal, 0.0f));
 	//v_normal.x = -v_normal.x;

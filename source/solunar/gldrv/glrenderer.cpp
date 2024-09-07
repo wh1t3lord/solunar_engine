@@ -199,7 +199,6 @@ namespace solunar {
 	}
 #endif // WIN32
 
-#if 0
 	// GL_ARB_debug_output
 	PFNGLDEBUGMESSAGECONTROLARBPROC glDebugMessageControlARB;
 	PFNGLDEBUGMESSAGEINSERTARBPROC glDebugMessageInsertARB;
@@ -214,48 +213,47 @@ namespace solunar {
 		const char* message,
 		const void* userParam)
 	{
-		if (type != GL_DEBUG_TYPE_ERROR)
+		if (type != GL_DEBUG_TYPE_ERROR_ARB)
 			return;
 
-		if (type == GL_DEBUG_TYPE_ERROR)
-			spdlog::Error("[gl]: {}type = 0x{}, severity = 0x{}, message = {}",
-				(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR ** " : ""),
+		if (type == GL_DEBUG_TYPE_ERROR_ARB)
+			Core::Msg("OpenGL Error: %stype = 0x%i, severity = 0x%i, message = %s",
+				(type == GL_DEBUG_TYPE_ERROR_ARB ? "** GL ERROR ** " : ""),
 				type, severity, message);
 		else
-			spdlog::info("[gl]: {}type = 0x{}, severity = 0x{}, message = {}",
-				(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR ** " : ""),
+			Core::Msg("OpenGL Error: %stype = 0x%i, severity = 0x%i, message = %s",
+				(type == GL_DEBUG_TYPE_ERROR_ARB ? "** GL ERROR ** " : ""),
 				type, severity, message);
 
-		if (type == GL_DEBUG_TYPE_ERROR && IsDebuggerPresent())
+		if (type == GL_DEBUG_TYPE_ERROR_ARB && IsDebuggerPresent())
 			DebugBreak();
 	}
 
 	void initGlDebug()
 	{
-		glDebugMessageControlARB = (PFNGLDEBUGMESSAGECONTROLARBPROC)glfwGetProcAddress("glDebugMessageControlARB");
-		glDebugMessageInsertARB = (PFNGLDEBUGMESSAGEINSERTARBPROC)glfwGetProcAddress("glDebugMessageInsertARB");
-		glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKARBPROC)glfwGetProcAddress("glDebugMessageCallbackARB");
-		glGetDebugMessageLogARB = (PFNGLGETDEBUGMESSAGELOGARBPROC)glfwGetProcAddress("glGetDebugMessageLogARB");
+		glDebugMessageControlARB = (PFNGLDEBUGMESSAGECONTROLARBPROC)wglGetProcAddress("glDebugMessageControlARB");
+		glDebugMessageInsertARB = (PFNGLDEBUGMESSAGEINSERTARBPROC)wglGetProcAddress("glDebugMessageInsertARB");
+		glDebugMessageCallbackARB = (PFNGLDEBUGMESSAGECALLBACKARBPROC)wglGetProcAddress("glDebugMessageCallbackARB");
+		glGetDebugMessageLogARB = (PFNGLGETDEBUGMESSAGELOGARBPROC)wglGetProcAddress("glGetDebugMessageLogARB");
 
 		glEnable(GL_DEBUG_OUTPUT);
 		glEnable(GL_DEBUG_OUTPUT_SYNCHRONOUS_ARB);
 		glDebugMessageCallbackARB(R_GLDebugOutput, 0);
 	}
-#endif
 
-	//void createRenderer()
-	//{
-	//	g_renderer = mem_new<GLRenderer>();
-	//}
+	void createRenderer()
+	{
+		g_renderer = mem_new<GLRenderer>();
+	}
 
-	//void destroyRenderer()
-	//{
-	//	if (g_renderer)
-	//	{
-	//		mem_delete(g_renderer);
-	//		g_renderer = nullptr;
-	//	}
-	//}
+	void destroyRenderer()
+	{
+		if (g_renderer)
+		{
+			mem_delete(g_renderer);
+			g_renderer = nullptr;
+		}
+	}
 
 	void registerGLRendererClasses()
 	{
@@ -306,6 +304,25 @@ namespace solunar {
 		//exit(0);
 	}
 
+	bool is_GL_ARB_debug_output_supported()
+	{
+		int externsionsCount = 0;
+		glGetIntegerv(GL_NUM_EXTENSIONS, &externsionsCount);
+
+		for (int i = 0; i < externsionsCount; i++)
+		{
+			const char* externsionName = (const char*)glGetStringi(GL_EXTENSIONS, i);
+
+			if (strcmp(externsionName, "GL_ARB_debug_output") == 0)
+			{
+				Core::Msg("[gldrv]: found GL_ARB_debug_output...");
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	GLuint g_vertexArrayObject = 0;
 
 	void GLRenderer::Init()
@@ -326,6 +343,9 @@ namespace solunar {
 		if (!gladLoadGL())
 			Core::Error("Failed to load OpenGL");
 
+		// Clear OpenGL Error
+		glGetError();
+
 		glEnable(GL_CULL_FACE);
 
 		findExtensions();
@@ -334,9 +354,8 @@ namespace solunar {
 		glGetIntegerv(GL_MAX_VERTEX_UNIFORM_BLOCKS, &maxVertexUniformBlocks);
 		Core::Msg("GLRenderer: Max vertex uniform blocks: %i", maxVertexUniformBlocks);
 
-#if 0
-		initGlDebug();
-#endif
+		if (is_GL_ARB_debug_output_supported())
+			initGlDebug();
 
 		glGenVertexArrays(1, &g_vertexArrayObject);
 		glBindVertexArray(g_vertexArrayObject);
@@ -798,10 +817,14 @@ namespace solunar {
 
 	void GLRenderer::ClearRenderTarget(IRenderTarget* renderTarget)
 	{
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClearDepth(1.0f);
 	}
 
 	void GLRenderer::setSwapChainRenderTarget()
 	{
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 
 }

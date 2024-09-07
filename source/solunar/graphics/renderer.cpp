@@ -83,6 +83,7 @@ namespace solunar
 		samplerDesc.m_minFilter = TextureFilter::Nearest;
 		samplerDesc.m_magFilter = TextureFilter::Nearest;
 		samplerDesc.m_comparisonFunc = COMPARISON_ALWAYS;
+		samplerDesc.m_anisotropyLevel = 1.0f;
 		g_defaultSampler = g_renderDevice->CreateSamplerState(samplerDesc);
 
 		DepthStencilDesc desc = {};
@@ -221,14 +222,14 @@ namespace solunar
 
 		AnimatedModelRenderer::GetInstance()->Init();
 
-		ShadowsRenderer::GetInstance()->Init();
+//		ShadowsRenderer::GetInstance()->Init();
 	}
 
 	void Renderer::Shutdown()
 	{
 		// Release inplace resources
 
-		ShadowsRenderer::GetInstance()->Shutdown();
+	//	ShadowsRenderer::GetInstance()->Shutdown();
 
 		AnimatedModelRenderer::GetInstance()->Shutdown();
 
@@ -299,10 +300,12 @@ namespace solunar
 	{
 		//OPTICK_EVENT("Renderer::RenderWorld");
 
-		RenderShadows(view);
+	//	RenderShadows(view);
 	
 		g_renderDevice->SetRenderTarget(m_screenRenderTarget);
 		ClearRenderTarget(m_screenRenderTarget);
+
+		SetDefaultRenderState();
 
 		// get camera
 		Camera* camera = CameraProxy::GetInstance();
@@ -397,7 +400,7 @@ namespace solunar
 		RenderWorld(view);
 
 		// post processing
-		g_postFxManager.HDRPass(m_screenColorTexture);
+	//	g_postFxManager.HDRPass(m_screenColorTexture);
 
 		// reset to swap chain
 		setSwapChainRenderTarget();
@@ -405,7 +408,7 @@ namespace solunar
 		g_stateManager->SetDepthStencilState(g_depthStencilState_NoWrite, 0);
 
 		// draw
-		//ScreenQuad::Render( m_screenColorTexture );
+		ScreenQuad::Render( m_screenColorTexture );
 
 		//ScreenQuad::Render(ShadowsRenderer::GetInstance()->GetTexture());
 

@@ -11,7 +11,7 @@ namespace solunar
 	IShaderProgram* ScreenQuad::ms_screenQuadShader;
 	InputLayoutDesc ScreenQuad::ms_inputLayout[2]=
 	{
-		{ "POSITION", 0, ImageFormat::RGBA32F,   0, (UINT)offsetof(QuadVertex, position), INPUT_PER_VERTEX_DATA, 0 },
+		{ "POSITION", 0, ImageFormat::RG32F,   0, (UINT)offsetof(QuadVertex, position), INPUT_PER_VERTEX_DATA, 0 },
 		{ "TEXCOORD", 0, ImageFormat::RG32F,   0, (UINT)offsetof(QuadVertex, texcoord),  INPUT_PER_VERTEX_DATA, 0 }
 	};
 
@@ -19,14 +19,14 @@ namespace solunar
 	{
 
 		float quadVertices[] = {
-			// positions         // texCoords
-			-1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
-			-1.0f, -1.0f, 0.0f,  0.0f, 0.0f,
-			 1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
+			// positions   // texCoords
+			-1.0f,  1.0f,  0.0f, 1.0f,
+			-1.0f, -1.0f,  0.0f, 0.0f,
+			 1.0f, -1.0f,  1.0f, 0.0f,
 			
-			-1.0f,  1.0f, 0.0f,  0.0f, 1.0f,
-			 1.0f, -1.0f, 0.0f,  1.0f, 0.0f,
-			 1.0f,  1.0f, 0.0f,  1.0f, 1.0f
+			-1.0f,  1.0f,  0.0f, 1.0f,
+			 1.0f, -1.0f,  1.0f, 0.0f,
+			 1.0f,  1.0f,  1.0f, 1.0f
 		};
 
 		BufferDesc bufferDesc;
