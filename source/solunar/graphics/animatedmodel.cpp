@@ -292,25 +292,6 @@ void AnimatedModel::Load_GLTF(const std::shared_ptr<DataStream>& stream)
 		if (primitive.material && strlen(primitive.material->name) > 0)
 			materialname = std::string("materials/models/") + std::string(primitive.material->name) + ".xml"; // #TODO: SHIT !!!!
 
-#if 0
-		if (data->materials_count != data->meshes_count)
-			Core::Msg("AnimatedModel::Load_GLTF: wrong material count! using default ...");
-
-		if (data->materials_count < data->meshes_count)
-			Core::Msg("AnimatedModel::Load_GLTF: material count less than mesh count (%i < %i)! using default ...",
-				data->materials_count, data->meshes_count);
-
-		// #TODO: This shit should be rewritten !!!
-		//if (data->materials_count == data->meshes_count)
-		if (i < data->materials_count)
-		{
-			if (data->materials[i].name && strlen(data->materials[i].name) <= 0)
-				Core::Msg("AnimatedModel::Load_GLTF: material name on mesh %i are empty! using default ...", i);
-			else if (data->materials[i].name && strlen(data->materials[i].name) > 0)
-				materialname = std::string("materials/models/") + std::string(data->materials[i].name) + ".xml"; // #TODO: SHIT !!!!
-		}
-#endif
-
 		AnimatedSubMesh* submesh = mem_new<AnimatedSubMesh>();
 		submesh->m_vertices = vertices;
 		submesh->m_verticesCount = (uint32_t)vertices.size();
@@ -321,12 +302,13 @@ void AnimatedModel::Load_GLTF(const std::shared_ptr<DataStream>& stream)
 	}
 
 	// loading animations
-	m_animations.resize( data->animations_count);
+	std::vector<AnimationGltf> animations;
+	animations.resize( data->animations_count);
 
 	for (int i = 0; i < data->animations_count; i++) {
 		const cgltf_animation& gltf_animation = data->animations[i];
 
-		Animation& animation = m_animations[i];
+		AnimationGltf& animation = animations[i];
 		animation.m_name = "unknowed animation name";
 		if (gltf_animation.name)
 			animation.m_name = gltf_animation.name;
@@ -380,6 +362,13 @@ void AnimatedModel::Load_GLTF(const std::shared_ptr<DataStream>& stream)
 		}
 
 		Core::Msg("AnimatedModel: animation %s channels %i", gltf_animation.name, gltf_animation.channels_count);
+	}
+
+	// resample animation
+	for (int i = 0; i < animations.size(); i++)
+	{
+		Animation animation;
+		ResampleAnimation(animation, animations[i]);
 	}
 
 	// loading model skin
@@ -512,6 +501,8 @@ void AnimatedModel::Load_GLTF(const std::shared_ptr<DataStream>& stream)
 
 	/// todo !!!!!!!!!!!!!! cgltf_free(data);
 
+	m_baseNodes = m_nodes;
+
 	// #TODO: cgltf has very SLOW memory freeing, fix with fixed allocator or custom allocator
 #ifdef NDEBUG
 	//cgltf_free(data);
@@ -577,10 +568,11 @@ inline glm::quat samplerRotationToGlm(const glm::vec4& v)
 
 void AnimatedModel::Update(float dt)
 {
+#if 0
 	m_currentTime += m_speed * dt;
 	
 	bool updated = false;
-	Animation& animation = *m_currentAnimation;
+	AnimationGltf& animation = *m_currentAnimation;
 
 	if (animation.m_startTime >= m_currentTime)
 		m_currentTime = animation.m_startTime;
@@ -637,6 +629,7 @@ void AnimatedModel::Update(float dt)
 			UpdateNode(i);
 		}
 	}
+#endif
 }
 
 void AnimatedModel::UpdateNode(int node_id)
@@ -702,6 +695,57 @@ void AnimatedModel::SetNodeScale(int nodeid, const glm::vec3& scale)
 {
 	Assert(nodeid != -1);
 	m_nodes[nodeid].m_scale = scale;
+}
+
+void AnimatedModel::ResampleAnimation(Animation& animation, const AnimationGltf& rawAnimation, int framerate /*= 30*/)
+{
+	animation.m_name = rawAnimation.m_name;
+	animation.m_framerate = framerate;
+	
+	int frameDelay = (int)round(1000.0f / (float)framerate);
+
+	// calculate frame count
+	animation.m_numFrames = (int)round(rawAnimation.m_endTime * 1000.0f / frameDelay) + 1;
+
+	Core::Msg("(AnimatedModel::ResampleAnimation) resamping animation %s, framerate %d, numframes %d",
+		animation.m_name.c_str(), animation.m_framerate, animation.m_numFrames);
+
+	for (int i = 0; i < animation.m_numFrames; i++)
+	{
+		float time = ((float)i * (float)frameDelay) / 1000.0f;
+
+		for (auto& channel : rawAnimation.m_channels)
+		{
+			const AnimationSampler& sampler = rawAnimation.m_samplers[channel.m_samplerId];
+			if (sampler.m_inputs.size() > sampler.m_outputs.size())
+				continue;
+
+			for (size_t j = 0; j < sampler.m_inputs.size() - 1; ++j)
+			{
+				if ((time >= sampler.m_inputs[j]) && (time <= sampler.m_inputs[j + 1]))
+				{
+					float u = std::max(0.0f, time - sampler.m_inputs[j]) / (sampler.m_inputs[j + 1] - sampler.m_inputs[j]);
+					if (u <= 1.0f)
+					{
+						if (channel.m_pathType == AnimationPathType_Translation)
+						{
+							auto A = sampler.m_outputs[j];
+							auto B = sampler.m_outputs[j + 1];
+							auto translation = glm::lerp(A, B, u);
+							animation.m_track.m_positions.push_back(translation);
+						}
+						else if (channel.m_pathType == AnimationPathType_Rotation)
+						{
+							auto A = samplerRotationToGlm(sampler.m_outputs[j]);
+							auto B = samplerRotationToGlm(sampler.m_outputs[j + 1]);
+							auto rotate = glm::slerp(A, B, u);
+							animation.m_track.m_rotations.push_back(glm::normalize(rotate));
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 ///////////////////////////////////////////////////////////

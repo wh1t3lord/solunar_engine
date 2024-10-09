@@ -17,6 +17,9 @@ namespace solunar
 // this defines the size of the vertex weight
 #define MAX_BONE_WEIGHT 4
 
+// animation base framerate
+#define ANIMATION_FRAMERATE 60
+
 // Forward declaration
 class ITexture2D;
 class ISamplerState;
@@ -78,13 +81,27 @@ struct AnimationChannel {
 	int m_samplerId = -1;
 };
 
-struct Animation
+struct AnimationGltf
 {
 	std::string m_name;
 	std::vector<AnimationSampler> m_samplers;
 	std::vector<AnimationChannel> m_channels;
-	float m_startTime = FLT_MAX; //std::numeric_limits<float>::max();
-	float m_endTime = -FLT_MAX;//std::numeric_limits<float>::min();
+	float m_startTime = FLT_MAX;
+	float m_endTime = -FLT_MAX;
+};
+
+struct AnimationTrack
+{
+	std::vector<glm::vec3> m_positions;
+	std::vector<glm::quat> m_rotations;
+};
+
+struct Animation
+{
+	std::string m_name;
+	AnimationTrack m_track;
+	int m_framerate = 30;
+	int m_numFrames = 0;
 };
 
 struct AnimationSkin
@@ -151,11 +168,14 @@ public:
 	int GetNodeByName(const std::string& name);
 	void SetNodeScale(int nodeid, const glm::vec3& scale);
 
+	void ResampleAnimation(Animation& animation, const AnimationGltf& rawAnimation, int framerate = ANIMATION_FRAMERATE);
+
 private:
 	std::vector<AnimatedSubMesh*> m_subMeshes;
 	std::vector<Animation> m_animations;
 	std::vector<AnimationSkin> m_skins;
 	//std::vector<AnimationNode> m_joints;
+	std::vector<AnimationNode> m_baseNodes;
 	std::vector<AnimationNode> m_nodes;
 	std::map<std::string, BoneInfo> m_bones;
 	Animation* m_currentAnimation;
