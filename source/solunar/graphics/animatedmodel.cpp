@@ -369,6 +369,7 @@ void AnimatedModel::Load_GLTF(const std::shared_ptr<DataStream>& stream)
 	{
 		Animation animation;
 		ResampleAnimation(animation, animations[i]);
+		m_animations.push_back(animation);
 	}
 
 	// loading model skin
@@ -568,6 +569,34 @@ inline glm::quat samplerRotationToGlm(const glm::vec4& v)
 
 void AnimatedModel::Update(float dt)
 {
+	const Animation& animation = *m_currentAnimation;
+
+	m_currentTime += m_speed * dt;
+
+	float time = m_currentTime * (float)animation.m_framerate;
+	int ist = (int)floorf(time);
+	int frame = ist % animation.m_numFrames;
+
+	if (frame > animation.m_numFrames)
+		m_currentTime = 0.0f;
+
+	const AnimationFrame& position = animation.m_track.m_positions[frame];
+	const AnimationFrame& rotation = animation.m_track.m_rotations[frame];
+
+	for (int i = 0; i < m_nodes.size() - 2; i++)
+	{
+		m_nodes[i].m_translation = position.m_data[i];
+		m_nodes[i].m_rotation = glm::quat(rotation.m_data[i].w, rotation.m_data[i].x, rotation.m_data[i].y, rotation.m_data[i].z);
+		m_nodes[i].m_scale = glm::vec3(1.0f);
+	}
+
+	UpdateNodeTransform(m_rootNodeId);
+
+	for (int i = 0; i < (int)m_nodes.size() - 1; i++)
+	{
+		UpdateNode(i);
+	}
+
 #if 0
 	m_currentTime += m_speed * dt;
 	
@@ -710,6 +739,9 @@ void AnimatedModel::ResampleAnimation(Animation& animation, const AnimationGltf&
 	Core::Msg("(AnimatedModel::ResampleAnimation) resamping animation %s, framerate %d, numframes %d",
 		animation.m_name.c_str(), animation.m_framerate, animation.m_numFrames);
 
+	animation.m_track.m_positions.resize(animation.m_numFrames);
+	animation.m_track.m_rotations.resize(animation.m_numFrames);
+
 	for (int i = 0; i < animation.m_numFrames; i++)
 	{
 		float time = ((float)i * (float)frameDelay) / 1000.0f;
@@ -732,14 +764,18 @@ void AnimatedModel::ResampleAnimation(Animation& animation, const AnimationGltf&
 							auto A = sampler.m_outputs[j];
 							auto B = sampler.m_outputs[j + 1];
 							auto translation = glm::lerp(A, B, u);
-							animation.m_track.m_positions.push_back(translation);
+							animation.m_track.m_positions[i].m_data[channel.m_nodeId] = translation;
 						}
 						else if (channel.m_pathType == AnimationPathType_Rotation)
 						{
 							auto A = samplerRotationToGlm(sampler.m_outputs[j]);
 							auto B = samplerRotationToGlm(sampler.m_outputs[j + 1]);
 							auto rotate = glm::slerp(A, B, u);
-							animation.m_track.m_rotations.push_back(glm::normalize(rotate));
+							//animation.m_track.m_rotations[i].m_data[channel.m_nodeId] = glm::normalize(rotate);
+
+							// #TODO: CAST TO VEC4 BECAUSE OF GLM :(
+							rotate = glm::normalize(rotate);
+							animation.m_track.m_rotations[i].m_data[channel.m_nodeId] = glm::vec4(rotate.x, rotate.y, rotate.z, rotate.w);
 						}
 					}
 				}

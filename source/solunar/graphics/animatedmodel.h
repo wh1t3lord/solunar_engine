@@ -90,17 +90,22 @@ struct AnimationGltf
 	float m_endTime = -FLT_MAX;
 };
 
+struct AnimationFrame
+{
+	glm::vec4 m_data[MAX_JOINTS];
+};
+
 struct AnimationTrack
 {
-	std::vector<glm::vec3> m_positions;
-	std::vector<glm::quat> m_rotations;
+	std::vector<AnimationFrame> m_positions;
+	std::vector<AnimationFrame> m_rotations;
 };
 
 struct Animation
 {
 	std::string m_name;
 	AnimationTrack m_track;
-	int m_framerate = 30;
+	int m_framerate = ANIMATION_FRAMERATE;
 	int m_numFrames = 0;
 };
 
@@ -122,15 +127,6 @@ struct AnimationNode
 	std::vector<int> m_children;
 	int m_parentId = -1;
 	int m_skinId = -1;
-};
-
-struct BoneInfo
-{
-	/*id is index in finalBoneMatrices*/
-	int id;
-
-	/*offset matrix transforms vertex from model space to bone space*/
-	glm::mat4 offset;
 };
 
 class AnimatedModel : public ModelBase
@@ -177,7 +173,6 @@ private:
 	//std::vector<AnimationNode> m_joints;
 	std::vector<AnimationNode> m_baseNodes;
 	std::vector<AnimationNode> m_nodes;
-	std::map<std::string, BoneInfo> m_bones;
 	Animation* m_currentAnimation;
 	bool m_playLooped = false;
 	float m_currentTime = 0.0f;
