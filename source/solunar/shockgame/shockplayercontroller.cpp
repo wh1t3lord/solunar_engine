@@ -10,6 +10,8 @@
 
 #include "game/gamelogic/weapons/weaponcomponent.h"
 
+#include "shockgame/demogame.h"
+
 #include <numeric>
 #include <limits>
 
@@ -238,7 +240,10 @@ void ShockPlayerController::Update(float dt)
 	UpdateCamera(dt);
 
 	// update player movement
-	//UpdateMovement(dt);
+	UpdateMovement(dt);
+
+	// Update game logic of player controller
+	UpdateLogic(dt);
 
 	// update debug
 	DebugUpdate(dt);
@@ -267,9 +272,9 @@ void ShockPlayerController::UpdateCamera(float dt)
 	glm::quat rot = glm::eulerAngleYX(glm::radians(-m_camera->m_yaw), glm::radians(m_camera->m_pitch));
 
 	//m_weaponEntity->setRotation(glm::slerp(rot, m_weaponEntity->getRotation(), 55.0f * dt));
-//	m_weaponEntity->SetRotation(rot);
+	m_weaponEntity->SetRotation(rot);
 
-#if 1
+#if 0
 	 glm::vec3 cameraDirection = CameraProxy::GetInstance()->GetDirection();
 	 glm::vec3 pos = GetEntity()->GetPosition();
 	 float camSpeed = 8.0f * dt;
@@ -304,34 +309,6 @@ void ShockPlayerController::UpdateMovement(float dt)
 	 
 	 Camera* camera = CameraProxy::GetInstance();
 	 
-#if 0
-	 m_onTheGround = true;
-	 if (isPlayerMove && m_onTheGround)
-	 {
-		 glm::vec3 dir = glm::vec3(0.0f);
-		 if (inputManager->getKey(KeyboardKeys::KEY_W))
-			 dir += camera->GetDirection();
-		 if (inputManager->getKey(KeyboardKeys::KEY_S))
-			 dir -= camera->GetDirection();
-		 if (inputManager->getKey(KeyboardKeys::KEY_A))
-			 dir -= glm::normalize(glm::cross(camera->GetDirection(), glm::vec3(0.0f, 1.0f, 0.0f)));
-		 if (inputManager->getKey(KeyboardKeys::KEY_D))
-			 dir += glm::normalize(glm::cross(camera->GetDirection(), glm::vec3(0.0f, 1.0f, 0.0f)));
-
-		 // apply impulse to rigid body
-		 //m_rigidBody->ApplyImpulse(dir);
-		 //m_rigidBody->SetDirection(glm::normalize(dir) * dt * 2.0f);
-		 //m_rigidBody->SetPositionForce(getEntity()->getPosition());
-		 m_rigidBody->GetCharacterController()->setVelocityForTimeInterval(
-			 glmVectorToBt(glm::normalize(dir) * 2.0f),
-			 2.0f);
-	 }
-
-	 if (!isPlayerMove)
-		 m_rigidBody->GetCharacterController()->setVelocityForTimeInterval(
-			 glmVectorToBt(glm::vec3(0.0f)),
-			 2.0f);
-#else
 	 m_onTheGround = m_rigidBody->GetCharacterController()->onGround();
 	 if (isPlayerMove && m_onTheGround)
 	 {
@@ -371,18 +348,43 @@ void ShockPlayerController::UpdateMovement(float dt)
 		 m_rigidBody->GetCharacterController()->jump(glmVectorToBt((upVector + cameraDirection) * jumpPower));
 	 }
 
-#endif
-
 	 m_rigidBody->Update(dt);
 
 	 btTransform trans = m_rigidBody->GetGhostObject()->getWorldTransform();
 	 GetEntity()->SetPosition(btVectorToGlm(trans.getOrigin()));
 }
 
+void ShockPlayerController::UpdateLogic(float dt)
+{
+	const float kDistance = 64.0f;
+
+	Camera* camera = CameraProxy::GetInstance();
+
+	glm::vec3 rayBegin = camera->GetPosition() + camera->GetDirection();
+	glm::vec3 rayEnd = camera->GetPosition() + (camera->GetDirection() * kDistance);
+
+	RayCastResult rayCastResult;
+	if (GetWorld()->RayCast(rayCastResult, rayBegin, rayEnd, PhysicsFilter_Usable))
+	{
+		UsableAreaComponent* usableArea = rayCastResult.m_entity->GetComponent<UsableAreaComponent>();
+		if (usableArea)
+		{
+			View* view = CameraProxy::GetInstance()->GetView();
+
+			glm::vec4 vp = glm::vec4(0.0f, 0.0f, (float)view->m_width, (float)view->m_height);
+			glm::vec3 proj = glm::project(rayCastResult.m_entity->GetWorldPosition(), view->m_view, view->m_projection, vp);
+			if (proj.z >= 1.0f)
+				return; // clip
+
+			proj.y = ((float)view->m_height - 1.0f - proj.y);
+
+			ImGui::GetForegroundDrawList()->AddText(ImVec2(proj.x, proj.y), IM_COL32_WHITE, "Press E to use");
+		}
+	}
+}
+
 void ShockPlayerController::DebugUpdate(float dt)
 {
-	return;
-
 	if (!m_rigidBody)
 		return;
 

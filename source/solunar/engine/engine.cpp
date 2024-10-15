@@ -4,6 +4,7 @@
 #include "core/timer.h"
 
 #include "engine/engine.h"
+#include "engine/inputmanager.h"
 #include "engine/entity/entity.h"
 #include "engine/entity/component.h"
 #include "engine/entity/world.h"
@@ -17,7 +18,9 @@
 
 namespace solunar
 {
-	EngineData g_engineData;
+	EngineData		g_engineData;
+	World*			Engine::ms_world = nullptr;
+	std::string		g_worldName;
 
 	// There is more nice looking object registration
 	void registerEngineObjects()
@@ -54,76 +57,15 @@ namespace solunar
 			TypeManager::GetInstance()->RegisterType(engineClasses[i]);
 	}
 
-	bool g_harakiriLogicThread = false;
-	bool g_worldIsReady = false;
-
-	class LogicThread : public Thread
-	{
-	public:
-		LogicThread();
-		~LogicThread();
-
-		void execute() override;
-	};
-
-	LogicThread::LogicThread()
-	{
-	}
-
-	LogicThread::~LogicThread()
-	{
-		g_harakiriLogicThread = true;
-	}
-
-	void LogicThread::execute()
-	{
-		setThreadName("Logic Thread");
-
-		while (!g_harakiriLogicThread)
-		{
-			if (g_worldIsReady)
-			{
-				Assert2(Engine::ms_world, "Trying to Update nullptr world. Check g_worldIsReady!");
-
-				Engine::ms_world->Update_LogicEntity();
-			}
-
-			Sleep(10);
-		}
-
-		Core::Msg("LogicThread: exiting ...");
-	}
-
-	LogicThread g_logicThread;
-
-	World* Engine::ms_world = nullptr;
-
 	void Engine::Init()
 	{
 		Core::Msg("Initializing engine");
 
 		registerEngineObjects();
-
-		// Start logic thread
-//		g_logicThread.start();
-
-		//ScriptManager::GetInstance()->Init();
-
-		// initalize console
-		//g_console->Init();
-
-		//WorldManager::Init();
-
-		//g_harakiriLogicThread = true;
-		//g_logicThread.stop();
 	}
 
 	void Engine::Shutdown()
 	{
-		// harakiri logic thread
-	//	g_harakiriLogicThread = true;
-	//	g_logicThread.stop();
-
 		if (ms_world)
 		{
 			Core::Msg("Engine: world is present on engine shutdown, deleting ...");
@@ -131,17 +73,12 @@ namespace solunar
 			mem_delete(ms_world);
 			ms_world = nullptr;
 		}
-
-		// Shutdown console
-	//	g_console->Shutdown();
-
-		//ScriptManager::GetInstance()->Shutdown();
-
-		//destroyComponentCacheSystem();
 	}
 
 	void Engine::LoadWorld(const std::string& filename)
 	{
+		g_worldName = filename;
+
 		if (ms_world)
 		{
 			mem_delete(ms_world);
@@ -208,6 +145,9 @@ namespace solunar
 	void Engine::Update()
 	{
 		//OPTICK_EVENT("Engine::update");
+
+		if (InputManager::GetInstance()->IsPressedWithReset(KEY_F8))
+			EngineStateManager::GetInstance()->LoadWorld(g_worldName);
 
 		EngineStateManager::GetInstance()->Update();
 
@@ -286,6 +226,7 @@ namespace solunar
 				Engine::LoadWorld(m_worldName);
 
 			m_nextState = EngineState::Running;
+			m_worldName.clear();
 
 			break;
 

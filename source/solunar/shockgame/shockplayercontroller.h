@@ -41,6 +41,7 @@ private:
 	void InitializeComponents();
 	void UpdateCamera(float dt);
 	void UpdateMovement(float dt);
+	void UpdateLogic(float dt);
 	void DebugUpdate(float dt);
 
 private:

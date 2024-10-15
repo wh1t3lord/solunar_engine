@@ -19,6 +19,7 @@
 #include "shockgame/shockgameui.h"
 #include "shockgame/shockaicomponent.h"
 #include "shockgame/shockprojectilecomponent.h"
+#include "shockgame/demogame.h"
 
 // Engine
 #include "engine/camera.h"
@@ -222,6 +223,7 @@ void registerGameClasses()
 		OBJECT_GET_TYPEINFO(TestPositionUpdaterComponent),
 		OBJECT_GET_TYPEINFO(TestAnimationComponent),
 		OBJECT_GET_TYPEINFO(ViewmodelAnimationController),
+		OBJECT_GET_TYPEINFO(UsableAreaComponent),
 	};
 
 	for (int i = 0; i < sizeof(gameClasses) / sizeof(gameClasses[0]); i++)

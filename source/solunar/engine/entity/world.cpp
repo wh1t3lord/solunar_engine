@@ -139,12 +139,19 @@ namespace solunar
 		m_physicsWorld->ToggleDebugDraw();
 	}
 
-	bool World::RayCast(RayCastResult& rayResult, const glm::vec3& rayStart, const glm::vec3& rayEnd)
+	bool World::RayCast(RayCastResult& rayResult, const glm::vec3& rayStart, const glm::vec3& rayEnd, const int collisionFilter /* =-1*/)
 	{
 		Assert2(m_physicsWorld, "Physics world is not initialized for ray casting");
 
 		btDynamicsWorld::ClosestRayResultCallback rayCallback(glmVectorToBt(rayStart), glmVectorToBt(rayEnd));
-		rayCallback.m_collisionFilterMask = kCollisionFilterAllMask ^ PhysicsFilter_Player;
+		
+		if (collisionFilter == -1)
+			rayCallback.m_collisionFilterMask = kCollisionFilterAllMask ^ kPhysicsFilter_AllAux;
+		else
+		{
+			rayCallback.m_collisionFilterGroup = btBroadphaseProxy::SensorTrigger;
+			rayCallback.m_collisionFilterMask = PhysicsFilter_Player;
+		}
 
 		m_physicsWorld->GetWorld()->rayTest(glmVectorToBt(rayStart), glmVectorToBt(rayEnd), rayCallback);
 		if (rayCallback.hasHit())
@@ -171,7 +178,8 @@ namespace solunar
 		std::vector<Entity*> entities;
 		
 		glm::vec3 halfSize = boxSize / glm::vec3(2.0f);
-		btConvexShape* convexShape = mem_new<btBoxShape>(glmVectorToBt(halfSize));
+		
+		//btConvexShape* convexShape = mem_new<btBoxShape>(glmVectorToBt(halfSize));
 
 		btTransform transform;
 		transform.setIdentity();

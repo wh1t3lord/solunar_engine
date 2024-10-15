@@ -7,11 +7,13 @@
 		<Scale x="1" y="1" z="1"/>
 		<MeshComponent>
 			<Model filename="models/common_floor.dae"/>
+			<CastShadow value="false"/>
 		</MeshComponent>
 		<RigidBodyComponent>
 			<Static value="true"/>
 		</RigidBodyComponent>
 		<BoxShapeComponent>
+			<Position x="0" y="-1" z="0"/>
 			<Size x="20" y="1" z="20"/>
 		</BoxShapeComponent>
 	</Entity>
@@ -40,14 +42,14 @@
 	<!-- TRAIDER -->
 	
 	<Entity>
-		<Position x="2" y="1.36" z="1.31"/>
+		<Position x="2" y="2.0" z="1.0"/>
 		<Rotation x="0" y="0" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		<PointLightComponent>
 			<AmbientColor r="0" g="0" b="0"/>
-			<Color r="1" g="1" b="1"/>
-			<SpecularColor r="1" g="1" b="1"/>
-			<Radius value="2"/>
+			<Color r="0.5" g="0.5" b="0.5"/>
+			<SpecularColor r="0.1" g="0.1" b="0.1"/>
+			<Radius value="12"/>
 		</PointLightComponent>
 	</Entity> 
 	
@@ -81,6 +83,30 @@
 		</TestAnimationComponent>
 	</Entity>
 	
+	
+	<!-- TRAIDER LOGIC -->
+	
+	
+	<!-- Usable Box -->
+	<Entity>
+		<Position x="2.0" y="0.8" z="1.49"/>
+		<Rotation x="0" y="0" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		<RigidBodyComponent>
+			<Trigger value="true"/>
+			<Filter value="PhysicsFilter_Usable"/>
+		</RigidBodyComponent>
+		<BoxShapeComponent>
+			<Position x="0" y="0" z="0"/>
+			<Size x="0.8" y="0.2" z="0.45"/>
+		</BoxShapeComponent>
+		<UsableAreaComponent>
+			<Script value="traider_start"/>
+		</UsableAreaComponent>		
+	</Entity>
+	
+	<!------------------->
+	
 	<!-------------------------------------------------------------------->
 	
 	
@@ -100,7 +126,13 @@
 		</BoxShapeComponent>
 	</Entity> -->
 	<!-------------------------->
-	<!--
+	
+	
+	
+	
+	
+	
+	<!-- SKY 
 	<Entity>
 		<Position x="0" y="0" z="0"/>
 		<Rotation x="0" y="90" z="0"/>

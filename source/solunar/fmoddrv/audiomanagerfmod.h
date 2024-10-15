@@ -33,8 +33,9 @@ namespace solunar
 
 	private:
 		FMODDrvSingletonStorer m_singletonStorer;
-
 		FMOD::Studio::System* m_studioSystem;
+
+		std::vector<AudioSource*> m_audioSources;
 	};
 }
 

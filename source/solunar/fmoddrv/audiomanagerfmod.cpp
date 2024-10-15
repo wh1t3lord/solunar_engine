@@ -95,6 +95,17 @@ namespace solunar
 	{
 		MusicManager::GetInstance()->Shutdown();
 
+		// clear sounds
+		for (int i = 0; i < m_audioSources.size(); i++)
+		{
+			if (m_audioSources[i])
+			{
+				mem_delete(m_audioSources[i]);
+			}
+		}
+
+		m_audioSources.clear();
+
 		//m_fmodSystem->close();
 		//m_fmodSystem->release();
 		//m_fmodSystem = nullptr;
@@ -107,13 +118,19 @@ namespace solunar
 
 	AudioSource* AudioManagerFMOD::CreateSource(const std::string& filename)
 	{
-		return (AudioSource*)mem_new<AudioSourceFMOD>(filename, GetFMODSystem());
+		AudioSource* pAudioSource = (AudioSource*)mem_new<AudioSourceFMOD>(filename, GetFMODSystem());
+		m_audioSources.push_back(pAudioSource);
+		return pAudioSource;
 	}
 
 	void AudioManagerFMOD::DeleteSource(AudioSource* source)
 	{
 		if (source)
 		{
+			auto it = std::find(m_audioSources.begin(), m_audioSources.end(), source);
+			if (it != m_audioSources.end())
+				m_audioSources.erase(it);
+
 			if (source->IsPlaying())
 				source->Stop();
 
