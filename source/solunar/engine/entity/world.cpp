@@ -146,7 +146,7 @@ namespace solunar
 		btDynamicsWorld::ClosestRayResultCallback rayCallback(glmVectorToBt(rayStart), glmVectorToBt(rayEnd));
 		
 		if (collisionFilter == -1)
-			rayCallback.m_collisionFilterMask ^= kPhysicsFilter_AllAux;
+			rayCallback.m_collisionFilterMask = kCollisionFilterAllMask;
 		else
 			rayCallback.m_collisionFilterMask = collisionFilter;
 
