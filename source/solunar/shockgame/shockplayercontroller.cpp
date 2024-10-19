@@ -356,7 +356,14 @@ void ShockPlayerController::UpdateMovement(float dt)
 
 void ShockPlayerController::UpdateLogic(float dt)
 {
-	const float kDistance = 64.0f;
+	const float kDistance = 4.0f;
+
+	static int cnt = 0;
+	if (cnt == 0)
+	{
+		cnt++;
+		return;
+	}
 
 	Camera* camera = CameraProxy::GetInstance();
 
@@ -379,6 +386,12 @@ void ShockPlayerController::UpdateLogic(float dt)
 			proj.y = ((float)view->m_height - 1.0f - proj.y);
 
 			ImGui::GetForegroundDrawList()->AddText(ImVec2(proj.x, proj.y), IM_COL32_WHITE, "Press E to use");
+
+			proj = glm::project(rayCastResult.m_hitPosition, view->m_view, view->m_projection, vp);
+			proj.y = ((float)view->m_height - 1.0f - proj.y);
+
+
+			ImGui::GetForegroundDrawList()->AddRectFilled(ImVec2(proj.x - 16.0f, proj.y - 16.0f), ImVec2(proj.x + 16.0f, proj.y + 16.0f), 0xff0000ff);
 		}
 	}
 }

@@ -100,13 +100,11 @@ namespace solunar {
 
 		if (changeFilterUsableHack)
 		{
-			m_rigidBody->getBroadphaseProxy()->m_collisionFilterGroup = btBroadphaseProxy::SensorTrigger;
-			m_rigidBody->getBroadphaseProxy()->m_collisionFilterMask = PhysicsFilter_Player;
+			m_rigidBody->getBroadphaseProxy()->m_collisionFilterGroup = PhysicsFilter_Usable;
 		}
 		else if (m_isTrigger)
 		{
 			m_rigidBody->getBroadphaseProxy()->m_collisionFilterGroup = PhysicsFilter_Triggers;
-			m_rigidBody->getBroadphaseProxy()->m_collisionFilterMask = PhysicsFilter_Player;
 		}
 	}
 

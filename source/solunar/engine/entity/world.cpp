@@ -146,12 +146,9 @@ namespace solunar
 		btDynamicsWorld::ClosestRayResultCallback rayCallback(glmVectorToBt(rayStart), glmVectorToBt(rayEnd));
 		
 		if (collisionFilter == -1)
-			rayCallback.m_collisionFilterMask = kCollisionFilterAllMask ^ kPhysicsFilter_AllAux;
+			rayCallback.m_collisionFilterMask ^= kPhysicsFilter_AllAux;
 		else
-		{
-			rayCallback.m_collisionFilterGroup = btBroadphaseProxy::SensorTrigger;
-			rayCallback.m_collisionFilterMask = PhysicsFilter_Player;
-		}
+			rayCallback.m_collisionFilterMask = collisionFilter;
 
 		m_physicsWorld->GetWorld()->rayTest(glmVectorToBt(rayStart), glmVectorToBt(rayEnd), rayCallback);
 		if (rayCallback.hasHit())
