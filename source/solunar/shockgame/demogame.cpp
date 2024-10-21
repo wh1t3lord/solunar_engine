@@ -64,4 +64,23 @@ void Debug_Draw3DText(const char* text, const glm::vec3& position, const glm::ve
 	g_fontManager->DrawSystemFontShadowed(text, proj.x, proj.y, color);
 }
 
+static GameManager s_GameManager;
+GameManager* g_GameManager = &s_GameManager;
+
+GameManager::GameManager()
+{
+}
+
+GameManager::~GameManager()
+{
+}
+
+void GameManager::OnWorldLoad(const std::string& worldName)
+{
+	Core::Msg("GameManager: Load script for level %s", worldName.c_str());
+
+}
+
+Entity* g_Player = nullptr;
+
 }

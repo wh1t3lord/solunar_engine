@@ -28,6 +28,20 @@ private:
 
 void Debug_Draw3DText(const char* text, const glm::vec3& position, const glm::vec4& color);
 
+class GameManager
+{
+public:
+	GameManager();
+	~GameManager();
+
+	void OnWorldLoad(const std::string& worldName);
+};
+
+extern GameManager* g_GameManager;
+
+extern Entity* g_Player;
+
 }
+
 
 #endif

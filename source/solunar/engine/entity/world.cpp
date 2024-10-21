@@ -176,16 +176,16 @@ namespace solunar
 		
 		glm::vec3 halfSize = boxSize / glm::vec3(2.0f);
 		
-		//btConvexShape* convexShape = mem_new<btBoxShape>(glmVectorToBt(halfSize));
+		btBoxShape convexShape(glmVectorToBt(halfSize));
 
 		btTransform transform;
 		transform.setIdentity();
 		transform.setOrigin(glmVectorToBt(boxPos));
 
-	//	m_physicsWorld->getWorld()->convexSweepTest(convexShape, transform, )
+		btDynamicsWorld::ClosestConvexResultCallback convexCallback(btVector3(0.0f, 0.0f, 0.0f), btVector3(0.0f, 0.0f, 0.0f));
+		//m_physicsWorld->GetWorld()->convexSweepTest(&convexShape, transform,  )
 
-		//btDynamicsWorld::ClosestConvexResultCallback convexCallback()
-
+		
 		return entities;
 	}
 

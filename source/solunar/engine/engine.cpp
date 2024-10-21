@@ -16,6 +16,9 @@
 #include "engine/physics/trianglemeshshape.h"
 #include "engine/physics/triggercomponent.h"
 
+// #HACK: move to game interface
+#include "shockgame/demogame.h"
+
 namespace solunar
 {
 	EngineData		g_engineData;
@@ -119,6 +122,8 @@ namespace solunar
 		
 		delete[] data;
 
+		g_GameManager->OnWorldLoad(filename);
+
 		// #TODO: RESET TIMER AND RUN ONE FRAME INSTEAD
 		Timer::GetInstance()->Update();
 		Timer::GetInstance()->Update();
@@ -136,6 +141,8 @@ namespace solunar
 
 		World* world = g_typeManager->CreateObject<World>();
 		ms_world = world;
+
+		g_GameManager->OnWorldLoad("");
 
 		// #TODO: RESET TIMER AND RUN ONE FRAME INSTEAD
 		Timer::GetInstance()->Update();
