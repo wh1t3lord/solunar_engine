@@ -47,7 +47,7 @@ namespace solunar
 		memset(&m_originalViewport, 0, sizeof(m_originalViewport));
 	}
 
-	const int kShadowMapSize = 1024;
+	const int kShadowMapSize = 1024 * 4;
 
 	void ShadowsRenderer::Init()
 	{
@@ -117,9 +117,9 @@ namespace solunar
 
 	void ShadowsRenderer::BeginRender()
 	{
-		ImGui::DragFloat("Z Near", &m_znear, 0.1f, 0.0f, 1.0f);
-		ImGui::DragFloat("Z Far", &m_zfar, 1.0f, 1.0f, 100.0f);
-		ImGui::DragFloat3("Pos", glm::value_ptr(pos), 1.0f, -100.0f, 100.0f);
+		//ImGui::DragFloat("Z Near", &m_znear, 0.1f, 0.0f, 1.0f);
+		//ImGui::DragFloat("Z Far", &m_zfar, 1.0f, 1.0f, 100.0f);
+		//ImGui::DragFloat3("Pos", glm::value_ptr(pos), 1.0f, -100.0f, 100.0f);
 
 		m_originalViewport = g_renderDevice->GetViewport();
 

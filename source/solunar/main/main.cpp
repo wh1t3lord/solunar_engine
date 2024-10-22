@@ -220,11 +220,7 @@ namespace solunar
 		// create window
 		int width = g_graphicsOptions.m_width, height = g_graphicsOptions.m_height;
 		bool fullscreen = g_graphicsOptions.m_fullscreen;
-#ifndef FINAL_BUILD
-		const char* title = "Vengeance Compile date: " __TIMESTAMP__;//= "Very big game title";
-#else
-		const char* title = "Project Vengeance";//= "Very big game title";
-#endif // !FINAL_BUILD
+		const char* title = "EngineWindowWin32";//= "Very big game title";
 		
 		WNDCLASSA wc = {};
 		wc.lpszClassName = "EngineWindowClass";

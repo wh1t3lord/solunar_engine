@@ -18,29 +18,6 @@
 		</BoxShapeComponent>
 	</Entity>
 	
-	<!-- Camera AI test -->
-	<Entity>
-		<Position x="0" y="3" z="0"/>
-		<Rotation x="0" y="0" z="0"/>
-		<Scale x="1" y="1" z="1"/>
-		<MeshComponent>
-			<Model filename="models/test_camera.dae"/>
-		</MeshComponent>
-		<ShockAIComponent>
-			<AIType value="ShockAIType_Camera"/>
-		</ShockAIComponent>
-	</Entity>
-
-	
-	<Entity>
-		<Position x="0" y="0" z="0"/>
-		<Rotation x="0" y="90" z="90"/>
-		<Scale x="1" y="1" z="1"/>
-		<MeshComponent>
-			<Model filename="models/test_camera.dae"/>
-		</MeshComponent>
-	</Entity>
-	
 	<!-- Test animated model
 	<Entity>
 		<Position x="2" y="0" z="2"/>

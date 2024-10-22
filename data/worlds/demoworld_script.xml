@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<Script name="traider_start">
+	<Command name="set_active_camera" value="traider_cam">
+	<Command name="disable_player_input" value="$player">
+	<Command name="open_traider_menu" value="">
+</Script>
+<Script name="traider_exit">
+	<Command name="set_active_camera" value="$player">
+	<Command name="enable_player_input" value="$player">
+</Script>

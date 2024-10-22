@@ -44,7 +44,7 @@ namespace solunar
 
 		// Casting functions
 
-		bool RayCast(RayCastResult& rayResult, const glm::vec3& rayStart, const glm::vec3& rayEnd);
+		bool RayCast(RayCastResult& rayResult, const glm::vec3& rayStart, const glm::vec3& rayEnd, const int collisionFilter = -1);
 		std::vector<Entity*> BoxCast(const glm::vec3& boxPos, const glm::vec3& boxSize);
 
 	private:

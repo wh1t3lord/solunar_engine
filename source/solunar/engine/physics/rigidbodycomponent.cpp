@@ -79,8 +79,33 @@ namespace solunar {
 		if (triggerElement)
 			triggerElement->QueryBoolAttribute("value", &m_isTrigger);
 
+		bool changeFilterUsableHack = false;
+
+		tinyxml2::XMLElement* filterElement = element.FirstChildElement("Filter");
+		if (filterElement)
+		{
+			const char* filterValue = nullptr;
+			filterElement->QueryStringAttribute("value", &filterValue);
+			if (filterValue)
+			{
+				if (strcmp(filterValue, "PhysicsFilter_Usable") == 0)
+				{
+					changeFilterUsableHack = true;
+				}
+			}
+		}
+
 		CreateBody();
 		UpdateBodyTranslationDirty();
+
+		if (changeFilterUsableHack)
+		{
+			m_rigidBody->getBroadphaseProxy()->m_collisionFilterGroup = PhysicsFilter_Usable;
+		}
+		else if (m_isTrigger)
+		{
+			m_rigidBody->getBroadphaseProxy()->m_collisionFilterGroup = PhysicsFilter_Triggers;
+		}
 	}
 
 	void RigidBodyComponent::SaveXML(tinyxml2::XMLElement& element)
@@ -216,6 +241,10 @@ namespace solunar {
 			bodyCollisionFlags &= ~btRigidBody::CF_NO_CONTACT_RESPONSE;
 
 		m_rigidBody->setCollisionFlags(bodyCollisionFlags);
+
+		// trigger custom color
+		if (m_isTrigger)
+			m_rigidBody->setCustomDebugColor(btVector3(1.0f, 0.5f, 0.0f));
 	}
 
 	void RigidBodyComponent::DisableCollide()

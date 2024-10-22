@@ -12,8 +12,12 @@ namespace solunar {
 	enum PhysicsFilter
 	{
 		PhysicsFilter_None = 1 << 6,
-		PhysicsFilter_Player = 1 << 6,
+		PhysicsFilter_Player = 1 << 7,
+		PhysicsFilter_Triggers = 1 << 8,
+		PhysicsFilter_Usable = 1 << 9,
 	};
+
+	const int kPhysicsFilter_AllAux = PhysicsFilter_Player | PhysicsFilter_Triggers | PhysicsFilter_Usable;
 
 	//! Rigid body component
 	class RigidBodyComponent : public Component
