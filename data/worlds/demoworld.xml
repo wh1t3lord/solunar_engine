@@ -31,65 +31,44 @@
 	
 	<!-- Player -->
 	<Entity>
-		<Position x="0" y="10" z="0"/>
+		<Position x="1" y="4" z="1"/>
 		<Rotation x="0" y="0" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		
 		<ShockPlayerController/>
 	</Entity>
 	
-	<!-------------------------------------------------------------------->
-	<!-- TRAIDER -->
-	
+	<!-- Level Geometry -->
 	<Entity>
-		<Position x="2" y="2.0" z="1.0"/>
-		<Rotation x="0" y="0" z="0"/>
-		<Scale x="1" y="1" z="1"/>
-		<PointLightComponent>
-			<AmbientColor r="0" g="0" b="0"/>
-			<Color r="0.5" g="0.5" b="0.5"/>
-			<SpecularColor r="0.1" g="0.1" b="0.1"/>
-			<Radius value="12"/>
-		</PointLightComponent>
-	</Entity> 
-	
-	<Entity>
-		<Position x="2" y="0" z="2"/>
+		<Position x="0" y="2" z="0"/>
 		<Rotation x="0" y="0" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		<MeshComponent>
-			<Model filename="models/stul_traider.dae"/>
+			<Model filename="models/common_wall_2x2.dae"/>
+			<CastShadow value="true"/>
 		</MeshComponent>
+		<RigidBodyComponent>
+			<Static value="true"/>
+		</RigidBodyComponent>
+		<BoxShapeComponent>
+			<Position x="0.06" y="-1" z="0"/>
+			<Size x="0.08" y="1" z="1"/>
+		</BoxShapeComponent>
 	</Entity>
 	
 	<Entity>
-		<Position x="2" y="0" z="1.3"/>
-		<Rotation x="0" y="0" z="0"/>
-		<Scale x="1" y="1" z="1"/>
-		<MeshComponent>
-			<Model filename="models/stol_traider.dae"/>
-		</MeshComponent>
-	</Entity>
-	
-	<Entity>
-		<Position x="2" y="0" z="2"/>
+		<Position x="0.2" y="1.3" z="-0.4"/>
 		<Rotation x="0" y="0" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		<AnimatedMeshComponent>
-			<Model filename="models/traider.glb"/>
+			<Model filename="models/worldmodel_shotgun.glb"/>
+			<CastShadow value="true"/>
 		</AnimatedMeshComponent>
-		<TestAnimationComponent>
-			<AnimationName name="idle"/>
-		</TestAnimationComponent>
 	</Entity>
-	
-	
-	<!-- TRAIDER LOGIC -->
-	
 	
 	<!-- Usable Box -->
 	<Entity>
-		<Position x="2.0" y="0.8" z="1.49"/>
+		<Position x="0.2" y="1.3" z="0"/>
 		<Rotation x="0" y="0" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		<RigidBodyComponent>
@@ -98,54 +77,13 @@
 		</RigidBodyComponent>
 		<BoxShapeComponent>
 			<Position x="0" y="0" z="0"/>
-			<Size x="0.8" y="0.2" z="0.45"/>
+			<Size x="0.05" y="0.2" z="0.45"/>
 		</BoxShapeComponent>
 		<UsableAreaComponent>
-			<Script value="traider_start"/>
+			<Script value="give_weapon weapon_shotgun"/>
 		</UsableAreaComponent>		
 	</Entity>
 	<!------------------->
-	
-	<!-- Traider collision -->
-	
-	<!--
-	<Entity>
-		<Position x="2.0" y="0.8" z="1.49"/>
-		<Rotation x="0" y="0" z="0"/>
-		<Scale x="1" y="1" z="1"/>
-		<RigidBodyComponent>
-			<Static value="true"/>
-		</RigidBodyComponent>
-		<BoxShapeComponent>
-			<Position x="0" y="0" z="0"/>
-			<Size x="1.0" y="0.4" z="0.65"/>
-		</BoxShapeComponent>
-	</Entity>
-	-->
-	<!-------------------------------------------------------------------->
-	
-	
-	<!-- TEMP LEVEL COLLISION 
-	<Entity>
-		<Position x="0" y="-1.0" z="0"/>
-		<Rotation x="0" y="0" z="0"/>
-		<Scale x="1" y="1" z="1"/>
-
-		<RigidBodyComponent>
-			<Position x="0" y="4" z="0"/>
-			<Static value="true"/>
-		</RigidBodyComponent>
-		
-		<BoxShapeComponent>
-			<Size x="7.0" y="1.0" z="30.0"/>
-		</BoxShapeComponent>
-	</Entity> -->
-	<!-------------------------->
-	
-	
-	
-	
-	
 	
 	<!-- SKY 
 	<Entity>

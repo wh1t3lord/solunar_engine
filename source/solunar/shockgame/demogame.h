@@ -21,6 +21,8 @@ public:
 
 	void OnInit();
 
+	const std::string& GetScriptName() { return m_scriptName; }
+
 private:
 	std::string m_scriptName;
 	bool m_isInited;

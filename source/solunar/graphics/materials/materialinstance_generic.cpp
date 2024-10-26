@@ -44,6 +44,8 @@ std::string getPixelVariationName(const std::string& instanceName, uint32_t pixe
 		shaderName += "_unlit";
 	if (pixelVariation & PixelVariation_Lit)
 		shaderName += "_lit";
+	if (pixelVariation & PixelVariation_Normalmap)
+		shaderName += "_normalmap";
 	return shaderName;
 }
 
@@ -56,8 +58,10 @@ MaterialInstance_Generic::MaterialInstance_Generic()
 	if (!isInited)
 	{
 		getShaderProgramVariation(VertexFactory_StaticMesh, PixelVariation_Lit);
+		getShaderProgramVariation(VertexFactory_StaticMesh, PixelVariation_Lit | PixelVariation_Normalmap);
 		getShaderProgramVariation(VertexFactory_StaticMesh, PixelVariation_Unlit);
 		getShaderProgramVariation(VertexFactory_SkinnedMesh, PixelVariation_Lit);
+		getShaderProgramVariation(VertexFactory_SkinnedMesh, PixelVariation_Lit | PixelVariation_Normalmap);
 		//getShaderProgramVariation(VertexFactory_SkinnedMesh, PixelVariation_Unlit);
 		isInited = true;
 	}

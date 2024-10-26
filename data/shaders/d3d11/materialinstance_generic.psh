@@ -3,6 +3,7 @@
 
 // C++ defines:
 //	UNLIT
+//	NORMALMAP
 
 #include "common.h"
 #include "cbuffers.h"
@@ -25,6 +26,14 @@ SamplerState		g_normalSampler : register(s1);
 
 Texture2D<float>	g_shadowmapTexture : register(t5);
 SamplerState		g_shadowmapSampler : register(s5);
+
+float3 CalculateNormal(float3 normal, float2 texcoord)
+{
+	float3 normalmap = g_normalTexture.Sample(g_normalSampler, texcoord).rgb;
+	normalmap = normalize(normalmap * 2.0 - 1.0);
+	normalmap = normalize(normal * normalmap);
+	return normalmap;
+}
 
 float ShadowCalculation(float4 fragPosLightSpace)
 {
@@ -66,6 +75,9 @@ float4 PSMain(VSOutput input) : SV_Target
 #endif
 
 	float3 N = input.normal;
+#ifdef NORMALMAP
+	N = CalculateNormal(N, input.texcoord);
+#endif
 	float3 L = -g_DirLight_direction.xyz;
 	float3 V = normalize(g_viewPos.xyz - input.worldPos.xyz);
 	float3 H = normalize(L + V);

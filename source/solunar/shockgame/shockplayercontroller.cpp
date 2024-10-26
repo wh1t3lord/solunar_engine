@@ -1,6 +1,8 @@
 #include "shockgamepch.h"
 #include "shockgame/shockplayercontroller.h"
 
+#include "core/file/contentmanager.h"
+
 #include "engine/inputmanager.h"
 
 #include "graphics/imguimanager.h"
@@ -31,6 +33,32 @@ END_PROPERTY_REGISTER(ShockPlayerController);
 Entity* g_freeCameraEntity = nullptr;
 CameraFirstPersonComponent* g_freeCamera = nullptr;
 
+Entity* CreateWeapon(Entity* cameraEntity)
+{
+	// create weapon
+	Entity* hackEntity = cameraEntity->CreateChild();
+	//Entity* hackEntity = getEntity()->createChild();
+	hackEntity->QuaternionRotate(glm::vec3(0.0f, 1.0f, 0.0f), -90.0f);
+
+	Entity* weaponEntity = hackEntity->CreateChild();
+	weaponEntity->SetPosition(glm::vec3(0.2f, -0.25f, -0.3f));
+
+	// load model
+	AnimatedMeshComponent* weaponMesh = weaponEntity->CreateComponent<AnimatedMeshComponent>();
+	weaponMesh->LoadModel("models/viewmodel_shotgun.glb");
+
+	weaponEntity->CreateComponent<WeaponComponent>();
+
+	//std::weak_ptr<AnimatedModel> weaponModel = dynamicCastWeakPtr<AnimatedModel, ModelBase>(m_weaponMesh->getModel());
+	//int rootNodeIndex = weaponModel.lock()->getNodeByName("Root Node");
+	//weaponModel.lock()->setNodeScale(rootNodeIndex, glm::vec3(0.1f));
+
+	// little hack #TODO: please remove ViewmodelAnimationController from shockgame.cpp
+	//Component* viewmodelComponent = (Component*)TypeManager::getInstance()->createObjectByName("ViewmodelAnimationController");
+	//m_weaponEntity->addComponent(viewmodelComponent);
+	return weaponEntity;
+}
+
 ShockPlayerController::ShockPlayerController() :
 	m_cameraEntity(nullptr),
 	m_camera(nullptr),
@@ -43,6 +71,9 @@ ShockPlayerController::ShockPlayerController() :
 	m_playerStats.m_health = 100.0f;
 	m_playerStats.m_endurance = 25.0f;
 	m_weaponSwayAngles = glm::vec3(0.0f);
+
+	// PRECACHE
+	g_contentManager->Load("models/viewmodel_shotgun.glb", AnimatedModel::GetStaticTypeInfo());
 }
 
 ShockPlayerController::~ShockPlayerController()
@@ -103,6 +134,7 @@ void ShockPlayerController::InitializeCamera()
 	ActivateCamera();
 
 	// create weapon
+#if 0
 	Entity* hackEntity = m_cameraEntity->CreateChild();
 	//Entity* hackEntity = getEntity()->createChild();
 	hackEntity->QuaternionRotate(glm::vec3(0.0f, 1.0f, 0.0f), -90.0f);
@@ -123,6 +155,7 @@ void ShockPlayerController::InitializeCamera()
 	// little hack #TODO: please remove ViewmodelAnimationController from shockgame.cpp
 	//Component* viewmodelComponent = (Component*)TypeManager::getInstance()->createObjectByName("ViewmodelAnimationController");
 	//m_weaponEntity->addComponent(viewmodelComponent);
+#endif
 
 	// #TODO: REMOVE FROM THIS
 	if (!g_freeCamera)
@@ -263,7 +296,8 @@ void ShockPlayerController::UpdateCamera(float dt)
 	glm::quat rot = glm::eulerAngleYX(glm::radians(-m_camera->m_yaw), glm::radians(m_camera->m_pitch));
 
 	//m_weaponEntity->setRotation(glm::slerp(rot, m_weaponEntity->getRotation(), 55.0f * dt));
-	m_weaponEntity->SetRotation(rot);
+	if (m_weaponEntity)
+		m_weaponEntity->SetRotation(rot);
 
 #if 0
 	 glm::vec3 cameraDirection = CameraProxy::GetInstance()->GetDirection();
@@ -367,10 +401,49 @@ void ShockPlayerController::UpdateLogic(float dt)
 		UsableAreaComponent* usableArea = rayCastResult.m_entity->GetComponent<UsableAreaComponent>();
 		if (usableArea)
 		{
+			if (InputManager::GetInstance()->IsPressedWithReset(KEY_E))
+			{
+				std::string scriptName = usableArea->GetScriptName();
+				if (!scriptName.empty())
+				{
+					std::string command;
+					std::string argument;
+
+					size_t spacePosition = scriptName.find_first_of(' ');
+					if (spacePosition != std::string::npos)
+					{
+						command = scriptName.substr(0, spacePosition);
+						argument = scriptName.substr(spacePosition + 1, scriptName.length());
+					}
+					else
+					{
+						command = scriptName;
+					}
+
+					if (command == "give_weapon")
+					{
+						if (argument.empty())
+						{
+							Core::Msg("UsableAreaComponent(Entity 0x%p): command give_weapon doesn't have any argument!", usableArea->GetEntity());
+						}
+						else if (m_weaponEntity)
+						{
+							Core::Msg("UsableAreaComponent(Entity 0x%p): command %s %s already have weapon!", usableArea->GetEntity(), command.c_str(), argument.c_str());
+						}
+						else
+						{
+							m_weaponEntity = CreateWeapon(m_cameraEntity);
+
+							Core::Msg("UsableAreaComponent(Entity 0x%p): command %s %s ok", usableArea->GetEntity(), command.c_str(), argument.c_str());
+						}
+					}
+				}
+			}
+
 			View* view = CameraProxy::GetInstance()->GetView();
 
 			glm::vec4 vp = glm::vec4(0.0f, 0.0f, (float)view->m_width, (float)view->m_height);
-			glm::vec3 proj = glm::project(rayCastResult.m_entity->GetWorldPosition(), view->m_view, view->m_projection, vp);
+			glm::vec3 proj = glm::project(rayCastResult.m_hitPosition, view->m_view, view->m_projection, vp);
 			if (proj.z >= 1.0f)
 				return; // clip
 
@@ -382,8 +455,66 @@ void ShockPlayerController::UpdateLogic(float dt)
 			proj.y = ((float)view->m_height - 1.0f - proj.y);
 
 
-			ImGui::GetForegroundDrawList()->AddRectFilled(ImVec2(proj.x - 16.0f, proj.y - 16.0f), ImVec2(proj.x + 16.0f, proj.y + 16.0f), 0xff0000ff);
+			//ImGui::GetForegroundDrawList()->AddRectFilled(ImVec2(proj.x - 16.0f, proj.y - 16.0f), ImVec2(proj.x + 16.0f, proj.y + 16.0f), 0xff0000ff);
 		}
+	}
+
+	{
+		View* view = CameraProxy::GetInstance()->GetView();
+
+		ImVec2 pos = ImVec2((float)view->m_width / 2.0f, (float)view->m_height / 2.0f);
+		
+	//	ImGui::GetForegroundDrawList()->AddCircle(pos, 12.0f, 0xff0000ff);
+		
+		//{
+		//	ImVec2 p1 = pos;
+		//	p1.x = p1.x - 16.0f;
+		//	ImVec2 p2 = pos;
+		//	p2.x = p2.x + 16.0f;
+		//	ImGui::GetForegroundDrawList()->AddLine(p1, p2, 0xffffffff);
+		//}
+		//{
+		//	ImVec2 p1 = pos;
+		//	p1.y = p1.y - 16.0f;
+		//	ImVec2 p2 = pos;
+		//	p2.y = p2.y + 16.0f;
+		//	ImGui::GetForegroundDrawList()->AddLine(p1, p2, 0xffffffff);
+		//}
+
+		const float kVoid = 4.0f;
+		const float kLenght = 24.0f;
+		
+		// vertical line
+		{
+			ImVec2 p1 = pos;
+			p1.x = p1.x - kLenght;
+			ImVec2 p2 = pos;
+			p2.x = p2.x - kVoid;
+			ImVec2 p3 = pos;
+			p3.x = p3.x + kVoid;
+			ImVec2 p4 = pos;
+			p4.x = p4.x + kLenght;
+
+			ImGui::GetForegroundDrawList()->AddLine(p1, p2, 0xffffffff);
+			ImGui::GetForegroundDrawList()->AddLine(p3, p4, 0xffffffff);
+		}
+
+		// horizontal
+		{
+			ImVec2 p1 = pos;
+			p1.y = p1.y - kLenght;
+			ImVec2 p2 = pos;
+			p2.y = p2.y - kVoid;
+			ImVec2 p3 = pos;
+			p3.y = p3.y + kVoid;
+			ImVec2 p4 = pos;
+			p4.y = p4.y + kLenght;
+
+			ImGui::GetForegroundDrawList()->AddLine(p1, p2, 0xffffffff);
+			ImGui::GetForegroundDrawList()->AddLine(p3, p4, 0xffffffff);
+		}
+
+		//ImGui::GetForegroundDrawList()->AddCircle(ImVec2(pos.x - 16.0f, pos.y - 16.0f), ImVec2(pos.x + 16.0f, pos.y + 16.0f), 0xff0000ff);
 	}
 }
 

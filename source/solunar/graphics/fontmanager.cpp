@@ -22,6 +22,7 @@
 
 #include "engine/camera.h"
 
+#include <imgui.h>
 #include <utility>
 
 namespace solunar
@@ -204,6 +205,7 @@ void FontManager::FlushPrimitives()
 	g_renderDevice->SetIndexBuffer(m_indexBuffer, true);
 
 	// draw font strings
+#if 0
 	for (auto& it : m_drawStrings)
 	{
 		// bind texture 
@@ -262,6 +264,92 @@ void FontManager::FlushPrimitives()
 		// draw
 		g_renderDevice->DrawIndexed(PM_TriangleList, 0, numIndices, 0);
 	}
+#else
+
+	FontImpl* previousFont = nullptr;
+	uint32_t numVertices = 0;
+	uint32_t numIndices = 0;
+	uint16_t currentIndex = 0;
+
+	// map our text buffer
+	FontVertex* fontVertices = (FontVertex*)m_vertexBuffer->Map(BufferMapping::WriteOnly);
+
+	// map our index buffer
+	uint16_t* fontIndices = (uint16_t*)m_indexBuffer->Map(BufferMapping::WriteOnly);
+
+	for (auto& it : m_drawStrings)
+	{
+		if (!previousFont)
+			previousFont = it.m_font;
+		
+		if (previousFont != it.m_font)
+		{
+			// unmap
+			m_indexBuffer->Unmap();
+			m_vertexBuffer->Unmap();
+
+			// draw
+			g_renderDevice->DrawIndexed(PM_TriangleList, 0, numIndices, 0);
+		
+			// map our text buffer
+			fontVertices = (FontVertex*)m_vertexBuffer->Map(BufferMapping::WriteOnly);
+
+			// map our index buffer
+			fontIndices = (uint16_t*)m_indexBuffer->Map(BufferMapping::WriteOnly);
+
+			previousFont = it.m_font;
+			numVertices = 0;
+			numIndices = 0;
+			currentIndex = 0;
+		}
+
+		// bind texture 
+		g_renderDevice->SetTexture2D(0, it.m_font->m_fontTexture);
+
+		size_t stringLength = it.m_string.length();
+
+		for (int i = 0; i < stringLength; i++)
+		{
+			stbtt_aligned_quad q;
+			stbtt_GetBakedQuad(it.m_font->m_fontChars, 512, 512, it.m_string[i] - 32, &it.m_x, &it.m_y, &q, 1);
+
+			fontIndices[numIndices] = currentIndex;
+			fontIndices[numIndices + 1] = currentIndex + 1;
+			fontIndices[numIndices + 2] = currentIndex + 2;
+			fontIndices[numIndices + 3] = currentIndex;
+			fontIndices[numIndices + 4] = currentIndex + 2;
+			fontIndices[numIndices + 5] = currentIndex + 3;
+
+			// position
+			fontVertices[numVertices + 0].position = glm::vec2(q.x0, (float)view->m_height - q.y0);
+			fontVertices[numVertices + 1].position = glm::vec2(q.x1, (float)view->m_height - q.y0);
+			fontVertices[numVertices + 2].position = glm::vec2(q.x1, (float)view->m_height - q.y1);
+			fontVertices[numVertices + 3].position = glm::vec2(q.x0, (float)view->m_height - q.y1);
+
+			// color
+			fontVertices[numVertices + 0].color = it.m_color;
+			fontVertices[numVertices + 1].color = it.m_color;
+			fontVertices[numVertices + 2].color = it.m_color;
+			fontVertices[numVertices + 3].color = it.m_color;
+
+			// texcoord
+			fontVertices[numVertices + 0].texcoord = glm::vec2(q.s0, q.t0);
+			fontVertices[numVertices + 1].texcoord = glm::vec2(q.s1, q.t0);
+			fontVertices[numVertices + 2].texcoord = glm::vec2(q.s1, q.t1);
+			fontVertices[numVertices + 3].texcoord = glm::vec2(q.s0, q.t1);
+
+			currentIndex += 4;
+			numIndices += 6;
+			numVertices += 4;
+		}
+	}
+#endif
+	// unmap
+	m_indexBuffer->Unmap();
+	m_vertexBuffer->Unmap();
+
+	// draw
+	g_renderDevice->DrawIndexed(PM_TriangleList, 0, numIndices, 0);
 
 	m_drawStrings.clear();
 	//m_drawStrings.resize(0);
@@ -310,6 +398,8 @@ IFont* FontManager::CreateFont(const char* filename, float size)
 
 void FontManager::DrawFontText(IFont* font, const char* text, float x, float y, const glm::vec4& color)
 {
+	//ImGui::GetForegroundDrawList()->AddText(ImVec2(x, y), IM_COL32(color.r * 255, color.g * 255, color.b * 255, color.a * 255), text);
+
 	StringDrawInfo drawInfo;
 	drawInfo.m_font = (FontImpl*)font;
 	drawInfo.m_string = text;

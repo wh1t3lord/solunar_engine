@@ -152,7 +152,7 @@ namespace solunar
 		if (!directionalLightEntity)
 			return;
 
-		glm::mat4 lightProjection = glm::ortho(-10.0f, 10.0f, -10.0f, 10.0f, m_znear, m_zfar);
+		glm::mat4 lightProjection = glm::ortho(-5.0f, 5.0f, -5.0f, 5.0f, m_znear, m_zfar);
 
 		// calculate view matrix for light
 		m_lightViewMatrix = glm::lookAt(pos,
@@ -173,7 +173,7 @@ namespace solunar
 
 		// shader selection
 		IShaderProgram* shaderProgram = nullptr;
-		if (mesh->IsA<AnimatedMeshComponent>())
+		if (mesh->IsA<AnimatedMeshComponent>() && dynamicCast<AnimatedMeshComponent>(mesh)->HasSkin())
 			shaderProgram = m_shadowShader_AnimationMesh;
 		else
 			shaderProgram = m_shadowShader_StaticMesh;

@@ -225,6 +225,7 @@ namespace solunar
 		WNDCLASSA wc = {};
 		wc.lpszClassName = "EngineWindowClass";
 		wc.lpfnWndProc = wndProc;
+		wc.hbrBackground = CreateSolidBrush(0x00000000);
 		RegisterClassA(&wc);
 
 		RECT rc = { 0, 0, width, height };

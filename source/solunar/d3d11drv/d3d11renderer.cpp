@@ -302,11 +302,17 @@ void D3D11Renderer::BindMaterialForMesh(MeshComponent* mesh, Material* material,
 	if (material->m_selfillum)
 		pixelVariation |= PixelVariation_Unlit;
 	else
+	{
 		pixelVariation |= PixelVariation_Lit;
+
+		if (!material->m_normalTexture.expired())
+			pixelVariation |= PixelVariation_Normalmap;
+	}
+		
 
 	IShaderProgram* shaderProgram = nullptr;
 
-	if (mesh->IsA<AnimatedMeshComponent>())
+	if (mesh->IsA<AnimatedMeshComponent>() && dynamicCast<AnimatedMeshComponent>(mesh)->HasSkin())
 		shaderProgram = materialInstance->getShaderProgramVariation(VertexFactory_SkinnedMesh, pixelVariation);
 	else
 		shaderProgram = materialInstance->getShaderProgramVariation(VertexFactory_StaticMesh, pixelVariation);

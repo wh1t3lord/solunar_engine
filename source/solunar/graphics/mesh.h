@@ -59,6 +59,7 @@ namespace solunar {
 
 		void Render() override;
 
+		bool HasSkin();
 	};
 
 }

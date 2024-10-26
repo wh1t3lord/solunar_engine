@@ -24,8 +24,8 @@ struct FontVertex
 };
 
 // Limited to 1024 characters per one sentence
-const int kMaxFontVBSize = sizeof(FontVertex)	* 1024;
-const int kMaxFontIBSize = sizeof(uint16_t)		* 1024;
+const int kMaxFontVBSize = sizeof(FontVertex)	* 1024 * 4;
+const int kMaxFontIBSize = sizeof(uint16_t)		* 1024 * 4;
 
 class FontManager;
 
@@ -67,10 +67,44 @@ private:
 	void InitPrivate();
 
 private:
+	template <int Capacity>
+	struct FixedDrawString
+	{
+		char buf[Capacity];
+
+		FixedDrawString()
+		{
+			buf[0] = '\0';
+		}
+
+		~FixedDrawString()
+		{
+			buf[0] = '\0';
+		}
+
+		FixedDrawString& operator=(const char* text)
+		{
+			Assert(strlen(text) <= Capacity);
+			strncpy(buf, text, Capacity);
+			return *this;
+		}
+
+		char operator[](size_t index)
+		{
+			Assert(index < Capacity);
+			return buf[index];
+		}
+
+		const int length() const { return strlen(buf); }
+		const char* c_str() const { return buf; }
+	};
+
+	typedef FixedDrawString<256> DrawString256;
+
 	struct StringDrawInfo
 	{
 		FontImpl* m_font;
-		std::string m_string;
+		DrawString256 m_string;
 		float m_x;
 		float m_y;
 		glm::vec4 m_color;

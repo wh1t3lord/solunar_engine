@@ -157,6 +157,8 @@ public:
 
 	void DebugRender(const glm::mat4& modelMatrix);
 
+	bool HasSkin() { return m_skins.size(); }
+
 private:
 	std::vector<AnimatedSubMesh*> m_subMeshes;
 	std::vector<Animation> m_animations;

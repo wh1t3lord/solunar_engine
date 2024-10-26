@@ -51,6 +51,28 @@ namespace solunar
 	IDepthStencilState* g_depthStencilState_Default = nullptr;
 	IRasterizerState* g_rasterizerState_Default = nullptr;
 
+	void DrawLoadscreen()
+	{
+		std::weak_ptr<TextureMap> loadscreen = g_contentManager->LoadObject<TextureMap>("textures/loadscreen.jpg");
+
+		View* view = CameraProxy::GetInstance()->GetView();
+
+		Viewport viewport;
+		viewport.m_x = 0;
+		viewport.m_y = 0;
+		viewport.m_width = view->m_width;
+		viewport.m_height = view->m_height;
+		g_renderDevice->SetViewport(&viewport);
+		g_renderDevice->SetSamplerState(0, g_defaultSampler);
+
+		g_stateManager->SetDepthStencilState(g_depthStencilState_NoWrite, 0);
+		g_stateManager->SetRasterizerState(g_rasterizerState_Default);
+
+		g_renderer->BeginFrame();
+		ScreenQuad::Render(loadscreen.lock()->getHWTexture());
+		g_renderer->EndFrame();
+	}
+
 	Renderer::Renderer()
 	{
 		m_meshPolysWireframe	= false;
@@ -73,7 +95,7 @@ namespace solunar
 		if (!g_fileSystem->Exist("data/shaders/dx11/quad.vsh") ||
 			!g_fileSystem->Exist("data/shaders/dx11/quad.psh"))
 		{
-			Core::Error("Game files is corrupted or incomplete.\nFor devs: wrong working directory???");
+			Core::Error("Game files is corrupted or incomplete.");
 		}
 #endif
 
@@ -201,6 +223,9 @@ namespace solunar
 		ShaderConstantManager::GetInstance()->Init();
 
 		ScreenQuad::Init();
+
+		// Draw loading screen
+		DrawLoadscreen();
 
 		// Initialize font manager
 		g_fontManager = mem_new<FontManager>();

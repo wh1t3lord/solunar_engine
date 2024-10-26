@@ -153,4 +153,17 @@ namespace solunar {
 			animatedModel.lock()->DebugRender(GetEntity()->GetWorldTranslation());
 		}
 	}
+
+	bool AnimatedMeshComponent::HasSkin()
+	{
+
+		if (!m_model.expired())
+		{
+			// guarantee cast, trust me 
+			std::weak_ptr<AnimatedModel> animatedModel = dynamicCastWeakPtr<AnimatedModel, ModelBase>(m_model);
+			return animatedModel.lock()->HasSkin();
+		}
+
+		return false;
+	}
 }
