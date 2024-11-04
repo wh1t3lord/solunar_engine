@@ -17,6 +17,8 @@
 #include "main/main.h"
 #endif // _WIN32
 
+#include "ImGuizmo.h"
+
 namespace solunar
 {
 	struct VERTEX_CONSTANT_BUFFER_DX11
@@ -619,6 +621,8 @@ namespace solunar
 		m_ImGuiRenderer.newFrame();
 
 		ImGui::NewFrame();
+
+		ImGuizmo::BeginFrame();
 	}
 
 	void ImGuiManager::EndFrame()
