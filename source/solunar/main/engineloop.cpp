@@ -57,6 +57,11 @@ namespace solunar {
 			g_modelConvert = true;
 			g_modelConvertName = g_commandLine.getOptionParameter("-modelConvert");
 		}
+
+		if (g_commandLine.hasOption("-editor"))
+		{
+			g_engineData.m_editor = true;
+		}
 	}
 
 	static bool g_showEntityList = false;

@@ -3,6 +3,8 @@
 
 #include "graphics/ifontmanager.h"
 
+#include "engine/engine.h"
+#include "engine/inputmanager.h"
 #include "engine/camera.h"
 
 namespace solunar
@@ -82,5 +84,68 @@ void GameManager::OnWorldLoad(const std::string& worldName)
 }
 
 Entity* g_Player = nullptr;
+
+IMPLEMENT_OBJECT(EditorCameraComponent, LogicComponent);
+
+EditorCameraComponent::EditorCameraComponent() :
+	m_camera(nullptr)
+{
+}
+
+EditorCameraComponent::~EditorCameraComponent()
+{
+}
+
+void EditorCameraComponent::OnEntitySet(Entity* entity)
+{
+	LogicComponent::OnEntitySet(entity);
+
+	m_camera = entity->CreateComponent<CameraFirstPersonComponent>();
+	
+	CameraProxy::GetInstance()->SetCameraComponent(m_camera);
+
+	g_engineData.m_shouldCaptureMouse = true;
+	g_engineData.m_shouldHideMouse = true;
+}
+
+void EditorCameraComponent::OnEntityRemove()
+{
+	LogicComponent::OnEntityRemove();
+}
+
+void EditorCameraComponent::Update(float delta)
+{
+	LogicComponent::Update(delta);
+
+	InputManager* input = InputManager::GetInstance();
+	glm::vec2 mousePos = input->GetCursorPos();
+
+	glm::vec2 deltaMousePos = input->GetDeltaCursorPos();
+	m_camera->updateFromMousePosition(deltaMousePos);
+
+	glm::vec3 cameraDirection = CameraProxy::GetInstance()->GetDirection();
+	glm::vec3 pos = GetEntity()->GetPosition();
+	float camSpeed = 8.0f * delta;
+
+	if (input->IsPressed(KeyboardKeys::KEY_LEFT_SHIFT))
+		camSpeed = 18.0f * delta;
+
+	if (input->IsPressed(KeyboardKeys::KEY_W))
+		pos += camSpeed * cameraDirection;
+	if (input->IsPressed(KeyboardKeys::KEY_S))
+		pos -= camSpeed * cameraDirection;
+
+	if (input->IsPressed(KeyboardKeys::KEY_Q))
+		pos -= glm::normalize(glm::cross(cameraDirection, glm::vec3(1.0f, 0.0f, 0.0f))) * camSpeed;
+	if (input->IsPressed(KeyboardKeys::KEY_E))
+		pos += glm::normalize(glm::cross(cameraDirection, glm::vec3(1.0f, 0.0f, 0.0f))) * camSpeed;
+
+	if (input->IsPressed(KeyboardKeys::KEY_A))
+		pos -= glm::normalize(glm::cross(cameraDirection, glm::vec3(0.0f, 1.0f, 0.0f))) * camSpeed;
+	if (input->IsPressed(KeyboardKeys::KEY_D))
+		pos += glm::normalize(glm::cross(cameraDirection, glm::vec3(0.0f, 1.0f, 0.0f))) * camSpeed;
+
+	GetEntity()->SetPosition(pos);
+}
 
 }

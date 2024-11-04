@@ -58,6 +58,7 @@ namespace solunar
 	{
 		bool m_shouldCaptureMouse = false;
 		bool m_shouldHideMouse = false;
+		bool m_editor = false;
 	};
 
 	extern EngineData g_engineData;

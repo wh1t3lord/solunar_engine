@@ -224,6 +224,7 @@ void registerGameClasses()
 		OBJECT_GET_TYPEINFO(TestAnimationComponent),
 		OBJECT_GET_TYPEINFO(ViewmodelAnimationController),
 		OBJECT_GET_TYPEINFO(UsableAreaComponent),
+		OBJECT_GET_TYPEINFO(EditorCameraComponent),
 	};
 
 	for (int i = 0; i < sizeof(gameClasses) / sizeof(gameClasses[0]); i++)

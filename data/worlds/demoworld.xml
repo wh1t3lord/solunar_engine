@@ -30,14 +30,18 @@
 	</Entity>
 	
 	<!-- Player -->
+	
 	<Entity>
 		<Position x="1" y="4" z="1"/>
 		<Rotation x="0" y="0" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		
-		<ShockPlayerController/>
+		<EditorCameraComponent/> <!-- FOR EDITOR !!! -->
+		<!-- <ShockPlayerController/> 	-->
 	</Entity>
+
 	
+
 	<!-- Level Geometry -->
 	<Entity>
 		<Position x="0" y="2" z="0"/>
@@ -84,6 +88,20 @@
 		</UsableAreaComponent>		
 	</Entity>
 	<!------------------->
+	
+	<!-- Test point light -->
+	<Entity>
+		<Position x="2" y="1" z="0"/>
+		<Rotation x="0" y="0" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		<PointLightComponent>
+			<AmbientColor r="0.501" g="0.443" b="0.337"/>
+			<Color r="0.678" g="0.596" b="0.427"/>
+			<SpecularColor r="0.678" g="0.596" b="0.427"/>
+			<Radius value="2"/>
+		</PointLightComponent>
+	</Entity> 
+	
 	
 	<!-- SKY 
 	<Entity>
