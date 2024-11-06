@@ -20,11 +20,11 @@ namespace solunar
 
 	LightComponent::LightComponent()
 	{
-		m_color = glm::vec3(2.0f);
-		m_ambientColor = glm::vec3(0.2f);
+		m_color = glm::vec3(1.0f);
+		m_ambientColor = glm::vec3(1.0f);
 		m_specularColor = glm::vec3(1.0f);
 	//	m_shininess = 128;
-		m_radius = 5.0f;
+		m_radius = 50.0f;
 	}
 
 	LightComponent::~LightComponent()
@@ -108,6 +108,22 @@ namespace solunar
 
 	void LightComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
+		Component::SaveXML(element);
+
+		tinyxml2::XMLElement* ambientColorElement = element.InsertNewChildElement("AmbientColor");
+		ambientColorElement->SetAttribute("r", m_ambientColor.r);
+		ambientColorElement->SetAttribute("g", m_ambientColor.g);
+		ambientColorElement->SetAttribute("b", m_ambientColor.b);
+
+		tinyxml2::XMLElement* colorElement = element.InsertNewChildElement("Color");
+		colorElement->SetAttribute("r", m_color.r);
+		colorElement->SetAttribute("g", m_color.g);
+		colorElement->SetAttribute("b", m_color.b);
+
+		tinyxml2::XMLElement* specularColorElement = element.InsertNewChildElement("SpecularColor");
+		specularColorElement->SetAttribute("r", m_specularColor.r);
+		specularColorElement->SetAttribute("g", m_specularColor.g);
+		specularColorElement->SetAttribute("b", m_specularColor.b);
 	}
 
 	/////////////////////////////////////////////////////////////////////
@@ -135,6 +151,10 @@ namespace solunar
 
 	void PointLightComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
+		LightComponent::SaveXML(element);
+	
+		tinyxml2::XMLElement* radiusElement = element.InsertNewChildElement("Radius");
+		radiusElement->SetAttribute("value", m_radius);
 	}
 
 

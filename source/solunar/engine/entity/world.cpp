@@ -55,7 +55,7 @@ namespace solunar
 			// if classname
 			else if (const tinyxml2::XMLAttribute* nodeClassName = entityElement->FindAttribute("className"))
 			{
-				entityTypeInfo = g_typeManager->GetTypeInfoByName(nodeClassId->Value());
+				entityTypeInfo = g_typeManager->GetTypeInfoByName(nodeClassName->Value());
 			}
 
 			Entity* entity = CreateEntityEx(entityTypeInfo);
@@ -69,6 +69,16 @@ namespace solunar
 
 	void World::SaveXML(tinyxml2::XMLElement& element)
 	{
+		const std::vector<Entity*>& entities = m_entityManager.GetEntities();
+		for (auto it : entities)
+		{
+			if (it->GetRootEntity())
+				continue;
+
+			tinyxml2::XMLElement* entityElement = element.InsertNewChildElement("Entity");
+			entityElement->SetAttribute("className", it->GetTypeInfo()->GetClassName());
+			it->SaveXML(*entityElement);
+		}
 	}
 
 	void World::PostInitializeEntity(Entity* entity)
@@ -146,7 +156,7 @@ namespace solunar
 		btDynamicsWorld::ClosestRayResultCallback rayCallback(glmVectorToBt(rayStart), glmVectorToBt(rayEnd));
 		
 		if (collisionFilter == -1)
-			rayCallback.m_collisionFilterMask = -1;//kCollisionFilterAllMask;
+			rayCallback.m_collisionFilterMask = kCollisionFilterAllMask;
 		else
 			rayCallback.m_collisionFilterMask = collisionFilter;
 

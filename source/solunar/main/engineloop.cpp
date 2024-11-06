@@ -12,6 +12,7 @@
 #include "engine/engine.h"
 #include "engine/inputmanager.h"
 #include "engine/gameinterface.h"
+#include "engine/debugoverlay.h"
 #include "engine/camera.h"
 #include "engine/entity/component.h"
 #include "engine/entity/world.h"
@@ -22,6 +23,9 @@
 #include "graphics/renderer.h"
 #include "graphics/imguimanager.h"
 #include "graphics/lightmanager.h"
+#include "graphics/mesh.h"
+#include "graphics/model.h"
+#include "graphics/animatedmodel.h"
 
 #include "shockgame/shockgame.h"
 #include "shockgame/shockplayercontroller.h"
@@ -157,6 +161,30 @@ namespace solunar {
 		doc.SaveFile("editor_classes.xml");
 	}
 
+	void SaveWorld()
+	{
+		tinyxml2::XMLDocument doc;
+
+		tinyxml2::XMLElement* pRoot = doc.NewElement("World");
+		doc.InsertFirstChild(pRoot);
+
+		Engine::ms_world->SaveXML(*pRoot);
+
+		doc.SaveFile("data/worlds/demoworld_clone.xml");
+	}
+
+	void Precache()
+	{
+
+		// PRECACHE TEXTURE MAPS
+		g_contentManager->Load("textures/common/dev_64.tga", TextureMap::GetStaticTypeInfo());
+		g_contentManager->Load("textures/models/armColor.png", TextureMap::GetStaticTypeInfo());
+		g_contentManager->Load("textures/models/boomstickColor.png", TextureMap::GetStaticTypeInfo());
+
+		// PRECACHE MODELS
+		g_contentManager->Load("models/viewmodel_shotgun.glb", AnimatedModel::GetStaticTypeInfo());
+	}
+
 	void ShowEngineDebugOverlay()
 	{
 		if (ImGui::BeginMainMenuBar())
@@ -190,6 +218,13 @@ namespace solunar {
 				ImGui::EndMenu();
 			}
 
+
+			if (ImGui::BeginMenu("World"))
+			{
+				if (ImGui::MenuItem("Save world")) { SaveWorld(); }
+				ImGui::EndMenu();
+			}
+
 			ImGui::EndMainMenuBar();
 		}
 
@@ -201,6 +236,8 @@ namespace solunar {
 
 		if (g_showShockPlayerDebug)
 			shockGamePlayerDebug(&g_showShockPlayerDebug);
+
+		DebugOverlay::render();
 	}
 
 	static std::string g_startWorldFilename;
@@ -262,6 +299,8 @@ namespace solunar {
 		}
 
 		LoadEnvironmentConfig();
+
+		Precache();
 
 		if (!g_startWorldFilename.empty() && !g_commandLine.hasOption("-world"))
 		{

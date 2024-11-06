@@ -114,6 +114,7 @@ float4 PSMain(VSOutput input) : SV_Target
 		ligthing += pointLightPhong(pointLight.color.rgb, pointLight.specular.rgb, 2.0, PL, input.normal, R) * falloff;
 	}
 	
+#if 0
 	for (int i = 0; i < g_spotLightCount; i++)
 	{
 		// get local copy of spot light from ubo
@@ -138,15 +139,23 @@ float4 PSMain(VSOutput input) : SV_Target
 			//ligthing += pointLightPhong(spotLight.color.rgb, spotLight.specular.rgb, 2.0, PL, input.normal, R) * falloff;
 		}
 	}
+#endif
 	
 	// calculate shadow
 	float shadow = ShadowCalculation(input.lightSpace);
+	shadow=1.0f;
 	
 	// Uncomment to see projected shadow map
 	//float3 finalColor = float3(shadow, shadow, shadow);
 
+	// Final color without directional
+	//float3 finalColor = albedoColor * ligthing;
+
+	// Final color without directional
+	float3 finalColor = albedoColor * (ambientColor + (1.0f - shadow)) * ligthing;
+
 	// Final color calculation
-	float3 finalColor = albedoColor * (ambientColor + (1.0f - shadow)) * (diffuseColor + specularColor + ligthing);
+	//float3 finalColor = albedoColor * (ambientColor + (1.0f - shadow)) * (diffuseColor + specularColor + ligthing);
 	//float3 finalColor = albedoColor * (ambientColor + (ambientColor - shadow)) * (diffuseColor + specularColor + ligthing);
 	
 	//float3 finalColor = albedoColor * (diffuseColor + (1.0 - shadow) + specularColor + ligthing);

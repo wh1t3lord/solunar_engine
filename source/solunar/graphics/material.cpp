@@ -424,7 +424,7 @@ namespace solunar
 		//}
 
 		// TODO: Return default texture if TextureMap is not exist
-		if (m_albedoTextureFileName.empty())
+		if (m_albedoTextureFileName.empty() || !g_contentManager->OpenStream(m_albedoTextureFileName))
 			m_albedoTextureFileName = "textures/system/notex.bmp";
 
 		m_albedoTexture = g_contentManager->LoadObject<TextureMap>(m_albedoTextureFileName);

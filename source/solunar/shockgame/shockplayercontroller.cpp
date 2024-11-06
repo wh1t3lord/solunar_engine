@@ -71,9 +71,6 @@ ShockPlayerController::ShockPlayerController() :
 	m_playerStats.m_health = 100.0f;
 	m_playerStats.m_endurance = 25.0f;
 	m_weaponSwayAngles = glm::vec3(0.0f);
-
-	// PRECACHE
-	g_contentManager->Load("models/viewmodel_shotgun.glb", AnimatedModel::GetStaticTypeInfo());
 }
 
 ShockPlayerController::~ShockPlayerController()
@@ -256,8 +253,12 @@ void ShockPlayerController::Update(float dt)
 	char enduranceText[64];
 	snprintf(enduranceText, sizeof(enduranceText), "Endurance: %.0f", m_playerStats.m_endurance);
 
+	char moneyText[64];
+	snprintf(moneyText, sizeof(moneyText), "Money: %i", 100500);
+
+
 	s_font->DrawText(healthText, 25.0f, view->m_height - 50.0f, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
-	//s_font->DrawText(enduranceText, 25.0f, view->m_height - 25.0f, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
+	s_font->DrawText(moneyText, view->m_width - 256.0f, view->m_height - 25.0f, glm::vec4(0.0f, 0.5f, 0.0f, 1.0f));
 #endif
 
 	// update camera look
@@ -449,13 +450,18 @@ void ShockPlayerController::UpdateLogic(float dt)
 
 			proj.y = ((float)view->m_height - 1.0f - proj.y);
 
-			ImGui::GetForegroundDrawList()->AddText(ImVec2(proj.x, proj.y), IM_COL32_WHITE, "Press E to use");
+			const char* label = "Press E to use (600$)";
+			const ImVec2 label_size = ImGui::CalcTextSize(label, NULL, true);
+
+			s_font->DrawText(label, proj.x - label_size.x, proj.y + 64.0f, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+
+			//ImGui::GetForegroundDrawList()->AddText(ImVec2(proj.x - label_size.x/2.0f, proj.y + 32.0f /*+ label_size.y / 2.0f*/), 0xff0000ff, label);
 
 			proj = glm::project(rayCastResult.m_hitPosition, view->m_view, view->m_projection, vp);
 			proj.y = ((float)view->m_height - 1.0f - proj.y);
 
 
-			//ImGui::GetForegroundDrawList()->AddRectFilled(ImVec2(proj.x - 16.0f, proj.y - 16.0f), ImVec2(proj.x + 16.0f, proj.y + 16.0f), 0xff0000ff);
+			//ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(proj.x - 16.0f, proj.y - 16.0f), ImVec2(proj.x + 16.0f, proj.y + 16.0f), 0xff0000ff);
 		}
 	}
 
@@ -464,24 +470,24 @@ void ShockPlayerController::UpdateLogic(float dt)
 
 		ImVec2 pos = ImVec2((float)view->m_width / 2.0f, (float)view->m_height / 2.0f);
 		
-	//	ImGui::GetForegroundDrawList()->AddCircle(pos, 12.0f, 0xff0000ff);
+	//	ImGui::GetBackgroundDrawList()->AddCircle(pos, 12.0f, 0xff0000ff);
 		
 		//{
 		//	ImVec2 p1 = pos;
 		//	p1.x = p1.x - 16.0f;
 		//	ImVec2 p2 = pos;
 		//	p2.x = p2.x + 16.0f;
-		//	ImGui::GetForegroundDrawList()->AddLine(p1, p2, 0xffffffff);
+		//	ImGui::GetBackgroundDrawList()->AddLine(p1, p2, 0xffffffff);
 		//}
 		//{
 		//	ImVec2 p1 = pos;
 		//	p1.y = p1.y - 16.0f;
 		//	ImVec2 p2 = pos;
 		//	p2.y = p2.y + 16.0f;
-		//	ImGui::GetForegroundDrawList()->AddLine(p1, p2, 0xffffffff);
+		//	ImGui::GetBackgroundDrawList()->AddLine(p1, p2, 0xffffffff);
 		//}
 
-		const float kVoid = 4.0f;
+		const float kVoid = 8.0f;
 		const float kLenght = 24.0f;
 		
 		// vertical line
@@ -495,8 +501,13 @@ void ShockPlayerController::UpdateLogic(float dt)
 			ImVec2 p4 = pos;
 			p4.x = p4.x + kLenght;
 
-			ImGui::GetForegroundDrawList()->AddLine(p1, p2, 0xffffffff);
-			ImGui::GetForegroundDrawList()->AddLine(p3, p4, 0xffffffff);
+			// black
+			ImGui::GetBackgroundDrawList()->AddLine(ImVec2(p1.x - 1.0f, p1.y), ImVec2(p2.x + 1.0f, p2.y), 0xff000000, 3.0f);
+			ImGui::GetBackgroundDrawList()->AddLine(ImVec2(p3.x - 1.0f, p3.y), ImVec2(p4.x + 1.0f, p4.y), 0xff000000, 3.0f);
+
+			// white 
+			ImGui::GetBackgroundDrawList()->AddLine(p1, p2, 0xffffffff);
+			ImGui::GetBackgroundDrawList()->AddLine(p3, p4, 0xffffffff);
 		}
 
 		// horizontal
@@ -510,11 +521,16 @@ void ShockPlayerController::UpdateLogic(float dt)
 			ImVec2 p4 = pos;
 			p4.y = p4.y + kLenght;
 
-			ImGui::GetForegroundDrawList()->AddLine(p1, p2, 0xffffffff);
-			ImGui::GetForegroundDrawList()->AddLine(p3, p4, 0xffffffff);
+			// black
+			ImGui::GetBackgroundDrawList()->AddLine(ImVec2(p1.x, p1.y - 1.0f), ImVec2(p2.x, p2.y + 1.0f), 0xff000000, 3.0f);
+			ImGui::GetBackgroundDrawList()->AddLine(ImVec2(p3.x, p3.y - 1.0f), ImVec2(p4.x, p4.y + 1.0f), 0xff000000, 3.0f);
+
+			// white 
+			ImGui::GetBackgroundDrawList()->AddLine(p1, p2, 0xffffffff);
+			ImGui::GetBackgroundDrawList()->AddLine(p3, p4, 0xffffffff);
 		}
 
-		//ImGui::GetForegroundDrawList()->AddCircle(ImVec2(pos.x - 16.0f, pos.y - 16.0f), ImVec2(pos.x + 16.0f, pos.y + 16.0f), 0xff0000ff);
+		//ImGui::GetBackgroundDrawList()->AddCircle(ImVec2(pos.x - 16.0f, pos.y - 16.0f), ImVec2(pos.x + 16.0f, pos.y + 16.0f), 0xff0000ff);
 	}
 }
 
@@ -522,6 +538,7 @@ void ShockPlayerController::DebugUpdate(float dt)
 {
 	if (!m_rigidBody)
 		return;
+	return;
 
 	static char buf[256];
 	

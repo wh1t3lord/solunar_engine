@@ -44,6 +44,7 @@ namespace solunar {
 
 	protected:
 		std::weak_ptr<ModelBase> m_model;
+		std::string m_filename;
 		bool m_castShadows;
 	};
 

@@ -68,7 +68,7 @@ ID3DBlob* CreateShaderFromText(const char* text, ShaderType shaderType, const ch
 	ID3DBlob* errorTextBlob = nullptr;
 
 	const char* entryPoint = (shaderType == ShaderType_Vertex) ? "VSMain" : "PSMain";
-	const char* shaderTarget = (shaderType == ShaderType_Vertex) ? "vs_5_0" : "ps_5_0";
+	const char* shaderTarget = (shaderType == ShaderType_Vertex) ? "vs_4_0" : "ps_4_0";
 
 	std::vector<std::string> shderMacroStrings;
 	if (defines && strlen(defines) > 0)

@@ -26,6 +26,7 @@ public:
 	virtual void OnWorldSet(World* world);
 
 	void SetRootEntity(Entity* node);
+	Entity* GetRootEntity() { return m_rootEntity; }
 
 	glm::vec3 GetPosition()	const	{ return m_position; }
 	glm::quat GetRotation()	const	{ return m_rotation; }

@@ -38,7 +38,7 @@
 			<AmbientColor r="0.501" g="0.443" b="0.337"/>
 			<Color r="0.678" g="0.596" b="0.427"/>
 			<SpecularColor r="0.678" g="0.596" b="0.427"/>
-			<Radius value="2"/>
+			<Radius value="12"/>
 		</PointLightComponent>
 	</Entity> 
 	

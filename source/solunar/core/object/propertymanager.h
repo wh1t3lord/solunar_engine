@@ -98,6 +98,14 @@ inline void PropertyGetValue(Object* object, IProperty* property, T& value)
 	value = *propertyData;
 }
 
+template<typename T>
+inline void PropertyGetValue(Object* object, IProperty* property, T*& value)
+{
+	void* data = object + property->GetOffset();
+	T* propertyData = reinterpret_cast<T*>(data);
+	value = propertyData;
+}
+
 template<>
 inline void PropertyGetValue(Object* object, IProperty* property, std::string& value)
 {

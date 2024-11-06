@@ -8,6 +8,10 @@ if (MSVC)
     add_compile_options(/W3) # Warning level
 endif()
 
+if (CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
+	set(CMAKE_CXX_FLAGS_DEBUG "/MDd /ZI /Ob0 /Od /RTC1")
+endif()
+
 ## Final
 if (SOLUNAR_ENABLE_FINAL)
     SET(CMAKE_CXX_FLAGS_FINAL "${CMAKE_CXX_FLAGS}" CACHE STRING "Flags used by the C++ compiler during coverage builds." FORCE )

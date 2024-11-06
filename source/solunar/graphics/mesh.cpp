@@ -35,6 +35,7 @@ namespace solunar {
 			{
 				std::string filename = filenameAttribute->Value();
 				m_model = g_contentManager->LoadObject<ModelBase>(filename);
+				m_filename = filename;
 			}
 			else
 			{
@@ -49,10 +50,16 @@ namespace solunar {
 
 	void MeshComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
+		Component::SaveXML(element);
+
+		tinyxml2::XMLElement* modelElement = element.InsertNewChildElement("Model");
+		modelElement->SetAttribute("filename", m_filename.c_str());
 	}
 
 	void MeshComponent::OnWorldSet(World* world)
 	{
+		Component::OnWorldSet(world);
+
 		world->GetGraphicsWorld()->AddMesh(this);
 	}
 
@@ -73,6 +80,7 @@ namespace solunar {
 	void MeshComponent::LoadModel(const std::string& filename)
 	{
 		m_model = g_contentManager->LoadObject<ModelBase>(filename);
+		m_filename = filename;
 	}
 
 	std::shared_ptr<ModelBase> MeshComponent::LockModel()
@@ -108,6 +116,7 @@ namespace solunar {
 			{
 				std::string filename = filenameAttribute->Value();
 				m_model = g_contentManager->LoadObject<AnimatedModel>(filename);
+				m_filename = filename;
 
 				// guarantee cast, trust me 
 				std::weak_ptr<AnimatedModel> animatedModel = dynamicCastWeakPtr<AnimatedModel, ModelBase>(m_model);

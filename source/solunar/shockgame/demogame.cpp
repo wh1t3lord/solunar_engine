@@ -25,6 +25,12 @@ namespace solunar
 
 IMPLEMENT_OBJECT(UsableAreaComponent, LogicComponent);
 
+BEGIN_PROPERTY_REGISTER(UsableAreaComponent)
+{
+	REGISTER_PROPERTY(UsableAreaComponent, PropertyString, m_scriptName);
+}
+END_PROPERTY_REGISTER(UsableAreaComponent)
+
 UsableAreaComponent::UsableAreaComponent()
 {
 	m_isInited = false;
@@ -46,6 +52,12 @@ void UsableAreaComponent::LoadXML(tinyxml2::XMLElement& element)
 	}
 }
 
+void UsableAreaComponent::SaveXML(tinyxml2::XMLElement& element)
+{
+	tinyxml2::XMLElement* scriptElement = element.InsertNewChildElement("Script");
+	scriptElement->SetAttribute("value", m_scriptName.c_str());
+}
+
 void UsableAreaComponent::OnInit()
 {
 }
@@ -59,10 +71,12 @@ void UsableAreaComponent::Update(float delta)
 		m_isInited = true;
 	}
 
+#if 0
 	static char buf[256];
 	snprintf(buf, sizeof(buf), "UsableAreaComponent: Script: %s", m_scriptName.c_str());
 
 	Debug_Draw3DText(buf, GetEntity()->GetWorldPosition(), glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+#endif
 }
 
 void Debug_Draw3DText(const char* text, const glm::vec3& position, const glm::vec4& color)
@@ -107,7 +121,7 @@ GameManager::~GameManager()
 
 void GameManager::OnWorldLoad(const std::string& worldName)
 {
-	Core::Msg("GameManager: Load script for level %s", worldName.c_str());
+	Core::Msg("GameManager: Initializing");
 
 }
 
@@ -187,7 +201,13 @@ void DrawProperties(const std::vector<IProperty*>& properties, Object* object)
 		{
 			std::string value;
 			PropertyGetValue(object, property, value);
-			ImGui::TextColored(ImVec4(1.0f, 0.0f, 0.0f, 1.0f), value.c_str());
+			ImGui::InputText(property->GetName(), (char*)value.c_str(), value.size() + 1);
+		}
+		if (property->GetType() == PropertyType_Bool)
+		{
+			bool value;
+			PropertyGetValue(object, property, value);
+			ImGui::Checkbox(property->GetName(), &value);
 		}
 	}
 }
@@ -202,6 +222,12 @@ void DrawEntityPropertyWindow(Entity* entity)
 			std::vector<IProperty*> properties;
 			PropertyManager::GetInstance()->GetProperties(entity->GetTypeInfo(), properties);
 			DrawProperties(properties, entity);
+
+			PointLightComponent* pl = entity->GetComponent<PointLightComponent>();
+			if (pl)
+			{
+				ImGui::DragFloat("RADIUS", &pl->m_radius);
+			}
 
 			// components
 			std::vector<Component*> components = entity->GetAllComponents();
@@ -222,11 +248,128 @@ void DrawEntityPropertyWindow(Entity* entity)
 	ImGui::End();
 }
 
+void CreateLight()
+{
+	Entity* entity = Engine::ms_world->CreateEntity();
+	entity->CreateComponent<PointLightComponent>();
+}
+
+void CreateWall()
+{
+	Entity* entity = Engine::ms_world->CreateEntity();
+	MeshComponent* mesh = entity->CreateComponent<MeshComponent>();
+	mesh->LoadModel("models/common_wall_2x2.dae");
+}
+
+void LevelInspector()
+{
+#if 0
+	static int selection = 0;
+	static ImGuiTableFlags flags = ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg | ImGuiTableFlags_BordersOuter | ImGuiTableFlags_BordersV | ImGuiTableFlags_Resizable | ImGuiTableFlags_Reorderable | ImGuiTableFlags_Hideable;
+	const std::vector<Entity*>& entities = Engine::ms_world->GetEntityManager().GetEntities();
+	if (ImGui::Begin("Entity Properties"))
+	{
+		if (ImGui::BeginTable("table_scrolly", 1, flags))
+		{
+			ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
+			ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_None);
+			ImGui::TableHeadersRow();
+
+			for (int i = 0;i < entities.size();i++)
+			{
+				Entity* entity = entities[i];
+
+				ImGui::TableNextRow();
+				ImGui::TableSetColumnIndex(0);
+
+				bool isLight = !!it->GetComponent<LightComponent>();
+				if (isLight)
+					ImGui::Text("Light 0x%p", it);
+				else
+					ImGui::Text("Entity 0x%p", it);
+			}
+
+			ImGui::EndTable();
+		}
+	}
+
+	ImGui::End();
+#endif
+	if (ImGui::Begin("Level Inspector"))
+	{
+			static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
+			static bool align_label_with_current_x_position = false;
+			static bool test_drag_and_drop = false;
+	
+			if (ImGui::Button("Create Light")) CreateLight();
+			if (ImGui::Button("Create Wall")) CreateWall();
+			
+			if (align_label_with_current_x_position)
+				ImGui::Unindent(ImGui::GetTreeNodeToLabelSpacing());
+
+			// 'selection_mask' is dumb representation of what may be user-side selection state.
+			//  You may retain selection state inside or outside your objects in whatever format you see fit.
+			// 'node_clicked' is temporary storage of what node we have clicked to process selection at the end
+			/// of the loop. May be a pointer to your own node type, etc.
+			static int selection_mask = (1 << 2);
+			int node_clicked = -1;
+			const std::vector<Entity*>& entities = Engine::ms_world->GetEntityManager().GetEntities();
+
+			for (int i = 0; i < entities.size(); i++)
+			{
+				Entity* entity = entities[i];
+				// Disable the default "open on single-click behavior" + set Selected flag according to our selection.
+				// To alter selection we use IsItemClicked() && !IsItemToggledOpen(), so clicking on an arrow doesn't alter selection.
+				ImGuiTreeNodeFlags node_flags = base_flags;
+				const bool is_selected = (selection_mask & (1 << i)) != 0;
+				if (is_selected)
+					node_flags |= ImGuiTreeNodeFlags_Selected;
+
+#if 1
+				bool isLight = !!entity->GetComponent<LightComponent>();
+				if (isLight)
+					ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, "Light 0x%p", entity);
+				else
+					ImGui::TreeNodeEx((void*)(intptr_t)i, node_flags, "Entity 0x%p", entity);
+#endif
+				// Items 0..2 are Tree Node
+				 
+				if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+					node_clicked = i;
+				if (test_drag_and_drop && ImGui::BeginDragDropSource())
+				{
+					ImGui::SetDragDropPayload("_TREENODE", NULL, 0);
+					ImGui::Text("This is a drag and drop source");
+					ImGui::EndDragDropSource();
+				}
+			}
+
+			if (node_clicked != -1)
+			{
+				g_SelectedEntity = entities[node_clicked];
+
+				// Update selection state
+				// (process outside of tree loop to avoid visual inconsistencies during the clicking frame)
+				if (ImGui::GetIO().KeyCtrl)
+					selection_mask ^= (1 << node_clicked);          // CTRL+click to toggle
+				else //if (!(selection_mask & (1 << node_clicked))) // Depending on selection behavior you want, may want to preserve selection when clicking on item that is part of the selection
+					selection_mask = (1 << node_clicked);           // Click to single-select
+			}
+			if (align_label_with_current_x_position)
+				ImGui::Indent(ImGui::GetTreeNodeToLabelSpacing());
+		//	ImGui::TreePop();
+	}
+
+	ImGui::End();
+}
+
 void EditorCameraComponent::Update(float delta)
 {
 	static std::vector<std::pair<glm::vec3, glm::vec3>> debugRays;
 
 	LogicComponent::Update(delta);
+
+	LevelInspector();
 
 	//if (!g_SelectedEntity)
 	//{
@@ -332,7 +475,7 @@ void EditorCameraComponent::Update(float delta)
 		{
 			char buf[256];
 			snprintf(buf, sizeof(buf), "Entity: 0x%p", g_SelectedEntity);
-			Debug_Draw3DText_Y(buf, g_SelectedEntity->GetWorldPosition(), glm::vec4(1.0f), 0.0f);
+			Debug_Draw3DText_Y(buf, g_SelectedEntity->GetWorldPosition(), glm::vec4(1.0f), -25.0f);
 
 			bool isLight = !!g_SelectedEntity->GetComponent<LightComponent>();
 			bool isMesh = !!g_SelectedEntity->GetComponent<MeshComponent>();
@@ -340,13 +483,16 @@ void EditorCameraComponent::Update(float delta)
 			if (isLight)
 			{
 				snprintf(buf, sizeof(buf), "Light");
-				Debug_Draw3DText_Y(buf, g_SelectedEntity->GetWorldPosition(), glm::vec4(1.0f), 25.0f);
+				Debug_Draw3DText_Y(buf, g_SelectedEntity->GetWorldPosition(), glm::vec4(1.0f), -50.0f);
+
+				BoundingBox bbox = g_SelectedEntity->GetBoundingBox();
+				g_debugRender.drawBoundingBox(bbox, glm::vec3(1.0f, 0.5f, 0.0f));
 			}
 
 			if (isMesh)
 			{
 				snprintf(buf, sizeof(buf), "Mesh");
-				Debug_Draw3DText_Y(buf, g_SelectedEntity->GetWorldPosition(), glm::vec4(1.0f), 25.0f);
+				Debug_Draw3DText_Y(buf, g_SelectedEntity->GetWorldPosition(), glm::vec4(1.0f), -50.0f);
 			}
 		}
 
@@ -375,6 +521,18 @@ void EditorCameraComponent::Update(float delta)
 	}
 
 	DrawEntityPropertyWindow(g_SelectedEntity);
+
+#if 0
+	if (!ImGui::IsAnyItemHovered() && ImGui::IsMouseReleased(1))
+		ImGui::OpenPopup("MyPopup");
+	if (ImGui::BeginPopup("MyPopup"))
+	{
+			ImGui::Text("Hello, world!");
+		if (ImGui::Button("Close"))
+			ImGui::CloseCurrentPopup();
+		ImGui::EndPopup();
+	}
+#endif
 }
 
 }

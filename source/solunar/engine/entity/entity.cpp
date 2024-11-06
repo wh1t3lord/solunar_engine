@@ -106,7 +106,7 @@ void Entity::LoadXML(tinyxml2::XMLElement& element)
 		// if classname
 		else if (const tinyxml2::XMLAttribute* nodeClassName = childElement->FindAttribute("className"))
 		{
-			entityTypeInfo = g_typeManager->GetTypeInfoByName(nodeClassId->Value());
+			entityTypeInfo = g_typeManager->GetTypeInfoByName(nodeClassName->Value());
 		}
 
 		Entity* entity = CreateChildEx(entityTypeInfo);
@@ -134,9 +134,10 @@ void Entity::SaveXML(tinyxml2::XMLElement& element)
 	tinyxml2::XMLElement* rotation = element.InsertNewChildElement("Rotation");
 	if (rotation)
 	{
-		rotation->SetAttribute("x", m_rotation.x);
-		rotation->SetAttribute("y", m_rotation.y);
-		rotation->SetAttribute("z", m_rotation.z);
+		glm::vec3 rot = glm::eulerAngles(m_rotation);
+		rotation->SetAttribute("x", rot.y);
+		rotation->SetAttribute("y", rot.x);
+		rotation->SetAttribute("z", rot.z);
 	}
 
 
@@ -148,6 +149,7 @@ void Entity::SaveXML(tinyxml2::XMLElement& element)
 		scale->SetAttribute("z", m_scale.z);
 	}
 
+#if 0
 	tinyxml2::XMLElement* bbox = element.InsertNewChildElement("BoundingBox");
 	if (bbox)
 	{
@@ -161,6 +163,7 @@ void Entity::SaveXML(tinyxml2::XMLElement& element)
 		bboxMax->SetAttribute("y", m_boundingBox.m_max.y);
 		bboxMax->SetAttribute("z", m_boundingBox.m_max.z);
 	}
+#endif
 
 	// save components
 	for (auto it : m_components)
@@ -171,6 +174,14 @@ void Entity::SaveXML(tinyxml2::XMLElement& element)
 			tinyxml2::XMLElement* compElem = element.InsertNewChildElement(typeInfo->m_name);
 			it->SaveXML(*compElem);
 		}
+	}
+
+	// save children
+	for (auto it : m_children)
+	{
+		tinyxml2::XMLElement* entityElement = element.InsertNewChildElement("Entity");
+		entityElement->SetAttribute("className", it->GetTypeInfo()->GetClassName());
+		it->SaveXML(*entityElement);
 	}
 }
 

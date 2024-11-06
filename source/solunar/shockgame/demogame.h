@@ -11,11 +11,13 @@ namespace solunar
 class UsableAreaComponent : public LogicComponent
 {
 	DECLARE_OBJECT(UsableAreaComponent);
+	DECLARE_PROPERTY_REGISTER(UsableAreaComponent);
 public:
 	UsableAreaComponent();
 	~UsableAreaComponent();
 
 	void LoadXML(tinyxml2::XMLElement& element) override;
+	void SaveXML(tinyxml2::XMLElement& element) override;
 
 	// Update component once per frame.
 	void Update(float delta) override;
