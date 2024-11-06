@@ -32,7 +32,7 @@ private:
 
 class EditorCameraComponent : public LogicComponent
 {
-	DECLARE_OBJECT(EditorCameraComponent, LogicComponent);
+	DECLARE_OBJECT(EditorCameraComponent);
 public:
 	EditorCameraComponent();
 	~EditorCameraComponent();

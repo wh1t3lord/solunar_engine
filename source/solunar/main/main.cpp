@@ -198,13 +198,20 @@ namespace solunar
 
 	void InputUpdate()
 	{
+		InputManager* input = InputManager::GetInstance();
+
 		if (g_fGainedFocus)
 		{
 			if (g_engineData.m_shouldCaptureMouse)
-				InputManager::GetInstance()->SetCursorCapture(true);
+				input->SetCursorCapture(true);
 
 			if (g_engineData.m_shouldHideMouse)
-				InputManager::GetInstance()->SetCursorHiding(true);
+				input->SetCursorHiding(true);
+		}
+		else
+		{
+			input->SetCursorCapture(false);
+			input->SetCursorHiding(false);
 		}
 	}
 

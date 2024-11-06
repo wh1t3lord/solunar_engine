@@ -267,6 +267,11 @@ Component* Entity::GetComponentByTypeInfo(const TypeInfo* typeinfo)
 	return nullptr;
 }
 
+std::vector<Component*> Entity::GetAllComponents()
+{
+	return m_components;
+}
+
 void Entity::AddComponent(Component* component)
 {
 	Assert(component);
@@ -285,7 +290,7 @@ void Entity::UpdateWorldTransform()
 	if (m_rootEntity)
 		m_worldTransform = m_rootEntity->GetWorldTranslation() * glm::scale(m_worldTransform, m_scale) * rotation * glm::translate(m_worldTransform, m_position);
 	else
-		m_worldTransform = glm::scale(m_worldTransform, m_scale) * rotation * glm::translate(m_worldTransform, m_position);
+		m_worldTransform = glm::translate(m_worldTransform, m_position)* rotation * glm::scale(m_worldTransform, m_scale);
 }
 
 void Entity::TransformBBox()

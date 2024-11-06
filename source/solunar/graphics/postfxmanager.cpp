@@ -207,7 +207,7 @@ void PostFxManager::HDRPass(ITexture2D* screenTexture)
 	ScreenQuad::RenderWithoutTextureBinding(m_hdrPassProgram);
 
 	// run second pass (blur)
-	//blurPass(screenTexture);
+	blurPass(screenTexture);
 
 	// combine pass (combine)
 	combinePass(screenTexture);
