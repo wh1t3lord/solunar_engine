@@ -11,7 +11,7 @@ else()
 	add_executable(main ${MAIN_SRC})
 endif()
 
-set_target_name_ex(main "solunar_main")
+set_target_name_ex(main "game")
 set_engine_out_dir(main "${CMAKE_SOURCE_DIR}/bin")
 
 target_include_directories(main PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../"

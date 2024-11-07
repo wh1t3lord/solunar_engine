@@ -18,6 +18,8 @@
 #include "engine/entity/world.h"
 #include "engine/audio/audiomanager.h"
 
+#include "engine/inputmanager_dinput.h"
+
 #include "graphics/graphics.h"
 #include "graphics/graphicsoptions.h"
 #include "graphics/renderer.h"
@@ -45,7 +47,7 @@ namespace solunar {
 	bool g_modelConvert = false;
 	std::string g_modelConvertName;
 
-	void InitEngineCommandLine()
+	void InitCommandLine()
 	{
 		if (g_commandLine.hasOption("-quit"))
 			g_quitAtStart = true;
@@ -253,13 +255,12 @@ namespace solunar {
 
 	void EngineLoop::Initialize()
 	{
-		InitEngineCommandLine();
-
-		//appInit2();
+		InitCommandLine();
 
 		// create engine view
 		CreateEngineView();
-		//appInitInput();
+		
+		appInitInput();
 
 		// Initialize engine
 		Engine::Init();

@@ -63,6 +63,11 @@ public:
 
 private:
 	void CreateShapeInternal() override;
+
+private:
+	std::vector<btTriangleMesh*> m_trimeshes;
+	std::vector<btBvhTriangleMeshShape*> m_trishapes;
+	std::string m_filename;
 };
 
 }

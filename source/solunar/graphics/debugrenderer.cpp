@@ -8,7 +8,7 @@
 
 #include <glm/gtx/rotate_vector.hpp>
 
-#define MAX_LINES_IN_VB 2048
+#define MAX_LINES_IN_VB 2048 * 8
 
 namespace solunar {
 

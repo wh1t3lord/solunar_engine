@@ -33,6 +33,32 @@ END_PROPERTY_REGISTER(ShockPlayerController);
 Entity* g_freeCameraEntity = nullptr;
 CameraFirstPersonComponent* g_freeCamera = nullptr;
 
+class ShockPlayerHUD : public Singleton<ShockPlayerHUD>
+{
+public:
+	static ShockPlayerHUD ms_ShockPlayerHUD;
+
+public:
+	void Draw();
+};
+
+ShockPlayerHUD ShockPlayerHUD::ms_ShockPlayerHUD;
+
+void ShockPlayerHUD::Draw()
+{
+
+}
+
+struct WeaponInfo
+{
+	WeaponsType type;
+	int idleAni;
+	int fireAni;
+	int prior_to_reload_Ani;
+	int reload_one_Ani;
+	int reload_last_one_Ani;
+};
+
 Entity* CreateWeapon(Entity* cameraEntity)
 {
 	// create weapon
@@ -530,12 +556,17 @@ void ShockPlayerController::UpdateLogic(float dt)
 			ImGui::GetBackgroundDrawList()->AddLine(p3, p4, 0xffffffff);
 		}
 
+		//ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(pos.x - 1.0f, pos.y - 1.0f), ImVec2(pos.x + 1.0f, pos.y + 1.0f), 0xff000000, 2.0f);
+		ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(pos.x, pos.y), ImVec2(pos.x + 1.0f, pos.y + 1.0f), 0xffffffff);
+
 		//ImGui::GetBackgroundDrawList()->AddCircle(ImVec2(pos.x - 16.0f, pos.y - 16.0f), ImVec2(pos.x + 16.0f, pos.y + 16.0f), 0xff0000ff);
 	}
 }
 
 void ShockPlayerController::DebugUpdate(float dt)
 {
+	g_debugRender.drawAxis(m_camera->GetEntity()->GetWorldPosition());
+
 	if (!m_rigidBody)
 		return;
 	return;
@@ -629,5 +660,7 @@ void shockGamePlayerDebug(bool* open)
 	ImGui::End();
 
 }
+
+
 
 }

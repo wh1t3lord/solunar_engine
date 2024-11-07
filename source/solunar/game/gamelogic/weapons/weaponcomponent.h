@@ -22,6 +22,7 @@ namespace solunar {
 		static void RegisterObject();
 
 		virtual void Update(float dt);
+		virtual void Update_Shotgun(float dt);
 
 	private:
 		bool m_inited;
@@ -32,6 +33,8 @@ namespace solunar {
 		int m_reload_last_one_Ani;
 
 		int m_ammo;
+	
+		WeaponsType m_type;
 	};
 }
 #endif // ! WEAPONCOMPONENT_H

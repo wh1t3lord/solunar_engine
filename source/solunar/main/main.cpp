@@ -17,6 +17,7 @@
 
 #include "backends/imgui_impl_win32.h"
 #include <engine/inputmanager_win32.h>
+#include <engine/inputmanager_dinput.h>
 
 extern IMGUI_IMPL_API LRESULT ImGui_ImplWin32_WndProcHandler(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam);
 
@@ -74,6 +75,13 @@ namespace solunar
 		}
 
 		Core::Shutdown();
+	}
+
+	void appInitInput()
+	{
+		InputManager_DInput* pInputManagerDInput = dynamic_cast<InputManager_DInput*>(InputManager::GetInstance());
+		if (pInputManagerDInput)
+			pInputManagerDInput->Init(g_engineWindow);
 	}
 
 	BOOL g_fMouseInClient;

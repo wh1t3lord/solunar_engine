@@ -3,6 +3,8 @@
 #include "shockgame/shockprojectilecomponent.h"
 #include "shockgame/shockplayercontroller.h"
 
+#include "shockgame/demogame.h"
+
 #include "graphics/fontmanager.h"
 
 namespace solunar
@@ -34,6 +36,10 @@ void ShockAIComponent::Update(float dt)
 	if (m_aiType == ShockAIType_Camera)
 	{
 		updateAICamera(dt);
+	}
+	else if (m_aiType == ShockAIType_Zombie)
+	{
+		UpdateZombie(dt);
 	}
 }
 
@@ -85,6 +91,16 @@ void ShockAIComponent::updateFire(float dt)
 
 }
 
+void ShockAIComponent::UpdateZombie(float dt)
+{
+	glm::vec3 direction = glm::normalize(g_Player->GetPosition() - GetEntity()->GetPosition());
+	
+	glm::vec3 pos = GetEntity()->GetPosition();
+	pos += direction * dt;
+	pos.y = GetEntity()->GetPosition().y;
+	GetEntity()->SetPosition(pos);
+}
+
 void ShockAIComponent::LoadXML(tinyxml2::XMLElement& element)
 {
 	const tinyxml2::XMLElement* aitypeElement = element.FirstChildElement("AIType");
@@ -93,29 +109,31 @@ void ShockAIComponent::LoadXML(tinyxml2::XMLElement& element)
 	aitypeElement->QueryAttribute("value", &aitypeString);
 
 	if (aitypeString)
-		m_aiType = getShockAITypeFromString(aitypeString);
+		m_aiType = GetShockAITypeFromString(aitypeString);
 }
 
 void ShockAIComponent::SaveXML(tinyxml2::XMLElement& element)
 {
-	std::string aitypeString = shockAITypeToString(m_aiType);
+	std::string aitypeString = ShockAITypeToString(m_aiType);
 
 	tinyxml2::XMLElement* aitype = element.InsertNewChildElement("AIType");
 	aitype->SetAttribute("value", aitypeString.c_str());
 }
 
-ShockAIType getShockAITypeFromString(const std::string& name)
+ShockAIType GetShockAITypeFromString(const std::string& name)
 {
 	if (name == "ShockAIType_None")
 		return ShockAIType_None;
 	if (name == "ShockAIType_Camera")
 		return ShockAIType_Camera;
+	if (name == "ShockAIType_Zombie")
+		return ShockAIType_Zombie;
 
 	Assert2(0, "Unknowed AI Type");
 	return ShockAIType_None;
 }
 
-std::string shockAITypeToString(ShockAIType type)
+std::string ShockAITypeToString(ShockAIType type)
 {
 	switch (type)
 	{
@@ -123,10 +141,12 @@ std::string shockAITypeToString(ShockAIType type)
 		return "ShockAIType_None";
 	case ShockAIType_Camera:
 		return "ShockAIType_Camera";
+	case ShockAIType_Zombie:
+		return "ShockAIType_Zombie";
 	}
 
 	Assert2(0, "Unknowed AI Type");
-	return std::string();
+	return "";
 
 }
 

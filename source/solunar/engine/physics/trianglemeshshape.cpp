@@ -2,6 +2,11 @@
 #include "engine/physics/trianglemeshshape.h"
 
 #include "core/file/filesystem.h"
+#include "core/file/contentmanager.h"
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 namespace solunar
 {
@@ -50,6 +55,94 @@ void TriangleMeshServer::saveCollision(const char* modelfilename)
 	g_fileSystem->Close(file);
 }
 
+struct CollisionMeshAssImp
+{
+	std::vector<glm::vec3> vertices;
+	std::vector<unsigned int> indices;
+	glm::mat4 transform;
+};
+
+static glm::mat4 Assimp2Glm(const aiMatrix4x4& from)
+{
+	return glm::mat4(
+		(double)from.a1, (double)from.b1, (double)from.c1, (double)from.d1,
+		(double)from.a2, (double)from.b2, (double)from.c2, (double)from.d2,
+		(double)from.a3, (double)from.b3, (double)from.c3, (double)from.d3,
+		(double)from.a4, (double)from.b4, (double)from.c4, (double)from.d4
+	);
+}
+
+static CollisionMeshAssImp ProccessSubMesh(aiMesh* mesh, aiNode* node, const aiScene* scene)
+{
+	std::vector<glm::vec3> vertices;
+	std::vector<unsigned int> indices;
+
+	for (uint32_t i = 0; i < mesh->mNumVertices; i++)
+	{
+		glm::vec3 pos = glm::vec3(mesh->mVertices[i].x, mesh->mVertices[i].y, mesh->mVertices[i].z);
+		vertices.push_back(pos);
+	}
+
+	for (uint32_t i = 0; i < mesh->mNumFaces; i++) {
+		aiFace face = mesh->mFaces[i];
+		for (uint32_t j = 0; j < face.mNumIndices; j++)
+			indices.push_back(face.mIndices[j]);
+	}
+
+	aiMatrix4x4 nodePosition = node->mTransformation;
+	glm::mat4 transform = glm::mat4(1.0f);
+	transform = Assimp2Glm(nodePosition);
+
+	CollisionMeshAssImp mesh2;
+	mesh2.transform = transform;
+	mesh2.vertices = vertices;
+	mesh2.indices = indices;
+
+	return mesh2;
+}
+
+static void ProccessNode(std::vector<CollisionMeshAssImp>& submeshes, aiNode* node, const aiScene* scene)
+{
+	for (uint32_t i = 0; i < node->mNumMeshes; i++)
+	{
+		aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+		CollisionMeshAssImp submesh = ProccessSubMesh(mesh, node, scene);
+		submeshes.push_back(submesh);
+	}
+
+	for (uint32_t i = 0; i < node->mNumChildren; i++)
+	{
+		ProccessNode(submeshes, node->mChildren[i], scene);
+	}
+}
+
+inline btVector3 getBulletVectorFromGlm(const glm::vec3& vec)
+{
+	return btVector3(vec.x, vec.y, vec.z);
+}
+
+/////////////////////////////////////////////////////////////////////
+
+ATTRIBUTE_ALIGNED16(class)
+HackCompoundShape : public btCompoundShape
+{
+public:
+	HackCompoundShape() {}
+	~HackCompoundShape()
+	{
+		releaseChilds();
+	}
+
+	void releaseChilds()
+	{
+		std::vector<btCollisionShape*> shapes;
+		for (int i = 0; i < m_children.size(); i++)
+			shapes.push_back(m_children[i].m_childShape);
+		for (int i = 0; i < shapes.size(); i++)
+			removeChildShape(shapes[i]);
+	}
+};
+
 /////////////////////////////////////////////////////////////////////
 
 IMPLEMENT_OBJECT(TriangleMeshShapeComponent, ShapeComponent);
@@ -60,6 +153,16 @@ TriangleMeshShapeComponent::TriangleMeshShapeComponent()
 
 TriangleMeshShapeComponent::~TriangleMeshShapeComponent()
 {
+	// delete shapes
+	for (int i = 0; i < m_trishapes.size(); i++)
+		mem_delete(m_trishapes[i]);
+
+	// delete meshes
+	for (int i = 0; i < m_trimeshes.size(); i++)
+		mem_delete(m_trimeshes[i]);
+
+	m_trishapes.clear();
+	m_trimeshes.clear();
 }
 
 void TriangleMeshShapeComponent::RegisterObject()
@@ -70,6 +173,20 @@ void TriangleMeshShapeComponent::RegisterObject()
 void TriangleMeshShapeComponent::LoadXML(tinyxml2::XMLElement& element)
 {
 	ShapeComponent::LoadXML(element);
+
+	tinyxml2::XMLElement* modelElement = element.FirstChildElement("Model");
+	if (modelElement)
+	{
+		const tinyxml2::XMLAttribute* filenameAttribute = modelElement->FindAttribute("filename");
+		if (filenameAttribute && strlen(filenameAttribute->Value()) > 0)
+		{
+			m_filename = filenameAttribute->Value();
+		}
+		else
+		{
+			Core::Msg("WARNING: TriangleMeshShapeComponent at entity(0x%p) has empty filename attribute in Model element!", GetEntity());
+		}
+	}
 }
 
 void TriangleMeshShapeComponent::SaveXML(tinyxml2::XMLElement& element)
@@ -79,7 +196,80 @@ void TriangleMeshShapeComponent::SaveXML(tinyxml2::XMLElement& element)
 
 void TriangleMeshShapeComponent::CreateShapeInternal()
 {
-	TriangleMeshServer::GetInstance()->saveCollision("test");
+	if (m_filename.empty())
+	{
+		Core::Msg("TriangleMeshShapeComponent::CreateShapeInternal: filename is empty.");
+		return;
+	}
+
+	DataStreamPtr stream = g_contentManager->OpenStream(m_filename);
+	if (!stream)
+	{
+		Core::Msg("TriangleMeshShapeComponent::CreateShapeInternal: failed to open file %s", m_filename.c_str());
+		return;
+	}
+
+	stream->Seek(Seek_End, 0);
+	size_t length = stream->Tell();
+	stream->Seek(Seek_Begin, 0);
+
+	char* filedata = new char[length];
+	stream->Read(filedata, length);
+
+	stream = nullptr;
+
+	Assimp::Importer importer;
+	const aiScene* scene = importer.ReadFileFromMemory(filedata, length,
+		aiProcess_OptimizeMeshes |
+		aiProcess_JoinIdenticalVertices |
+		aiProcess_PreTransformVertices);
+
+	if (!scene || scene->mFlags & AI_SCENE_FLAGS_INCOMPLETE || !scene->mRootNode) {
+		Core::Error("TriangleMeshShapeComponent::CreateShapeInternal: failed to load scene '%s'.\n%s", m_filename.c_str(), importer.GetErrorString());
+	}
+
+	if (scene && !scene->HasMeshes()) {
+		Core::Error("TriangleMeshShapeComponent::CreateShapeInternal: model '%s' doesnt have any mesh. Please check export parameters!", m_filename.c_str());
+	}
+
+	std::vector<CollisionMeshAssImp> out;
+	ProccessNode(out, scene->mRootNode, scene);
+
+	delete[] filedata;
+
+	size_t verticesCount = 0;
+	size_t indicesCount = 0;
+	size_t trianglesCount = 0;
+
+	m_shape = mem_new<HackCompoundShape>();
+
+	for (int i = 0; i < out.size(); i++)
+	{
+		const CollisionMeshAssImp& collisionMeshAssImp = out[i];
+
+		btTriangleMesh* collisionMesh = mem_new<btTriangleMesh>();
+		m_trimeshes.push_back(collisionMesh);
+
+		for (unsigned int n = 0; n < collisionMeshAssImp.indices.size(); n += 3) {
+			collisionMesh->addTriangle(
+				getBulletVectorFromGlm(collisionMeshAssImp.vertices[collisionMeshAssImp.indices[n]]),
+				getBulletVectorFromGlm(collisionMeshAssImp.vertices[collisionMeshAssImp.indices[n + 1]]),
+				getBulletVectorFromGlm(collisionMeshAssImp.vertices[collisionMeshAssImp.indices[n + 2]]),
+				true);
+
+			trianglesCount++;
+		}
+
+		btBvhTriangleMeshShape* collisionShape = mem_new<btBvhTriangleMeshShape>(collisionMesh, true);
+		m_trishapes.push_back(collisionShape);
+
+		btTransform trans;
+		trans.setIdentity();
+
+		((btCompoundShape*)m_shape)->addChildShape(trans, collisionShape);
+	}
+
+	Core::Msg("TriangleMeshShapeComponent(%s): %i triangles %i bytes", m_filename.c_str(), trianglesCount, trianglesCount * sizeof(glm::vec3));
 }
 
 }

@@ -8,6 +8,7 @@ enum ShockAIType
 {
 	ShockAIType_None,
 	ShockAIType_Camera,
+	ShockAIType_Zombie,
 };
 
 class ShockAIComponent : public LogicComponent
@@ -22,6 +23,8 @@ public:
 	void updateAICamera(float dt);
 	void updateFire(float dt);
 
+	void UpdateZombie(float dt);
+
 	void LoadXML(tinyxml2::XMLElement& element) override;
 	void SaveXML(tinyxml2::XMLElement& element) override;
 
@@ -31,8 +34,8 @@ private:
 	bool m_disable;
 };
 
-ShockAIType getShockAITypeFromString(const std::string& name);
-std::string shockAITypeToString(ShockAIType type);
+ShockAIType GetShockAITypeFromString(const std::string& name);
+std::string ShockAITypeToString(ShockAIType type);
 
 }
 

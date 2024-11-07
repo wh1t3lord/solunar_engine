@@ -26,6 +26,12 @@
 			<Model filename="models/zombie_dungeon.dae"/>
 			<CastShadow value="false"/>
 		</MeshComponent>
+		<RigidBodyComponent>
+			<Static value="true"/>
+		</RigidBodyComponent>
+		<TriangleMeshShapeComponent>
+			<Model filename="models/zombie_dungeon.dae"/>
+		</TriangleMeshShapeComponent>
 	</Entity>
 	
 	<Entity>
@@ -34,8 +40,11 @@
 		<Scale x="1" y="1" z="1"/>
 		<MeshComponent>
 			<Model filename="models/zombie_static.dae"/>
-			<CastShadow value="false"/>
+			<CastShadow value="true"/>
 		</MeshComponent>
+		<ShockAIComponent>
+			<AIType value="ShockAIType_Zombie"/>
+		</ShockAIComponent>
 	</Entity>
 	
 	

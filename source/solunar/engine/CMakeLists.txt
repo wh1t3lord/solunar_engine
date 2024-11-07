@@ -34,4 +34,6 @@ target_precompile_headers(engine PRIVATE "enginepch.h")
 target_include_directories(engine PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/../"
 								  PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}")
 
+target_include_directories(engine PRIVATE "${CMAKE_SOURCE_DIR}/externals/assimp/include")
+
 target_link_libraries(engine bullet graphics core)

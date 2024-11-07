@@ -6,6 +6,7 @@ namespace solunar {
 
 	void appInit(int argc, char** argv);
 	void appShutdown();
+	void appInitInput();
 	void* appGetWindow();
 	View* appGetView();
 	void appPresent();

@@ -12,16 +12,17 @@
 #include "graphics/ifontmanager.h"
 #include "graphics/debugrenderer.h"
 
+#include <imgui.h>
+
 namespace solunar
 {
 	IMPLEMENT_OBJECT(WeaponComponent, LogicComponent);
 	
 	WeaponComponent::WeaponComponent() :
 		m_inited(false),
-		m_ammo(0)
+		m_ammo(0),
+		m_type(WeaponsType::Shotgun)
 	{
-		// Shotgun
-		m_ammo = 8;
 	}
 
 	WeaponComponent::~WeaponComponent()
@@ -31,6 +32,18 @@ namespace solunar
 	void WeaponComponent::RegisterObject()
 	{
 		g_typeManager->RegisterObject<WeaponComponent>();
+	}
+
+	glm::vec3 GetLookingEntityPos(const glm::vec3& rayStart, const glm::vec3& rayEnd)
+	{
+		RayCastResult rq = {};
+		if (Engine::ms_world->RayCast(rq, rayStart, rayEnd))
+		{
+			Entity* entity = rq.m_entity;
+			return rq.m_hitPosition;
+		}
+
+		return rayStart;
 	}
 
 	void WeaponComponent::Update(float dt)
@@ -116,6 +129,11 @@ namespace solunar
 			}
 		}
 
+		float distance = glm::distance(camera->GetPosition(), GetLookingEntityPos(camera->GetPosition() + camera->GetDirection(),
+			camera->GetPosition() + camera->GetDirection() * 1000.0f));
+
+		ImGui::GetForegroundDrawList()->AddText(ImVec2(500, 500), 0xff0000ff, std::to_string(distance).c_str());
+
 		//	m_ammo = 8;
 
 		if (InputManager::GetInstance()->IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
@@ -133,8 +151,21 @@ namespace solunar
 			int shellCount = 6;
 			for (int i = 0; i < shellCount; i++)
 			{
-				float r = rand() % 10;
-				r = r / 100;
+
+
+				float ra = rand() % 10;
+				ra = ra / 100;
+
+				glm::vec3 r;
+				r.x = ra * distance;
+
+				ra = rand() % 10;
+				ra = ra / 100;
+				r.y = ra * distance;
+
+				ra = rand() % 10;
+				ra = ra / 100;
+				r.z = ra * distance;
 
 				glm::vec3 rayStart = camera->GetPosition() + r + camera->GetDirection() ;
 				glm::vec3 rayEnd = camera->GetPosition() + r + camera->GetDirection()  * 1000.0f;
@@ -164,7 +195,7 @@ namespace solunar
 			g_debugRender.drawAxis(it);
 		}
 
-		if (debugTime >= 4.0f)
+		if (debugTime >= 12.0f)
 		{
 			for (int i = 0; i < 12; i++)
 			{
@@ -200,5 +231,9 @@ namespace solunar
 		snprintf(buf, sizeof(buf), "Time: %.2f", animatedModel->GetCurrentTime());
 		g_fontManager->DrawSystemFontShadowed(buf, (float)view->m_width - 300.0f, 140.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 #endif
+	}
+
+	void WeaponComponent::Update_Shotgun(float dt)
+	{
 	}
 }
