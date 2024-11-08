@@ -83,7 +83,7 @@ namespace solunar
 		virtual void CreateHw() override;
 		virtual void ReleaseHw() override;
 
-		void saveBinary(const std::string& filename);
+		void SaveBinary(const std::string& filename);
 
 		std::vector<SubMesh*>& GetSubmehes() { return m_subMeshes; }
 
@@ -128,20 +128,24 @@ namespace solunar
 	public:
 		static void RegisterObject();
 
+	public:
+		ModelSubmesh();
+		~ModelSubmesh();
+
 		//! NOTE: The file pointer must be set before any ModelFileSubmeshData entries!
-		void load(DataStreamPtr stream);
+		void Load(DataStreamPtr stream);
 		void Save(DataStreamPtr stream);
 
 		void CreateHw() override;
 		void ReleaseHw() override;
 
 		// Accessors
-		IBufferBase* getVerticesBuffer() const { return m_verticesBuffer; }
-		IBufferBase* getIndicesBuffer() const { return m_indicesBuffer; }
-		const uint32_t getVerticesCount() const { return m_verticesCount; }
-		const uint32_t getIndicesCount() const { return m_indicesCount; }
-		std::weak_ptr<Material> getMaterial() const { return m_material; }
-
+		IBufferBase* GetVerticesBuffer() const { return m_verticesBuffer; }
+		IBufferBase* GetIndicesBuffer() const { return m_indicesBuffer; }
+		const uint32_t GetVerticesCount() const { return m_verticesCount; }
+		const uint32_t GetIndicesCount() const { return m_indicesCount; }
+		std::weak_ptr<Material> GetMaterial() const { return m_material; }
+		std::shared_ptr<Material> LockMaterial();
 	private:
 		std::vector<Vertex> m_vertices;
 		std::vector<uint32_t> m_indices;
@@ -159,7 +163,7 @@ namespace solunar
 	};
 
 	//! Model class
-	class Model : public GraphicsObject
+	class Model : public ModelBase
 	{
 		DECLARE_OBJECT(Model);
 	public:
@@ -174,6 +178,8 @@ namespace solunar
 
 		void CreateHw() override;
 		void ReleaseHw() override;
+
+		const std::vector<std::shared_ptr<ModelSubmesh>>& GetModelSubmeshes();
 
 	private:
 		std::vector<std::shared_ptr<ModelSubmesh>> m_submeshes;

@@ -16,7 +16,7 @@ namespace solunar {
 
 	void GLRenderTarget::Create(const RenderTargetCreationDesc& renderTargetDesc)
 	{
-		Assert(renderTargetDesc.m_textures2DCount != 0);
+		//Assert(renderTargetDesc.m_textures2DCount != 0);
 
 		glGenFramebuffers(1, &m_handle);
 		glBindFramebuffer(GL_FRAMEBUFFER, m_handle);

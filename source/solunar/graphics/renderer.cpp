@@ -367,6 +367,8 @@ namespace solunar
 	{
 		//OPTICK_EVENT("Renderer::RenderShadows");
 
+		return;
+
 		ShadowsRenderer::GetInstance()->BeginRender();
 
 		// get camera

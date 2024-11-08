@@ -503,7 +503,7 @@ namespace solunar {
 
 			//g_renderDevice->SetIndexBuffer(it->getIndexBuffer());
 
-			//it->getMaterial()->bind();
+			//it->GetMaterial()->bind();
 
 			std::shared_ptr<Material> material = submesh->LockMaterial();
 			BindMaterialForMesh(mesh, material.get(), material->GetMaterialInstance());
@@ -591,7 +591,7 @@ namespace solunar {
 
 			//g_renderDevice->SetIndexBuffer(it->getIndexBuffer());
 
-			//it->getMaterial()->bind();
+			//it->GetMaterial()->bind();
 
 			std::shared_ptr<Material> material = submesh->m_material.lock();
 			BindMaterialForMesh(mesh, material.get(), material->GetMaterialInstance());
@@ -677,10 +677,10 @@ namespace solunar {
 			g_renderDevice->SetVertexBuffer(it->GetVertexBuffer(), sizeof(Vertex), 0);
 			g_renderDevice->setVertexFormat(&s_vfVertex);
 
-			it->getMaterial()->bind();
+			it->GetMaterial()->bind();
 
 			g_shaderManager->SetShaderProgram(customShader);
-			it->getMaterial()->bindUniformsCustom(customShader);
+			it->GetMaterial()->bindUniformsCustom(customShader);
 
 			/*graphicsDevice->SetIndexBuffer(it->getIndexBuffer());
 

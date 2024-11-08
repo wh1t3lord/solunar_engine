@@ -280,11 +280,11 @@ namespace solunar {
 		//if (g_commandLine.hasOption("-saveClassIds"))
 		//	saveClassIds();
 
-		//if (g_modelConvert)
-		//{
-		//	std::shared_ptr<ModelBase> model = g_contentManager->LoadModelOld(g_modelConvertName);
-		//	model->saveBinary(g_modelConvertName);
-		//}
+		if (g_modelConvert)
+		{
+			std::weak_ptr<ModelBase> model = g_contentManager->LoadObject<ModelBase>(g_modelConvertName);
+			model.lock()->SaveBinary(g_modelConvertName);
+		}
 
 		// Register properties #TODO: PLEASE MAKE IT MORE NORMAL
 		PropertyRegistrator::GetInstance()->RegisterClasses();

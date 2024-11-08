@@ -119,6 +119,17 @@ namespace solunar
 		return std::shared_ptr<T>();
 	}
 
+	template <typename T, typename U>
+	std::shared_ptr<T> dynamicCastPtr(const std::shared_ptr<U>& object)
+	{
+		if (object->IsA<T>())
+		{
+			return std::static_pointer_cast<T>(object);
+		}
+
+		return std::shared_ptr<T>();
+	}
+
 	template <typename T>
 	std::weak_ptr<T> dynamicCastPtr(const std::shared_ptr<Object>& object)
 	{
@@ -127,7 +138,6 @@ namespace solunar
 
 		return std::weak_ptr<T>();
 	}
-
 
 	template <typename T>
 	std::weak_ptr<T> dynamicCastPtr(const std::weak_ptr<Object>& object)

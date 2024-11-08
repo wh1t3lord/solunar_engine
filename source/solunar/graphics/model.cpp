@@ -239,7 +239,7 @@ namespace solunar
 			m_subMeshes[i]->Render();
 	}
 
-	void ModelBase::saveBinary(const std::string& filename)
+	void ModelBase::SaveBinary(const std::string& filename)
 	{
 		//return;
 
@@ -265,19 +265,21 @@ namespace solunar
 		header.magic = MODELFILE_MAGIC;
 		header.version = kModelFileVersion;
 		header.submeshCount = (uint32_t)m_subMeshes.size();
-		g_fileSystem->Write(file, &header, sizeof(file));
+		g_fileSystem->Write(file, &header, sizeof(header));
 
 		for (SubMesh* pSubMesh : m_subMeshes)
 		{
 			ModelFileSubmeshData submeshData;
 			memset(&submeshData, 0, sizeof(submeshData));
-			//strcpy(submeshData.materialInfo, pSubMesh->getMaterial()->getName().c_str());
-			strcpy(submeshData.materialInfo, "MATERIAL UNNAMED");
+			strcpy(submeshData.materialInfo, pSubMesh->m_materialName.c_str());
+			//strcpy(submeshData.materialInfo, pSubMesh->LockMaterial()->GetName().c_str());
+			//strcpy(submeshData.materialInfo, "MATERIAL UNNAMED");
 			submeshData.verticesCount = pSubMesh->GetVerticesCount();
 			submeshData.indicesCount = pSubMesh->getIndeciesCount();
 			g_fileSystem->Write(file, &submeshData, sizeof(submeshData));
 
-			Vertex* pBufferVertices = (Vertex*)pSubMesh->GetVertexBuffer()->Map(BufferMapping::ReadOnly);
+			//Vertex* pBufferVertices = (Vertex*)pSubMesh->GetVertexBuffer()->Map(BufferMapping::ReadOnly);
+			Vertex* pBufferVertices = (Vertex*)pSubMesh->m_vertices.data();
 
 			// Avoid transform in vertex buffer
 			// so we copy vertices to temp buffer and write them to file.
@@ -285,7 +287,7 @@ namespace solunar
 			memcpy(pVertices, (const void*)pBufferVertices, pSubMesh->GetVerticesCount() * sizeof(Vertex));
 
 			// Unmap buffer
-			pSubMesh->GetVertexBuffer()->Unmap();
+		//	pSubMesh->GetVertexBuffer()->Unmap();
 			pBufferVertices = nullptr;
 
 			// Transform vertices to OpenGL space.
@@ -299,11 +301,12 @@ namespace solunar
 			// free temp buffer
 			free(pBufferVertices);
 
-			unsigned int* pIndices = (unsigned int*)pSubMesh->getIndexBuffer()->Map(BufferMapping::ReadOnly);
+			//unsigned int* pIndices = (unsigned int*)pSubMesh->getIndexBuffer()->Map(BufferMapping::ReadOnly);
+			unsigned int* pIndices = (unsigned int*)pSubMesh->m_indecies.data();
 			g_fileSystem->Write(file, pIndices, pSubMesh->getIndeciesCount() * sizeof(uint32_t));
 
 			// Unmap buffer
-			pSubMesh->getIndexBuffer()->Unmap();
+			//pSubMesh->getIndexBuffer()->Unmap();
 			pIndices = nullptr;
 		}
 
@@ -459,7 +462,19 @@ namespace solunar
 		TypeManager::GetInstance()->RegisterObject<ModelSubmesh>();
 	}
 
-	void ModelSubmesh::load(DataStreamPtr stream)
+	ModelSubmesh::ModelSubmesh() :
+		m_verticesBuffer(nullptr),
+		m_indicesBuffer(nullptr),
+		m_verticesCount(0),
+		m_indicesCount(0)
+	{
+	}
+
+	ModelSubmesh::~ModelSubmesh()
+	{
+	}
+
+	void ModelSubmesh::Load(DataStreamPtr stream)
 	{
 		// read submesh data
 		ModelFileSubmeshData submeshData = { 0 };
@@ -490,6 +505,8 @@ namespace solunar
 		}
 
 		m_indicesCount = (uint32_t)m_indices.size();
+
+		CreateHw();
 	}
 
 	void ModelSubmesh::Save(DataStreamPtr stream)
@@ -537,9 +554,19 @@ namespace solunar
 
 	void ModelSubmesh::ReleaseHw()
 	{
+		mem_delete(m_indicesBuffer);
+		m_indicesBuffer = nullptr;
+
+		mem_delete(m_verticesBuffer);
+		m_verticesBuffer = nullptr;
 	}
 
-	IMPLEMENT_OBJECT(Model, GraphicsObject);
+	std::shared_ptr<Material> ModelSubmesh::LockMaterial()
+	{
+		return m_material.lock();
+	}
+
+	IMPLEMENT_OBJECT(Model, ModelBase);
 
 	void Model::RegisterObject()
 	{
@@ -595,6 +622,8 @@ namespace solunar
 		
 			// Load from current stream
 			submeshPtr->Load(stream);
+
+			m_submeshes.push_back(std::shared_ptr<ModelSubmesh >(submeshPtr, ObjectDeleter));
 		}
 	}
 
@@ -610,24 +639,24 @@ namespace solunar
 		{
 			ModelFileSubmeshData submeshData;
 			memset(&submeshData, 0, sizeof(submeshData));
-			//strcpy(submeshData.materialInfo, pSubMesh->getMaterial()->getName().c_str());
+			//strcpy(submeshData.materialInfo, pSubMesh->GetMaterial()->getName().c_str());
 			strcpy(submeshData.materialInfo, "MATERIAL UNNAMED");
-			submeshData.verticesCount = pSubMesh->getVerticesCount();
-			submeshData.indicesCount = pSubMesh->getIndicesCount();
+			submeshData.verticesCount = pSubMesh->GetVerticesCount();
+			submeshData.indicesCount = pSubMesh->GetIndicesCount();
 			stream->Write(&submeshData);
 
-			Vertex* pVertices = (Vertex*)pSubMesh->getVerticesBuffer()->Map(BufferMapping::ReadOnly);
-			stream->Write(pVertices, pSubMesh->getVerticesCount() * sizeof(Vertex));
+			Vertex* pVertices = (Vertex*)pSubMesh->GetVerticesBuffer()->Map(BufferMapping::ReadOnly);
+			stream->Write(pVertices, pSubMesh->GetVerticesCount() * sizeof(Vertex));
 
 			// Unmap buffer
-			pSubMesh->getVerticesBuffer()->Unmap();
+			pSubMesh->GetVerticesBuffer()->Unmap();
 			pVertices = nullptr;
 
-			unsigned int* pIndices = (unsigned int*)pSubMesh->getIndicesBuffer()->Map(BufferMapping::ReadOnly);
-			stream->Write(pIndices, pSubMesh->getIndicesCount() * sizeof(uint32_t));
+			unsigned int* pIndices = (unsigned int*)pSubMesh->GetIndicesBuffer()->Map(BufferMapping::ReadOnly);
+			stream->Write(pIndices, pSubMesh->GetIndicesCount() * sizeof(uint32_t));
 
 			// Unmap buffer
-			pSubMesh->getIndicesBuffer()->Unmap();
+			pSubMesh->GetIndicesBuffer()->Unmap();
 			pIndices = nullptr;
 		}
 
@@ -640,6 +669,11 @@ namespace solunar
 
 	void Model::ReleaseHw()
 	{
+	}
+
+	const std::vector<std::shared_ptr<ModelSubmesh>>& Model::GetModelSubmeshes()
+	{
+		return m_submeshes;
 	}
 
 }

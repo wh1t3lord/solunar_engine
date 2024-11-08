@@ -6,7 +6,7 @@
 		<Rotation x="0" y="180" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		<MeshComponent>
-			<Model filename="models/common_floor.dae"/>
+			<Model filename="models/common_floor.model"/>
 			<CastShadow value="false"/>
 		</MeshComponent>
 		<RigidBodyComponent>
@@ -22,7 +22,7 @@
 		<Rotation x="0" y="0" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		<MeshComponent>
-			<Model filename="models/zombie_dungeon.dae"/>
+			<Model filename="models/zombie_dungeon.model"/>
 			<CastShadow value="false"/>
 		</MeshComponent>
 		<RigidBodyComponent>
@@ -38,7 +38,7 @@
 		<Rotation x="0" y="0" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		<MeshComponent>
-			<Model filename="models/zombie_static.dae"/>
+			<Model filename="models/zombie_static.model"/>
 			<CastShadow value="true"/>
 		</MeshComponent>
 		<ShockAIComponent>

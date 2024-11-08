@@ -34,7 +34,12 @@ namespace solunar {
 			if (filenameAttribute && strlen( filenameAttribute->Value())>0)
 			{
 				std::string filename = filenameAttribute->Value();
-				m_model = g_contentManager->LoadObject<ModelBase>(filename);
+
+				if (strstr(filename.c_str(), ".model"))
+					m_model = g_contentManager->LoadObject<Model>(filename);
+				else
+					m_model = g_contentManager->LoadObject<ModelBase>(filename);
+				
 				m_filename = filename;
 			}
 			else
