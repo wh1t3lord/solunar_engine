@@ -197,14 +197,12 @@ namespace solunar
 
 		if (debugTime >= 12.0f)
 		{
-			for (int i = 0; i < 12; i++)
-			{
-				if (!debugLines.empty())
-					debugLines.pop_back();
+			if (!debugLines.empty())
+				debugLines.clear();
 
-				if (!debugHits.empty())
-					debugHits.pop_back();
-			}
+			if (!debugHits.empty())
+				debugHits.clear();
+	
 			debugTime = 0.0f;
 		}
 

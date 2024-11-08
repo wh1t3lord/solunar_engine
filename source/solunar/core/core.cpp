@@ -48,12 +48,13 @@ namespace solunar
 		vsnprintf(buf, sizeof(buf), msg, args);
 		va_end(args);
 
-#ifndef MASTER_GOLD_BUILD
+#ifndef FINAL_BUILD
 		Logger::LogPrint("!!! ERROR: %s", buf);
 		error_backend(buf);
 		std::terminate();
 #else
-		std::terminate();
+		Logger::LogPrint("!!! ERROR: %s", buf);
+		error_backend(buf);
 #endif // !MASTER_GOLD_BUILD
 
 #ifdef _WINDOWS

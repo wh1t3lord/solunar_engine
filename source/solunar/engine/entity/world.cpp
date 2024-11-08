@@ -90,6 +90,13 @@ namespace solunar
 			for (auto it : shapes)
 				it->InitializeShape();
 		}
+
+		std::vector<RigidBodyComponent*> bodies = entity->GetComponents<RigidBodyComponent>();
+		if (!bodies.empty())
+		{
+			for (auto it : bodies)
+				it->UpdateBodyTranslationDirty();
+		}
 	}
 
 	void World::Update_PreEntityUpdate()

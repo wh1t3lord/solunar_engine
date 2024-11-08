@@ -120,6 +120,7 @@ void ShockPlayerController::OnEntitySet(Entity* entity)
 
 void ShockPlayerController::OnEntityRemove()
 {
+	g_freeCamera = nullptr;
 	g_Player = nullptr;
 
 	// m_cameraNode = nullptr;

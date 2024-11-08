@@ -99,6 +99,8 @@ void ShockAIComponent::UpdateZombie(float dt)
 	pos += direction * dt;
 	pos.y = GetEntity()->GetPosition().y;
 	GetEntity()->SetPosition(pos);
+
+	GetEntity()->SetEulerRotation(direction);
 }
 
 void ShockAIComponent::LoadXML(tinyxml2::XMLElement& element)

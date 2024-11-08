@@ -71,6 +71,8 @@ namespace solunar {
 
 	void RigidBodyComponent::LoadXML(tinyxml2::XMLElement& element)
 	{
+		Component::LoadXML(element);
+
 		tinyxml2::XMLElement* staticElement = element.FirstChildElement("Static");
 		if (staticElement)
 			staticElement->QueryBoolAttribute("value", &m_static);
@@ -110,6 +112,8 @@ namespace solunar {
 
 	void RigidBodyComponent::SaveXML(tinyxml2::XMLElement& element)
 	{
+		Component::SaveXML(element);
+
 		tinyxml2::XMLElement* enableElement = element.InsertNewChildElement("Enable");
 		enableElement->SetAttribute("value", m_isEnable);
 
@@ -160,6 +164,7 @@ namespace solunar {
 		bodyRot.setY(entityRot.y);
 		bodyRot.setZ(entityRot.z);
 		bodyRot.setW(entityRot.w);
+		trans.setRotation(bodyRot);
 
 		// set transformation to body
 		m_rigidBody->setWorldTransform(trans);
