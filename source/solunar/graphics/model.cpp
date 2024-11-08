@@ -472,6 +472,7 @@ namespace solunar
 
 	ModelSubmesh::~ModelSubmesh()
 	{
+		ReleaseHw();
 	}
 
 	void ModelSubmesh::Load(DataStreamPtr stream)
