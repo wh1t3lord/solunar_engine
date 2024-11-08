@@ -4,6 +4,8 @@
 #include "core/file/filesystem.h"
 #include "core/file/contentmanager.h"
 
+#include "graphics/model.h"
+
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
@@ -37,7 +39,7 @@ TriangleMeshServer::~TriangleMeshServer()
 {
 }
 
-void TriangleMeshServer::saveCollision(const char* modelfilename)
+void TriangleMeshServer::SaveCollision(const char* modelfilename)
 {
 	char buffer[260];
 	snprintf(buffer, sizeof(buffer), "data/models/%s.cm", modelfilename);
@@ -202,6 +204,18 @@ void TriangleMeshShapeComponent::CreateShapeInternal()
 		return;
 	}
 
+	if (m_filename.find(".model") != std::string::npos)
+	{
+		CreateShapeInternal_Model();
+	}
+	else
+	{
+		CreateShapeInternal_AssImp();
+	}
+}
+
+void TriangleMeshShapeComponent::CreateShapeInternal_AssImp()
+{
 	DataStreamPtr stream = g_contentManager->OpenStream(m_filename);
 	if (!stream)
 	{
@@ -255,6 +269,92 @@ void TriangleMeshShapeComponent::CreateShapeInternal()
 				getBulletVectorFromGlm(collisionMeshAssImp.vertices[collisionMeshAssImp.indices[n]]),
 				getBulletVectorFromGlm(collisionMeshAssImp.vertices[collisionMeshAssImp.indices[n + 1]]),
 				getBulletVectorFromGlm(collisionMeshAssImp.vertices[collisionMeshAssImp.indices[n + 2]]),
+				true);
+
+			trianglesCount++;
+		}
+
+		btBvhTriangleMeshShape* collisionShape = mem_new<btBvhTriangleMeshShape>(collisionMesh, true);
+		m_trishapes.push_back(collisionShape);
+
+		btTransform trans;
+		trans.setIdentity();
+
+		((btCompoundShape*)m_shape)->addChildShape(trans, collisionShape);
+	}
+
+	Core::Msg("TriangleMeshShapeComponent(%s): %i triangles %i bytes", m_filename.c_str(), trianglesCount, trianglesCount * sizeof(glm::vec3));
+}
+
+void TriangleMeshShapeComponent::CreateShapeInternal_Model()
+{
+	DataStreamPtr stream = g_contentManager->OpenStream(m_filename);
+	if (!stream)
+	{
+		Core::Msg("TriangleMeshShapeComponent::CreateShapeInternal: failed to open file %s", m_filename.c_str());
+		return;
+	}
+
+	// read header
+	ModelFileHeader header;
+	stream->Read(&header);
+
+	if (header.magic != MODELFILE_MAGIC)
+		Core::Error("Model file has unknowed magic!");
+
+	if (header.version > kModelFileVersion)
+		Core::Msg("[graphics]: model has older version format");
+	else if (header.version < kModelFileVersion)
+		Core::Msg("Model has newer version than engine support. (model %i, engine %i)", header.version, kModelFileVersion);
+
+	if (header.submeshCount == 0)
+		Core::Msg("Model has zero sub meshes, cannot load");
+
+	size_t verticesCount = 0;
+	size_t indicesCount = 0;
+	size_t trianglesCount = 0;
+
+	if (header.submeshCount > 0)
+		m_shape = mem_new<HackCompoundShape>();
+
+	for (uint32_t i = 0; i < header.submeshCount; i++)
+	{
+		// read submesh data
+		ModelFileSubmeshData submeshData = { 0 };
+		stream->Read(&submeshData);
+
+		std::vector<Vertex> vertices;
+
+		for (uint32_t i = 0; i < submeshData.verticesCount; i++)
+		{
+			Vertex vertex;
+			stream->Read(&vertex);
+
+			vertices.push_back(vertex);
+		}
+
+		verticesCount += (size_t)vertices.size();
+
+		std::vector<unsigned int> indices;
+
+		for (uint32_t i = 0; i < submeshData.indicesCount; i++)
+		{
+			unsigned int index;
+			stream->Read(&index);
+
+			indices.push_back(index);
+		}
+
+		indicesCount += (size_t)indices.size();
+	
+		btTriangleMesh* collisionMesh = mem_new<btTriangleMesh>();
+		m_trimeshes.push_back(collisionMesh);
+		
+		for (unsigned int n = 0; n < indices.size(); n += 3) {
+			collisionMesh->addTriangle(
+				getBulletVectorFromGlm(vertices[indices[n]].m_position),
+				getBulletVectorFromGlm(vertices[indices[n + 1]].m_position),
+				getBulletVectorFromGlm(vertices[indices[n + 2]].m_position),
 				true);
 
 			trianglesCount++;

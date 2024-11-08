@@ -13,7 +13,7 @@
 			<Static value="true"/>
 		</RigidBodyComponent>
 		<TriangleMeshShapeComponent>
-			<Model filename="models/common_floor.dae"/>
+			<Model filename="models/common_floor.model"/>
 		</TriangleMeshShapeComponent>
 	</Entity>
 	
@@ -29,7 +29,7 @@
 			<Static value="true"/>
 		</RigidBodyComponent>
 		<TriangleMeshShapeComponent>
-			<Model filename="models/zombie_dungeon.dae"/>
+			<Model filename="models/zombie_dungeon.model"/>
 		</TriangleMeshShapeComponent>
 	</Entity>
 	
@@ -143,7 +143,7 @@
 		<Rotation x="0" y="90" z="0"/>
 		<Scale x="1000" y="1000" z="1000"/>
 		<MeshComponent>
-			<Model filename="models/demo_sky.dae"/>
+			<Model filename="models/demo_sky.model"/>
 		</MeshComponent>
 	</Entity>
 	

@@ -35,7 +35,7 @@ public:
 	TriangleMeshServer();
 	~TriangleMeshServer();
 
-	void saveCollision(const char* modelfilename);
+	void SaveCollision(const char* modelfilename);
 
 private:
 	struct TrimeshEntry
@@ -63,6 +63,8 @@ public:
 
 private:
 	void CreateShapeInternal() override;
+	void CreateShapeInternal_AssImp();
+	void CreateShapeInternal_Model();
 
 private:
 	std::vector<btTriangleMesh*> m_trimeshes;
