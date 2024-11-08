@@ -70,7 +70,7 @@ void D3D11Texture2D::Create(D3D11Device* device, const TextureDesc& textureDesc,
 	subresourceData.SysMemPitch = subresourceDesc.m_memoryPitch;
 	subresourceData.SysMemSlicePitch = subresourceDesc.m_memorySlicePitch;
 
-	D3D11_CHECK(device->getDevice()->CreateTexture2D(&d3dTextureDesc, subresourceDesc.m_memory ? &subresourceData : NULL, &m_texture));
+	D3D11_CHECK(device->GetDevice()->CreateTexture2D(&d3dTextureDesc, subresourceDesc.m_memory ? &subresourceData : NULL, &m_texture));
 
 	if ((d3dTextureDesc.BindFlags & D3D11_BIND_SHADER_RESOURCE ) != 0)  
 	{
@@ -83,7 +83,7 @@ void D3D11Texture2D::Create(D3D11Device* device, const TextureDesc& textureDesc,
 		shaderResourceViewDesc.Texture2D.MipLevels = -1;
 		shaderResourceViewDesc.Texture2D.MostDetailedMip = 0;
 
-		D3D11_CHECK(device->getDevice()->CreateShaderResourceView(m_texture, &shaderResourceViewDesc, &m_textureSRV));
+		D3D11_CHECK(device->GetDevice()->CreateShaderResourceView(m_texture, &shaderResourceViewDesc, &m_textureSRV));
 	}
 }
 
@@ -104,7 +104,7 @@ void D3D11Texture2D::Destroy()
 
 void D3D11Texture2D::updateTexture(const void* data, int rowPitch, int depthPitch)
 {
-	g_d3d11Device->getDeviceContext()->UpdateSubresource(
+	g_d3d11Device->GetDeviceContext()->UpdateSubresource(
 		m_texture,
 		0,
 		NULL,

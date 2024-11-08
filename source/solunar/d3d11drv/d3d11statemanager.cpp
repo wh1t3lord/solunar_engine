@@ -77,7 +77,7 @@ IRasterizerState* D3D11StateManager::CreateRasterizerState(const RasterizerState
 
     // create d3d object
     IRasterizerState* rasterizerState = nullptr;
-    D3D11_CHECK(g_d3d11Device->getDevice()->CreateRasterizerState(&d3drasterizerDesc, reinterpret_cast<ID3D11RasterizerState**>(&rasterizerState)));
+    D3D11_CHECK(g_d3d11Device->GetDevice()->CreateRasterizerState(&d3drasterizerDesc, reinterpret_cast<ID3D11RasterizerState**>(&rasterizerState)));
 
     m_rasterizerStates.emplace(rasterizerDesc, rasterizerState);
 
@@ -93,7 +93,7 @@ void D3D11StateManager::DestroyRasterizerState(IRasterizerState* rasterizerState
 void D3D11StateManager::SetRasterizerState(IRasterizerState* rasterizerState)
 {
     ID3D11RasterizerState* d3drasterizerState = (ID3D11RasterizerState*)rasterizerState;
-    g_d3d11Device->getDeviceContext()->RSSetState(d3drasterizerState);
+    g_d3d11Device->GetDeviceContext()->RSSetState(d3drasterizerState);
 }
 
 ISamplerState* D3D11StateManager::CreateSamplerState(const SamplerDesc& samplerDesc)
@@ -144,7 +144,7 @@ IBlendState* D3D11StateManager::CreateBlendState(const BlendStateDesc& blendStat
 
     // create d3d object
     IBlendState* blendState = nullptr;
-    D3D11_CHECK(g_d3d11Device->getDevice()->CreateBlendState(&blendDesc, reinterpret_cast<ID3D11BlendState**>(&blendState)));
+    D3D11_CHECK(g_d3d11Device->GetDevice()->CreateBlendState(&blendDesc, reinterpret_cast<ID3D11BlendState**>(&blendState)));
 
     m_blendStates.emplace(blendStateDesc, blendState);
 
@@ -160,7 +160,7 @@ void D3D11StateManager::DestroyBlendState(IBlendState* blendState)
 void D3D11StateManager::SetBlendState(IBlendState* blendState, const float blendFactor[4], uint32_t sampleMask)
 {
     ID3D11BlendState* d3dBlendState = (ID3D11BlendState*)blendState;
-    g_d3d11Device->getDeviceContext()->OMSetBlendState(d3dBlendState, blendFactor, sampleMask);
+    g_d3d11Device->GetDeviceContext()->OMSetBlendState(d3dBlendState, blendFactor, sampleMask);
 }
 
 IDepthStencilState* D3D11StateManager::CreateDepthStencilState(const DepthStencilDesc& desc)
@@ -190,7 +190,7 @@ IDepthStencilState* D3D11StateManager::CreateDepthStencilState(const DepthStenci
 
     // create d3d object
     IDepthStencilState* depthStencilState = nullptr;
-    D3D11_CHECK(g_d3d11Device->getDevice()->CreateDepthStencilState(&dsDesc, reinterpret_cast<ID3D11DepthStencilState**>(&depthStencilState)));
+    D3D11_CHECK(g_d3d11Device->GetDevice()->CreateDepthStencilState(&dsDesc, reinterpret_cast<ID3D11DepthStencilState**>(&depthStencilState)));
 
     m_depthStencilStates.emplace(desc, depthStencilState);
 
@@ -206,7 +206,7 @@ void D3D11StateManager::DestroyDepthStencilState(IDepthStencilState* state)
 void D3D11StateManager::SetDepthStencilState(IDepthStencilState* state, uint32_t stencilRef)
 {
     ID3D11DepthStencilState* d3dDSState = (ID3D11DepthStencilState*)state;
-    g_d3d11Device->getDeviceContext()->OMSetDepthStencilState(d3dDSState, stencilRef);
+    g_d3d11Device->GetDeviceContext()->OMSetDepthStencilState(d3dDSState, stencilRef);
 }
 
 

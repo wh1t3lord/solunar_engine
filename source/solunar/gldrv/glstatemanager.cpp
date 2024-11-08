@@ -228,7 +228,7 @@ void GLStateManager::DestroyBlendState(IBlendState* blendState)
 void GLStateManager::SetBlendState(IBlendState* blendState, const float blendFactor[4], uint32_t sampleMask)
 {
     //ID3D11BlendState* d3dBlendState = (ID3D11BlendState*)blendState;
-    //g_d3d11Device->getDeviceContext()->OMSetBlendState(d3dBlendState, blendFactor, sampleMask);
+    //g_d3d11Device->GetDeviceContext()->OMSetBlendState(d3dBlendState, blendFactor, sampleMask);
 }
 
 IDepthStencilState* GLStateManager::CreateDepthStencilState(const DepthStencilDesc& desc)

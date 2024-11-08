@@ -36,7 +36,7 @@ void D3D11BufferImpl::Create(D3D11Device* device, const BufferDesc& bufferDesc, 
 	subresourceData.SysMemPitch = subresourceDesc.m_memoryPitch;
 	subresourceData.SysMemSlicePitch = subresourceDesc.m_memorySlicePitch;
 	
-	D3D11_CHECK(device->getDevice()->CreateBuffer(&d3d11BufferDesc, subresourceDesc.m_memory ? &subresourceData : NULL, &m_buffer));
+	D3D11_CHECK(device->GetDevice()->CreateBuffer(&d3d11BufferDesc, subresourceDesc.m_memory ? &subresourceData : NULL, &m_buffer));
 }
 
 void D3D11BufferImpl::Destroy()
@@ -55,19 +55,19 @@ void* D3D11BufferImpl::Map(BufferMapping mapping)
 	D3D11_MAPPED_SUBRESOURCE mappedSubresource;
 	memset(&mappedSubresource, 0, sizeof(mappedSubresource));
 	
-	D3D11_CHECK(m_device->getDeviceContext()->Map(m_buffer, 0, GetD3D11Map(mapping), 0, &mappedSubresource));
+	D3D11_CHECK(m_device->GetDeviceContext()->Map(m_buffer, 0, GetD3D11Map(mapping), 0, &mappedSubresource));
 	
 	return mappedSubresource.pData;
 }
 
 void D3D11BufferImpl::Unmap()
 {
-	m_device->getDeviceContext()->Unmap(m_buffer, 0);
+	m_device->GetDeviceContext()->Unmap(m_buffer, 0);
 }
 
 void D3D11BufferImpl::UpdateSubresource(void* data, size_t size)
 {
-	m_device->getDeviceContext()->UpdateSubresource(m_buffer, 0, NULL, data, 0, 0);
+	m_device->GetDeviceContext()->UpdateSubresource(m_buffer, 0, NULL, data, 0, 0);
 }
 
 }

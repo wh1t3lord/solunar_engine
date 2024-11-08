@@ -132,7 +132,7 @@ void D3D11SamplerState::Create(D3D11Device* device, const SamplerDesc& samplerDe
 		d3d11SamplerDesc.BorderColor[2] =
 		d3d11SamplerDesc.BorderColor[3] = 10000.0f;
 
-	D3D11_CHECK(device->getDevice()->CreateSamplerState(&d3d11SamplerDesc, &m_samplerState));
+	D3D11_CHECK(device->GetDevice()->CreateSamplerState(&d3d11SamplerDesc, &m_samplerState));
 }
 
 void D3D11SamplerState::Destroy()

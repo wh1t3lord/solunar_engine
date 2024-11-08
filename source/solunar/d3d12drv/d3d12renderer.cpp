@@ -50,7 +50,7 @@ void reportD3D12RenderDevice()
 {
 #if 0
 	IDXGIDevice* dxgiDevice = nullptr;
-	D3D12_CHECK(g_d3d12Device->getDevice()->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice));
+	D3D12_CHECK(g_d3d12Device->GetDevice()->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice));
 
 	IDXGIAdapter* dxgiAdapter = nullptr;
 	D3D12_CHECK(dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)&dxgiAdapter));
@@ -117,7 +117,7 @@ void D3D12Renderer::createSwapChain()
 	//D3D11Device* device = ((D3D11Device*)g_renderDevice);
 
 	//IDXGIDevice* dxgiDevice;
-	//device->getDevice()->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice);
+	//device->GetDevice()->QueryInterface(__uuidof(IDXGIDevice), (void**)&dxgiDevice);
 
 	//IDXGIAdapter* dxgiAdapter;
 	//HRESULT hr = dxgiDevice->GetParent(__uuidof(IDXGIAdapter), (void**)&dxgiAdapter);
@@ -143,12 +143,12 @@ void D3D12Renderer::createSwapChain()
 	//swapChainDesc.OutputWindow = windowHandle;
 	//swapChainDesc.Windowed = TRUE;
 	//swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-	//D3D11_CHECK(dxgiFactory->CreateSwapChain(device->getDevice(), &swapChainDesc, &m_swapChain));
+	//D3D11_CHECK(dxgiFactory->CreateSwapChain(device->GetDevice(), &swapChainDesc, &m_swapChain));
 
 	//ID3D11Texture2D* backBuffer;
 	//m_swapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&backBuffer);
 
-	//D3D11_CHECK(device->getDevice()->CreateRenderTargetView(backBuffer, NULL, &m_renderTargetView));
+	//D3D11_CHECK(device->GetDevice()->CreateRenderTargetView(backBuffer, NULL, &m_renderTargetView));
 	//backBuffer->Release();
 	//backBuffer = nullptr;
 
@@ -169,7 +169,7 @@ void D3D12Renderer::createSwapChain()
 	//depthStencilTextureDesc.Usage = D3D11_USAGE_DEFAULT;
 	//depthStencilTextureDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 
-	//D3D11_CHECK(device->getDevice()->CreateTexture2D(&depthStencilTextureDesc, NULL, &m_depthStencilTexture));
+	//D3D11_CHECK(device->GetDevice()->CreateTexture2D(&depthStencilTextureDesc, NULL, &m_depthStencilTexture));
 
 	//D3D11_DEPTH_STENCIL_VIEW_DESC depthStencilViewDesc;
 	//memset(&depthStencilViewDesc, 0, sizeof(depthStencilViewDesc));
@@ -177,13 +177,13 @@ void D3D12Renderer::createSwapChain()
 	//depthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	//depthStencilViewDesc.Texture2D.MipSlice = 0;
 
-	//D3D11_CHECK(device->getDevice()->CreateDepthStencilView(m_depthStencilTexture, &depthStencilViewDesc, &m_depthStencilView));
+	//D3D11_CHECK(device->GetDevice()->CreateDepthStencilView(m_depthStencilTexture, &depthStencilViewDesc, &m_depthStencilView));
 
 	//// Create proxy render target for swap chain
 	//m_swapChainRenderTarget = mem_new<D3D11RenderTarget>(m_renderTargetView, m_depthStencilView);
 
 	//// Initialize target
-	//device->getDeviceContext()->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
+	//device->GetDeviceContext()->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
 
 	//// Create depth stencil state
 	//// https://learn.microsoft.com/en-us/windows/win32/direct3d11/d3d10-graphics-programming-guide-depth-stencil
@@ -213,10 +213,10 @@ void D3D12Renderer::createSwapChain()
 	//depthStencilDesc.BackFace.StencilPassOp = D3D11_STENCIL_OP_KEEP;
 	//depthStencilDesc.BackFace.StencilFunc = D3D11_COMPARISON_ALWAYS;
 
-	//D3D11_CHECK(device->getDevice()->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilState));
+	//D3D11_CHECK(device->GetDevice()->CreateDepthStencilState(&depthStencilDesc, &m_depthStencilState));
 
 	//// Set depth stencil state
-	//device->getDeviceContext()->OMSetDepthStencilState(m_depthStencilState, 0);
+	//device->GetDeviceContext()->OMSetDepthStencilState(m_depthStencilState, 0);
 }
 
 void D3D12Renderer::CreateRasterizerState()
@@ -362,7 +362,7 @@ void D3D12Renderer::RenderMesh(GraphicsWorld* graphicsWorld, View* view, MeshCom
 	// OPTICK_EVENT("D3D12Renderer::RenderMesh");
 
 	// Set depth stencil state
-	//g_d3d11Device->getDeviceContext()->OMSetDepthStencilState(m_depthStencilState, 0);
+	//g_d3d11Device->GetDeviceContext()->OMSetDepthStencilState(m_depthStencilState, 0);
 	//g_stateManager->SetRasterizerState(m_rasterizerState);
 
 	// setup lights
@@ -582,21 +582,21 @@ void D3D12Renderer::takeScreenshotInternal()
 	//textureDesc.Usage = D3D11_USAGE_STAGING;
 
 	//ID3D11Texture2D* copyOfScreenTexture = nullptr;
-	//D3D11_CHECK(device->getDevice()->CreateTexture2D(&textureDesc, NULL, &copyOfScreenTexture));
+	//D3D11_CHECK(device->GetDevice()->CreateTexture2D(&textureDesc, NULL, &copyOfScreenTexture));
 
-	//device->getDeviceContext()->CopyResource(copyOfScreenTexture, screenTexture);
+	//device->GetDeviceContext()->CopyResource(copyOfScreenTexture, screenTexture);
 
 	//screenTexture->Release();
 	//screenTexture = nullptr;
 
 	//// map resource
 	//D3D11_MAPPED_SUBRESOURCE mapped;
-	//D3D11_CHECK(device->getDeviceContext()->Map(copyOfScreenTexture, 0, D3D11_MAP_READ, 0, &mapped));
+	//D3D11_CHECK(device->GetDeviceContext()->Map(copyOfScreenTexture, 0, D3D11_MAP_READ, 0, &mapped));
 
 	//uint64_t imageSize = uint64_t(mapped.RowPitch) * uint64_t(textureDesc.Height);
 	//memcpy(screenBuffer, mapped.pData, imageSize);
 
-	//device->getDeviceContext()->Unmap(copyOfScreenTexture, 0);
+	//device->GetDeviceContext()->Unmap(copyOfScreenTexture, 0);
 
 	//copyOfScreenTexture->Release();
 	//copyOfScreenTexture = nullptr;
@@ -633,8 +633,8 @@ void D3D12Renderer::clearScreen()
 	//if (m_renderTargetView)
 	//{
 	//	static float color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	//	((D3D11Device*)g_renderDevice)->getDeviceContext()->ClearRenderTargetView(m_renderTargetView, color);
-	//	((D3D11Device*)g_renderDevice)->getDeviceContext()->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	//	((D3D11Device*)g_renderDevice)->GetDeviceContext()->ClearRenderTargetView(m_renderTargetView, color);
+	//	((D3D11Device*)g_renderDevice)->GetDeviceContext()->ClearDepthStencilView(m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 	//}
 }
 
@@ -648,13 +648,13 @@ void D3D12Renderer::ClearRenderTarget(IRenderTarget* renderTarget)
 	//		if (it)
 	//		{
 	//			static float color[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
-	//			g_d3d11Device->getDeviceContext()->ClearRenderTargetView(it, color);
+	//			g_d3d11Device->GetDeviceContext()->ClearRenderTargetView(it, color);
 	//		}
 	//	}
 
 	//	if (d3dRenderTarget->m_depthStencilView)
 	//	{
-	//		g_d3d11Device->getDeviceContext()->ClearDepthStencilView(d3dRenderTarget->m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
+	//		g_d3d11Device->GetDeviceContext()->ClearDepthStencilView(d3dRenderTarget->m_depthStencilView, D3D11_CLEAR_DEPTH, 1.0f, 0);
 	//	}
 	//}
 }
@@ -662,7 +662,7 @@ void D3D12Renderer::ClearRenderTarget(IRenderTarget* renderTarget)
 void D3D12Renderer::setSwapChainRenderTarget()
 {
 	// Initialize target
-	//g_d3d11Device->getDeviceContext()->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
+	//g_d3d11Device->GetDeviceContext()->OMSetRenderTargets(1, &m_renderTargetView, m_depthStencilView);
 
 }
 

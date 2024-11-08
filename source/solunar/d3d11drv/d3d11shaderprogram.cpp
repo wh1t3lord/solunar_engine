@@ -172,7 +172,7 @@ D3D11ShaderProgram::~D3D11ShaderProgram()
 void D3D11ShaderProgram::Create(D3D11Device* device, const char* vstext, const char* pstext, const char* defines /*= nullptr*/, InputLayoutDesc* inputLayout /*= nullptr*/, int inputLayoutCount /*= 0*/)
 {
 	ID3DBlob* vertexShaderBlob = CreateShaderFromText(vstext, ShaderType_Vertex, defines);
-	device->getDevice()->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), NULL, &m_vertexShader);
+	device->GetDevice()->CreateVertexShader(vertexShaderBlob->GetBufferPointer(), vertexShaderBlob->GetBufferSize(), NULL, &m_vertexShader);
 
 	if (inputLayout && inputLayoutCount > 0)
 	{
@@ -191,7 +191,7 @@ void D3D11ShaderProgram::Create(D3D11Device* device, const char* vstext, const c
 			inputLayoutDesc.push_back(inputElementDesc);
 		}
 
-		device->getDevice()->CreateInputLayout(&inputLayoutDesc[0],
+		device->GetDevice()->CreateInputLayout(&inputLayoutDesc[0],
 			(UINT)inputLayoutDesc.size(),
 			vertexShaderBlob->GetBufferPointer(),
 			vertexShaderBlob->GetBufferSize(),
@@ -210,7 +210,7 @@ void D3D11ShaderProgram::Create(D3D11Device* device, const char* vstext, const c
 	vertexShaderBlob = nullptr;
 
 	ID3DBlob* pixelShaderBlob = CreateShaderFromText(pstext, ShaderType_Pixel, defines);
-	device->getDevice()->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), NULL, &m_pixelShader);
+	device->GetDevice()->CreatePixelShader(pixelShaderBlob->GetBufferPointer(), pixelShaderBlob->GetBufferSize(), NULL, &m_pixelShader);
 
 	pixelShaderBlob->Release();
 	pixelShaderBlob = nullptr;
@@ -300,7 +300,7 @@ void D3D11ShaderProgram::CreateInputLayout(D3D11Device* device, ID3DBlob* vertex
 		inputLayoutDesc.push_back(elementDesc);
 	}
 
-	device->getDevice()->CreateInputLayout(&inputLayoutDesc[0], 
+	device->GetDevice()->CreateInputLayout(&inputLayoutDesc[0], 
 		(UINT)inputLayoutDesc.size(), 
 		vertexShaderBlob->GetBufferPointer(),
 		vertexShaderBlob->GetBufferSize(), 

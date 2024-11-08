@@ -79,15 +79,15 @@ void D3D11ShaderProgramManager::SetShaderProgram(IShaderProgram* program)
 	// #TODO: REFACTOR
 	if (d3dProgram)
 	{
-		device->getDeviceContext()->IASetInputLayout(d3dProgram->getInputLayout());
-		device->getDeviceContext()->VSSetShader(d3dProgram->getVertexShader(), NULL, 0);
-		device->getDeviceContext()->PSSetShader(d3dProgram->getPixelShader(), NULL, 0);
+		device->GetDeviceContext()->IASetInputLayout(d3dProgram->getInputLayout());
+		device->GetDeviceContext()->VSSetShader(d3dProgram->getVertexShader(), NULL, 0);
+		device->GetDeviceContext()->PSSetShader(d3dProgram->getPixelShader(), NULL, 0);
 	}
 	else
 	{
-		device->getDeviceContext()->IASetInputLayout(NULL);
-		device->getDeviceContext()->VSSetShader(NULL, NULL, 0);
-		device->getDeviceContext()->PSSetShader(NULL, NULL, 0);
+		device->GetDeviceContext()->IASetInputLayout(NULL);
+		device->GetDeviceContext()->VSSetShader(NULL, NULL, 0);
+		device->GetDeviceContext()->PSSetShader(NULL, NULL, 0);
 	}
 }
 

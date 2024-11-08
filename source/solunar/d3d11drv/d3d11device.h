@@ -66,8 +66,8 @@ public:
 	void DrawIndexed(PrimitiveMode primitiveMode, size_t indexStart, size_t indexCount, int baseVertexLocation) override;
 
 public:
-	ID3D11Device* getDevice() { return m_device; }
-	ID3D11DeviceContext* getDeviceContext() { return m_deviceContext; }
+	ID3D11Device* GetDevice() { return m_device; }
+	ID3D11DeviceContext* GetDeviceContext() { return m_deviceContext; }
 
 private:
 	ID3D11Device* m_device;

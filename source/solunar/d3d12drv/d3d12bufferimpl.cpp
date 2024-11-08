@@ -167,7 +167,7 @@ void D3D12BufferImpl::Unmap()
 void D3D12BufferImpl::UpdateSubresource(void* data, size_t size)
 {
 	Assert2(0, "Implement please");
-//	m_device->getDeviceContext()->UpdateSubresource(m_buffer, 0, NULL, data, 0, 0);
+//	m_device->GetDeviceContext()->UpdateSubresource(m_buffer, 0, NULL, data, 0, 0);
 }
 
 void D3D12BufferImpl::setIndexFormat(bool is16BitIndices)
