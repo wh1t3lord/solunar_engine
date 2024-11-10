@@ -6,6 +6,7 @@
 #include "shockgame/demogame.h"
 
 #include "graphics/fontmanager.h"
+#include "graphics/debugrenderer.h"
 
 namespace solunar
 {
@@ -93,6 +94,8 @@ void ShockAIComponent::updateFire(float dt)
 
 void ShockAIComponent::UpdateZombie(float dt)
 {
+	g_debugRender.drawBoundingBox(GetEntity()->GetBoundingBox(), glm::vec3(1.0f, 0.0f, 0.0f));
+
 	glm::vec3 direction = glm::normalize(g_Player->GetPosition() - GetEntity()->GetPosition());
 	
 	glm::vec3 pos = GetEntity()->GetPosition();
@@ -100,7 +103,15 @@ void ShockAIComponent::UpdateZombie(float dt)
 	pos.y = GetEntity()->GetPosition().y;
 	GetEntity()->SetPosition(pos);
 
-	GetEntity()->SetEulerRotation(direction);
+	// rotate camera torwads to player
+	glm::vec3 playerPos = g_Player->GetPosition();
+	playerPos.y = 0.0f;
+
+	glm::vec3 characterPos = GetEntity()->GetPosition();
+	characterPos.y = 0.0f;
+
+	glm::quat rotation = glm::quatLookAt(glm::normalize(playerPos - characterPos), glm::vec3(0.0f, 1.0f, 0.0f));
+	GetEntity()->SetRotation(rotation);
 }
 
 void ShockAIComponent::LoadXML(tinyxml2::XMLElement& element)

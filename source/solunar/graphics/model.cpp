@@ -272,13 +272,10 @@ namespace solunar
 			ModelFileSubmeshData submeshData;
 			memset(&submeshData, 0, sizeof(submeshData));
 			strcpy(submeshData.materialInfo, pSubMesh->m_materialName.c_str());
-			//strcpy(submeshData.materialInfo, pSubMesh->LockMaterial()->GetName().c_str());
-			//strcpy(submeshData.materialInfo, "MATERIAL UNNAMED");
 			submeshData.verticesCount = pSubMesh->GetVerticesCount();
 			submeshData.indicesCount = pSubMesh->getIndeciesCount();
 			g_fileSystem->Write(file, &submeshData, sizeof(submeshData));
 
-			//Vertex* pBufferVertices = (Vertex*)pSubMesh->GetVertexBuffer()->Map(BufferMapping::ReadOnly);
 			Vertex* pBufferVertices = (Vertex*)pSubMesh->m_vertices.data();
 
 			// Avoid transform in vertex buffer
@@ -286,8 +283,6 @@ namespace solunar
 			Vertex* pVertices = (Vertex*)malloc(pSubMesh->GetVerticesCount() * sizeof(Vertex));
 			memcpy(pVertices, (const void*)pBufferVertices, pSubMesh->GetVerticesCount() * sizeof(Vertex));
 
-			// Unmap buffer
-		//	pSubMesh->GetVertexBuffer()->Unmap();
 			pBufferVertices = nullptr;
 
 			// Transform vertices to OpenGL space.
@@ -301,12 +296,10 @@ namespace solunar
 			// free temp buffer
 			free(pBufferVertices);
 
-			//unsigned int* pIndices = (unsigned int*)pSubMesh->getIndexBuffer()->Map(BufferMapping::ReadOnly);
 			unsigned int* pIndices = (unsigned int*)pSubMesh->m_indecies.data();
 			g_fileSystem->Write(file, pIndices, pSubMesh->getIndeciesCount() * sizeof(uint32_t));
 
 			// Unmap buffer
-			//pSubMesh->getIndexBuffer()->Unmap();
 			pIndices = nullptr;
 		}
 
@@ -348,13 +341,10 @@ namespace solunar
 			submesh->m_indexBuffer = g_renderDevice->CreateBuffer(indexBufferDesc, indexBufferSubresourceDesc);
 
 			// Load material
-
-			// submesh->m_material = ContentManager::GetInstance()->LoadMaterial(submesh->m_materialName);
-			//submesh->m_material = dynamicCastPtr<Material>(g_contentManager->Load(submesh->m_materialName, Material::GetStaticTypeInfo()));
 			submesh->m_material = g_contentManager->LoadObject<Material>(submesh->m_materialName);
-			if (submesh->m_material.lock() == nullptr)
+			if (submesh->m_material.expired())
 			{
-				//Core::Msg("ERROR: ModelBase: Missing material \"%s\"", submesh->m_materialName.c_str());
+				Core::Msg("ERROR: ModelBase: Missing material \"%s\"", submesh->m_materialName.c_str());
 				submesh->m_material = GetDefaultMaterial();
 			}
 		}
@@ -484,28 +474,16 @@ namespace solunar
 		m_materialName = submeshData.materialInfo;
 		m_material = dynamicCastPtr<Material>(g_contentManager->Load(m_materialName, Material::GetStaticTypeInfo()));
 
-		Assert2(submeshData.verticesCount != 0, "Mesh has zero vertices, internal error...");
-		Assert2(submeshData.indicesCount != 0, "Mesh has zero indices, internal error...");
+		Assert2(submeshData.verticesCount != 0, "Mesh has zero vertices");
+		Assert2(submeshData.indicesCount != 0, "Mesh has zero indices");
 
-		for (uint32_t i = 0; i < submeshData.verticesCount; i++)
-		{
-			Vertex vertex;
-			stream->Read(&vertex);
+		m_verticesCount = submeshData.verticesCount;
+		m_vertices.resize(m_verticesCount);
+		stream->Read(m_vertices.data(), m_verticesCount * sizeof(Vertex));
 
-			m_vertices.push_back(vertex);
-		}
-
-		m_verticesCount = (uint32_t)m_vertices.size();
-
-		for (uint32_t i = 0; i < submeshData.indicesCount; i++)
-		{
-			unsigned int index;
-			stream->Read(&index);
-
-			m_indices.push_back(index);
-		}
-
-		m_indicesCount = (uint32_t)m_indices.size();
+		m_indicesCount = submeshData.indicesCount;
+		m_indices.resize(m_indicesCount);
+		stream->Read(m_indices.data(), m_indicesCount * sizeof(unsigned int));
 
 		CreateHw();
 	}
@@ -516,10 +494,6 @@ namespace solunar
 
 	void ModelSubmesh::CreateHw()
 	{
-		/////////////////////////
-		// Vertex buffer creation
-		/////////////////////////
-
 		BufferDesc verticesBufferDesc;
 		memset(&verticesBufferDesc, 0, sizeof(verticesBufferDesc));
 		verticesBufferDesc.m_bufferType = BufferType::VertexBuffer;
@@ -531,10 +505,6 @@ namespace solunar
 		verticesSubresourceDesc.m_memory = m_vertices.data();
 
 		m_verticesBuffer = g_renderDevice->CreateBuffer(verticesBufferDesc, verticesSubresourceDesc);
-
-		////////////////////////
-		// Index buffer creation
-		////////////////////////
 
 		BufferDesc indicesBufferDesc;
 		memset(&indicesBufferDesc, 0, sizeof(indicesBufferDesc));

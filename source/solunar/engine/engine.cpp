@@ -16,6 +16,8 @@
 #include "engine/physics/trianglemeshshape.h"
 #include "engine/physics/triggercomponent.h"
 
+#include "graphics/renderer.h"
+
 // #HACK: move to game interface
 #include "shockgame/demogame.h"
 
@@ -227,6 +229,10 @@ namespace solunar
 		case EngineState::Running:
 			break;
 		case EngineState::LoadWorld:
+
+			Assert(g_renderer);
+			g_renderer->RenderLoadscreen();
+
 			if (m_worldName.empty())
 				Engine::LoadEmptyWorld();
 			else

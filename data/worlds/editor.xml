@@ -41,6 +41,13 @@
 			<Model filename="models/zombie_static.model"/>
 			<CastShadow value="true"/>
 		</MeshComponent>
+		<RigidBodyComponent>
+			<Static value="false"/>
+		</RigidBodyComponent>
+		<BoxShapeComponent>
+			<Position x="0.0" y="0.8" z="0.0"/>
+			<Size x="0.4" y="0.8" z="0.4"/>
+		</BoxShapeComponent>
 		<ShockAIComponent>
 			<AIType value="ShockAIType_Zombie"/>
 		</ShockAIComponent>

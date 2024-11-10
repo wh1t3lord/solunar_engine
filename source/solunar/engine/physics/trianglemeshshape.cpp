@@ -310,9 +310,9 @@ void TriangleMeshShapeComponent::CreateShapeInternal_Model()
 	if (header.submeshCount == 0)
 		Core::Msg("Model has zero sub meshes, cannot load");
 
-	size_t verticesCount = 0;
-	size_t indicesCount = 0;
-	size_t trianglesCount = 0;
+	size_t verticesUsageCount = 0;
+	size_t indicesUsageCount = 0;
+	size_t trianglesUsageCount = 0;
 
 	if (header.submeshCount > 0)
 		m_shape = mem_new<HackCompoundShape>();
@@ -324,28 +324,19 @@ void TriangleMeshShapeComponent::CreateShapeInternal_Model()
 		stream->Read(&submeshData);
 
 		std::vector<Vertex> vertices;
+		uint32_t verticesCount = submeshData.verticesCount;
+		vertices.resize(verticesCount);
+		stream->Read(vertices.data(), verticesCount * sizeof(Vertex));
 
-		for (uint32_t i = 0; i < submeshData.verticesCount; i++)
-		{
-			Vertex vertex;
-			stream->Read(&vertex);
-
-			vertices.push_back(vertex);
-		}
-
-		verticesCount += (size_t)vertices.size();
+		verticesUsageCount += (size_t)vertices.size();
 
 		std::vector<unsigned int> indices;
 
-		for (uint32_t i = 0; i < submeshData.indicesCount; i++)
-		{
-			unsigned int index;
-			stream->Read(&index);
+		uint32_t indicesCount = submeshData.indicesCount;
+		indices.resize(indicesCount);
+		stream->Read(indices.data(), indicesCount * sizeof(unsigned int));
 
-			indices.push_back(index);
-		}
-
-		indicesCount += (size_t)indices.size();
+		indicesUsageCount += (size_t)indices.size();
 	
 		btTriangleMesh* collisionMesh = mem_new<btTriangleMesh>();
 		m_trimeshes.push_back(collisionMesh);
@@ -357,7 +348,7 @@ void TriangleMeshShapeComponent::CreateShapeInternal_Model()
 				getBulletVectorFromGlm(vertices[indices[n + 2]].m_position),
 				true);
 
-			trianglesCount++;
+			trianglesUsageCount++;
 		}
 
 		btBvhTriangleMeshShape* collisionShape = mem_new<btBvhTriangleMeshShape>(collisionMesh, true);
@@ -369,7 +360,7 @@ void TriangleMeshShapeComponent::CreateShapeInternal_Model()
 		((btCompoundShape*)m_shape)->addChildShape(trans, collisionShape);
 	}
 
-	Core::Msg("TriangleMeshShapeComponent(%s): %i triangles %i bytes", m_filename.c_str(), trianglesCount, trianglesCount * sizeof(glm::vec3));
+	Core::Msg("TriangleMeshShapeComponent(%s): %i triangles %i bytes", m_filename.c_str(), trianglesUsageCount, trianglesUsageCount * sizeof(glm::vec3));
 }
 
 }

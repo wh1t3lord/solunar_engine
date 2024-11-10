@@ -616,9 +616,8 @@ namespace solunar
 
 	void Renderer::RenderLoadscreen()
 	{
-		BeginFrame();
-		ImGui::Text("Loading ...");
-		EndFrame();
+		// Draw loading screen
+		DrawLoadscreen();
 	}
 
 	void Renderer::SetDefaultRenderState()
