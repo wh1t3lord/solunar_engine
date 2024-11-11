@@ -33,14 +33,12 @@ namespace solunar {
 			const tinyxml2::XMLAttribute* filenameAttribute = modelElement->FindAttribute("filename");
 			if (filenameAttribute && strlen( filenameAttribute->Value())>0)
 			{
-				std::string filename = filenameAttribute->Value();
+				m_filename = filenameAttribute->Value();
 
-				if (strstr(filename.c_str(), ".model"))
-					m_model = g_contentManager->LoadObject<Model>(filename);
+				if (strstr(m_filename.c_str(), ".model"))
+					m_model = g_contentManager->LoadObject<Model>(m_filename);
 				else
-					m_model = g_contentManager->LoadObject<ModelBase>(filename);
-				
-				m_filename = filename;
+					m_model = g_contentManager->LoadObject<ModelBase>(m_filename);
 			}
 			else
 			{
@@ -119,9 +117,8 @@ namespace solunar {
 			const tinyxml2::XMLAttribute* filenameAttribute = modelElement->FindAttribute("filename");
 			if (filenameAttribute && strlen(filenameAttribute->Value()) > 0)
 			{
-				std::string filename = filenameAttribute->Value();
-				m_model = g_contentManager->LoadObject<AnimatedModel>(filename);
-				m_filename = filename;
+				m_filename = filenameAttribute->Value();
+				m_model = g_contentManager->LoadObject<AnimatedModel>(m_filename);
 
 				// guarantee cast, trust me 
 				std::weak_ptr<AnimatedModel> animatedModel = dynamicCastWeakPtr<AnimatedModel, ModelBase>(m_model);

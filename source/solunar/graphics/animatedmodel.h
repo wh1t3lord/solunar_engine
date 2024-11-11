@@ -107,15 +107,6 @@ struct AnimationNode
 	int m_skinId = -1;
 };
 
-struct BoneInfo
-{
-	/*id is index in finalBoneMatrices*/
-	int id;
-
-	/*offset matrix transforms vertex from model space to bone space*/
-	glm::mat4 offset;
-};
-
 class AnimatedModel : public ModelBase
 {
 	DECLARE_OBJECT(AnimatedModel);
@@ -165,7 +156,6 @@ private:
 	std::vector<AnimationSkin> m_skins;
 	//std::vector<AnimationNode> m_joints;
 	std::vector<AnimationNode> m_nodes;
-	std::map<std::string, BoneInfo> m_bones;
 	Animation* m_currentAnimation;
 	bool m_playLooped = false;
 	bool m_play = false;
