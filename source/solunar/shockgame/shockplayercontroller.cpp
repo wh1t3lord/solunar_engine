@@ -17,6 +17,8 @@
 #include <numeric>
 #include <limits>
 
+#include "stb_sprintf.h"
+
 namespace solunar
 {
 
@@ -269,20 +271,19 @@ void ShockPlayerController::Update(float dt)
 	if (m_playerStats.m_health <= 0.0f)
 	{
 		char healthText[64];
-		snprintf(healthText, sizeof(healthText), "WE ARE DEAD :((((");
+		stbsp_snprintf(healthText, sizeof(healthText), "WE ARE DEAD :((((");
 		g_fontManager->DrawSystemFont(healthText, 500, 500, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
 	}
 
 #if 1
-	char healthText[64];
-	snprintf(healthText, sizeof(healthText), "Health: %.0f", m_playerStats.m_health);
+	static char healthText[64];
+	stbsp_snprintf(healthText, sizeof(healthText), "Health: %.0f", m_playerStats.m_health);
 	
-	char enduranceText[64];
-	snprintf(enduranceText, sizeof(enduranceText), "Endurance: %.0f", m_playerStats.m_endurance);
+	static char enduranceText[64];
+	stbsp_snprintf(enduranceText, sizeof(enduranceText), "Endurance: %.0f", m_playerStats.m_endurance);
 
-	char moneyText[64];
-	snprintf(moneyText, sizeof(moneyText), "Money: %i", 100500);
-
+	static char moneyText[64];
+	stbsp_snprintf(moneyText, sizeof(moneyText), "Money: %i", 100500);
 
 	s_font->DrawText(healthText, 25.0f, view->m_height - 50.0f, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
 	s_font->DrawText(moneyText, view->m_width - 256.0f, view->m_height - 25.0f, glm::vec4(0.0f, 0.5f, 0.0f, 1.0f));
@@ -566,7 +567,7 @@ void ShockPlayerController::UpdateLogic(float dt)
 
 void ShockPlayerController::DebugUpdate(float dt)
 {
-	g_debugRender.drawAxis(m_camera->GetEntity()->GetWorldPosition());
+	//g_debugRender.drawAxis(m_camera->GetEntity()->GetWorldPosition());
 
 	if (!m_rigidBody)
 		return;
@@ -576,13 +577,13 @@ void ShockPlayerController::DebugUpdate(float dt)
 	
 	// Ghost object stuff ...
 
-	snprintf(buf, sizeof(buf), "--- Ghost Object ---");
+	stbsp_snprintf(buf, sizeof(buf), "--- Ghost Object ---");
 	g_fontManager->DrawSystemFontShadowed(buf, 0, 200, glm::vec4(1.0f));
 
 	btTransform trans = m_rigidBody->GetGhostObject()->getWorldTransform();
 	
 	glm::vec3 ghostObjectOrigin = btVectorToGlm(trans.getOrigin());
-	snprintf(buf, sizeof(buf), "Origin: %.2f %.2f %.2f", 
+	stbsp_snprintf(buf, sizeof(buf), "Origin: %.2f %.2f %.2f",
 		ghostObjectOrigin.x, 
 		ghostObjectOrigin.y, 
 		ghostObjectOrigin.z);
@@ -590,7 +591,7 @@ void ShockPlayerController::DebugUpdate(float dt)
 	g_fontManager->DrawSystemFontShadowed(buf, 0, 220, glm::vec4(1.0f));
 
 	btQuaternion ghostObjectRotation = trans.getRotation();
-	snprintf(buf, sizeof(buf), "Basis: %.2f %.2f %.2f %.2f", 
+	stbsp_snprintf(buf, sizeof(buf), "Basis: %.2f %.2f %.2f %.2f",
 		ghostObjectRotation.x(),
 		ghostObjectRotation.y(),
 		ghostObjectRotation.z(),
@@ -598,15 +599,15 @@ void ShockPlayerController::DebugUpdate(float dt)
 
 	g_fontManager->DrawSystemFontShadowed(buf, 0, 240, glm::vec4(1.0f));
 
-	snprintf(buf, sizeof(buf), "--- Character Controller ---");
+	stbsp_snprintf(buf, sizeof(buf), "--- Character Controller ---");
 	g_fontManager->DrawSystemFontShadowed(buf, 0, 280, glm::vec4(1.0f));
 
-	snprintf(buf, sizeof(buf), "Delta: %f", dt);
+	stbsp_snprintf(buf, sizeof(buf), "Delta: %f", dt);
 	g_fontManager->DrawSystemFontShadowed(buf, 0, 300, glm::vec4(1.0f));
 
 	btVector3 linearVelocity = m_rigidBody->GetCharacterController()->getLinearVelocity();
 
-	snprintf(buf, sizeof(buf), "Linear velocity: %.2f %.2f %.2f",
+	stbsp_snprintf(buf, sizeof(buf), "Linear velocity: %.2f %.2f %.2f",
 		ghostObjectRotation.x(),
 		ghostObjectRotation.y(),
 		ghostObjectRotation.z());
@@ -614,7 +615,7 @@ void ShockPlayerController::DebugUpdate(float dt)
 	g_fontManager->DrawSystemFontShadowed(buf, 0, 320, glm::vec4(1.0f));
 
 	btVector3 gravity = m_rigidBody->GetCharacterController()->getGravity();
-	snprintf(buf, sizeof(buf), "Gravity: %.2f %.2f %.2f",
+	stbsp_snprintf(buf, sizeof(buf), "Gravity: %.2f %.2f %.2f",
 		ghostObjectRotation.x(),
 		ghostObjectRotation.y(),
 		ghostObjectRotation.z());
@@ -622,11 +623,11 @@ void ShockPlayerController::DebugUpdate(float dt)
 	g_fontManager->DrawSystemFontShadowed(buf, 0, 340, glm::vec4(1.0f));
 
 	btScalar fallSpeed = m_rigidBody->GetCharacterController()->getFallSpeed();
-	snprintf(buf, sizeof(buf), "fallSpeed: %f", fallSpeed);
+	stbsp_snprintf(buf, sizeof(buf), "fallSpeed: %f", fallSpeed);
 	g_fontManager->DrawSystemFontShadowed(buf, 0, 360, glm::vec4(1.0f));
 
 	bool onGround = m_rigidBody->GetCharacterController()->onGround();
-	snprintf(buf, sizeof(buf), "onGround: %s", onGround ? "true" : "false");
+	stbsp_snprintf(buf, sizeof(buf), "onGround: %s", onGround ? "true" : "false");
 	g_fontManager->DrawSystemFontShadowed(buf, 0, 380, glm::vec4(1.0f));
 }
 

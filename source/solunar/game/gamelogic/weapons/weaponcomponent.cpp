@@ -14,6 +14,10 @@
 
 #include <imgui.h>
 
+#include "stb_sprintf.h"
+
+//#define ENABLE_TRACE_DEBUG
+
 namespace solunar
 {
 	IMPLEMENT_OBJECT(WeaponComponent, LogicComponent);
@@ -47,6 +51,12 @@ namespace solunar
 	}
 
 	void WeaponComponent::Update(float dt)
+	{
+		if (m_type == WeaponsType::Shotgun)
+			Update_Shotgun(dt);
+	}
+
+	void WeaponComponent::Update_Shotgun(float dt)
 	{
 		static AudioSource* s_fireSound = nullptr;
 		static AudioSource* s_reloadSound = nullptr;
@@ -89,7 +99,7 @@ namespace solunar
 		bool isReloadAniFinished = currentId == m_reload_one_Ani && animatedModel->IsStoped();
 		bool isReloadLastOneAniFinished = currentId == m_reload_last_one_Ani && animatedModel->IsStoped();
 		static bool reload = false;
-	
+
 		const int kMaxAmmo = 12;
 
 		if (InputManager::GetInstance()->IsPressed(KEY_R) && (isFireAniFinished || currentId == m_idleAni) && m_ammo < kMaxAmmo)
@@ -108,7 +118,7 @@ namespace solunar
 
 		if (isReloadLastOneAniFinished)
 			animatedModel->PlayAnimation(m_idleAni, true);
-			
+
 
 		if (reload)
 		{
@@ -129,18 +139,20 @@ namespace solunar
 			}
 		}
 
+
 		float distance = glm::distance(camera->GetPosition(), GetLookingEntityPos(camera->GetPosition() + camera->GetDirection(),
 			camera->GetPosition() + camera->GetDirection() * 1000.0f));
-
+#if 0
 		ImGui::GetForegroundDrawList()->AddText(ImVec2(500, 500), 0xff0000ff, std::to_string(distance).c_str());
+#endif
 
 		//	m_ammo = 8;
 
 		if (InputManager::GetInstance()->IsMouseButtonPressed(MOUSE_BUTTON_LEFT) &&
-			( isFireAniFinished || currentId != m_fireAni) &&
+			(isFireAniFinished || currentId != m_fireAni) &&
 			m_ammo > 0) {
 			animatedModel->PlayAnimation(m_fireAni, false);
-			
+
 			if (s_fireSound->IsPlaying())
 				s_fireSound->Stop();
 
@@ -167,8 +179,8 @@ namespace solunar
 				ra = ra / 100;
 				r.z = ra * distance;
 
-				glm::vec3 rayStart = camera->GetPosition() + r + camera->GetDirection() ;
-				glm::vec3 rayEnd = camera->GetPosition() + r + camera->GetDirection()  * 1000.0f;
+				glm::vec3 rayStart = camera->GetPosition() + r + camera->GetDirection();
+				glm::vec3 rayEnd = camera->GetPosition() + r + camera->GetDirection() * 1000.0f;
 
 				//debugLines.push_back(std::make_pair(rayStart, rayEnd));
 
@@ -178,13 +190,15 @@ namespace solunar
 					Entity* entity = rq.m_entity;
 					Core::Msg("WeaponComponent::Update(): shot entity 0x%p", entity);
 
+#ifdef ENABLE_TRACE_DEBUG
 					debugLines.push_back(std::make_pair(rayStart, rq.m_hitPosition));
-
 					debugHits.push_back(rq.m_hitPosition);
+#endif // ENABLE_TRACE_DEBUG
 				}
 			}
-		}		
+		}
 
+#ifdef ENABLE_TRACE_DEBUG
 		for (auto& it : debugLines)
 		{
 			g_debugRender.DrawLine(it.first, it.second, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -202,9 +216,10 @@ namespace solunar
 
 			if (!debugHits.empty())
 				debugHits.clear();
-	
+
 			debugTime = 0.0f;
-		}
+			}
+#endif
 
 		if (isFireAniFinished) {
 			animatedModel->PlayAnimation(m_idleAni, true);
@@ -214,24 +229,20 @@ namespace solunar
 
 		View* view = CameraProxy::GetInstance()->GetView();
 
-		char buf[256];
+		static char buf[256];
 
-		snprintf(buf, sizeof(buf), "Ammo: %i", m_ammo);
+		stbsp_snprintf(buf, sizeof(buf), "Ammo: %i", m_ammo);
 		s_font->DrawText(buf, 25.0f, view->m_height - 20.0f, glm::vec4(1.0f, 0.2f, 0.0f, 1.0f));
 
-#if 1
-		snprintf(buf, sizeof(buf), "--- Viewmodel ---");
+#if 0
+		stbsp_snprintf(buf, sizeof(buf), "--- Viewmodel ---");
 		g_fontManager->DrawSystemFontShadowed(buf, (float)view->m_width - 300.0f, 100.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-		snprintf(buf, sizeof(buf), "Animation: %s", animatedModel->GetCurrentAnimation() ? animatedModel->GetCurrentAnimation()->m_name.c_str() : "NO ANIMATION");
+		stbsp_snprintf(buf, sizeof(buf), "Animation: %s", animatedModel->GetCurrentAnimation() ? animatedModel->GetCurrentAnimation()->m_name.c_str() : "NO ANIMATION");
 		g_fontManager->DrawSystemFontShadowed(buf, (float)view->m_width - 300.0f, 125.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-		snprintf(buf, sizeof(buf), "Time: %.2f", animatedModel->GetCurrentTime());
+		stbsp_snprintf(buf, sizeof(buf), "Time: %.2f", animatedModel->GetCurrentTime());
 		g_fontManager->DrawSystemFontShadowed(buf, (float)view->m_width - 300.0f, 140.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 #endif
-	}
-
-	void WeaponComponent::Update_Shotgun(float dt)
-	{
 	}
 }

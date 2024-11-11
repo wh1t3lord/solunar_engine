@@ -94,10 +94,8 @@ namespace solunar
 
 #define MODELFILE_MAGIC (('\0' << 24) + ('L' << 16) + ('D' << 8) + 'M')
 	
-	//! Model file version constant
 	const int kModelFileVersion = 1;
 
-	//! Header of model file
 	struct ModelFileHeader
 	{
 		//! see MODELFILE_MAGIC
@@ -106,17 +104,12 @@ namespace solunar
 		//! see kModelFileVersion
 		uint32_t version;
 
-		//! ModelFileSubmeshData enties count
 		uint32_t submeshCount;
 	};
 	
-	//! Data structure
 	struct ModelFileSubmeshData
 	{
-		// Material info
 		char materialInfo[248];
-
-		// Vertex data
 		uint32_t verticesCount;
 		uint32_t indicesCount;
 	};

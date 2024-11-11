@@ -147,7 +147,7 @@ public:
 	void UpdateNode(int node_id);
 	void UpdateNodeTransform(int node_id);
 
-	glm::mat4 GetNodeMatrix(int nodeId);
+	const glm::mat4& GetNodeMatrix(int nodeId);
 
 	const BoundingBox& GetBoundingBox();
 

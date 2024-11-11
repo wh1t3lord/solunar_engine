@@ -490,6 +490,18 @@ namespace solunar
 
 	void ModelSubmesh::Save(DataStreamPtr stream)
 	{
+		ModelFileSubmeshData submeshData;
+		memset(&submeshData, 0, sizeof(submeshData));
+		strcpy(submeshData.materialInfo, m_materialName.c_str());
+		submeshData.verticesCount = GetVerticesCount();
+		submeshData.indicesCount = GetIndicesCount();
+		stream->Write(&submeshData);
+
+		Vertex* pVertices = (Vertex*)m_vertices.data();
+		stream->Write(pVertices, GetVerticesCount() * sizeof(Vertex));
+
+		unsigned int* pIndices = (unsigned int*)m_indices.data();
+		stream->Write(pIndices, GetIndicesCount() * sizeof(uint32_t));
 	}
 
 	void ModelSubmesh::CreateHw()
@@ -518,9 +530,11 @@ namespace solunar
 
 		m_indicesBuffer = g_renderDevice->CreateBuffer(indicesBufferDesc, indicesSubresourceDesc);
 
+#ifdef FINAL_BUILD
 		// clear temp data
 		m_indices.clear();
 		m_vertices.clear();
+#endif // !FINAL_BUILD
 	}
 
 	void ModelSubmesh::ReleaseHw()
@@ -552,23 +566,6 @@ namespace solunar
 	{
 	}
 
-	template <typename T>
-	void templatedObjectDeleter(T* t)
-	{
-		if (t)
-		{
-			mem_delete(t);
-		}
-	}
-
-	void submeshDeleter(ModelSubmesh* submesh)
-	{
-		if (submesh)
-		{
-			mem_delete(submesh);
-		}
-	}
-
 	void Model::Load(const std::shared_ptr<DataStream>& stream)
 	{
 		// read header
@@ -579,12 +576,17 @@ namespace solunar
 			Core::Error("Model file has unknowed magic!");
 
 		if (header.version > kModelFileVersion)
-			Core::Msg("[graphics]: model has older version format");
+			Core::Msg("Model has older version format");
 		else if (header.version < kModelFileVersion)
 			Core::Msg("Model has newer version than engine support. (model %i, engine %i)", header.version, kModelFileVersion);
 
 		if (header.submeshCount == 0)
 			Core::Msg("Model has zero sub meshes, cannot load");
+
+		if (header.version > kModelFileVersion ||
+			header.version < kModelFileVersion ||
+			header.submeshCount == 0)
+			return;
 
 		for (uint32_t i = 0; i < header.submeshCount; i++)
 		{
@@ -600,6 +602,10 @@ namespace solunar
 
 	void Model::Save(const std::shared_ptr<DataStream>& stream)
 	{
+#ifdef FINAL_BUILD
+		Core::Error("Model::Save: Canno't save in the final build.");
+#endif // FINAL_BUILD
+
 		ModelFileHeader header = { 0 };
 		header.magic = MODELFILE_MAGIC;
 		header.version = kModelFileVersion;
@@ -608,38 +614,28 @@ namespace solunar
 
 		for (auto pSubMesh : m_submeshes)
 		{
-			ModelFileSubmeshData submeshData;
-			memset(&submeshData, 0, sizeof(submeshData));
-			//strcpy(submeshData.materialInfo, pSubMesh->GetMaterial()->getName().c_str());
-			strcpy(submeshData.materialInfo, "MATERIAL UNNAMED");
-			submeshData.verticesCount = pSubMesh->GetVerticesCount();
-			submeshData.indicesCount = pSubMesh->GetIndicesCount();
-			stream->Write(&submeshData);
-
-			Vertex* pVertices = (Vertex*)pSubMesh->GetVerticesBuffer()->Map(BufferMapping::ReadOnly);
-			stream->Write(pVertices, pSubMesh->GetVerticesCount() * sizeof(Vertex));
-
-			// Unmap buffer
-			pSubMesh->GetVerticesBuffer()->Unmap();
-			pVertices = nullptr;
-
-			unsigned int* pIndices = (unsigned int*)pSubMesh->GetIndicesBuffer()->Map(BufferMapping::ReadOnly);
-			stream->Write(pIndices, pSubMesh->GetIndicesCount() * sizeof(uint32_t));
-
-			// Unmap buffer
-			pSubMesh->GetIndicesBuffer()->Unmap();
-			pIndices = nullptr;
+			pSubMesh->Save(stream);
 		}
-
-		//stream->Flush();
 	}
 
 	void Model::CreateHw()
 	{
+		return;
+			
+		for (auto pSubMesh : m_submeshes)
+		{
+			pSubMesh->CreateHw();
+		}
 	}
 
 	void Model::ReleaseHw()
 	{
+		return;
+
+		for (auto pSubMesh : m_submeshes)
+		{
+			pSubMesh->ReleaseHw();
+		}
 	}
 
 	const std::vector<std::shared_ptr<ModelSubmesh>>& Model::GetModelSubmeshes()

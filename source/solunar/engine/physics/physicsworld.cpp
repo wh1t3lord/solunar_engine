@@ -38,10 +38,10 @@ namespace solunar
 
 		m_world->getBroadphase()->getOverlappingPairCache()->setInternalGhostPairCallback(m_btGhostPairCallback);
 		m_world->setInternalTickCallback(InternalTickCallback, this);
-		m_world->setDebugDrawer(&g_physicsDebugDraw);
+		m_world->setDebugDrawer(&m_physicsDebugDraw);
 
 		m_accumulatedTime = 0.0f;
-		m_stepTime = (1.0f / 60.0f); // 30 fps
+		m_stepTime = (1.0f / 30.0f); // 30 fps
 
 		// set the standart gravity
 		//m_world->setGravity(btVector3(0, 0, 0));
@@ -69,19 +69,29 @@ namespace solunar
 
 		// delete collision configuration
 		mem_delete(m_collisionConfiguration);
-
 	}
 
 	void PhysicsWorld::AddRigidBody(RigidBodyComponent* body)
 	{
 		Assert2(body->GetSDKBody(), "RigidBodyComponent is not properly initialized");
 		m_world->addRigidBody(body->GetSDKBody());
+
+		m_rigidbodies.push_back(body);
 	}
 
 	void PhysicsWorld::RemoveRigidBody(RigidBodyComponent* body)
 	{
 		Assert2(body->GetSDKBody(), "RigidBodyComponent is not properly initialized");
 		m_world->removeRigidBody(body->GetSDKBody());
+
+		auto it = std::find(m_rigidbodies.begin(), m_rigidbodies.end(), body);
+		if (it != m_rigidbodies.end())
+			m_rigidbodies.erase(it);
+	}
+
+	const std::vector<RigidBodyComponent*>& PhysicsWorld::GetRigidBodies()
+	{
+		return m_rigidbodies;
 	}
 
 	void PhysicsWorld::Step(float delta)
@@ -113,7 +123,7 @@ namespace solunar
 			debugDrawMode |= btIDebugDraw::DBG_DrawAabb;
 			debugDrawMode |= btIDebugDraw::DBG_DrawWireframe;
 			// debugDrawMode |= btIDebugDraw::DBG_DrawContactPoints;
-			g_physicsDebugDraw.setDebugMode(debugDrawMode);
+			m_physicsDebugDraw.setDebugMode(debugDrawMode);
 
 			m_world->debugDrawWorld();
 		}
@@ -125,7 +135,7 @@ namespace solunar
 		debugDrawMode |= btIDebugDraw::DBG_DrawAabb;
 		debugDrawMode |= btIDebugDraw::DBG_DrawWireframe;
 		debugDrawMode |= btIDebugDraw::DBG_DrawContactPoints;
-		g_physicsDebugDraw.setDebugMode(debugDrawMode);
+		m_physicsDebugDraw.setDebugMode(debugDrawMode);
 		
 		m_world->debugDrawWorld();*/
 	}
@@ -193,7 +203,7 @@ namespace solunar
 				compoundShape->getAabb(body->GetSDKBody()->getWorldTransform(), aabbMin, aabbMax);
 
 				const btVector3 color = btVector3(1.0f, 0.6f, 0.0f);
-				g_physicsDebugDraw.drawBox(aabbMin, aabbMax, color);
+				m_physicsDebugDraw.drawBox(aabbMin, aabbMax, color);
 
 				std::string entityName = "Trigger #" + std::to_string(i);
 			}

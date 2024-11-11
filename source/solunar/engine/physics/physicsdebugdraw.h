@@ -23,8 +23,6 @@ private:
 	int m_debugMode;
 };
 
-extern PhysicsDebugDraw g_physicsDebugDraw;
-
 }
 
 #endif

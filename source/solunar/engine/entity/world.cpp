@@ -111,11 +111,14 @@ namespace solunar
 
 	void World::Update_LogicEntity()
 	{
-		std::vector<Entity*> logicEntities = m_entityManager.GetEntitiesWithComponent<LogicComponent>();
-		for (auto entity : logicEntities)
+		Timer* timerInstance = Timer::GetInstance();
+
+		const std::vector<Entity*>& entities = m_entityManager.GetEntities();
+		for (auto entity : entities)
 		{
 			LogicComponent* logicComponent = entity->GetComponent<LogicComponent>();
-			logicComponent->Update(Timer::GetInstance()->GetDelta());
+			if (logicComponent)
+				logicComponent->Update(timerInstance->GetDelta());
 		}
 	}
 
@@ -124,16 +127,10 @@ namespace solunar
 		float delta = Timer::GetInstance()->GetDelta();
 		m_physicsWorld->Step(delta);
 
-		std::vector<Entity*> physicsEntities = m_entityManager.GetEntitiesWithComponent<RigidBodyComponent>();
-
+		const std::vector<RigidBodyComponent*>& physicsEntities = m_physicsWorld->GetRigidBodies();
 		for (auto it : physicsEntities)
 		{
-			RigidBodyComponent* rigidBody = it->GetComponent<RigidBodyComponent>();
-			if (rigidBody)
-			{
-				rigidBody->UpdateBodyTranslationDirty();
-				//rigidBody->updateNodeTranslationDirty();
-			}
+			it->UpdateBodyTranslationDirty();
 		}
 	}
 

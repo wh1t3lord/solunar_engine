@@ -10,6 +10,9 @@
 #include "core/object/serializableobject.h"
 #include "core/object/propertymanager.h"
 
+#define STB_SPRINTF_IMPLEMENTATION
+#include "stb_sprintf.h"
+
 namespace solunar
 {
 	

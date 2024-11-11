@@ -565,7 +565,6 @@ int AnimatedModel::GetCurrentAnimationId()
 }
 
 void AnimatedModel::PlayAnimation(int index, bool looped)
-
 {
 	m_animationId = index;
 	m_currentAnimation = &m_animations[m_animationId];
@@ -711,7 +710,7 @@ void AnimatedModel::UpdateNodeTransform(int node_id) {
 		UpdateNodeTransform(node.m_children[i]);
 }
 
-glm::mat4 AnimatedModel::GetNodeMatrix(int nodeId)
+const glm::mat4& AnimatedModel::GetNodeMatrix(int nodeId)
 {
 	Assert(nodeId != -1);
 	AnimationNode& node = m_nodes[nodeId];
