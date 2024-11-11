@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<World>
+	<!-- Level Geometry -->
+	<Entity>
+		<Position x="0" y="0" z="0"/>
+		<Rotation x="0" y="0" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		<MeshComponent>
+			<Model filename="models/test_lab.model"/>
+			<CastShadow value="false"/>
+		</MeshComponent>
+		<RigidBodyComponent>
+			<Static value="true"/>
+		</RigidBodyComponent>
+		<TriangleMeshShapeComponent>
+			<Model filename="models/test_lab.model"/>
+		</TriangleMeshShapeComponent>
+	</Entity>
+	
+	<!-- Test entity with directional light -->
+	<Entity>
+		<Position x="0" y="0" z="0"/>
+		<Rotation x="-80" y="90" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		
+		<DirectionalLightComponent>
+			<Color r="1.0" g="1.0" b="1.0"/>
+		</DirectionalLightComponent>
+	</Entity>
+	
+	<!-- Player -->
+	
+	<Entity>
+		<Position x="1" y="4" z="1"/>
+		<Rotation x="0" y="0" z="0"/>
+		<Scale x="1" y="1" z="1"/>
+		
+		<EditorCameraComponent/> <!-- FOR EDITOR !!! -->
+		<!-- <ShockPlayerController/> 	-->
+	</Entity>
+
+	<Entity>
+		<Position x="0" y="0" z="0"/>
+		<Rotation x="0" y="90" z="0"/>
+		<Scale x="1000" y="1000" z="1000"/>
+		<MeshComponent>
+			<Model filename="models/demo_sky.dae"/>
+		</MeshComponent>
+	</Entity>
+</World>
