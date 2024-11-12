@@ -1,6 +1,6 @@
 <Material>
     <Shader>diffuse</Shader>
-    <AlbedoTexture filename="textures/skies/sky_night.png"/>
+    <AlbedoTexture filename="textures/skies/test_sky.png"/>
     <NormalTexture filename=""/>
     <SpecularTexture filename=""/>
     <RenderState>

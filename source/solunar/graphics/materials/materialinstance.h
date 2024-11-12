@@ -17,6 +17,7 @@ enum PixelVariation
 	PixelVariation_Unlit = 1 << 0,
 	PixelVariation_Lit = 1 << 1,
 	PixelVariation_Normalmap = 1 << 2,
+	PixelVariation_Wireframe = 1 << 3,
 };
 
 class IShaderProgram;

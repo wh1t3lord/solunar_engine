@@ -119,6 +119,8 @@ public:
 	void Load(const std::shared_ptr<DataStream>& dataStream) override;
 	void Load_GLTF(const std::shared_ptr<DataStream>& dataStream);
 
+	void Save(const std::shared_ptr<DataStream>& dataStream) override;
+
 	void CreateHw() override;
 	void ReleaseHw() override;
 

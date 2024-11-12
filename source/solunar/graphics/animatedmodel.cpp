@@ -524,6 +524,122 @@ void AnimatedModel::Load_GLTF(const std::shared_ptr<DataStream>& stream)
 	CreateHw();
 }
 
+template<typename POD>
+void Serialize(const std::shared_ptr<DataStream>& os, std::vector<POD> const& v)
+{
+	// this only works on built in data types (PODs)
+	static_assert(std::is_trivial<POD>::value && std::is_standard_layout<POD>::value,
+		"Can only serialize POD types with this function");
+
+	uint32_t size = v.size();
+	os->Write((void*)&size, sizeof(size));
+	os->Write((void*)v.data(), v.size() * sizeof(POD));
+}
+
+void Serialize(const std::shared_ptr<DataStream>& os, std::string const& v)
+{
+	uint32_t size = v.size();
+	os->Write((void*)&size, sizeof(size));
+	os->Write((void*)v.data(), v.size() * sizeof(std::string::value_type));
+}
+
+//template<typename POD>
+//std::istream& deserialize(const std::shared_ptr<DataStream>& is, std::vector<POD>& v)
+//{
+//	static_assert(std::is_trivial<POD>::value && std::is_standard_layout<POD>::value,
+//		"Can only deserialize POD types with this function");
+//
+//	decltype(v.size()) size;
+//	is.read(reinterpret_cast<char*>(&size), sizeof(size));
+//	v.resize(size);
+//	is.read(reinterpret_cast<char*>(v.data()), v.size() * sizeof(POD));
+//	return is;
+//}
+
+void AnimatedModel::Save(const std::shared_ptr<DataStream>& dataStream)
+{
+	ModelFileHeader header;
+	header.magic = MODELFILE_MAGIC;
+	header.version = 2;
+	header.submeshCount = m_subMeshes.size();
+	dataStream->Write(&header);
+
+	// animations
+	uint32_t animationsCount = m_animations.size();
+	dataStream->Write(&animationsCount);
+
+	// skins
+	uint32_t skinsCount = m_skins.size();
+	dataStream->Write(&skinsCount);
+
+	// node count
+	uint32_t nodeCount = m_nodes.size();
+	dataStream->Write(&nodeCount);
+
+	for (const auto& animation : m_animations)
+	{
+		Serialize(dataStream, animation.m_name);
+
+		uint16_t samplersCount = animation.m_samplers.size();
+		dataStream->Write(&samplersCount);
+
+		for (const auto& sampler : animation.m_samplers)
+		{
+			uint8_t interpolationType = sampler.m_interpolationType;
+			dataStream->Write(&interpolationType);
+			Serialize(dataStream, sampler.m_inputs);
+			Serialize(dataStream, sampler.m_outputs);
+		}
+
+		for (const auto& channels : animation.m_channels)
+		{
+			uint8_t pathType = channels.m_pathType;
+			dataStream->Write(&pathType);
+			dataStream->Write(&channels.m_nodeId);
+			dataStream->Write(&channels.m_samplerId);
+		}
+
+		dataStream->Write(&animation.m_startTime);
+		dataStream->Write(&animation.m_endTime);
+	}
+
+	for (const auto& skin : m_skins)
+	{
+		Serialize(dataStream, skin.m_name);
+		Serialize(dataStream, skin.m_joints);
+		Serialize(dataStream, skin.m_inverseBindMatrices);
+		dataStream->Write(&skin.m_skeletonRootId);
+	}
+
+	for (const auto& node : m_nodes)
+	{
+		Serialize(dataStream, node.m_name);
+		dataStream->Write(&node.m_translation);
+		dataStream->Write(&node.m_rotation);
+		dataStream->Write(&node.m_scale);
+		dataStream->Write(&node.m_matrix);
+		Serialize(dataStream, node.m_children);
+		dataStream->Write(&node.m_parentId);
+		dataStream->Write(&node.m_skinId);
+	}
+
+	for (const auto& submesh : m_subMeshes)
+	{
+		ModelFileSubmeshData submeshData;
+		memset(&submeshData, 0, sizeof(submeshData));
+		strcpy(submeshData.materialInfo, submesh->m_materialName.c_str());
+		submeshData.verticesCount = submesh->m_verticesCount;
+		submeshData.indicesCount = submesh->m_indicesCount;
+		dataStream->Write(&submeshData);
+
+		AnimatedVertex* pVertices = (AnimatedVertex*)submesh->m_vertices.data();
+		dataStream->Write(pVertices, submeshData.verticesCount * sizeof(Vertex));
+
+		unsigned int* pIndices = (unsigned int*)submesh->m_indices.data();
+		dataStream->Write(pIndices, submeshData.indicesCount * sizeof(uint32_t));
+	}
+}
+
 void AnimatedModel::CreateHw()
 {
 	for (int i = 0; i < m_subMeshes.size(); i++)
@@ -889,7 +1005,7 @@ void AnimatedSubMesh::Create()
 	subresourceDesc.m_memoryPitch = sizeof(AnimatedVertex);
 
 	m_vertexBuffer = g_renderDevice->CreateBuffer(bufferDesc, subresourceDesc);
-	m_vertices.clear();
+	//m_vertices.clear();
 
 	memset(&bufferDesc, 0, sizeof(bufferDesc));
 	bufferDesc.m_bufferType = BufferType::IndexBuffer;
@@ -901,7 +1017,7 @@ void AnimatedSubMesh::Create()
 	subresourceDesc.m_memoryPitch = sizeof(uint32_t);
 
 	m_indexBuffer = g_renderDevice->CreateBuffer(bufferDesc, subresourceDesc);
-	m_indices.clear();
+	//m_indices.clear();
 
 	m_material = g_contentManager->LoadObject<Material>(m_materialName);
 	if (m_material.expired())

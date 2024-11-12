@@ -63,8 +63,8 @@ namespace solunar
 		virtual void setSwapChainRenderTarget() = 0;
 
 		// Too simple but i dont regret
-		void setRenderMode(RendererViewMode mode) { m_currentViewMode = mode; }
-		RendererViewMode getRenderMode() { return m_currentViewMode; }
+		void SetRenderMode(RendererViewMode mode) { m_currentViewMode = mode; }
+		RendererViewMode GetRenderMode() { return m_currentViewMode; }
 
 		void ToggleShowingWireframe();
 		void ToggleShowOctree();

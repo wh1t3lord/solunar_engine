@@ -35,16 +35,61 @@
 		<Rotation x="0" y="0" z="0"/>
 		<Scale x="1" y="1" z="1"/>
 		
-		<EditorCameraComponent/> <!-- FOR EDITOR !!! -->
+		<FreeCameraComponent/> <!-- FOR EDITOR !!! -->
 		<!-- <ShockPlayerController/> 	-->
 	</Entity>
 
 	<Entity>
-		<Position x="0" y="0" z="0"/>
+		<Position x="0" y="-1" z="0"/>
 		<Rotation x="0" y="90" z="0"/>
-		<Scale x="1000" y="1000" z="1000"/>
+		<Scale x="100" y="100" z="100"/>
 		<MeshComponent>
-			<Model filename="models/demo_sky.dae"/>
+			<Model filename="models/test_sky_half.dae"/>
 		</MeshComponent>
 	</Entity>
+	
+	    <Entity className="Entity">
+        <Position x="-1.6477257" y="2.2866282" z="-4.2965918"/>
+        <Rotation x="-0" y="0" z="0"/>
+        <Scale x="1" y="1" z="1"/>
+        <PointLightComponent>
+			<AmbientColor r="0.1" g="0.1" b="0.1"/>
+			<Color r="0.678" g="0.596" b="0.427"/>
+			<SpecularColor r="0.678" g="0.596" b="0.427"/>
+            <Radius value="4"/>
+        </PointLightComponent>
+    </Entity>
+    <Entity className="Entity">
+        <Position x="0.43385506" y="2.2866282" z="-4.2965918"/>
+        <Rotation x="-0" y="0" z="0"/>
+        <Scale x="1" y="1" z="1"/>
+        <PointLightComponent>
+			<AmbientColor r="0.1" g="0.1" b="0.1"/>
+			<Color r="0.678" g="0.596" b="0.427"/>
+			<SpecularColor r="0.678" g="0.596" b="0.427"/>
+            <Radius value="4"/>
+        </PointLightComponent>
+    </Entity>
+    <Entity className="Entity">
+        <Position x="3.5321634" y="2.2866282" z="-4.2965918"/>
+        <Rotation x="-0" y="0" z="0"/>
+        <Scale x="1" y="1" z="1"/>
+        <PointLightComponent>
+			<AmbientColor r="0.1" g="0.1" b="0.1"/>
+			<Color r="0.678" g="0.596" b="0.427"/>
+			<SpecularColor r="0.678" g="0.596" b="0.427"/>
+            <Radius value="4"/>
+        </PointLightComponent>
+    </Entity>
+	<Entity className="Entity">
+        <Position x="-5.0983512" y="2.0" z="0.43688837"/>
+        <Rotation x="-0" y="0" z="0"/>
+        <Scale x="1" y="1" z="1"/>
+        <PointLightComponent>
+            <AmbientColor r="0.1" g="0.0" b="0.0"/>
+            <Color r="0.1" g="0.0" b="0.0"/>
+            <SpecularColor r="0.1" g="0.0" b="0.0"/>
+            <Radius value="12"/>
+        </PointLightComponent>
+    </Entity>
 </World>

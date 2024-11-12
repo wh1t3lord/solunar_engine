@@ -4,6 +4,7 @@
 // C++ defines:
 //	UNLIT
 //	NORMALMAP
+//	WIREFRAME
 
 #include "common.h"
 #include "cbuffers.h"
@@ -62,6 +63,10 @@ float ShadowCalculation(float4 fragPosLightSpace)
 
 float4 PSMain(VSOutput input) : SV_Target
 {
+#ifdef WIREFRAME
+	return float4(0.0f, 0.48f, 0.48f, 1.0f);
+#endif
+
 	//return float4(input.normal, 1.0f);
 
 	const float3 kSpecColor = float3(4.0f, 4.0f, 4.0f);

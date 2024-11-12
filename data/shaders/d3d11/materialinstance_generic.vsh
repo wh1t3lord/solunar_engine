@@ -64,7 +64,7 @@ VSOutput VSMain(VSInput input)
 	output.normal = mul(float4(output.normal, 0.0f), g_modelMatrix);
 #else
 	// normal
-	output.normal = mul(float4(input.normal, 0.0f), g_modelMatrix);
+	output.normal = normalize(mul(float4(input.normal, 0.0f), g_modelMatrix));
 #endif
 
 	// Light space position

@@ -78,6 +78,20 @@ ID3DBlob* CreateShaderFromText(const char* text, ShaderType shaderType, const ch
 		std::string exactDefineStr = definesStr.substr(0, iterator);
 		shderMacroStrings.push_back(exactDefineStr);
 
+		iterator = definesStr.find_first_of('\n', iterator);
+		if (iterator != std::string::npos)
+		{
+			exactDefineStr = definesStr.substr(0, iterator);
+			shderMacroStrings.push_back(exactDefineStr);
+		}
+
+		iterator = definesStr.find_first_of('\n', iterator);
+		if (iterator != std::string::npos)
+		{
+			exactDefineStr = definesStr.substr(0, iterator);
+			shderMacroStrings.push_back(exactDefineStr);
+		}
+
 		/*std::string definesStr = defines;
 
 		size_t iterator = definesStr.find_first_of('\n');

@@ -11,7 +11,7 @@ namespace solunar
 	class FileStream : public DataStream
 	{
 	public:
-		FileStream(const std::string& filename);
+		FileStream(const std::string& filename, bool create = false);
 		~FileStream();
 
 		size_t Read(void* buffer, size_t count) override;

@@ -6,10 +6,14 @@
 
 namespace solunar
 {
-	FileStream::FileStream(const std::string& filename) :
+	FileStream::FileStream(const std::string& filename, bool create /*= false*/) :
 		m_fileHandle(nullptr)
 	{
-		m_fileHandle = g_fileSystem->Open(filename.c_str());
+		if (create)
+			m_fileHandle = g_fileSystem->Create(filename.c_str());
+		else
+			m_fileHandle = g_fileSystem->Open(filename.c_str());
+
 		Assert3(m_fileHandle, "Failed to open file", filename.c_str());
 	}
 

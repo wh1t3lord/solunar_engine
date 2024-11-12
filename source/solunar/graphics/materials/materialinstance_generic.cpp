@@ -34,6 +34,12 @@ std::string getPixelVariationDefine(uint32_t pixelVariation)
 	if (pixelVariation & PixelVariation_Unlit)
 		defines.append("UNLIT\n");
 
+	if (pixelVariation & PixelVariation_Normalmap)
+		defines.append("NORMALMAP\n");
+
+	if (pixelVariation & PixelVariation_Wireframe)
+		defines.append("WIREFRAME\n");
+
 	return defines;
 }
 
@@ -46,6 +52,8 @@ std::string getPixelVariationName(const std::string& instanceName, uint32_t pixe
 		shaderName += "_lit";
 	if (pixelVariation & PixelVariation_Normalmap)
 		shaderName += "_normalmap";
+	if (pixelVariation & PixelVariation_Wireframe)
+		shaderName += "_wireframe";
 	return shaderName;
 }
 

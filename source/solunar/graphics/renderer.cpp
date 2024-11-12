@@ -217,7 +217,7 @@ namespace solunar
 		ImGuiManager::GetInstance()->Init();
 
 		// set as lit
-		setRenderMode(RendererViewMode::Lit);
+		SetRenderMode(RendererViewMode::Lit);
 
 		RenderContext::Init();
 

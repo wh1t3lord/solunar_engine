@@ -7,6 +7,7 @@
 
 #include "graphics/ifontmanager.h"
 #include "graphics/debugrenderer.h"
+#include "graphics/renderer.h"
 
 #include "graphics/light.h"
 #include "graphics/mesh.h"
@@ -271,7 +272,7 @@ void LevelInspector()
 	{
 		if (ImGui::BeginTable("table_scrolly", 1, flags))
 		{
-			ImGui::TableSetupScrollFreeze(0, 1); // Make top row always visible
+			ImGui::TableSetupScrollEditorze(0, 1); // Make top row always visible
 			ImGui::TableSetupColumn("Name", ImGuiTableColumnFlags_None);
 			ImGui::TableHeadersRow();
 
@@ -533,6 +534,79 @@ void EditorCameraComponent::Update(float delta)
 		ImGui::EndPopup();
 	}
 #endif
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Free Camera
+IMPLEMENT_OBJECT(FreeCameraComponent, LogicComponent);
+
+FreeCameraComponent::FreeCameraComponent() :
+	m_camera(nullptr)
+{
+}
+
+FreeCameraComponent::~FreeCameraComponent()
+{
+}
+
+void FreeCameraComponent::OnEntitySet(Entity* entity)
+{
+	LogicComponent::OnEntitySet(entity);
+
+	m_camera = entity->CreateComponent<CameraFirstPersonComponent>();
+
+	CameraProxy::GetInstance()->SetCameraComponent(m_camera);
+
+	g_engineData.m_shouldCaptureMouse = true;
+	g_engineData.m_shouldHideMouse = true;
+}
+
+void FreeCameraComponent::OnEntityRemove()
+{
+	LogicComponent::OnEntityRemove();
+}
+
+void FreeCameraComponent::Update(float delta)
+{
+	static std::vector<std::pair<glm::vec3, glm::vec3>> debugRays;
+
+	LogicComponent::Update(delta);
+
+	InputManager* input = InputManager::GetInstance();
+
+	glm::vec2 mousePos = input->GetCursorPos();
+
+	glm::vec2 deltaMousePos = input->GetDeltaCursorPos();
+	m_camera->updateFromMousePosition(deltaMousePos);
+
+	glm::vec3 cameraDirection = CameraProxy::GetInstance()->GetDirection();
+	glm::vec3 pos = GetEntity()->GetPosition();
+	float camSpeed = 8.0f * delta;
+
+	if (input->IsPressed(KeyboardKeys::KEY_LEFT_SHIFT))
+		camSpeed = 18.0f * delta;
+
+	if (input->IsPressed(KeyboardKeys::KEY_W))
+		pos += camSpeed * cameraDirection;
+	if (input->IsPressed(KeyboardKeys::KEY_S))
+		pos -= camSpeed * cameraDirection;
+
+	if (input->IsPressed(KeyboardKeys::KEY_Q))
+		pos -= glm::normalize(glm::cross(cameraDirection, glm::vec3(1.0f, 0.0f, 0.0f))) * camSpeed;
+	if (input->IsPressed(KeyboardKeys::KEY_E))
+		pos += glm::normalize(glm::cross(cameraDirection, glm::vec3(1.0f, 0.0f, 0.0f))) * camSpeed;
+
+	if (input->IsPressed(KeyboardKeys::KEY_A))
+		pos -= glm::normalize(glm::cross(cameraDirection, glm::vec3(0.0f, 1.0f, 0.0f))) * camSpeed;
+	if (input->IsPressed(KeyboardKeys::KEY_D))
+		pos += glm::normalize(glm::cross(cameraDirection, glm::vec3(0.0f, 1.0f, 0.0f))) * camSpeed;
+
+	GetEntity()->SetPosition(pos);
+
+	if (InputManager::GetInstance()->IsPressed(KEY_F1))
+		g_renderer->SetRenderMode(RendererViewMode::Wireframe);
+	else if (InputManager::GetInstance()->IsPressed(KEY_F2))
+		g_renderer->SetRenderMode(RendererViewMode::Lit);
 }
 
 }

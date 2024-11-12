@@ -547,7 +547,7 @@ namespace solunar {
 			}
 			else
 			{
-				//	if (getRenderMode() == RendererViewMode::Wireframe)
+				//	if (GetRenderMode() == RendererViewMode::Wireframe)
 				//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 				g_renderDevice->Draw(PM_TriangleList, 0, submesh->GetVerticesCount());
@@ -556,7 +556,7 @@ namespace solunar {
 					//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
 
 					// reset
-				//	if (getRenderMode() == RendererViewMode::Wireframe)
+				//	if (GetRenderMode() == RendererViewMode::Wireframe)
 				//		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			}
 
@@ -636,7 +636,7 @@ namespace solunar {
 			}
 			else
 			{
-				//	if (getRenderMode() == RendererViewMode::Wireframe)
+				//	if (GetRenderMode() == RendererViewMode::Wireframe)
 				//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 				g_renderDevice->DrawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
@@ -646,7 +646,7 @@ namespace solunar {
 					//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
 
 					// reset
-				//	if (getRenderMode() == RendererViewMode::Wireframe)
+				//	if (GetRenderMode() == RendererViewMode::Wireframe)
 				//		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 			}
 

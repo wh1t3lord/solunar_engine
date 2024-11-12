@@ -70,6 +70,8 @@ void reportRenderDevice()
 	dxgiDevice->Release();
 }
 
+IRasterizerState* g_wireframeRasterizerState = nullptr;
+
 D3D11Renderer::D3D11Renderer() :
 	m_renderTargetView(nullptr),
 	m_depthStencilTexture(nullptr),
@@ -308,7 +310,9 @@ void D3D11Renderer::BindMaterialForMesh(MeshComponent* mesh, Material* material,
 		if (!material->m_normalTexture.expired())
 			pixelVariation |= PixelVariation_Normalmap;
 	}
-		
+	
+	if (GetRenderMode() == RendererViewMode::Wireframe)
+		pixelVariation = PixelVariation_Wireframe;
 
 	IShaderProgram* shaderProgram = nullptr;
 
@@ -449,16 +453,26 @@ void D3D11Renderer::RenderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 			}
 			else
 			{
-				//	if (getRenderMode() == RendererViewMode::Wireframe)
-				//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				if (GetRenderMode() == RendererViewMode::Wireframe)
+				{
+					if (!g_wireframeRasterizerState)
+					{
+						RasterizerStateDesc rasterizerStateDesc;
+						memset(&rasterizerStateDesc, 0, sizeof(rasterizerStateDesc));
+						rasterizerStateDesc.m_cullMode = CullMode::None;
+						rasterizerStateDesc.m_frontCCW = true;
+						rasterizerStateDesc.m_fillMode = FillMode::Wireframe;
+						g_wireframeRasterizerState = g_stateManager->CreateRasterizerState(rasterizerStateDesc);
+					}
+
+					g_stateManager->SetRasterizerState(g_wireframeRasterizerState);
+				}
 
 				g_renderDevice->Draw(PM_TriangleList, 0, submesh->GetVerticesCount());
-				//	glDrawArrays(GL_TRIANGLES, 0, it->GetVerticesCount());
-					//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
 
-					// reset
-				//	if (getRenderMode() == RendererViewMode::Wireframe)
-				//		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				// reset
+				if (GetRenderMode() == RendererViewMode::Wireframe)
+					SetDefaultRenderState();
 			}
 
 			// return what have been
@@ -532,16 +546,26 @@ void D3D11Renderer::RenderStaticMesh(GraphicsWorld* graphicsWorld, View* view, M
 			}
 			else
 			{
-				//	if (getRenderMode() == RendererViewMode::Wireframe)
-				//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+				if (GetRenderMode() == RendererViewMode::Wireframe)
+				{
+					if (!g_wireframeRasterizerState)
+					{
+						RasterizerStateDesc rasterizerStateDesc;
+						memset(&rasterizerStateDesc, 0, sizeof(rasterizerStateDesc));
+						rasterizerStateDesc.m_cullMode = CullMode::Back;
+						rasterizerStateDesc.m_frontCCW = true;
+						rasterizerStateDesc.m_fillMode = FillMode::Wireframe;
+						g_wireframeRasterizerState = g_stateManager->CreateRasterizerState(rasterizerStateDesc);
+					}
+
+					g_stateManager->SetRasterizerState(g_wireframeRasterizerState);
+				}
 
 				g_renderDevice->Draw(PM_TriangleList, 0, submesh->GetVerticesCount());
-				//	glDrawArrays(GL_TRIANGLES, 0, it->GetVerticesCount());
-					//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
 
-					// reset
-				//	if (getRenderMode() == RendererViewMode::Wireframe)
-				//		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+				// reset
+				if (GetRenderMode() == RendererViewMode::Wireframe)
+					SetDefaultRenderState();
 			}
 
 			// return what have been
@@ -628,7 +652,7 @@ void D3D11Renderer::RenderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view,
 		}
 		else
 		{
-			//	if (getRenderMode() == RendererViewMode::Wireframe)
+			//	if (GetRenderMode() == RendererViewMode::Wireframe)
 			//		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
 			g_renderDevice->DrawIndexed(PM_TriangleList, 0, submesh->m_indicesCount, 0);
@@ -637,7 +661,7 @@ void D3D11Renderer::RenderAnimatedMesh(GraphicsWorld* graphicsWorld, View* view,
 				//glDrawElements(GL_TRIANGLES, it->getIndeciesCount(), GL_UNSIGNED_BYTE, NULL);
 
 				// reset
-			//	if (getRenderMode() == RendererViewMode::Wireframe)
+			//	if (GetRenderMode() == RendererViewMode::Wireframe)
 			//		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 		}
 
