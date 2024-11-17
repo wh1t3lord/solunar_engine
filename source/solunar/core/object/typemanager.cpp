@@ -10,7 +10,7 @@ namespace solunar
 
 static TypeManager s_typeManager;
 
-Object* createObjectPrivate(const TypeInfo* typeInfo)
+Object* CreateObjectPrivate(const TypeInfo* typeInfo)
 {
 	IAllocator* pAllocator = MemoryManager::getDefaultAllocator();
 	Object* pObject = (Object*)pAllocator->allocate(typeInfo->GetClassSize(), typeInfo->GetClassAlign());
@@ -55,7 +55,7 @@ Object* TypeManager::CreateObjectByName(const char* name)
 	for (auto it : m_registeredTypes)
 	{
 		if (strcmp(it->m_name, name) == 0)
-			return createObjectPrivate(it);
+			return CreateObjectPrivate(it);
 	}
 
 	return nullptr;
@@ -66,7 +66,7 @@ Object* TypeManager::CreateObjectByTypeInfo(const TypeInfo* typeInfo)
 	for (auto it : m_registeredTypes)
 	{
 		if (it->IsExactly(typeInfo))
-			return createObjectPrivate(it);
+			return CreateObjectPrivate(it);
 	}
 
 	return nullptr;

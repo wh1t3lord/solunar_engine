@@ -1,0 +1,21 @@
+Shotgun model and animations:
+
+Shotgun Animated
+DJMaesen
+https://sketchfab.com/3d-models/shotgun-animated-963e540358b84ca9b72a5e4d59acd57c
+---------------------------------------------------------------------------------------------------
+Zombie model:
+
+Cursed Undead Soldier Rig
+DM-913
+https://sketchfab.com/3d-models/cursed-undead-soldier-rig-b2e39de76b834d978adee5716aec814d
+---------------------------------------------------------------------------------------------------
+
+Animations for characters are taken from: mixamo.org
+World textures are taken from: textures.com
+HDRI Skybox: ...
+
+
+Sounds from:
+Call of Duty World at War
+freesound.org

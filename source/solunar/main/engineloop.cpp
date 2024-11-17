@@ -357,7 +357,7 @@ namespace solunar {
 		InputManager* input = InputManager::GetInstance();
 
 		if (g_quitAtStart)
-			return true;
+			return false;
 
 		if (g_forceQuit)
 			return false;
