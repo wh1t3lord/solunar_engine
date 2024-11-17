@@ -39,6 +39,7 @@ namespace solunar
 		size_t Read(void* buffer, size_t count) override
 		{
 			memcpy(buffer, m_fileData.data() + m_currentPosition, count);
+			m_currentPosition += count;
 			return count;
 		}
 
