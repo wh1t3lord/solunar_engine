@@ -6,6 +6,11 @@
 
 namespace solunar
 {
+	class IEditorWindow;
+}
+
+namespace solunar
+{
 	class PhysicsWorld;
 
 	struct RayCastResult
@@ -13,6 +18,21 @@ namespace solunar
 		Entity* m_entity;
 		glm::vec3 m_hitPosition;
 		glm::vec3 m_hitNormal;
+	};
+
+	// stores information for editor
+	class EditorStateData
+	{
+	public:
+		EditorStateData() : m_pSelectedEntity(nullptr) {}
+		~EditorStateData() {}
+
+		void* GetSelectedEntity() { return m_pSelectedEntity; }
+		void SetSelectedEntity(void* pEntity) { m_pSelectedEntity = pEntity; }
+
+	private:
+		// todo: kirrik -> change to entity id type like uint32_t or something else, storing a pointer is not a good thing at all, it is temporary implementation
+		void* m_pSelectedEntity;
 	};
 
 	class World : public SerializableObject
@@ -32,13 +52,14 @@ namespace solunar
 		void Update_PreEntityUpdate();
 		void Update_LogicEntity();
 		void Update_PhysicsEntity();
+		void Update_Editor();
 
 		Entity* CreateEntity();
 		Entity* CreateEntityEx(const TypeInfo* typeInfo);
 
-		EntityManager&	GetEntityManager()	{ return m_entityManager; }
-		GraphicsWorld*	GetGraphicsWorld()	{ return m_graphicsWorld; }
-		PhysicsWorld*	GetPhysicsWorld()	{ return m_physicsWorld; }
+		EntityManager& GetEntityManager() { return m_entityManager; }
+		GraphicsWorld* GetGraphicsWorld() { return m_graphicsWorld; }
+		PhysicsWorld* GetPhysicsWorld() { return m_physicsWorld; }
 
 		void TogglePhysicsDebugDraw();
 
@@ -47,6 +68,15 @@ namespace solunar
 		bool RayCast(RayCastResult& rayResult, const glm::vec3& rayStart, const glm::vec3& rayEnd, const int collisionFilter = -1);
 		std::vector<Entity*> BoxCast(const glm::vec3& boxPos, const glm::vec3& boxSize);
 
+		void RegisterEditorWindow(IEditorWindow* pWindow);
+
+		EditorStateData* GetEditor();
+
+	private:
+		void Update_EditorWindows();
+
+		std::vector<IEditorWindow*> m_editor_windows;
+		EditorStateData m_editor;
 	private:
 		EntityManager m_entityManager;
 

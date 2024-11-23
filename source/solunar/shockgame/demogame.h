@@ -78,7 +78,7 @@ public:
 	GameManager();
 	~GameManager();
 
-	void OnWorldLoad(const std::string& worldName);
+	void OnWorldLoad(const std::string& worldName, World* pLoadedWorld);
 };
 
 extern GameManager* g_GameManager;

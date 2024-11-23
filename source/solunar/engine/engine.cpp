@@ -24,13 +24,13 @@
 namespace solunar
 {
 	EngineData		g_engineData;
-	World*			Engine::ms_world = nullptr;
+	World* Engine::ms_world = nullptr;
 	std::string		g_worldName;
 
 	// There is more nice looking object registration
 	void registerEngineObjects()
 	{
-		const TypeInfo* engineClasses[] = 
+		const TypeInfo* engineClasses[] =
 		{
 			// base types
 			Entity::GetStaticTypeInfo(),
@@ -109,22 +109,22 @@ namespace solunar
 
 		tinyxml2::XMLDocument doc;
 		tinyxml2::XMLError error = doc.Parse(data, length);
-		
+
 		if (error != tinyxml2::XML_SUCCESS)
 		{
 			Core::Error("Engine::loadWorld: Failed to parse world %s. %s", filename.c_str(), doc.ErrorStr());
 		}
-		
+
 		tinyxml2::XMLElement* worldElement = doc.FirstChildElement("World");;
 
 		World* world = g_typeManager->CreateObject<World>();
 		world->LoadXML(*worldElement);
-		
+
 		ms_world = world;
-		
+
 		delete[] data;
 
-		g_GameManager->OnWorldLoad(filename);
+		g_GameManager->OnWorldLoad(filename, world);
 
 		// #TODO: RESET TIMER AND RUN ONE FRAME INSTEAD
 		Timer::GetInstance()->Update();
@@ -144,7 +144,7 @@ namespace solunar
 		World* world = g_typeManager->CreateObject<World>();
 		ms_world = world;
 
-		g_GameManager->OnWorldLoad("");
+		g_GameManager->OnWorldLoad("", world);
 
 		// #TODO: RESET TIMER AND RUN ONE FRAME INSTEAD
 		Timer::GetInstance()->Update();
@@ -168,6 +168,7 @@ namespace solunar
 			world->Update_PreEntityUpdate();
 			world->Update_PhysicsEntity();
 			world->Update_LogicEntity();
+			world->Update_Editor();
 		}
 	}
 
