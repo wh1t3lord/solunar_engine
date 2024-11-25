@@ -85,15 +85,12 @@ namespace solunar
 			ms_world = nullptr;
 		}
 
-		if (g_engineData.m_editor)
+		if (g_engineData.m_editor && g_editorManager)
 		{
-			if (g_editorManager)
-			{
-				g_editorManager->Shutdown();
+			g_editorManager->Shutdown();
 
-				mem_delete(g_editorManager);
-				g_editorManager = nullptr;
-			}
+			mem_delete(g_editorManager);
+			g_editorManager = nullptr;
 		}
 	}
 
