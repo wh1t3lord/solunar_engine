@@ -37,12 +37,6 @@ namespace solunar
 		{
 			mem_delete(m_graphicsWorld); m_graphicsWorld = nullptr;
 		}
-
-		for (IEditorWindow* pWindow : this->m_editor_windows)
-		{
-			mem_delete(pWindow);
-		}
-		this->m_editor_windows.clear();
 	}
 
 	void World::LoadXML(tinyxml2::XMLElement& element)
@@ -142,14 +136,6 @@ namespace solunar
 		}
 	}
 
-	void World::Update_Editor()
-	{
-		if (g_engineData.m_editor)
-		{
-			this->Update_EditorWindows();
-		}
-	}
-
 	Entity* World::CreateEntity()
 	{
 		Entity* entity = m_entityManager.CreateEntity();
@@ -217,30 +203,6 @@ namespace solunar
 
 		
 		return entities;
-	}
-
-	void World::RegisterEditorWindow(IEditorWindow* pWindow)
-	{
-		if (pWindow)
-		{
-			this->m_editor_windows.push_back(pWindow);
-		}
-	}
-
-	EditorStateData* World::GetEditor()
-	{
-		return &m_editor;
-	}
-
-	void World::Update_EditorWindows()
-	{
-		for (IEditorWindow* pWindow : this->m_editor_windows)
-		{
-			if (pWindow)
-			{
-				pWindow->Draw(this);
-			}
-		}
 	}
 
 }

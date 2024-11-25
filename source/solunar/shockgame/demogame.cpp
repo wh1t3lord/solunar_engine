@@ -21,7 +21,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/matrix_decompose.hpp> // Matrix decomposition
 
-#include "editor_window_level_inspector.h"
+#include "engine/editor/editor_manager.h"
+#include "engine/editor/editor_window_level_inspector.h"
 
 namespace solunar
 {
@@ -133,7 +134,7 @@ void GameManager::OnWorldLoad(const std::string& worldName, World* pLoadedWorld)
 		// todo: kirrik -> add ability to add preprocessor from cmake like -DENABLE_EDITOR=ON and in IDE we use like #ifdef SOLUNAR_EDITOR
 		if (g_engineData.m_editor)
 		{
-			pLoadedWorld->RegisterEditorWindow(mem_new<EditorWindow_LevelInspector>());
+			g_editorManager->RegisterWindow(mem_new<EditorWindow_LevelInspector>(EditorWindow_LevelInspector()));
 		}
 	}
 }

@@ -21,6 +21,8 @@
 // #HACK: move to game interface
 #include "shockgame/demogame.h"
 
+#include "engine/editor/editor_manager.h"
+
 namespace solunar
 {
 	EngineData		g_engineData;
@@ -65,8 +67,12 @@ namespace solunar
 	void Engine::Init()
 	{
 		Core::Msg("Initializing engine");
-
 		registerEngineObjects();
+
+		if (g_engineData.m_editor)
+		{
+			g_editorManager = mem_new<EditorManager>();
+		}
 	}
 
 	void Engine::Shutdown()
@@ -78,17 +84,22 @@ namespace solunar
 			mem_delete(ms_world);
 			ms_world = nullptr;
 		}
+
+		if (g_engineData.m_editor)
+		{
+			if (g_editorManager)
+			{
+				g_editorManager->Shutdown();
+
+				mem_delete(g_editorManager);
+				g_editorManager = nullptr;
+			}
+		}
 	}
 
 	void Engine::LoadWorld(const std::string& filename)
 	{
 		g_worldName = filename;
-
-		if (ms_world)
-		{
-			mem_delete(ms_world);
-			ms_world = nullptr;
-		}
 
 		Core::Msg("Engine: Loading world %s", filename.c_str());
 
@@ -124,8 +135,6 @@ namespace solunar
 
 		delete[] data;
 
-		g_GameManager->OnWorldLoad(filename, world);
-
 		// #TODO: RESET TIMER AND RUN ONE FRAME INSTEAD
 		Timer::GetInstance()->Update();
 		Timer::GetInstance()->Update();
@@ -133,12 +142,6 @@ namespace solunar
 
 	void Engine::LoadEmptyWorld()
 	{
-		if (ms_world)
-		{
-			mem_delete(ms_world);
-			ms_world = nullptr;
-		}
-
 		Core::Msg("Engine: Creating empty world");
 
 		World* world = g_typeManager->CreateObject<World>();
@@ -149,6 +152,17 @@ namespace solunar
 		// #TODO: RESET TIMER AND RUN ONE FRAME INSTEAD
 		Timer::GetInstance()->Update();
 		Timer::GetInstance()->Update();
+	}
+
+	void Engine::InitEditor(World* pLoadedWorld)
+	{
+		Assert(g_editorManager && "early calling or something is broken!");
+
+		if (g_editorManager)
+		{
+			g_editorManager->Shutdown();
+			g_editorManager->Init(pLoadedWorld);
+		}
 	}
 
 	void Engine::Update()
@@ -168,7 +182,14 @@ namespace solunar
 			world->Update_PreEntityUpdate();
 			world->Update_PhysicsEntity();
 			world->Update_LogicEntity();
-			world->Update_Editor();
+		}
+
+		if (g_engineData.m_editor)
+		{
+			if (g_editorManager)
+			{
+				g_editorManager->Update();
+			}
 		}
 	}
 
@@ -234,10 +255,21 @@ namespace solunar
 			Assert(g_renderer);
 			g_renderer->RenderLoadscreen();
 
+			if (Engine::ms_world)
+			{
+				mem_delete(Engine::ms_world);
+				Engine::ms_world = nullptr;
+			}
+
 			if (m_worldName.empty())
 				Engine::LoadEmptyWorld();
 			else
 				Engine::LoadWorld(m_worldName);
+
+			if (g_engineData.m_editor)
+				Engine::InitEditor(Engine::ms_world);
+
+			g_GameManager->OnWorldLoad(m_worldName, Engine::ms_world);
 
 			m_nextState = EngineState::Running;
 			m_worldName.clear();

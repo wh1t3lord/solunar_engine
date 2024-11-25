@@ -1,6 +1,8 @@
 #include "editor_window_level_inspector.h"
 #include "imgui.h"
 #include "graphics\light.h"
+#include "../entity/world.h"
+#include "editor_manager.h"
 
 solunar::EditorWindow_LevelInspector::EditorWindow_LevelInspector()
 {
@@ -12,6 +14,9 @@ solunar::EditorWindow_LevelInspector::~EditorWindow_LevelInspector()
 
 void solunar::EditorWindow_LevelInspector::Draw(World* pWorld)
 {
+	Assert(pWorld && "must be valid!");
+	Assert(g_editorManager && "must be valid!");
+
 	if (ImGui::Begin("Level Inspector"))
 	{
 		static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
@@ -31,7 +36,7 @@ void solunar::EditorWindow_LevelInspector::Draw(World* pWorld)
 		/// of the loop. May be a pointer to your own node type, etc.
 		static int selection_mask = (1 << 2);
 		int node_clicked = -1;
-		const std::vector<Entity*>& entities = Engine::ms_world->GetEntityManager().GetEntities();
+		const std::vector<Entity*>& entities = pWorld->GetEntityManager().GetEntities();
 
 		for (int i = 0; i < entities.size(); i++)
 		{
@@ -67,7 +72,7 @@ void solunar::EditorWindow_LevelInspector::Draw(World* pWorld)
 			
 			//g_SelectedEntity = entities[node_clicked];
 			
-			pWorld->GetEditor()->SetSelectedEntity(entities[node_clicked]);
+			g_editorManager->SetSelectedEntity(entities[node_clicked]);
 
 			// Update selection state
 			// (process outside of tree loop to avoid visual inconsistencies during the clicking frame)
