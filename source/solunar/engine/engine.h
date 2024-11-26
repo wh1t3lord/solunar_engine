@@ -5,6 +5,7 @@ namespace solunar
 {
 	class World;
 	class IGameInterface;
+	class EditorManager;
 
 	class Engine
 	{
@@ -18,6 +19,8 @@ namespace solunar
 		static void LoadWorld(const std::string& filename);
 
 		static void LoadEmptyWorld();
+
+		static void InitEditor(World* pLoadedWorld);
 
 		static void Update();
 

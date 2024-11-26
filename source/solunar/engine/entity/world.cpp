@@ -8,6 +8,8 @@
 #include "engine/physics/physicsworld.h"
 #include "engine/physics/rigidbodycomponent.h"
 #include "engine/physics/shapescomponent.h"
+#include "editor\editor_window.h"
+#include "engine\engine.h"
 #include <imgui.h>
 
 namespace solunar

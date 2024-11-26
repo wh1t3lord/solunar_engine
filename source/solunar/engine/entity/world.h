@@ -6,6 +6,11 @@
 
 namespace solunar
 {
+	class IEditorWindow;
+}
+
+namespace solunar
+{
 	class PhysicsWorld;
 
 	struct RayCastResult
@@ -36,9 +41,9 @@ namespace solunar
 		Entity* CreateEntity();
 		Entity* CreateEntityEx(const TypeInfo* typeInfo);
 
-		EntityManager&	GetEntityManager()	{ return m_entityManager; }
-		GraphicsWorld*	GetGraphicsWorld()	{ return m_graphicsWorld; }
-		PhysicsWorld*	GetPhysicsWorld()	{ return m_physicsWorld; }
+		EntityManager& GetEntityManager() { return m_entityManager; }
+		GraphicsWorld* GetGraphicsWorld() { return m_graphicsWorld; }
+		PhysicsWorld* GetPhysicsWorld() { return m_physicsWorld; }
 
 		void TogglePhysicsDebugDraw();
 
