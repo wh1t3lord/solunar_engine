@@ -27,13 +27,6 @@ namespace solunar
 		kSize
 	};
 
-	enum eBehaviourTreeNodeType
-	{
-		kSelector,
-		kSequence,
-		kUndefined = -1
-	};
-
 	const unsigned char kBehaviourTreeMaxCountOfChildren = 8;
 
 	class BehaviourTreeNode
@@ -45,7 +38,6 @@ namespace solunar
 		virtual void AddNode(BehaviourTreeNode* pAllocateNode);
 		virtual eBehaviourTreeStatus Update(float dt);
 		virtual const char* GetName(void) const;
-		virtual eBehaviourTreeNodeType GetType() const;
 
 		void SetID(unsigned char id);
 		unsigned char GetID(void) const;
@@ -55,26 +47,6 @@ namespace solunar
 		unsigned char m_children_count;
 		unsigned char m_priority;
 		BehaviourTreeNode** m_pNodes;
-	};
-
-	class BehaviourTreeSelectorNode : public BehaviourTreeNode
-	{
-	public:
-		BehaviourTreeSelectorNode();
-		~BehaviourTreeSelectorNode();
-
-	private:
-
-	};
-
-	class BehaviourTreeSequenceNode : public BehaviourTreeNode
-	{
-	public:
-		BehaviourTreeSequenceNode();
-		~BehaviourTreeSequenceNode();
-
-	private:
-
 	};
 
 	class IBehaviourTreeAllocator
