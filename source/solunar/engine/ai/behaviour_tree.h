@@ -84,8 +84,9 @@ namespace solunar
 			if (size_of_class <= MaxSizeOfBehaviourTreeNodeInBytes)
 			{
 				pResult = &m_memory_buffer[m_allocated_nodes_count * MaxSizeOfBehaviourTreeNodeInBytes];
-				++m_allocated_nodes_count;
 			}
+
+			++m_allocated_nodes_count;
 
 			return pResult;
 		}
