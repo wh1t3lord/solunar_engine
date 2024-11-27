@@ -41,12 +41,18 @@ namespace solunar
 
 		void SetID(unsigned char id);
 		unsigned char GetID(void) const;
+
+		void SetPriority(unsigned char priority);
+		unsigned char GetPriority(void) const;
+
+		bool CanUpdate() const;
+		void SetCanUpdate(bool status);
 	private:
+		// in case of linear allocator we can't delete node
+		bool m_update;
 		// allocated id from allocator
 		unsigned char m_id;
-		unsigned char m_children_count;
 		unsigned char m_priority;
-		BehaviourTreeNode** m_pNodes;
 	};
 
 	class IBehaviourTreeAllocator
@@ -74,6 +80,7 @@ namespace solunar
 		~BehaviourTreeLinearAllocator() {}
 
 		// use this for placement new
+		// e.g.: new (pOffsetFromAllocateNodePointer) BehaviourTreeNodeXXX()
 		void* AllocateNode(size_t size_of_class) override
 		{
 			Assert(m_allocated_nodes_count < MaxNumberOfNodes && "overflow you need to shrink your allocator");
@@ -94,6 +101,14 @@ namespace solunar
 		void DeleteNode(void* pNode) override
 		{
 			// no sense for linear
+			// but we need to keep arch same
+
+			BehaviourTreeNode* pNode = static_cast<BehaviourTreeNode*>(pNode);
+
+			if (pNode)
+			{
+				pNode->SetCanUpdate(false);
+			}
 		}
 
 		constexpr static unsigned char GetMaxNodes() {
@@ -147,9 +162,6 @@ namespace solunar
 		void Update(float dt);
 		void Shutdown();
 
-		void LoadXML(tinyxml2::XMLElement& element);
-		void SaveXML(tinyxml2::XMLElement& element);
-
 		const char* GetName(void) const;
 
 		void GetAllNodes(BehaviourTreeNode**& pNodes, unsigned char& count);
@@ -181,14 +193,6 @@ namespace solunar
 	}
 	template<typename Allocator, unsigned char MaxNodesInTree>
 	inline void BehaviourTree<Allocator, MaxNodesInTree>::Shutdown()
-	{
-	}
-	template<typename Allocator, unsigned char MaxNodesInTree>
-	inline void BehaviourTree<Allocator, MaxNodesInTree>::LoadXML(tinyxml2::XMLElement& element)
-	{
-	}
-	template<typename Allocator, unsigned char MaxNodesInTree>
-	inline void BehaviourTree<Allocator, MaxNodesInTree>::SaveXML(tinyxml2::XMLElement& element)
 	{
 	}
 	template<typename Allocator, unsigned char MaxNodesInTree>
