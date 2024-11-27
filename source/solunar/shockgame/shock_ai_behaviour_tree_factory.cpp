@@ -20,10 +20,12 @@ namespace solunar
 
 			pInstance->Init();
 			
-			auto* pSequence = pInstance->AddNode<BehaviourTreeNodeSequence<2>>("zombie_seq_main");
+			const unsigned char _kMaxChildrenCountMainSequence = 2;
+			const unsigned char _kMaxChildrenCountSubSequence = 2;
+			auto* pSequence = pInstance->AddNode<BehaviourTreeNodeSequence<_kMaxChildrenCountMainSequence>>("zombie_seq_main");
 			pInstance->AddNode<BehaviourTreeActionNodeZombieSearchTarget>(pSequence->GetID(), "zombie_act_search_target");
 			
-			auto* pSequenceSub = pInstance->AddNode<BehaviourTreeNodeSequence<2>>(pSequence->GetID(), "zombie_seq_move_and_attack");
+			auto* pSequenceSub = pInstance->AddNode<BehaviourTreeNodeSequence<_kMaxChildrenCountSubSequence>>(pSequence->GetID(), "zombie_seq_move_and_attack");
 			pInstance->AddNode<BehaviourTreeActionNodeZombieMoveToTarget>(pSequenceSub->GetID(), "zombie_act_move_to_target");
 			pInstance->AddNode<BehaviourTreeActionNodeZombieAttackTarget>(pSequenceSub->GetID(), "zombie_act_attack_target");
 
