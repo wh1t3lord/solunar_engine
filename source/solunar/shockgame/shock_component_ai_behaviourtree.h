@@ -1,6 +1,12 @@
 #ifndef SHOCK_AI_BEHAVIOURTREE
 #define SHOCK_AI_BEHAVIOURTREE
 
+namespace solunar
+{
+	class IBehaviourTree;
+	enum eShockBehaviourTreeType;
+}
+
 namespace solunar 
 {
 	class ShockAIBehaviourTree : public LogicComponent
@@ -17,6 +23,8 @@ namespace solunar
 		void SaveXML(tinyxml2::XMLElement& element) override;
 
 	private:
+		eShockBehaviourTreeType m_tree_type;
+		IBehaviourTree* m_pTree;
 	};
 }
 

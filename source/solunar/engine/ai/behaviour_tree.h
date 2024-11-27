@@ -27,17 +27,28 @@ namespace solunar
 		kSize
 	};
 
-	const unsigned char kBehaviourTreeMaxCountOfChildren = 8;
+	constexpr unsigned char kBehaviourTreeMaxCountOfChildren = 8;
+	constexpr unsigned char kBehaviourTreeInvalidBaseType = unsigned char(-1);
 
 	class BehaviourTreeNode
 	{
 	public:
-		BehaviourTreeNode();
+		BehaviourTreeNode(const char* pDebugName);
 		virtual ~BehaviourTreeNode();
 
-		virtual void AddNode(BehaviourTreeNode* pAllocateNode);
 		virtual eBehaviourTreeStatus Update(float dt);
-		virtual const char* GetName(void) const;
+		virtual void OnEvent(int event_id);
+
+
+		// only parent defines children
+		virtual BehaviourTreeNode** GetChildren(void);
+		virtual unsigned char GetChildrenMaxCount(void) const;
+		virtual unsigned char GetChildrenCount(void) const;
+
+		virtual void SetChild(unsigned char array_index, BehaviourTreeNode* pChild);
+		virtual void RemoveChild(unsigned char node_id);
+
+
 
 		void SetID(unsigned char id);
 		unsigned char GetID(void) const;
@@ -47,12 +58,17 @@ namespace solunar
 
 		bool CanUpdate() const;
 		void SetCanUpdate(bool status);
+
+		const char* GetName(void) const;
 	private:
 		// in case of linear allocator we can't delete node
 		bool m_update;
 		// allocated id from allocator
 		unsigned char m_id;
 		unsigned char m_priority;
+#ifdef _DEBUG
+		char m_debug_name[32];
+#endif
 	};
 
 	class IBehaviourTreeAllocator
@@ -103,11 +119,11 @@ namespace solunar
 			// no sense for linear
 			// but we need to keep arch same
 
-			BehaviourTreeNode* pNode = static_cast<BehaviourTreeNode*>(pNode);
+			BehaviourTreeNode* pCasted = static_cast<BehaviourTreeNode*>(pNode);
 
-			if (pNode)
+			if (pCasted)
 			{
-				pNode->SetCanUpdate(false);
+				pCasted->SetCanUpdate(false);
 			}
 		}
 
@@ -165,9 +181,23 @@ namespace solunar
 		const char* GetName(void) const;
 
 		void GetAllNodes(BehaviourTreeNode**& pNodes, unsigned char& count);
+		unsigned char GetMaxNodesCount(void) const;
+		unsigned char GetCurrentNodesCount(void) const;
+
+		// add node to tree and returns the created instance of user node type
+		// if there's no memory returns nullptr (can't allocate because no space or size of class was not expected by instantieted allocator you will get assert about class size)
+		template<typename UserBehaviourTreeNodeType>
+		UserBehaviourTreeNodeType* AddNode(const char* pNodeDebugName);
+
+		template<typename UserBehaviourTreeNodeType>
+		UserBehaviourTreeNodeType* AddNode(unsigned char parent_id, const char* pNodeDebugName);
 
 	private:
-		unsigned char m_nodes_count;
+#ifdef _DEBUG
+		bool m_shutdown_was_called;
+#endif
+		unsigned char m_current_nodes_count;
+		float m_priorities[eBehaviourTreeNodePriority::kSize];
 #ifdef _DEBUG
 		char m_debug_name[16];
 #endif
@@ -176,25 +206,55 @@ namespace solunar
 	};
 
 	template<typename Allocator, unsigned char MaxNodesInTree>
-	inline BehaviourTree<Allocator, MaxNodesInTree>::BehaviourTree(const char* pDebugName)
+	inline BehaviourTree<Allocator, MaxNodesInTree>::BehaviourTree(const char* pDebugName) :
+#ifdef _DEBUG
+		m_shutdown_was_called(false), 
+#endif
+		m_current_nodes_count(0), m_priorities{-1.0f,-1.0f,-1.0f}
 	{
+#ifdef _DEBUG
+		constexpr size_t _kDebugNameStringMaxLength = sizeof(m_debug_name) / sizeof(m_debug_name[0]);
+		std::memcpy(m_debug_name, pDebugName, min(strlen(pDebugName), _kDebugNameStringMaxLength));
+#endif
 	}
+
 	template<typename Allocator, unsigned char MaxNodesInTree>
 	inline BehaviourTree<Allocator, MaxNodesInTree>::~BehaviourTree()
 	{
+#ifdef _DEBUG
+		Assert(m_shutdown_was_called && "you forgot to call ::Shutdown, it is important we must issue ~dtor for user nodes because of placement new policy");
+#endif
 	}
+
 	template<typename Allocator, unsigned char MaxNodesInTree>
 	inline void BehaviourTree<Allocator, MaxNodesInTree>::Init(float p_user_priority_timings[eBehaviourTreeNodePriority::kSize])
 	{
+		if (p_user_priority_timings)
+		{
+			std::memcpy(m_priorities, p_user_priority_timings, sizeof(m_priorities));
+		}
+		else
+		{
+			m_priorities[eBehaviourTreeNodePriority::kLow] = 1.0f;
+			m_priorities[eBehaviourTreeNodePriority::kMedium] = 0.35f;
+			m_priorities[eBehaviourTreeNodePriority::kHigh] = 0.0f;
+		}
 	}
+
 	template<typename Allocator, unsigned char MaxNodesInTree>
 	inline void BehaviourTree<Allocator, MaxNodesInTree>::Update(float dt)
 	{
+#ifdef _DEBUG
+		Assert(m_priorities[eBehaviourTreeNodePriority::kLow] < 0.0f && "you forgot to call ::Init method!");
+#endif
 	}
+
 	template<typename Allocator, unsigned char MaxNodesInTree>
 	inline void BehaviourTree<Allocator, MaxNodesInTree>::Shutdown()
 	{
+
 	}
+
 	template<typename Allocator, unsigned char MaxNodesInTree>
 	inline const char* BehaviourTree<Allocator, MaxNodesInTree>::GetName(void) const
 	{
@@ -204,11 +264,69 @@ namespace solunar
 		return nullptr;
 #endif
 	}
+
 	template<typename Allocator, unsigned char MaxNodesInTree>
 	inline void BehaviourTree<Allocator, MaxNodesInTree>::GetAllNodes(BehaviourTreeNode**& pNodes, unsigned char& count)
 	{
 		pNodes = this->m_pNodes;
 		count = this->m_nodes_count;
+	}
+
+	template<typename Allocator, unsigned char MaxNodesInTree>
+	inline unsigned char BehaviourTree<Allocator, MaxNodesInTree>::GetMaxNodesCount(void) const
+	{
+		return MaxNodesInTree;
+	}
+	
+	template<typename Allocator, unsigned char MaxNodesInTree>
+	inline unsigned char BehaviourTree<Allocator, MaxNodesInTree>::GetCurrentNodesCount(void) const
+	{
+		return m_current_nodes_count;
+	}
+
+	template<typename Allocator, unsigned char MaxNodesInTree>
+	template<typename UserBehaviourTreeNodeType>
+	inline UserBehaviourTreeNodeType* BehaviourTree<Allocator, MaxNodesInTree>::AddNode(const char* pNodeDebugName)
+	{
+		size_t size_of_class = sizeof(UserBehaviourTreeNodeType);
+
+		Assert(size_of_class != 0 && "can't be!");
+		Assert(size_of_class != size_t(-1) && "something is wrong!");
+		
+		UserBehaviourTreeNodeType* pUserNode = nullptr;
+
+		if (m_current_nodes_count == MaxNodesInTree)
+			return pUserNode;
+
+		void* pPlacementNewBufferPointer = m_allocator.AllocateNode(size_of_class);
+
+		if (pPlacementNewBufferPointer)
+		{
+			pUserNode = new (pPlacementNewBufferPointer) UserBehaviourTreeNodeType(pNodeDebugName);
+			m_pNodes[m_current_nodes_count] = pUserNode;
+			pUserNode->SetID(m_current_nodes_count);
+			++m_current_nodes_count;
+		}
+
+		return pUserNode;
+	}
+	template<typename Allocator, unsigned char MaxNodesInTree>
+	template<typename UserBehaviourTreeNodeType>
+	inline UserBehaviourTreeNodeType* BehaviourTree<Allocator, MaxNodesInTree>::AddNode(unsigned char parent_id, const char* pNodeDebugName)
+	{
+		BehaviourTreeNode* pParent = m_pNodes[parent_id];
+
+		Assert(pParent && "can't find parent by id");
+		UserBehaviourTreeNodeType* pChild = nullptr;
+		if (pParent)
+		{
+			pChild = this->AddNode<UserBehaviourTreeNodeType>(pNodeDebugName);
+
+			unsigned char current_child_id = pParent->GetChildrenCount();
+			pParent->SetChild(current_child_id, pChild);
+		}
+
+		return pChild;
 	}
 }
 
