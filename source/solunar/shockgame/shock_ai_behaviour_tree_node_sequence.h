@@ -21,6 +21,8 @@ namespace solunar
 		unsigned char GetChildrenMaxCount(void) const override;
 		unsigned char GetChildrenCount(void) const override;
 
+		unsigned char GetIDForNewNode(void) override;
+
 		void SetChild(unsigned char array_index, BehaviourTreeNode* pChild) override;
 
 	private:
@@ -86,6 +88,12 @@ namespace solunar
 
 	template<unsigned char MaxChildrenCount>
 	inline unsigned char BehaviourTreeNodeSequence<MaxChildrenCount>::GetChildrenCount(void) const
+	{
+		return m_current_nodes_count;
+	}
+
+	template<unsigned char MaxChildrenCount>
+	inline unsigned char BehaviourTreeNodeSequence<MaxChildrenCount>::GetIDForNewNode(void)
 	{
 		return m_current_nodes_count;
 	}

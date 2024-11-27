@@ -48,6 +48,11 @@ namespace solunar
         return 0;
     }
 
+    unsigned char BehaviourTreeNode::GetIDForNewNode(void)
+    {
+        return 0;
+    }
+
     void BehaviourTreeNode::SetChild(unsigned char array_index, BehaviourTreeNode* pChild)
     {
         Assert(false && "provide implementation, if no childs just override and do nothing in method");

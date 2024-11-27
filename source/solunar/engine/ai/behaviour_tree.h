@@ -44,7 +44,9 @@ namespace solunar
 		virtual BehaviourTreeNode** GetChildren(void);
 		virtual unsigned char GetChildrenMaxCount(void) const;
 		virtual unsigned char GetChildrenCount(void) const;
-
+		// this method might be different due to different allocator's policy
+		// todo: wh1t3lord -> make argument for determing allocator's policy
+		virtual unsigned char GetIDForNewNode(void);
 		virtual void SetChild(unsigned char array_index, BehaviourTreeNode* pChild);
 		virtual void RemoveChild(unsigned char node_id);
 
@@ -78,12 +80,14 @@ namespace solunar
 
 		virtual void* AllocateNode(size_t size_of_class) = 0;
 		virtual void DeleteNode(void* pNode) = 0;
+		virtual void Reset(void) = 0;
 	};
 
 	class IBehaviourTree
 	{
 	public:
 		virtual ~IBehaviourTree() {}
+		virtual void Update(float dt) = 0;
 	};
 
 	// choose size per user behaviour tree implementation, it might be very different!
@@ -116,15 +120,20 @@ namespace solunar
 
 		void DeleteNode(void* pNode) override
 		{
-			// no sense for linear
-			// but we need to keep arch same
-
+			// Linear it is not supposed to rebuild buffer or something
 			BehaviourTreeNode* pCasted = static_cast<BehaviourTreeNode*>(pNode);
 
 			if (pCasted)
 			{
 				pCasted->SetCanUpdate(false);
+				pCasted->~BehaviourTreeNode();
 			}
+		}
+
+		void Reset(void) override
+		{
+			m_allocated_nodes_count = 0;
+			std::memset(m_memory_buffer, 0, sizeof(m_memory_buffer));
 		}
 
 		constexpr static unsigned char GetMaxNodes() {
@@ -175,7 +184,7 @@ namespace solunar
 		~BehaviourTree();
 
 		void Init(float p_user_priority_timings[eBehaviourTreeNodePriority::kSize] = 0);
-		void Update(float dt);
+		void Update(float dt) override;
 		void Shutdown();
 
 		const char* GetName(void) const;
@@ -247,12 +256,43 @@ namespace solunar
 #ifdef _DEBUG
 		Assert(m_priorities[eBehaviourTreeNodePriority::kLow] < 0.0f && "you forgot to call ::Init method!");
 #endif
+
+		for (unsigned char i = 0; i < m_current_nodes_count; ++i)
+		{
+			BehaviourTreeNode* pNode = m_pNodes[i];
+
+			Assert(pNode && "must be valid!");
+
+			if (pNode)
+			{
+				if (pNode->CanUpdate())
+				{
+					pNode->Update(dt);
+				}
+			}
+		}
 	}
 
 	template<typename Allocator, unsigned char MaxNodesInTree>
 	inline void BehaviourTree<Allocator, MaxNodesInTree>::Shutdown()
 	{
+		for (unsigned char i = 0; i < m_current_nodes_count; ++i)
+		{
+			BehaviourTreeNode* pNode = m_pNodes[i];
 
+			if (pNode)
+			{
+				m_allocator.DeleteNode(pNode);
+			}
+		}
+
+		m_current_nodes_count = 0;
+		std::memset(m_pNodes, 0, sizeof(m_pNodes));
+#ifdef _DEBUG
+		m_debug_name[0] = '\0';
+#endif
+		m_allocator.Reset();
+		m_shutdown_was_called = true;
 	}
 
 	template<typename Allocator, unsigned char MaxNodesInTree>
@@ -310,6 +350,7 @@ namespace solunar
 
 		return pUserNode;
 	}
+
 	template<typename Allocator, unsigned char MaxNodesInTree>
 	template<typename UserBehaviourTreeNodeType>
 	inline UserBehaviourTreeNodeType* BehaviourTree<Allocator, MaxNodesInTree>::AddNode(unsigned char parent_id, const char* pNodeDebugName)
@@ -322,7 +363,7 @@ namespace solunar
 		{
 			pChild = this->AddNode<UserBehaviourTreeNodeType>(pNodeDebugName);
 
-			unsigned char current_child_id = pParent->GetChildrenCount();
+			unsigned char current_child_id = pParent->GetIDForNewNode();
 			pParent->SetChild(current_child_id, pChild);
 		}
 
