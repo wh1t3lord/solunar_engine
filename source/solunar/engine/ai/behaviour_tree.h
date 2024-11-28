@@ -1,3 +1,11 @@
+// -----------------------------------------
+//
+//   author: wh1t3lord (https://github.com/wh1t3lord)
+//	 description: BehaviourTree implementation (embedded like approach) 
+//
+// -----------------------------------------
+
+
 #ifndef BEHAVIOUR_TREE_H
 #define BEHAVIOUR_TREE_H
 
