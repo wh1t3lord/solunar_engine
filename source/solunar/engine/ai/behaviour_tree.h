@@ -213,6 +213,7 @@ namespace solunar
 	private:
 #ifdef _DEBUG
 		bool m_shutdown_was_called;
+		bool m_init_was_called;
 #endif
 		unsigned char m_current_nodes_count;
 		World* m_pWorld;
@@ -234,6 +235,7 @@ namespace solunar
 	inline BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::BehaviourTree(const char* pDebugName) :
 #ifdef _DEBUG
 		m_shutdown_was_called(false),
+		m_init_was_called(false),
 #endif
 		m_current_nodes_count(0), m_pWorld(nullptr), m_priorities{ -1.0f,-1.0f,-1.0f }
 	{
@@ -258,6 +260,10 @@ namespace solunar
 	inline void BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::Init(World* pWorld, float p_user_priority_timings[eBehaviourTreeNodePriority::kSize])
 	{
 		Assert(pWorld && "must be valid!");
+		
+#ifdef _DEBUG
+		m_init_was_called = true;
+#endif
 
 		this->m_pWorld = pWorld;
 
@@ -278,6 +284,7 @@ namespace solunar
 	{
 #ifdef _DEBUG
 		Assert(m_priorities[eBehaviourTreeNodePriority::kLow] < 0.0f && "you forgot to call ::Init method!");
+		Assert(m_init_was_called && "must be called ::Init before updating");
 #endif
 
 		for (unsigned char i = 0; i < m_current_nodes_count; ++i)
