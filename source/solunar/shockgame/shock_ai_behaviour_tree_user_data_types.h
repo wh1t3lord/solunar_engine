@@ -23,6 +23,10 @@ namespace solunar
 		// todo: kirrik -> replace to id for accessing entity
 		Entity* pTarget;
 	};
+
+	// if you don't want to use logic state then
+	struct NoLogicStateType
+	{};
 }
 
 #endif
