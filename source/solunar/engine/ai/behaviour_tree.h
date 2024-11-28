@@ -237,6 +237,9 @@ namespace solunar
 #endif
 		m_current_nodes_count(0), m_pWorld(nullptr), m_priorities{ -1.0f,-1.0f,-1.0f }
 	{
+		static_assert(std::is_pod<UserLogicDataType>::value && "it must be plain class or struct (preferrably struct without set/get methods)");
+		std::memset(&this->m_user_data, 0, sizeof(this->m_user_data));
+
 #ifdef _DEBUG
 		constexpr size_t _kDebugNameStringMaxLength = sizeof(m_debug_name) / sizeof(m_debug_name[0]);
 		std::memcpy(m_debug_name, pDebugName, min(strlen(pDebugName), _kDebugNameStringMaxLength));
