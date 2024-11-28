@@ -3,25 +3,31 @@
 
 #include "shock_ai_behaviour_tree_node_sequence.h"
 
-
+#include "shock_ai_behaviour_tree_user_data_types.h"
 #include "shock_ai_behaviour_tree_node_zombie_search_target.h"
 #include "shock_ai_behaviour_tree_node_zombie_move_to_target.h"
 #include "shock_ai_behaviour_tree_node_zombie_attack_target.h"
 
 namespace solunar
 {
-	IBehaviourTree* CreateBehaviourTree(eShockBehaviourTree type)
+	IBehaviourTree* CreateBehaviourTree(World* pLoadedWorld, eShockBehaviourTree type)
 	{
+		Assert(pLoadedWorld && "must be valid!");
+
 		switch (type)
 		{
 		case eShockBehaviourTree::kZombie:
 		{
-			auto* pInstance = new BehaviourTree<BehaviourTreeLinearAllocator<5, 128>, 3>("zombie_tree");
+			constexpr size_t _kAllocatorMaxClassNodeSize = 128;
+			constexpr unsigned char _kAllocatorReservedNodeCount = 5;
+			constexpr unsigned char _kBehaviourTreeMaxNodesCount = 3;
 
-			pInstance->Init();
+			auto* pInstance = new BehaviourTree<BehaviourTreeLinearAllocator<_kAllocatorReservedNodeCount, _kAllocatorMaxClassNodeSize>, ZombieLogicStateType, _kBehaviourTreeMaxNodesCount>("zombie_tree");
+
+			pInstance->Init(pLoadedWorld);
 			
-			const unsigned char _kMaxChildrenCountMainSequence = 2;
-			const unsigned char _kMaxChildrenCountSubSequence = 2;
+			constexpr unsigned char _kMaxChildrenCountMainSequence = 2;
+			constexpr unsigned char _kMaxChildrenCountSubSequence = 2;
 			auto* pSequence = pInstance->AddNode<BehaviourTreeNodeSequence<_kMaxChildrenCountMainSequence>>("zombie_seq_main");
 			pInstance->AddNode<BehaviourTreeActionNodeZombieSearchTarget>(pSequence->GetID(), "zombie_act_search_target");
 			

@@ -12,7 +12,7 @@ namespace solunar
 		BehaviourTreeNodeSequence(const char* pDebugName);
 		~BehaviourTreeNodeSequence();
 
-		eBehaviourTreeStatus Update(float dt) override;
+		eBehaviourTreeStatus Update(World* pWorld, void* pUserStateData, float dt) override;
 		void OnEvent(int event_id) override;
 
 
@@ -42,7 +42,7 @@ namespace solunar
 	}
 
 	template<unsigned char MaxChildrenCount>
-	inline eBehaviourTreeStatus BehaviourTreeNodeSequence<MaxChildrenCount>::Update(float dt)
+	inline eBehaviourTreeStatus BehaviourTreeNodeSequence<MaxChildrenCount>::Update(World* pWorld, void* pUserStateData, float dt)
 	{
 		eBehaviourTreeStatus status = eBehaviourTreeStatus::kSuccess;
 
@@ -58,7 +58,7 @@ namespace solunar
 
 		if (pChild)
 		{
-			status = pChild->Update(dt);
+			status = pChild->Update(pWorld, pUserStateData, dt);
 		}
 
 		if (status == eBehaviourTreeStatus::kSuccess)

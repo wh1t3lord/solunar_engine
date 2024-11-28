@@ -21,6 +21,7 @@ namespace solunar
 
 	void ShockAIBehaviourTree::LoadXML(tinyxml2::XMLElement& element)
 	{
+		World* pWorld = this->GetWorld();
 	}
 
 	void ShockAIBehaviourTree::SaveXML(tinyxml2::XMLElement& element)

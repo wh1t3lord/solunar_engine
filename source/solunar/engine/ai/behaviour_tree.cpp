@@ -15,7 +15,7 @@ namespace solunar
     {
     }
 
-    eBehaviourTreeStatus BehaviourTreeNode::Update(float dt)
+    eBehaviourTreeStatus BehaviourTreeNode::Update(World* pWorld, void* pUserStateData, float dt)
     {
         return eBehaviourTreeStatus::kFailure;
     }

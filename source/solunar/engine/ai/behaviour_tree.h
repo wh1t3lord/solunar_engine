@@ -6,6 +6,12 @@ namespace tinyxml2
 	class XMLElement;
 }
 
+
+namespace solunar
+{
+	class World;
+}
+
 namespace solunar
 {
 	enum eBehaviourTreeStatus
@@ -36,7 +42,7 @@ namespace solunar
 		BehaviourTreeNode(const char* pDebugName);
 		virtual ~BehaviourTreeNode();
 
-		virtual eBehaviourTreeStatus Update(float dt);
+		virtual eBehaviourTreeStatus Update(World* pWorld, void* pUserStateData, float dt);
 		virtual void OnEvent(int event_id);
 
 
@@ -175,7 +181,7 @@ namespace solunar
 
 		Node that stopped updates it means that a node was deleted from a tree, depends on allocator
 	*/
-	template<typename Allocator, unsigned char MaxNodesInTree>
+	template<typename Allocator, typename UserLogicDataType, unsigned char MaxNodesInTree>
 	class BehaviourTree : public IBehaviourTree
 	{
 		static_assert(Allocator::GetMaxNodes() >= MaxNodesInTree && "suppose that allocator can allocate at least MaxNodeInTree! Sadly but in C++ we can't obtain template parameter from class :(");
@@ -183,7 +189,7 @@ namespace solunar
 		BehaviourTree(const char* pDebugName);
 		~BehaviourTree();
 
-		void Init(float p_user_priority_timings[eBehaviourTreeNodePriority::kSize] = 0);
+		void Init(World* pLoadedWorld, float p_user_priority_timings[eBehaviourTreeNodePriority::kSize] = 0);
 		void Update(float dt) override;
 		void Shutdown();
 
@@ -201,25 +207,35 @@ namespace solunar
 		template<typename UserBehaviourTreeNodeType>
 		UserBehaviourTreeNodeType* AddNode(unsigned char parent_id, const char* pNodeDebugName);
 
+		void* GetUserData(void) { return static_cast<void*>(&this->m_user_data); }
+		const void* GetUserData(void) const { return static_cast<const void*>(&this->m_user_data); }
+
 	private:
 #ifdef _DEBUG
 		bool m_shutdown_was_called;
 #endif
 		unsigned char m_current_nodes_count;
+		World* m_pWorld;
 		float m_priorities[eBehaviourTreeNodePriority::kSize];
 #ifdef _DEBUG
 		char m_debug_name[16];
 #endif
 		BehaviourTreeNode* m_pNodes[MaxNodesInTree];
+
+		// stores temp information for handling logic, like what target we found 
+		// what we need to do and etc, it passes among ALL nodes for exchange/interaction between nodes instead making some global manager we just use structs (or classes)
+		// on user side what we need really for storing information for each monster/ai creature so we defines memory what we really need without making global manager thing
+		UserLogicDataType m_user_data;
+
 		Allocator m_allocator;
 	};
 
-	template<typename Allocator, unsigned char MaxNodesInTree>
-	inline BehaviourTree<Allocator, MaxNodesInTree>::BehaviourTree(const char* pDebugName) :
+	template<typename Allocator, typename UserLogicDataType, unsigned char MaxNodesInTree>
+	inline BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::BehaviourTree(const char* pDebugName) :
 #ifdef _DEBUG
-		m_shutdown_was_called(false), 
+		m_shutdown_was_called(false),
 #endif
-		m_current_nodes_count(0), m_priorities{-1.0f,-1.0f,-1.0f}
+		m_current_nodes_count(0), m_pWorld(nullptr), m_priorities{ -1.0f,-1.0f,-1.0f }
 	{
 #ifdef _DEBUG
 		constexpr size_t _kDebugNameStringMaxLength = sizeof(m_debug_name) / sizeof(m_debug_name[0]);
@@ -227,17 +243,21 @@ namespace solunar
 #endif
 	}
 
-	template<typename Allocator, unsigned char MaxNodesInTree>
-	inline BehaviourTree<Allocator, MaxNodesInTree>::~BehaviourTree()
+	template<typename Allocator, typename UserLogicDataType, unsigned char MaxNodesInTree>
+	inline BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::~BehaviourTree()
 	{
 #ifdef _DEBUG
 		Assert(m_shutdown_was_called && "you forgot to call ::Shutdown, it is important we must issue ~dtor for user nodes because of placement new policy");
 #endif
 	}
 
-	template<typename Allocator, unsigned char MaxNodesInTree>
-	inline void BehaviourTree<Allocator, MaxNodesInTree>::Init(float p_user_priority_timings[eBehaviourTreeNodePriority::kSize])
+	template<typename Allocator, typename UserLogicDataType, unsigned char MaxNodesInTree>
+	inline void BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::Init(World* pWorld, float p_user_priority_timings[eBehaviourTreeNodePriority::kSize])
 	{
+		Assert(pWorld && "must be valid!");
+
+		this->m_pWorld = pWorld;
+
 		if (p_user_priority_timings)
 		{
 			std::memcpy(m_priorities, p_user_priority_timings, sizeof(m_priorities));
@@ -250,8 +270,8 @@ namespace solunar
 		}
 	}
 
-	template<typename Allocator, unsigned char MaxNodesInTree>
-	inline void BehaviourTree<Allocator, MaxNodesInTree>::Update(float dt)
+	template<typename Allocator, typename UserLogicDataType, unsigned char MaxNodesInTree>
+	inline void BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::Update(float dt)
 	{
 #ifdef _DEBUG
 		Assert(m_priorities[eBehaviourTreeNodePriority::kLow] < 0.0f && "you forgot to call ::Init method!");
@@ -267,14 +287,14 @@ namespace solunar
 			{
 				if (pNode->CanUpdate())
 				{
-					pNode->Update(dt);
+					pNode->Update(this->m_pWorld, static_cast<void*>(&this->m_user_data), dt);
 				}
 			}
 		}
 	}
 
-	template<typename Allocator, unsigned char MaxNodesInTree>
-	inline void BehaviourTree<Allocator, MaxNodesInTree>::Shutdown()
+	template<typename Allocator, typename UserLogicDataType, unsigned char MaxNodesInTree>
+	inline void BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::Shutdown()
 	{
 		for (unsigned char i = 0; i < m_current_nodes_count; ++i)
 		{
@@ -295,8 +315,8 @@ namespace solunar
 		m_shutdown_was_called = true;
 	}
 
-	template<typename Allocator, unsigned char MaxNodesInTree>
-	inline const char* BehaviourTree<Allocator, MaxNodesInTree>::GetName(void) const
+	template<typename Allocator, typename UserLogicDataType, unsigned char MaxNodesInTree>
+	inline const char* BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::GetName(void) const
 	{
 #ifdef _DEBUG
 		return m_debug_name;
@@ -305,34 +325,34 @@ namespace solunar
 #endif
 	}
 
-	template<typename Allocator, unsigned char MaxNodesInTree>
-	inline void BehaviourTree<Allocator, MaxNodesInTree>::GetAllNodes(BehaviourTreeNode**& pNodes, unsigned char& count)
+	template<typename Allocator, typename UserLogicDataType, unsigned char MaxNodesInTree>
+	inline void BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::GetAllNodes(BehaviourTreeNode**& pNodes, unsigned char& count)
 	{
 		pNodes = this->m_pNodes;
 		count = this->m_nodes_count;
 	}
 
-	template<typename Allocator, unsigned char MaxNodesInTree>
-	inline unsigned char BehaviourTree<Allocator, MaxNodesInTree>::GetMaxNodesCount(void) const
+	template<typename Allocator, typename UserLogicDataType, unsigned char MaxNodesInTree>
+	inline unsigned char BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::GetMaxNodesCount(void) const
 	{
 		return MaxNodesInTree;
 	}
-	
-	template<typename Allocator, unsigned char MaxNodesInTree>
-	inline unsigned char BehaviourTree<Allocator, MaxNodesInTree>::GetCurrentNodesCount(void) const
+
+	template<typename Allocator, typename UserLogicDataType, unsigned char MaxNodesInTree>
+	inline unsigned char BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::GetCurrentNodesCount(void) const
 	{
 		return m_current_nodes_count;
 	}
 
-	template<typename Allocator, unsigned char MaxNodesInTree>
+	template<typename Allocator, typename UserLogicDataType, unsigned char MaxNodesInTree>
 	template<typename UserBehaviourTreeNodeType>
-	inline UserBehaviourTreeNodeType* BehaviourTree<Allocator, MaxNodesInTree>::AddNode(const char* pNodeDebugName)
+	inline UserBehaviourTreeNodeType* BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::AddNode(const char* pNodeDebugName)
 	{
 		size_t size_of_class = sizeof(UserBehaviourTreeNodeType);
 
 		Assert(size_of_class != 0 && "can't be!");
 		Assert(size_of_class != size_t(-1) && "something is wrong!");
-		
+
 		UserBehaviourTreeNodeType* pUserNode = nullptr;
 
 		if (m_current_nodes_count == MaxNodesInTree)
@@ -351,9 +371,9 @@ namespace solunar
 		return pUserNode;
 	}
 
-	template<typename Allocator, unsigned char MaxNodesInTree>
+	template<typename Allocator, typename UserLogicDataType, unsigned char MaxNodesInTree>
 	template<typename UserBehaviourTreeNodeType>
-	inline UserBehaviourTreeNodeType* BehaviourTree<Allocator, MaxNodesInTree>::AddNode(unsigned char parent_id, const char* pNodeDebugName)
+	inline UserBehaviourTreeNodeType* BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::AddNode(unsigned char parent_id, const char* pNodeDebugName)
 	{
 		BehaviourTreeNode* pParent = m_pNodes[parent_id];
 

@@ -10,7 +10,7 @@ namespace solunar
 	{
 	}
 
-	eBehaviourTreeStatus BehaviourTreeActionNodeZombieSearchTarget::Update(float dt)
+	eBehaviourTreeStatus BehaviourTreeActionNodeZombieSearchTarget::Update(World* pWorld, void* pUserStateData, float dt)
 	{
 		return eBehaviourTreeStatus::kFailure;
 	}

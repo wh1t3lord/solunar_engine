@@ -4,6 +4,7 @@
 namespace solunar
 {
 	class IBehaviourTree;
+	class World;
 }
 
 namespace solunar
@@ -13,7 +14,7 @@ namespace solunar
 		kZombie
 	};
 
-	IBehaviourTree* CreateBehaviourTree(eShockBehaviourTree type);
+	IBehaviourTree* CreateBehaviourTree(World* pLoadedWorld, eShockBehaviourTree type);
 }
 
 #endif

@@ -5,10 +5,12 @@ namespace solunar
 	BehaviourTreeActionNodeZombieAttackTarget::BehaviourTreeActionNodeZombieAttackTarget(const char* pDebugName) : BehaviourTreeNode(pDebugName)
 	{
 	}
+
 	BehaviourTreeActionNodeZombieAttackTarget::~BehaviourTreeActionNodeZombieAttackTarget()
 	{
 	}
-	eBehaviourTreeStatus BehaviourTreeActionNodeZombieAttackTarget::Update(float dt)
+
+	eBehaviourTreeStatus BehaviourTreeActionNodeZombieAttackTarget::Update(World* pWorld, void* pUserStateData, float dt)
 	{
 		return eBehaviourTreeStatus();
 	}

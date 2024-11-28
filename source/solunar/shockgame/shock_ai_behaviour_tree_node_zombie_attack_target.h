@@ -11,7 +11,7 @@ namespace solunar
 		BehaviourTreeActionNodeZombieAttackTarget(const char* pDebugName);
 		~BehaviourTreeActionNodeZombieAttackTarget();
 
-		eBehaviourTreeStatus Update(float dt) override;
+		eBehaviourTreeStatus Update(World* pWorld, void* pUserStateData, float dt) override;
 	};
 }
 
