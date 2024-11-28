@@ -1,3 +1,10 @@
+// -----------------------------------------
+//
+//   author: wh1t3lord (https://github.com/wh1t3lord)
+//	 description: Frontend component for storing backend of behaviour tree implementation (see behaviour tree factory impl)
+//
+// -----------------------------------------
+
 #ifndef SHOCK_AI_BEHAVIOURTREE
 #define SHOCK_AI_BEHAVIOURTREE
 

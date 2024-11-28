@@ -1,3 +1,10 @@
+// -----------------------------------------
+//
+//   author: wh1t3lord (https://github.com/wh1t3lord)
+//	 description: User data types for handling logic and passing data between all nodes of behaviour tree (for exchange/interaction purposes)
+//
+// -----------------------------------------
+
 #ifndef SHOCK_AI_BT_USER_DATA_TYPES_H
 #define SHOCK_AI_BT_USER_DATA_TYPES_H
 

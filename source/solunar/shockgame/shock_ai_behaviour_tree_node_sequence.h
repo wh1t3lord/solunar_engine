@@ -1,3 +1,11 @@
+// -----------------------------------------
+//
+//   author: wh1t3lord (https://github.com/wh1t3lord)
+//	 description: Sequence node it executes sequentially all nodes until all succeded 
+//
+// -----------------------------------------
+
+
 #ifndef SHOCK_AI_BT_NODE_SEQUENCE_H
 #define SHOCK_AI_BT_NODE_SEQUENCE_H
 
