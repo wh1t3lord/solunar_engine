@@ -167,7 +167,6 @@ namespace solunar {
 
 	bool AnimatedMeshComponent::HasSkin()
 	{
-
 		if (!m_model.expired())
 		{
 			// guarantee cast, trust me 
@@ -176,5 +175,11 @@ namespace solunar {
 		}
 
 		return false;
+	}
+
+	std::shared_ptr<AnimatedModel> AnimatedMeshComponent::LockAnimatedModel()
+	{
+		std::weak_ptr<AnimatedModel> animatedModel = dynamicCastWeakPtr<AnimatedModel, ModelBase>(m_model);
+		return animatedModel.lock();
 	}
 }

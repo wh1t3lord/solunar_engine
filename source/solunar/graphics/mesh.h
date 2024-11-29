@@ -2,6 +2,7 @@
 #define GRAPHICS_MESH_H
 
 #include "graphics/model.h"
+#include "graphics/animatedmodel.h"
 
 namespace solunar {
 
@@ -61,6 +62,8 @@ namespace solunar {
 		void Render() override;
 
 		bool HasSkin();
+
+		std::shared_ptr<AnimatedModel> LockAnimatedModel();
 	};
 
 }
