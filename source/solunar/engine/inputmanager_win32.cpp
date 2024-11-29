@@ -68,6 +68,11 @@ namespace solunar
 		if (keyId >= 420)
 			return;
 
+		if (state)
+			m_lastCharactedPressed = tolower((char)keyId);
+		else
+			m_lastCharactedPressed = 0;
+
 		m_keys[keyId] = state;
 	}
 

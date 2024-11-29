@@ -13,6 +13,7 @@
 #include "engine/inputmanager.h"
 #include "engine/gameinterface.h"
 #include "engine/debugoverlay.h"
+#include "engine/console.h"
 #include "engine/camera.h"
 #include "engine/entity/component.h"
 #include "engine/entity/world.h"
@@ -187,6 +188,11 @@ namespace solunar {
 		g_contentManager->Load("models/viewmodel_shotgun.glb", AnimatedModel::GetStaticTypeInfo());
 	}
 
+	void Command_Quit()
+	{
+		appFireExit();
+	}
+
 	void ShowEngineDebugOverlay()
 	{
 		if (ImGui::BeginMainMenuBar())
@@ -256,6 +262,8 @@ namespace solunar {
 	void EngineLoop::Initialize()
 	{
 		InitCommandLine();
+
+		ConsoleCommandManager::GetInstance()->RegisterCommand("quit", &Command_Quit);
 
 		// create engine view
 		CreateEngineView();
@@ -367,9 +375,6 @@ namespace solunar {
 
 		if (g_slowdown2X)
 			Sleep(200);
-			
-		// update delta cursor pos and others input stuff
-		input->Update();
 
 		// update timer
 		Timer::GetInstance()->Update();
@@ -403,6 +408,9 @@ namespace solunar {
 		ShowEngineDebugOverlay();
 #endif // !FINAL_BUILD
 		
+		if (g_console->IsToggled())
+			g_console->OnRender();
+
 		// End and render ImGui
 		ImGuiManager::GetInstance()->EndFrame();
 
@@ -412,6 +420,13 @@ namespace solunar {
 		// Take screenshot
 		if (input->IsPressedWithReset(KeyboardKeys::KEY_F12))
 			g_renderer->TakeScreenshot();
+
+		// update delta cursor pos and others input stuff
+		input->Update();
+		
+		// Toggle console if pressed
+		if (input->IsPressedWithReset(KEY_GRAVE_ACCENT))
+			g_console->ToggleConsole();
 
 		return true;
 	}

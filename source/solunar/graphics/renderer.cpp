@@ -34,6 +34,7 @@
 
 #include "engine/camera.h"
 #include "engine/engine.h"
+#include "engine/console.h"
 #include "engine/entity/world.h"
 #include "engine/entity/entitymanager.h"
 #include "engine/entity/entity.h"
@@ -51,6 +52,24 @@ namespace solunar
 
 	IDepthStencilState* g_depthStencilState_Default = nullptr;
 	IRasterizerState* g_rasterizerState_Default = nullptr;
+
+	void Command_ToggleRMode()
+	{
+		if (!g_renderer)
+			return;
+
+		RendererViewMode currentMode = g_renderer->GetRenderMode();
+
+		RendererViewMode modeToSet;
+		if (currentMode == RendererViewMode::Wireframe)
+			modeToSet = RendererViewMode::Unlit;
+		else if (currentMode == RendererViewMode::Unlit)
+			modeToSet = RendererViewMode::Lit;
+		else if (currentMode == RendererViewMode::Lit)
+			modeToSet = RendererViewMode::Wireframe;
+
+		g_renderer->SetRenderMode(modeToSet);
+	}
 
 	void DrawLoadscreen()
 	{
@@ -206,6 +225,8 @@ namespace solunar
 
 	void Renderer::Init()
 	{
+		ConsoleCommandManager::GetInstance()->RegisterCommand("togglermode", &Command_ToggleRMode);
+
 		View* view = CameraProxy::GetInstance()->GetView();
 
 		// Initialize default framebuffer

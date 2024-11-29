@@ -172,6 +172,9 @@ namespace solunar
 		// Get delta cursor position.
 		const glm::vec2& GetDeltaCursorPos() const { return m_deltaCursorPos; }
 
+		// Get last pressed character.
+		const char GetLastCharacter() const { return m_lastCharactedPressed; }
+
 	protected:
 		bool m_keys[KEY_COUNT];
 		bool m_mouseButtons[MOUSE_BUTTON_COUNT];
@@ -180,6 +183,7 @@ namespace solunar
 		glm::vec2 m_deltaCursorPos;
 		bool m_captureCursor;
 		bool m_hideCursor;
+		char m_lastCharactedPressed;
 	};
 }
 

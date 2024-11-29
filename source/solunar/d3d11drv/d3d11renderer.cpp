@@ -301,7 +301,7 @@ void D3D11Renderer::BindMaterialForMesh(MeshComponent* mesh, Material* material,
 
 	// Initialize shader
 	uint32_t pixelVariation = 0;
-	if (material->m_selfillum)
+	if (material->m_selfillum || g_renderer->GetRenderMode() == RendererViewMode::Unlit)
 		pixelVariation |= PixelVariation_Unlit;
 	else
 	{
