@@ -3,7 +3,7 @@
 
 namespace solunar
 {
-    BehaviourTreeNode::BehaviourTreeNode(const char* pDebugName) : m_update(true), m_id(kBehaviourTreeInvalidBaseType), m_priority(kBehaviourTreeInvalidBaseType)
+    BehaviourTreeNode::BehaviourTreeNode(const char* pDebugName) : m_update(true), m_id(kBehaviourTreeInvalidBaseType), m_priority(kBehaviourTreeInvalidBaseType), m_children_count(0)
     {
 #ifdef _DEBUG
         constexpr size_t _kDebugStringMaxLength = sizeof(m_debug_name) / sizeof(m_debug_name[0]);
@@ -15,7 +15,7 @@ namespace solunar
     {
     }
 
-    eBehaviourTreeStatus BehaviourTreeNode::Update(World* pWorld, void* pUserStateData, float dt)
+    eBehaviourTreeStatus BehaviourTreeNode::Update(World* pWorld, void* pUserStateData, BehaviourTreeNode** pChildren, unsigned char children_count, float dt)
     {
         return eBehaviourTreeStatus::kFailure;
     }
@@ -33,34 +33,14 @@ namespace solunar
 #endif
     }
 
-    BehaviourTreeNode** BehaviourTreeNode::GetChildren(void)
-    {
-        return nullptr;
-    }
-
-    unsigned char BehaviourTreeNode::GetChildrenMaxCount(void) const
-    {
-        return 0;
-    }
-
     unsigned char BehaviourTreeNode::GetChildrenCount(void) const
     {
-        return 0;
+        return m_children_count;
     }
 
-    unsigned char BehaviourTreeNode::GetIDForNewNode(void)
+    void BehaviourTreeNode::SetChildrenCount(unsigned char count)
     {
-        return 0;
-    }
-
-    void BehaviourTreeNode::SetChild(unsigned char array_index, BehaviourTreeNode* pChild)
-    {
-        Assert(false && "provide implementation, if no childs just override and do nothing in method");
-    }
-
-    void BehaviourTreeNode::RemoveChild(unsigned char node_id)
-    {
-        Assert(false && "provide implementation, if no childs just override and do nothing in method");
+        m_children_count = count;
     }
 
     void BehaviourTreeNode::SetID(unsigned char id)
