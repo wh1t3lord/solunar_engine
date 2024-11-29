@@ -98,10 +98,16 @@ void ShockAIComponent::UpdateZombie(float dt)
 
 	glm::vec3 direction = glm::normalize(g_Player->GetPosition() - GetEntity()->GetPosition());
 	
+	/*
 	glm::vec3 pos = GetEntity()->GetPosition();
 	pos += direction * dt;
 	pos.y = GetEntity()->GetPosition().y;
 	GetEntity()->SetPosition(pos);
+	*/
+
+	RigidBodyComponent* rigidBody = (RigidBodyComponent*)GetEntity()->GetComponentByTypeInfo(RigidBodyComponent::GetStaticTypeInfo());
+	if (rigidBody)
+		rigidBody->SetLinearVelocity(direction * 12.0f);
 
 	// rotate camera torwads to player
 	glm::vec3 playerPos = g_Player->GetPosition();
