@@ -51,6 +51,11 @@ namespace solunar
 		return kBehaviourTreeInvalidBaseType;
 	}
 
+	void BehaviourTreeNode::AddChild(BehaviourTreeNode* pChild)
+	{
+		Assert(false && "provide impl!");
+	}
+
 	void BehaviourTreeNode::SetID(unsigned char id)
 	{
 		m_id = id;
