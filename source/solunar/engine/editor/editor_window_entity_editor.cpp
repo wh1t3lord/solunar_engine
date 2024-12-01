@@ -17,7 +17,7 @@ namespace solunar
 	{
 		const auto& types = TypeManager::GetInstance()->GetAllTypes();
 
-		m_show = types.empty() == false;
+		Assert(types.empty() == false && "must be registered already here!!!!");
 	}
 
 	void EditorWindow_EntityEditor::Draw(World* pWorld)
