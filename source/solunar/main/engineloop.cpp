@@ -252,7 +252,7 @@ namespace solunar {
 							if (pWindow)
 							{
 								char button_name[32];
-								sprintf(button_name, sizeof(button_name), "%s##EditorSubMenu", pWindow->GetName());
+								sprintf(button_name, sizeof(button_name), "%s##EWinds", pWindow->GetName());
 
 								if (ImGui::MenuItem(button_name))
 								{
