@@ -226,7 +226,8 @@ namespace solunar {
 								char button_name[32];
 								sprintf(button_name, sizeof(button_name), "%s##EWinds", pWindow->GetName());
 
-								if (ImGui::MenuItem(button_name))
+								bool selected = pWindow->IsShow();
+								if (ImGui::MenuItem(button_name, 0, selected))
 								{
 									pWindow->SetShow(!pWindow->IsShow());
 								}
