@@ -28,19 +28,15 @@ namespace solunar
 		BehaviourTreeNode** GetChildren(void) override;
 		unsigned char GetChildrenMaxCount(void) const override;
 		unsigned char GetChildrenCount(void) const override;
-
-		unsigned char GetIDForNewNode(void) override;
-
-		void SetChild(unsigned char array_index, BehaviourTreeNode* pChild) override;
+		void AddChild(BehaviourTreeNode* pChild) override;
 
 	private:
-		unsigned char m_current_nodes_count;
 		unsigned char m_success_iter;
 		BehaviourTreeNode* m_pChildren[MaxChildrenCount];
 	};
 
 	template<unsigned char MaxChildrenCount>
-	inline BehaviourTreeNodeSequence<MaxChildrenCount>::BehaviourTreeNodeSequence(const char* pDebugName) : BehaviourTreeNode(pDebugName), m_current_nodes_count(0), m_success_iter(0), m_pChildren{}
+	inline BehaviourTreeNodeSequence<MaxChildrenCount>::BehaviourTreeNodeSequence(const char* pDebugName) : BehaviourTreeNode(pDebugName), m_success_iter(0), m_pChildren{}
 	{
 	}
 
@@ -97,20 +93,33 @@ namespace solunar
 	template<unsigned char MaxChildrenCount>
 	inline unsigned char BehaviourTreeNodeSequence<MaxChildrenCount>::GetChildrenCount(void) const
 	{
-		return m_current_nodes_count;
+		unsigned char result = kBehaviourTreeInvalidBaseType;
+
+		for (unsigned char i = 0; i < MaxChildrenCount; ++i)
+		{
+			if (!m_pChildren[i])
+			{
+				result = i;
+				break;
+			}
+		}
+
+		return result;
 	}
 
 	template<unsigned char MaxChildrenCount>
-	inline unsigned char BehaviourTreeNodeSequence<MaxChildrenCount>::GetIDForNewNode(void)
+	inline void BehaviourTreeNodeSequence<MaxChildrenCount>::AddChild(BehaviourTreeNode* pChild)
 	{
-		return m_current_nodes_count;
-	}
+		Assert(pChild && "you must pass a valid pointer!");
 
-	template<unsigned char MaxChildrenCount>
-	inline void BehaviourTreeNodeSequence<MaxChildrenCount>::SetChild(unsigned char array_index, BehaviourTreeNode* pChild)
-	{
-		m_pChildren[array_index] = pChild;
-		++m_current_nodes_count;
+		for (unsigned char i = 0; i < MaxChildrenCount; ++i)
+		{
+			if (m_pChildren[i] == nullptr)
+			{
+				m_pChildren[i] = pChild;
+				break;
+			}
+		}
 	}
 }
 

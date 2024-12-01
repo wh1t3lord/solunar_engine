@@ -50,7 +50,7 @@ namespace solunar
 		BehaviourTreeNode(const char* pDebugName);
 		virtual ~BehaviourTreeNode();
 
-		virtual eBehaviourTreeStatus Update(World* pWorld, void* pUserStateData, BehaviourTreeNode** pChildren, unsigned char children_count, float dt);
+		virtual eBehaviourTreeStatus Update(World* pWorld, void* pUserStateData, float dt);
 		virtual void OnEvent(int event_id);
 
 		void SetID(unsigned char id);
@@ -64,8 +64,10 @@ namespace solunar
 
 		const char* GetName(void) const;
 
-		unsigned char GetChildrenCount(void) const;
-		void SetChildrenCount(unsigned char count);
+		virtual BehaviourTreeNode** GetChildren(void);
+		virtual unsigned char GetChildrenMaxCount(void) const;
+		virtual unsigned char GetChildrenCount(void) const;
+		virtual void AddChild(BehaviourTreeNode* pChild);
 
 	private:
 		// in case of linear allocator we can't delete node
@@ -73,7 +75,6 @@ namespace solunar
 		// allocated id from allocator
 		unsigned char m_id;
 		unsigned char m_priority;
-		unsigned char m_children_count;
 #ifdef _DEBUG
 		char m_debug_name[32];
 #endif
@@ -196,6 +197,7 @@ namespace solunar
 		const char* GetName(void) const;
 
 		void GetAllNodes(BehaviourTreeNode**& pNodes, unsigned char& count);
+		BehaviourTreeNode* GetNode(unsigned char id) const;
 		unsigned char GetMaxNodesCount(void) const;
 		unsigned char GetCurrentNodesCount(void) const;
 
@@ -209,10 +211,6 @@ namespace solunar
 
 		void* GetUserData(void) { return static_cast<void*>(&this->m_user_data); }
 		const void* GetUserData(void) const { return static_cast<const void*>(&this->m_user_data); }
-
-		// if returns nullptr it means there's no children for node_id (node)
-		BehaviourTreeNode** GetChildrenNodes(unsigned char node_id);
-		unsigned char GetChildrenCount(unsigned char node_id);
 
 		void Dump(const char* pStackBuffer);
 		void PrintLogToConsole();
@@ -351,6 +349,12 @@ namespace solunar
 	}
 
 	template<typename Allocator, typename UserLogicDataType, unsigned char MaxNodesInTree>
+	inline BehaviourTreeNode* BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::GetNode(unsigned char id) const
+	{
+		return m_pNodes[id];
+	}
+
+	template<typename Allocator, typename UserLogicDataType, unsigned char MaxNodesInTree>
 	inline unsigned char BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::GetMaxNodesCount(void) const
 	{
 		return MaxNodesInTree;
@@ -360,19 +364,6 @@ namespace solunar
 	inline unsigned char BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::GetCurrentNodesCount(void) const
 	{
 		return m_current_nodes_count;
-	}
-
-	template<typename Allocator, typename UserLogicDataType, unsigned char MaxNodesInTree>
-	inline BehaviourTreeNode** BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::GetChildrenNodes(unsigned char node_id)
-	{
-		return nullptr;
-	}
-
-	template<typename Allocator, typename UserLogicDataType, unsigned char MaxNodesInTree>
-	inline unsigned char BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::GetChildrenCount(unsigned char node_id)
-	{
-		m_pNodes[node_id];
-		return 0;
 	}
 
 	template<typename Allocator, typename UserLogicDataType, unsigned char MaxNodesInTree>
@@ -392,6 +383,7 @@ namespace solunar
 		// todo: kirrik -> add sane preprocessors for determine platform type like SOLUNAR_PLATFORM_WINDOWS, SOLUNAR_PLATFORM_PS, SOLUNAR_PLATFORM_LINUX and etc
 #ifdef _MSC_VER
 		char buffer[256]{};
+
 #endif
 	}
 
@@ -432,11 +424,11 @@ namespace solunar
 		UserBehaviourTreeNodeType* pChild = nullptr;
 		if (pParent)
 		{
-			pChild = this->AddNode<UserBehaviourTreeNodeType>(pNodeDebugName);
-
-			unsigned char current_child_id = pParent->GetChildrenCount();
-			current_child_id += unsigned char(1);
-			pParent->SetChildrenCount(current_child_id);
+			if (pParent->GetChildrenCount() < pParent->GetChildrenMaxCount())
+			{
+				pChild = this->AddNode<UserBehaviourTreeNodeType>(pNodeDebugName);
+				pParent->AddChild(pChild);
+			}
 		}
 
 		return pChild;

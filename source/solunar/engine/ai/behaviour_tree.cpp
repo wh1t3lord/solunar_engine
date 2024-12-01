@@ -3,73 +3,81 @@
 
 namespace solunar
 {
-    BehaviourTreeNode::BehaviourTreeNode(const char* pDebugName) : m_update(true), m_id(kBehaviourTreeInvalidBaseType), m_priority(kBehaviourTreeInvalidBaseType), m_children_count(0)
-    {
+	BehaviourTreeNode::BehaviourTreeNode(const char* pDebugName) : m_update(true), m_id(kBehaviourTreeInvalidBaseType), m_priority(kBehaviourTreeInvalidBaseType)
+	{
 #ifdef _DEBUG
-        constexpr size_t _kDebugStringMaxLength = sizeof(m_debug_name) / sizeof(m_debug_name[0]);
-        std::memcpy(m_debug_name, pDebugName, min(strlen(pDebugName), _kDebugStringMaxLength));
+		constexpr size_t _kDebugStringMaxLength = sizeof(m_debug_name) / sizeof(m_debug_name[0]);
+		std::memcpy(m_debug_name, pDebugName, min(strlen(pDebugName), _kDebugStringMaxLength));
 #endif
-    }
+	}
 
-    BehaviourTreeNode::~BehaviourTreeNode()
-    {
-    }
+	BehaviourTreeNode::~BehaviourTreeNode()
+	{
+	}
 
-    eBehaviourTreeStatus BehaviourTreeNode::Update(World* pWorld, void* pUserStateData, BehaviourTreeNode** pChildren, unsigned char children_count, float dt)
-    {
-        return eBehaviourTreeStatus::kFailure;
-    }
+	eBehaviourTreeStatus BehaviourTreeNode::Update(World* pWorld, void* pUserStateData, float dt)
+	{
+		return eBehaviourTreeStatus::kFailure;
+	}
 
-    void BehaviourTreeNode::OnEvent(int event_id)
-    {
-    }
+	void BehaviourTreeNode::OnEvent(int event_id)
+	{
+	}
 
-    const char* BehaviourTreeNode::GetName(void) const
-    {
+	const char* BehaviourTreeNode::GetName(void) const
+	{
 #ifdef _DEBUG
-        return m_debug_name;
+		return m_debug_name;
 #else
-        return nullptr;
+		return nullptr;
 #endif
-    }
+	}
 
-    unsigned char BehaviourTreeNode::GetChildrenCount(void) const
-    {
-        return m_children_count;
-    }
+	BehaviourTreeNode** BehaviourTreeNode::GetChildren(void) 
+	{
+		Assert(false && "provide impl!");
+		return nullptr;
+	}
 
-    void BehaviourTreeNode::SetChildrenCount(unsigned char count)
-    {
-        m_children_count = count;
-    }
+	unsigned char BehaviourTreeNode::GetChildrenMaxCount(void) const 
+	{
+		Assert(false && "provide impl!");
+		return kBehaviourTreeInvalidBaseType;
+	}
 
-    void BehaviourTreeNode::SetID(unsigned char id)
-    {
-        m_id = id;
-    }
+	unsigned char BehaviourTreeNode::GetChildrenCount(void) const
+	{
+		Assert(false && "provide impl!");
+		return kBehaviourTreeInvalidBaseType;
+	}
 
-    unsigned char BehaviourTreeNode::GetID(void) const
-    {
-        return m_id;
-    }
+	void BehaviourTreeNode::SetID(unsigned char id)
+	{
+		m_id = id;
+	}
 
-    void BehaviourTreeNode::SetPriority(unsigned char priority)
-    {
-        m_priority = priority;
-    }
+	unsigned char BehaviourTreeNode::GetID(void) const
+	{
+		return m_id;
+	}
 
-    unsigned char BehaviourTreeNode::GetPriority(void) const
-    {
-        return m_priority;
-    }
+	void BehaviourTreeNode::SetPriority(unsigned char priority)
+	{
+		m_priority = priority;
+	}
 
-    bool BehaviourTreeNode::CanUpdate() const
-    {
-        return m_update;
-    }
+	unsigned char BehaviourTreeNode::GetPriority(void) const
+	{
+		return m_priority;
+	}
 
-    void BehaviourTreeNode::SetCanUpdate(bool status)
-    {
-        m_update = status;
-    }
+	bool BehaviourTreeNode::CanUpdate() const
+	{
+		return m_update;
+	}
+
+	void BehaviourTreeNode::SetCanUpdate(bool status)
+	{
+		m_update = status;
+	}
 }
