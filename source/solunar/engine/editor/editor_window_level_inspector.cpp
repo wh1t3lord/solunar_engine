@@ -19,6 +19,7 @@ void solunar::EditorWindow_LevelInspector::Draw(World* pWorld)
 
 	if (ImGui::Begin("Level Inspector"))
 	{
+		/*
 		static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
 		static bool align_label_with_current_x_position = false;
 		static bool test_drag_and_drop = false;
@@ -84,6 +85,104 @@ void solunar::EditorWindow_LevelInspector::Draw(World* pWorld)
 		if (align_label_with_current_x_position)
 			ImGui::Indent(ImGui::GetTreeNodeToLabelSpacing());
 		//	ImGui::TreePop();
+		*/
+
+		if (ImGui::BeginTabBar("TabBar##LevelInspector"))
+		{
+			if (ImGui::BeginTabItem("All"))
+			{
+				const std::vector<Entity*>& entities = pWorld->GetEntityManager().GetEntities();
+
+				for (int i = 0; i < entities.size(); i++)
+				{
+					Entity* entity = entities[i];
+
+					char node_name[64];
+					sprintf(node_name, sizeof(node_name), "%s##%p", entity->GetTypeInfo()->GetEntityClassName(), entity);
+
+					if (ImGui::TreeNode(node_name))
+					{
+						const auto& components = entity->GetAllComponents();
+
+						for (Component* pComponent : components)
+						{
+							if (pComponent)
+							{
+								char component_name[64];
+								sprintf(component_name, sizeof(component_name), "%s##%p", pComponent->GetTypeInfo()->GetEntityClassName(), pComponent);
+
+								if (ImGui::TreeNode(component_name))
+								{
+
+
+									ImGui::TreePop();
+								}
+							}
+						}
+
+						ImGui::TreePop();
+					}
+				}
+
+				ImGui::EndTabItem();
+			}
+
+			if (ImGui::BeginTabItem("Light"))
+			{
+				const std::vector<Entity*>& entities = pWorld->GetEntityManager().GetEntities();
+
+				for (int i = 0; i < entities.size(); i++)
+				{
+					Entity* entity = entities[i];
+
+
+					LightComponent* pLight = entity->GetComponent<LightComponent>();
+
+					if (pLight)
+					{
+						char node_name[64];
+						sprintf(node_name, sizeof(node_name), "%s##%p", entity->GetTypeInfo()->GetEntityClassName(), entity);
+
+						if (ImGui::TreeNode(node_name))
+						{
+							const auto& components = entity->GetAllComponents();
+
+							for (Component* pComponent : components)
+							{
+								if (pComponent)
+								{
+									char component_name[64];
+									sprintf(component_name, sizeof(component_name), "%s##%p", pComponent->GetTypeInfo()->GetEntityClassName(), pComponent);
+
+									if (ImGui::TreeNode(component_name))
+									{
+
+
+										ImGui::TreePop();
+									}
+								}
+							}
+
+							ImGui::TreePop();
+						}
+					}
+				}
+
+				ImGui::EndTabItem();
+			}
+
+			if (ImGui::BeginTabItem("AI"))
+			{
+				ImGui::EndTabItem();
+			}
+
+			if (ImGui::BeginTabItem("Sound"))
+			{
+				ImGui::EndTabItem();
+			}
+
+			ImGui::EndTabBar();
+		}
 	}
 
 	ImGui::End();

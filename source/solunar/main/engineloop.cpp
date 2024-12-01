@@ -256,7 +256,10 @@ namespace solunar {
 		if (!environment.ReadFile())
 			return; // defaults
 
-		g_startWorldFilename = environment.GetValue("Global_PC", "StartWorld");
+		if (g_engineData.m_editor)
+			g_startWorldFilename = environment.GetValue("Global_PC", "StartEditorWorld");
+		else
+			g_startWorldFilename = environment.GetValue("Global_PC", "StartGameWorld");
 	}
 
 	void EngineLoop::Initialize()
