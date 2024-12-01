@@ -9,5 +9,6 @@ namespace solunar
 		~EditorWindow_LevelInspector();
 
 		void Draw(World* pWorld) override;
+		const char* GetName(void) const override;
 	};
 }

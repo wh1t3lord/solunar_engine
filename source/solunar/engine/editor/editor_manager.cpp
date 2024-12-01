@@ -66,4 +66,8 @@ namespace solunar
 	{
 		m_pSelectedEntity = pEntity;
 	}
+	const std::vector<IEditorWindow*>& EditorManager::GetWindows(void) const
+	{
+		return m_windows;
+	}
 }

@@ -21,6 +21,9 @@
 
 #include "engine/inputmanager_dinput.h"
 
+#include "engine/editor/editor_manager.h"
+#include "engine/editor/editor_window.h"
+
 #include "graphics/graphics.h"
 #include "graphics/graphicsoptions.h"
 #include "graphics/renderer.h"
@@ -231,6 +234,40 @@ namespace solunar {
 			{
 				if (ImGui::MenuItem("Save world")) { SaveWorld(); }
 				ImGui::EndMenu();
+			}
+
+			if (g_engineData.m_editor)
+			{
+				if (ImGui::BeginMenu("Editor"))
+				{
+					if (ImGui::BeginMenu("Windows##Editor"))
+					{
+						Assert(g_editorManager && "must be initialized!");
+
+
+						const std::vector<IEditorWindow*>& windows = g_editorManager->GetWindows();
+
+						for (IEditorWindow* pWindow : windows)
+						{
+							if (pWindow)
+							{
+								char button_name[32];
+								sprintf(button_name, sizeof(button_name), "%s##EditorSubMenu", pWindow->GetName());
+
+								if (ImGui::MenuItem(button_name))
+								{
+									// todo: wh1t3lord -> add commnds to show windows
+								}
+							}
+						}
+
+
+						ImGui::EndMenu();
+					}
+
+					ImGui::EndMenu();
+				}
+
 			}
 
 			ImGui::EndMainMenuBar();

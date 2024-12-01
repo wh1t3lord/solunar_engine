@@ -187,3 +187,8 @@ void solunar::EditorWindow_LevelInspector::Draw(World* pWorld)
 
 	ImGui::End();
 }
+
+const char* solunar::EditorWindow_LevelInspector::GetName(void) const
+{
+	return "Level Inspector";
+}
