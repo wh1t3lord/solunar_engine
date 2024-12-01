@@ -244,7 +244,6 @@ namespace solunar {
 					{
 						Assert(g_editorManager && "must be initialized!");
 
-
 						const std::vector<IEditorWindow*>& windows = g_editorManager->GetWindows();
 
 						for (IEditorWindow* pWindow : windows)

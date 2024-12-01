@@ -83,4 +83,9 @@ void TypeManager::GetRegisteredTypes(std::vector<const TypeInfo*>& registeredTyp
 	registeredTypes = m_registeredTypes;
 }
 
+const std::vector<const TypeInfo*>& TypeManager::GetAllTypes(void) const
+{
+	return m_registeredTypes;
+}
+
 }

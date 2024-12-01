@@ -26,6 +26,7 @@ public:
 	void RegisterType(const TypeInfo* typeInfo);
 
 	void GetRegisteredTypes(std::vector<const TypeInfo*>& registeredTypes);
+	const std::vector<const TypeInfo*>& GetAllTypes(void) const;
 
 	template <typename T>
 	T* CreateObject();

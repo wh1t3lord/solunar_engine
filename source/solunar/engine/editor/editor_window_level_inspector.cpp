@@ -4,11 +4,15 @@
 #include "../entity/world.h"
 #include "editor_manager.h"
 
-solunar::EditorWindow_LevelInspector::EditorWindow_LevelInspector()
+solunar::EditorWindow_LevelInspector::EditorWindow_LevelInspector() : m_show(false)
 {
 }
 
 solunar::EditorWindow_LevelInspector::~EditorWindow_LevelInspector()
+{
+}
+
+void solunar::EditorWindow_LevelInspector::Init(void)
 {
 }
 
@@ -191,4 +195,14 @@ void solunar::EditorWindow_LevelInspector::Draw(World* pWorld)
 const char* solunar::EditorWindow_LevelInspector::GetName(void) const
 {
 	return "Level Inspector";
+}
+
+bool solunar::EditorWindow_LevelInspector::IsShow(void) const
+{
+	return m_show;
+}
+
+void solunar::EditorWindow_LevelInspector::SetShow(bool status)
+{
+	m_show = status;
 }

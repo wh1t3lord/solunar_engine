@@ -271,6 +271,11 @@ namespace solunar
 
 			g_GameManager->OnWorldLoad(m_worldName, Engine::ms_world);
 
+			if (g_engineData.m_editor)
+			{
+				g_editorManager->PostInit();
+			}
+
 			m_nextState = EngineState::Running;
 			m_worldName.clear();
 

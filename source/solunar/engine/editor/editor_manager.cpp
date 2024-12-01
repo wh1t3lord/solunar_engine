@@ -26,6 +26,22 @@ namespace solunar
 		this->m_pWorld = pWorld;
 	}
 
+	void EditorManager::PostInit()
+	{
+		this->InitWindows();
+	}
+
+	void EditorManager::InitWindows()
+	{
+		for (IEditorWindow* pWindow : m_windows)
+		{
+			if (pWindow)
+			{
+				pWindow->Init();
+			}
+		}
+	}
+
 	void EditorManager::Shutdown()
 	{
 		for (IEditorWindow* pWindow : m_windows)
@@ -45,7 +61,10 @@ namespace solunar
 		{
 			if (pWindow)
 			{
-				pWindow->Draw(this->m_pWorld);
+				if (pWindow->IsShow())
+				{
+					pWindow->Draw(this->m_pWorld);
+				}
 			}
 		}
 	}
