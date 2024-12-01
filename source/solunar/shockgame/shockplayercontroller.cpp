@@ -4,6 +4,7 @@
 #include "core/file/contentmanager.h"
 
 #include "engine/inputmanager.h"
+#include "engine/console.h"
 
 #include "graphics/imguimanager.h"
 #include "graphics/ifontmanager.h"
@@ -219,7 +220,7 @@ void ShockPlayerController::Update(float dt)
 		g_freeCameraEntity->SetPosition(GetEntity()->GetWorldPosition());
 	}
 
-	if (CameraProxy::GetInstance()->GetCameraComponent() == g_freeCamera)
+	if (CameraProxy::GetInstance()->GetCameraComponent() == g_freeCamera && !g_console->IsToggled())
 	{
 		InputManager* input = InputManager::GetInstance();
 		glm::vec2 mousePos = input->GetCursorPos();
@@ -352,23 +353,26 @@ void ShockPlayerController::UpdateCamera(float dt)
 
 void ShockPlayerController::UpdateMovement(float dt)
 {
-	 glm::vec3 moveVector = glm::vec3(0.0f);
+	if (g_console->IsToggled())
+		return;
+
+	glm::vec3 moveVector = glm::vec3(0.0f);
 	 
-	 InputManager* inputManager = InputManager::GetInstance();
+	InputManager* inputManager = InputManager::GetInstance();
 	 
-	 bool isPlayerMove = (inputManager->IsPressed(KeyboardKeys::KEY_W)) ||
+	bool isPlayerMove = (inputManager->IsPressed(KeyboardKeys::KEY_W)) ||
 	 					(inputManager->IsPressed(KeyboardKeys::KEY_S)) ||
 	 					(inputManager->IsPressed(KeyboardKeys::KEY_A)) ||
 	 					(inputManager->IsPressed(KeyboardKeys::KEY_D));
 	 
-	 Camera* camera = CameraProxy::GetInstance();
-	 
-	 m_onTheGround = m_rigidBody->GetCharacterController()->onGround();
-	 if (isPlayerMove && m_onTheGround)
-	 {
+	Camera* camera = CameraProxy::GetInstance();
+	
+	m_onTheGround = m_rigidBody->GetCharacterController()->onGround();
+	if (isPlayerMove && m_onTheGround)
+	{
 		 glm::vec3 camdir = camera->GetDirection();
 		 camdir.y = 0.0f;
-
+	
 		 glm::vec3 dir = glm::vec3(0.0f);
 		 if (inputManager->IsPressed(KeyboardKeys::KEY_W))
 			 dir += camdir;
@@ -378,34 +382,34 @@ void ShockPlayerController::UpdateMovement(float dt)
 			 dir -= glm::normalize(glm::cross(camdir, glm::vec3(0.0f, 1.0f, 0.0f)));
 		 if (inputManager->IsPressed(KeyboardKeys::KEY_D))
 			 dir += glm::normalize(glm::cross(camdir, glm::vec3(0.0f, 1.0f, 0.0f)));
-
+	
 		 // apply impulse to rigid body
 		 //m_rigidBody->ApplyImpulse(dir);
 		 if (glm::length(dir) >= 0.01f)
 			m_rigidBody->SetDirection(glm::normalize(dir) * dt * 2.0f);
 		 //m_rigidBody->SetPositionForce(getEntity()->getPosition());
 		
-	 }
-
-	 if (!isPlayerMove)
+	}
+	
+	if (!isPlayerMove)
 		 m_rigidBody->SetDirection(glm::vec3(0.0f));
-
-	 // #TODO: Save jump velocity vector
-	 if (inputManager->IsPressed(KeyboardKeys::KEY_SPACE) && m_onTheGround)
-	 {
+	
+	// #TODO: Save jump velocity vector
+	if (inputManager->IsPressed(KeyboardKeys::KEY_SPACE) && m_onTheGround)
+	{
 		 const glm::vec3 upVector = glm::vec3(0.0f, 1.0f, 0.0f);
 		 const float jumpPower = 6.0f;
-
+	
 		 glm::vec3 cameraDirection = m_camera->GetDirection(); // camera->GetDirection();
 		 cameraDirection.y = 0.0f;
 		 
 		 m_rigidBody->GetCharacterController()->jump(glmVectorToBt((upVector + cameraDirection) * jumpPower));
-	 }
-
-	 m_rigidBody->Update(dt);
-
-	 btTransform trans = m_rigidBody->GetGhostObject()->getWorldTransform();
-	 GetEntity()->SetPosition(btVectorToGlm(trans.getOrigin()));
+	}
+	
+	m_rigidBody->Update(dt);
+	
+	btTransform trans = m_rigidBody->GetGhostObject()->getWorldTransform();
+	GetEntity()->SetPosition(btVectorToGlm(trans.getOrigin()));
 }
 
 void ShockPlayerController::UpdateLogic(float dt)

@@ -9,7 +9,8 @@ InputManager::InputManager() :
 	m_lastCursorPos(0.0f),
 	m_deltaCursorPos(0.0f),
 	m_captureCursor(false),
-	m_hideCursor(false)
+	m_hideCursor(false),
+	m_lastCharactedPressed(0)
 {
 	memset(m_keys, 0, sizeof(m_keys));
 }
@@ -20,6 +21,7 @@ InputManager::~InputManager()
 
 void InputManager::Update()
 {
+	m_lastCharactedPressed = 0;
 }
 
 bool InputManager::IsPressed(uint32_t key)

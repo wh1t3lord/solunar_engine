@@ -317,8 +317,7 @@ namespace solunar
 			break;
 		case Win32Keys::OEM2:
 			break;
-		case Win32Keys::OEM3:
-			break;
+		case Win32Keys::OEM3: return KEY_GRAVE_ACCENT;
 		case Win32Keys::OEM4:
 			break;
 		case Win32Keys::OEM5:

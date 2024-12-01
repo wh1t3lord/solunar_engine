@@ -62,6 +62,23 @@ STDMETHODIMP D3D11Include::Close(LPCVOID pData)
 
 D3D11Include g_d3d11Include;
 
+std::vector<std::string> split(const char* str, char c = ' ')
+{
+	std::vector<std::string> result;
+
+	do
+	{
+		const char* begin = str;
+
+		while (*str != c && *str)
+			str++;
+
+		result.push_back(std::string(begin, str));
+	} while (0 != *str++);
+
+	return result;
+}
+
 ID3DBlob* CreateShaderFromText(const char* text, ShaderType shaderType, const char* defines = nullptr)
 {
 	ID3DBlob* shaderBlob = nullptr;
@@ -70,27 +87,10 @@ ID3DBlob* CreateShaderFromText(const char* text, ShaderType shaderType, const ch
 	const char* entryPoint = (shaderType == ShaderType_Vertex) ? "VSMain" : "PSMain";
 	const char* shaderTarget = (shaderType == ShaderType_Vertex) ? "vs_4_0" : "ps_4_0";
 
-	std::vector<std::string> shderMacroStrings;
+	std::vector<std::string> shaderMacroStrings;
 	if (defines && strlen(defines) > 0)
 	{
-		std::string definesStr = defines;
-		size_t iterator = definesStr.find_first_of('\n');
-		std::string exactDefineStr = definesStr.substr(0, iterator);
-		shderMacroStrings.push_back(exactDefineStr);
-
-		iterator = definesStr.find_first_of('\n', iterator);
-		if (iterator != std::string::npos)
-		{
-			exactDefineStr = definesStr.substr(0, iterator);
-			shderMacroStrings.push_back(exactDefineStr);
-		}
-
-		iterator = definesStr.find_first_of('\n', iterator);
-		if (iterator != std::string::npos)
-		{
-			exactDefineStr = definesStr.substr(0, iterator);
-			shderMacroStrings.push_back(exactDefineStr);
-		}
+		shaderMacroStrings = split(defines, '\n');
 
 		/*std::string definesStr = defines;
 
@@ -104,7 +104,7 @@ ID3DBlob* CreateShaderFromText(const char* text, ShaderType shaderType, const ch
 	}
 
 	std::vector<D3D_SHADER_MACRO> shaderMacro;
-	for (auto& it : shderMacroStrings)
+	for (auto& it : shaderMacroStrings)
 		shaderMacro.push_back(D3D_SHADER_MACRO{ it.c_str(), NULL });
 
 	shaderMacro.push_back(D3D_SHADER_MACRO{ NULL, NULL });

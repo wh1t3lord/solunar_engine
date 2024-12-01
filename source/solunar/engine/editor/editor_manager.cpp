@@ -5,13 +5,18 @@ namespace solunar
 {
 	EditorManager* g_editorManager = nullptr;
 
-	EditorManager::EditorManager()
+	EditorManager::EditorManager() :
+		m_pWorld(nullptr),
+		m_pSelectedEntity(nullptr)
 	{
 	}
 
 	EditorManager::~EditorManager()
 	{
-		Assert(m_windows.empty() && "you forgot to clear (or even to delete data)!");
+		if (!m_windows.empty())
+			Core::Msg("EditorManager::~EditorManager:: you forgot to clear (or even to delete data)!");
+
+		Shutdown();
 	}
 
 	void EditorManager::Init(World* pWorld)

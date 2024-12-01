@@ -5,6 +5,7 @@
 
 #include "engine/engine.h"
 #include "engine/inputmanager.h"
+#include "engine/console.h"
 #include "engine/entity/entity.h"
 #include "engine/entity/component.h"
 #include "engine/entity/world.h"
@@ -69,10 +70,10 @@ namespace solunar
 		Core::Msg("Initializing engine");
 		registerEngineObjects();
 
+		g_console->Init();
+
 		if (g_engineData.m_editor)
-		{
 			g_editorManager = mem_new<EditorManager>();
-		}
 	}
 
 	void Engine::Shutdown()
@@ -85,13 +86,15 @@ namespace solunar
 			ms_world = nullptr;
 		}
 
-		if (g_engineData.m_editor && g_editorManager)
+		if (g_editorManager)
 		{
 			g_editorManager->Shutdown();
 
 			mem_delete(g_editorManager);
 			g_editorManager = nullptr;
 		}
+		
+		g_console->Shutdown();
 	}
 
 	void Engine::LoadWorld(const std::string& filename)

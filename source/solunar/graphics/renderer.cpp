@@ -34,6 +34,7 @@
 
 #include "engine/camera.h"
 #include "engine/engine.h"
+#include "engine/console.h"
 #include "engine/entity/world.h"
 #include "engine/entity/entitymanager.h"
 #include "engine/entity/entity.h"
@@ -51,6 +52,24 @@ namespace solunar
 
 	IDepthStencilState* g_depthStencilState_Default = nullptr;
 	IRasterizerState* g_rasterizerState_Default = nullptr;
+
+	void Command_ToggleRMode()
+	{
+		if (!g_renderer)
+			return;
+
+		RendererViewMode currentMode = g_renderer->GetRenderMode();
+
+		RendererViewMode modeToSet;
+		if (currentMode == RendererViewMode::Wireframe)
+			modeToSet = RendererViewMode::Unlit;
+		else if (currentMode == RendererViewMode::Unlit)
+			modeToSet = RendererViewMode::Lit;
+		else if (currentMode == RendererViewMode::Lit)
+			modeToSet = RendererViewMode::Wireframe;
+
+		g_renderer->SetRenderMode(modeToSet);
+	}
 
 	void DrawLoadscreen()
 	{
@@ -206,6 +225,8 @@ namespace solunar
 
 	void Renderer::Init()
 	{
+		ConsoleCommandManager::GetInstance()->RegisterCommand("togglermode", &Command_ToggleRMode);
+
 		View* view = CameraProxy::GetInstance()->GetView();
 
 		// Initialize default framebuffer
@@ -453,18 +474,7 @@ namespace solunar
 #endif
 	}
 
-	void SetupLightData()
-	{
-		LightGlobalDataCB* globalData = (LightGlobalDataCB*)g_lightDataConstantBuffer->Map(BufferMapping::WriteOnly);
-		globalData->m_pointLightCount = 0;
-		globalData->m_spotLightCount = 0;
-
-		g_lightDataConstantBuffer->Unmap();
-
-		g_renderDevice->SetConstantBufferIndex(CBBindings_LightData, g_lightDataConstantBuffer.get());
-	}
-
-	void SetupDirectionalLight(DirectionalLightComponent* directionalLight)
+	void UpdateDirectionalLight(DirectionalLightComponent* directionalLight)
 	{
 		if (!directionalLight)
 			return;
@@ -501,10 +511,8 @@ namespace solunar
 		g_renderDevice->SetConstantBufferIndex(CBBindings_DirectionalLight, g_directionalLightConstantBuffer.get());
 	}
 
-	void UpdatePointLightCB(GraphicsWorld* graphicsWorld)
+	void UpdatePointLightCB(LightManager* lightMgr)
 	{
-		LightManager* lightMgr = graphicsWorld->GetLightManager();
-		
 		const std::vector<LightComponent*>& lights = lightMgr->GetLights();
 		const std::vector<PointLightComponent*>& pointLights = lightMgr->GetPointLights();
 
@@ -527,10 +535,8 @@ namespace solunar
 		g_renderDevice->SetConstantBufferIndex(CBBindings_PointLights, g_pointLightConstantBuffer.get());	
 	}
 
-	void UpdateSpotLightCB(GraphicsWorld* graphicsWorld)
+	void UpdateSpotLightCB(LightManager* lightMgr)
 	{
-		LightManager* lightMgr = graphicsWorld->GetLightManager();
-
 		const std::vector<LightComponent*>& lights = lightMgr->GetLights();
 		const std::vector<SpotLightComponent*>& spotLights = lightMgr->GetSpotLights();
 
@@ -541,9 +547,9 @@ namespace solunar
 			{
 				auto it = spotLights[i];
 				spotLightData->spotLights[i].color = glm::vec4(it->m_color, 1.0f);
-				spotLightData->spotLights[i].position = glm::vec4(it->GetEntity()->GetPosition(), 1.0f);
+				spotLightData->spotLights[i].position = glm::vec4(it->GetEntity()->GetWorldPosition(), 1.0f);
 				spotLightData->spotLights[i].specular = glm::vec4(it->m_specularColor, 1.0f);
-				spotLightData->spotLights[i].lightData.r = it->m_cutoff;
+				spotLightData->spotLights[i].lightData.r = glm::radians(it->m_cutoff);
 
 				// #TODO STUPID REFACTOR
 				glm::quat o = it->GetEntity()->GetRotation();
@@ -564,10 +570,8 @@ namespace solunar
 		g_renderDevice->SetConstantBufferIndex(CBBindings_SpotLights, g_spotLightConstantBuffer.get());
 	}
 
-	void UpdateLightDataCB(GraphicsWorld* graphicsWorld)
+	void UpdateLightDataCB(LightManager* lightMgr)
 	{
-		LightManager* lightMgr = graphicsWorld->GetLightManager();
-
 		const std::vector<PointLightComponent*>& pointLights = lightMgr->GetPointLights();
 		const std::vector<SpotLightComponent*>& spotLights = lightMgr->GetSpotLights();
 
@@ -581,16 +585,14 @@ namespace solunar
 
 	void Renderer::SetupLights(GraphicsWorld* graphicsWorld)
 	{
-		LightManager* lightMgr = graphicsWorld->GetLightManager();
-		if (!lightMgr)
+		LightManager* lightManager = graphicsWorld->GetLightManager();
+		if (!lightManager)
 			return;
 
-		SetupLightData();
-
-		SetupDirectionalLight(lightMgr->GetDirectionalLight());
-		UpdatePointLightCB(graphicsWorld);
-		UpdateSpotLightCB(graphicsWorld);
-		UpdateLightDataCB(graphicsWorld);
+		UpdateDirectionalLight(lightManager->GetDirectionalLight());
+		UpdatePointLightCB(lightManager);
+		UpdateSpotLightCB(lightManager);
+		UpdateLightDataCB(lightManager);
 	}
 
 	void Renderer::EndFrame()

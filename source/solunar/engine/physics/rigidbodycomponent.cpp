@@ -73,6 +73,10 @@ namespace solunar {
 	{
 		Component::LoadXML(element);
 
+		tinyxml2::XMLElement* massElement = element.FirstChildElement("Mass");
+		if (massElement)
+			massElement->QueryFloatAttribute("value", &m_mass);
+
 		tinyxml2::XMLElement* staticElement = element.FirstChildElement("Static");
 		if (staticElement)
 			staticElement->QueryBoolAttribute("value", &m_static);
