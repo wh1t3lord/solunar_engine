@@ -13,7 +13,7 @@ namespace solunar
 		TypeInfo(const char* name, StaticConstructor_t staticConstructor, size_t classSize, size_t classAlign, const TypeInfo* baseInfo);
 		~TypeInfo();
 
-		const char* GetClassName() const { return m_name; }
+		const char* GetEntityClassName() const { return m_name; }
 		const size_t GetStringHash() const { return m_stringHash; }
 
 		const StaticConstructor_t GetStaticConstructor() const { return m_staticConstructor; }

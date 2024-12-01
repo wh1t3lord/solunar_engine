@@ -99,10 +99,10 @@ namespace solunar {
 				continue;
 
 			tinyxml2::XMLElement* component = doc.NewElement("Class");
-			component->SetAttribute("classname", it->GetClassName());
+			component->SetAttribute("classname", it->GetEntityClassName());
 			
 			if (it->m_baseInfo)
-				component->SetAttribute("baseClassname", it->m_baseInfo->GetClassName());
+				component->SetAttribute("baseClassname", it->m_baseInfo->GetEntityClassName());
 			
 			pRoot->InsertFirstChild(component);
 

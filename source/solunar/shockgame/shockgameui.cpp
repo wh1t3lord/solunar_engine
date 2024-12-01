@@ -325,14 +325,19 @@ void DemoGameMainMenuComponent::OnWorldSet(World* world)
 {
 	Component::OnWorldSet(world);
 
-	g_mainMenuBackground = g_contentManager->LoadObject<TextureMap>("textures/ui/ui_menu_background.png");
-
-	//MusicManager::GetInstance()->play("sounds/music/temp_mainmenu.mp3", true);
+	if (g_engineData.m_editor == false)
+	{
+		g_mainMenuBackground = g_contentManager->LoadObject<TextureMap>("textures/ui/ui_menu_background.png");
+		//MusicManager::GetInstance()->play("sounds/music/temp_mainmenu.mp3", true);
+	}
 }
 
 void DemoGameMainMenuComponent::Update(float dt)
 {
 	// begin menu window
+
+	if (g_engineData.m_editor)
+		return;
 
 	ImGuiIO& io = ImGui::GetIO();
 	ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
