@@ -237,6 +237,25 @@ namespace solunar {
 						ImGui::EndMenu();
 					}
 
+					ImGui::Separator();
+
+					if (ImGui::BeginMenu("Hide All"))
+					{
+						if (ImGui::MenuItem("Windows"))
+						{
+							Assert(g_editorManager && "must be initialized!");
+
+							const std::vector<IEditorWindow*>& windows = g_editorManager->GetWindows();
+
+							for (IEditorWindow* pWindow : windows)
+							{
+								pWindow->SetShow(false);
+							}
+						}
+
+						ImGui::EndMenu();
+					}
+
 					ImGui::EndMenu();
 				}
 
