@@ -36,12 +36,18 @@
 #include "shockgame/shockgame.h"
 #include "shockgame/shockplayercontroller.h"
 
+#ifdef _MSC_VER
+#include <commdlg.h>
+#else
+#error provide implementation
+#endif
+
 namespace solunar {
 
 	extern void graphicsShowConstantBuffers(bool* open);
 
 	// extern View* g_engineView;
-	
+
 	// Debug purposes global variables
 	bool g_quitAtStart = false;
 	bool g_slowdown = false;
@@ -103,10 +109,10 @@ namespace solunar {
 
 			tinyxml2::XMLElement* component = doc.NewElement("Class");
 			component->SetAttribute("classname", it->GetEntityClassName());
-			
+
 			if (it->m_baseInfo)
 				component->SetAttribute("baseClassname", it->m_baseInfo->GetEntityClassName());
-			
+
 			pRoot->InsertFirstChild(component);
 
 			std::vector<IProperty*> properties;
@@ -213,6 +219,55 @@ namespace solunar {
 			{
 				if (ImGui::BeginMenu("Editor"))
 				{
+					if (ImGui::BeginMenu("File"))
+					{
+						if (ImGui::MenuItem("Load"))
+						{
+							// todo: kirrik -> add preprocessors for determine platform SOLUNAR_PLATFORM_WINDOWS and etc
+#ifdef _MSC_VER
+							OPENFILENAME ofn;       // common dialog box structure
+							TCHAR szFile[260] = { 0 };       // if using TCHAR macros
+
+							// Initialize OPENFILENAME
+							ZeroMemory(&ofn, sizeof(ofn));
+							ofn.lStructSize = sizeof(ofn);
+							ofn.hwndOwner = NULL;
+							ofn.lpstrFile = szFile;
+							ofn.nMaxFile = sizeof(szFile);
+							ofn.lpstrFilter = TEXT("All\0*.*\0Text\0*.xml\0");
+							ofn.nFilterIndex = 1;
+							ofn.lpstrFileTitle = NULL;
+							ofn.nMaxFileTitle = 0;
+							ofn.lpstrInitialDir = NULL;
+							ofn.Flags = OFN_PATHMUSTEXIST | OFN_FILEMUSTEXIST;
+
+							if (GetOpenFileName(&ofn) == TRUE)
+							{
+								std::string filename = ofn.lpstrFile;
+
+								filename = filename.substr(filename.rfind('\\')+1);
+
+								EngineStateManager::GetInstance()->LoadWorld("worlds/"+ filename);
+							}
+#else
+#error provide implementation
+#endif
+						}
+
+						if (ImGui::MenuItem("Save"))
+						{
+
+						}
+
+						ImGui::Separator();
+						if (ImGui::BeginMenu("Open recent"))
+						{
+							ImGui::EndMenu();
+						}
+
+						ImGui::EndMenu();
+					}
+
 					if (ImGui::BeginMenu("Windows##Editor"))
 					{
 						Assert(g_editorManager && "must be initialized!");
@@ -294,7 +349,7 @@ namespace solunar {
 
 		if (g_showCBManager)
 			graphicsShowConstantBuffers(&g_showCBManager);
-	
+
 		if (g_showLightEditor)
 			graphicsLightEditor(&g_showLightEditor);
 
@@ -326,14 +381,14 @@ namespace solunar {
 
 		// create engine view
 		CreateEngineView();
-		
+
 		appInitInput();
 
 		// Initialize engine
 		Engine::Init();
-		
+
 		graphicsInit();
-		
+
 		// Initialize audio manager
 		AudioManager* audioManager = AudioManager::CreateInstance();
 		audioManager->Init();
@@ -419,7 +474,7 @@ namespace solunar {
 
 	bool EngineLoop::Update()
 	{
-//		OPTICK_EVENT("EngineLoop::update");
+		//		OPTICK_EVENT("EngineLoop::update");
 
 		InputManager* input = InputManager::GetInstance();
 
@@ -458,7 +513,7 @@ namespace solunar {
 
 		// Begin renderer frame
 		g_renderer->BeginFrame();
-		
+
 		// Render view
 		g_renderer->RenderView(appGetView());
 
@@ -466,7 +521,7 @@ namespace solunar {
 		// Draw the engine debug overlay
 		ShowEngineDebugOverlay();
 #endif // !FINAL_BUILD
-		
+
 		if (g_console->IsToggled())
 			g_console->OnRender();
 
@@ -482,7 +537,7 @@ namespace solunar {
 
 		// update delta cursor pos and others input stuff
 		input->Update();
-		
+
 		// Toggle console if pressed
 		if (input->IsPressedWithReset(KEY_GRAVE_ACCENT))
 			g_console->ToggleConsole();
