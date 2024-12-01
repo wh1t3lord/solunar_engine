@@ -3,7 +3,7 @@
 
 namespace solunar
 {
-	BehaviourTreeNode::BehaviourTreeNode(const char* pDebugName) : m_update(true), m_id(kBehaviourTreeInvalidBaseType), m_priority(kBehaviourTreeInvalidBaseType)
+	BehaviourTreeNode::BehaviourTreeNode(const char* pDebugName) : m_update(true), m_id(kBehaviourTreeInvalidBaseType), m_priority(kBehaviourTreeInvalidBaseType), m_parent_id(kBehaviourTreeInvalidBaseType)
 	{
 #ifdef _DEBUG
 		constexpr size_t _kDebugStringMaxLength = sizeof(m_debug_name) / sizeof(m_debug_name[0]);
@@ -31,6 +31,16 @@ namespace solunar
 #else
 		return nullptr;
 #endif
+	}
+
+	unsigned char BehaviourTreeNode::GetParentID(void) const
+	{
+		return m_parent_id;
+	}
+
+	void BehaviourTreeNode::SetParentID(unsigned char parent_id)
+	{
+		m_parent_id = parent_id;
 	}
 
 	BehaviourTreeNode** BehaviourTreeNode::GetChildren(void) 

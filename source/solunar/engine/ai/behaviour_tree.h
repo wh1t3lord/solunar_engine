@@ -52,6 +52,10 @@ namespace solunar
 
 		virtual eBehaviourTreeStatus Update(World* pWorld, void* pUserStateData, float dt);
 		virtual void OnEvent(int event_id);
+		virtual BehaviourTreeNode** GetChildren(void);
+		virtual unsigned char GetChildrenMaxCount(void) const;
+		virtual unsigned char GetChildrenCount(void) const;
+		virtual void AddChild(BehaviourTreeNode* pChild);
 
 		void SetID(unsigned char id);
 		unsigned char GetID(void) const;
@@ -64,10 +68,8 @@ namespace solunar
 
 		const char* GetName(void) const;
 
-		virtual BehaviourTreeNode** GetChildren(void);
-		virtual unsigned char GetChildrenMaxCount(void) const;
-		virtual unsigned char GetChildrenCount(void) const;
-		virtual void AddChild(BehaviourTreeNode* pChild);
+		unsigned char GetParentID(void) const;
+		void SetParentID(unsigned char parent_id);
 
 	private:
 		// in case of linear allocator we can't delete node
@@ -75,6 +77,7 @@ namespace solunar
 		// allocated id from allocator
 		unsigned char m_id;
 		unsigned char m_priority;
+		unsigned char m_parent_id;
 #ifdef _DEBUG
 		char m_debug_name[32];
 #endif
@@ -127,6 +130,7 @@ namespace solunar
 
 		void DeleteNode(void* pNode) override
 		{
+			// todo: wh1t3lord -> think about it carefully and finish it, because when we try to delete from parent some of it child it can break the runtime execution
 			// Linear it is not supposed to rebuild buffer or something
 			BehaviourTreeNode* pCasted = static_cast<BehaviourTreeNode*>(pNode);
 
@@ -217,6 +221,10 @@ namespace solunar
 		void PrintLogToIDEConsole();
 
 	private:
+		// moves all root nodes to first places of array in order to make correct tree execution, otherwise other nodes can be called but node handles them (double execution)
+		void RebuildOrder();
+
+	private:
 #ifdef _DEBUG
 		bool m_shutdown_was_called;
 		bool m_init_was_called;
@@ -266,7 +274,7 @@ namespace solunar
 	inline void BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::Init(World* pWorld, float p_user_priority_timings[eBehaviourTreeNodePriority::kSize])
 	{
 		Assert(pWorld && "must be valid!");
-		
+
 #ifdef _DEBUG
 		m_init_was_called = true;
 #endif
@@ -301,9 +309,16 @@ namespace solunar
 
 			if (pNode)
 			{
-				if (pNode->CanUpdate())
+				if (pNode->GetParentID() == kBehaviourTreeInvalidBaseType)
 				{
-					pNode->Update(this->m_pWorld, static_cast<void*>(&this->m_user_data), dt);
+					if (pNode->CanUpdate())
+					{
+						pNode->Update(this->m_pWorld, static_cast<void*>(&this->m_user_data), dt);
+					}
+				}
+				else
+				{
+					break;
 				}
 			}
 		}
@@ -388,6 +403,41 @@ namespace solunar
 	}
 
 	template<typename Allocator, typename UserLogicDataType, unsigned char MaxNodesInTree>
+	inline void BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::RebuildOrder()
+	{
+		BehaviourTreeNode* copy[MaxNodesInTree];
+
+		constexpr size_t _SizeOf = sizeof(m_pNodes[0]) * MaxNodesInTree;
+		std::memcpy(copy, m_pNodes,_SizeOf);
+		
+		unsigned char nodes_iter = 0;
+		for (unsigned char i = 0; i < m_current_nodes_count; ++i)
+		{
+			if (copy[i])
+			{
+				// root node
+				if (copy[i]->GetParentID() == kBehaviourTreeInvalidBaseType)
+				{
+					m_pNodes[nodes_iter] = copy[i];
+					++nodes_iter;
+				}
+			}
+		}
+
+		for (unsigned char i = 0; i < m_current_nodes_count; ++i)
+		{
+			if (copy[i])
+			{
+				if (copy[i]->GetParentID() != kBehaviourTreeInvalidBaseType)
+				{
+					m_pNodes[nodes_iter] = copy[i];
+					++nodes_iter;
+				}
+			}
+		}
+	}
+
+	template<typename Allocator, typename UserLogicDataType, unsigned char MaxNodesInTree>
 	template<typename UserBehaviourTreeNodeType>
 	inline UserBehaviourTreeNodeType* BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::AddNode(const char* pNodeDebugName)
 	{
@@ -427,6 +477,8 @@ namespace solunar
 			pChild = this->AddNode<UserBehaviourTreeNodeType>(pNodeDebugName);
 			pParent->AddChild(pChild);
 		}
+
+		this->RebuildOrder();
 
 		return pChild;
 	}
