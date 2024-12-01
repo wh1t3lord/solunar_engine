@@ -424,11 +424,8 @@ namespace solunar
 		UserBehaviourTreeNodeType* pChild = nullptr;
 		if (pParent)
 		{
-			if (pParent->GetChildrenCount() < pParent->GetChildrenMaxCount())
-			{
-				pChild = this->AddNode<UserBehaviourTreeNodeType>(pNodeDebugName);
-				pParent->AddChild(pChild);
-			}
+			pChild = this->AddNode<UserBehaviourTreeNodeType>(pNodeDebugName);
+			pParent->AddChild(pChild);
 		}
 
 		return pChild;
