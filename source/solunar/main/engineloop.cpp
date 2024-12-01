@@ -209,6 +209,39 @@ namespace solunar {
 				ImGui::EndMenu();
 			}
 
+			if (g_engineData.m_editor)
+			{
+				if (ImGui::BeginMenu("Editor"))
+				{
+					if (ImGui::BeginMenu("Windows##Editor"))
+					{
+						Assert(g_editorManager && "must be initialized!");
+
+						const std::vector<IEditorWindow*>& windows = g_editorManager->GetWindows();
+
+						for (IEditorWindow* pWindow : windows)
+						{
+							if (pWindow)
+							{
+								char button_name[32];
+								sprintf(button_name, sizeof(button_name), "%s##EWinds", pWindow->GetName());
+
+								if (ImGui::MenuItem(button_name))
+								{
+									pWindow->SetShow(!pWindow->IsShow());
+								}
+							}
+						}
+
+
+						ImGui::EndMenu();
+					}
+
+					ImGui::EndMenu();
+				}
+
+			}
+
 			if (ImGui::BeginMenu("Graphics"))
 			{
 				if (ImGui::MenuItem("Constant Buffer Tracker")) { g_showCBManager = !g_showCBManager; }
@@ -234,39 +267,6 @@ namespace solunar {
 			{
 				if (ImGui::MenuItem("Save world")) { SaveWorld(); }
 				ImGui::EndMenu();
-			}
-
-			if (g_engineData.m_editor)
-			{
-				if (ImGui::BeginMenu("Editor"))
-				{
-					if (ImGui::BeginMenu("Windows##Editor"))
-					{
-						Assert(g_editorManager && "must be initialized!");
-
-						const std::vector<IEditorWindow*>& windows = g_editorManager->GetWindows();
-
-						for (IEditorWindow* pWindow : windows)
-						{
-							if (pWindow)
-							{
-								char button_name[32];
-								sprintf(button_name, sizeof(button_name), "%s##EWinds", pWindow->GetName());
-
-								if (ImGui::MenuItem(button_name))
-								{
-									// todo: wh1t3lord -> add commnds to show windows
-								}
-							}
-						}
-
-
-						ImGui::EndMenu();
-					}
-
-					ImGui::EndMenu();
-				}
-
 			}
 
 			ImGui::EndMainMenuBar();
