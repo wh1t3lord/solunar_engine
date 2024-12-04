@@ -3,6 +3,8 @@
 
 namespace solunar
 {
+	IMPLEMENT_OBJECT(ShockAIBehaviourTree, LogicComponent);
+
 	ShockAIBehaviourTree::ShockAIBehaviourTree()
 	{
 	}

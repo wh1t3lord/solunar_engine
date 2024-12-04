@@ -205,6 +205,18 @@ void DebugRender::drawCone(float radius, float height, int upAxis, const glm::ve
 #endif
 }
 
+void DebugRender::DrawPoly(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec3& color)
+{
+	// a-b
+	DrawLine(a, b, color);
+
+	// b - c
+	DrawLine(b, c, color);
+
+	// c - a
+	DrawLine(c, a, color);
+}
+
 void DebugRender::RenderFrame(View* view)
 {
 	beginDraw();
