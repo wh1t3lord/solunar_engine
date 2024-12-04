@@ -39,6 +39,7 @@ void Console::ToggleConsole()
 void Console::UpdateConsoleBuffer()
 {
 	InputManager* input = InputManager::GetInstance();
+	ConsoleCommandManager* cmd = ConsoleCommandManager::GetInstance();
 
 	if (m_isToggled)
 	{
@@ -50,8 +51,10 @@ void Console::UpdateConsoleBuffer()
 			std::vector<char> localConsoleText = m_consoleText;
 			localConsoleText.push_back('\0');
 
-			Core::Msg("> %s", localConsoleText.data());
-			ConsoleCommandManager::GetInstance()->Execute(localConsoleText.data());
+			if (cmd->Execute(localConsoleText.data()))
+				Core::Msg("> %s", localConsoleText.data());
+			else
+				Core::Msg("unknowed cmd %s", localConsoleText.data());
 
 			ToggleConsole();
 		}
@@ -146,7 +149,7 @@ void ConsoleCommandManager::RegisterCommand(const char* name, ConsoleCommand* co
 	m_commands.push_back(reg);
 }
 
-void ConsoleCommandManager::Execute(const char* text)
+bool ConsoleCommandManager::Execute(const char* text)
 {
 	int numCommands = (int)m_commands.size();
 
@@ -155,8 +158,13 @@ void ConsoleCommandManager::Execute(const char* text)
 		const ConsoleCommandReg& reg = m_commands[i];
 		Assert2(reg.command, "Internal error. Console commands cannot be null!");
 		if (strcmp(reg.name, text) == 0)
+		{
 			reg.command();
+			return true;
+		}
 	}
+
+	return false;
 }
 
 

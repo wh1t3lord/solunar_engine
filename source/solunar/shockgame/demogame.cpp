@@ -518,8 +518,6 @@ void FreeCameraComponent::OnEntityRemove()
 
 void FreeCameraComponent::Update(float delta)
 {
-	static std::vector<std::pair<glm::vec3, glm::vec3>> debugRays;
-
 	LogicComponent::Update(delta);
 
 	InputManager* input = InputManager::GetInstance();

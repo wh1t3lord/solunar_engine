@@ -17,7 +17,7 @@ public:
 private:
 	friend class Console;
 
-	void Execute(const char* text);
+	bool Execute(const char* text);
 
 private:
 	struct ConsoleCommandReg
