@@ -23,6 +23,7 @@
 
 #include "engine/editor/editor_manager.h"
 #include "engine/editor/editor_window_level_inspector.h"
+#include "engine/editor/editor_window_entity_editor.h"
 
 namespace solunar
 {
@@ -135,6 +136,7 @@ void GameManager::OnWorldLoad(const std::string& worldName, World* pLoadedWorld)
 		if (g_engineData.m_editor)
 		{
 			g_editorManager->RegisterWindow(mem_new<EditorWindow_LevelInspector>(EditorWindow_LevelInspector()));
+			g_editorManager->RegisterWindow(mem_new<EditorWindow_EntityEditor>(EditorWindow_EntityEditor()));
 		}
 	}
 }
@@ -232,7 +234,7 @@ void DrawEntityPropertyWindow(Entity* entity)
 	{
 		if (entity)
 		{
-			ImGui::Text("%s", entity->GetTypeInfo()->GetClassName());
+			ImGui::Text("%s", entity->GetTypeInfo()->GetEntityClassName());
 			std::vector<IProperty*> properties;
 			PropertyManager::GetInstance()->GetProperties(entity->GetTypeInfo(), properties);
 			DrawProperties(properties, entity);
@@ -248,7 +250,7 @@ void DrawEntityPropertyWindow(Entity* entity)
 			for (int i = 0; i < components.size(); i++)
 			{
 				ImGui::Separator();
-				ImGui::Text("%s", components[i]->GetTypeInfo()->GetClassName());
+				ImGui::Text("%s", components[i]->GetTypeInfo()->GetEntityClassName());
 
 				properties.clear();
 

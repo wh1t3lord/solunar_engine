@@ -10,6 +10,10 @@
 
 #include <assert.h>
 
+
+int sprintf(char* const p_string, const size_t buffer_count,
+	char const* const p_format, ...);
+
 #ifdef _MSC_VER
 #	define Strdup _strdup
 #else

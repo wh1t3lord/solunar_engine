@@ -1,3 +1,6 @@
+#ifndef EDITOR_WINDOW_LEVEL_INSPECTOR_H
+#define EDITOR_WINDOW_LEVEL_INSPECTOR_H
+
 #include "engine/editor/editor_window.h"
 
 namespace solunar
@@ -8,6 +11,15 @@ namespace solunar
 		EditorWindow_LevelInspector();
 		~EditorWindow_LevelInspector();
 
+		void Init(void) override;
 		void Draw(World* pWorld) override;
+		const char* GetName(void) const override;
+		bool IsShow(void) const override;
+		void SetShow(bool status) override;
+
+	private:
+		bool m_show;
 	};
 }
+
+#endif

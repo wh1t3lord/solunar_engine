@@ -16,6 +16,7 @@ namespace solunar
 		~EditorManager();
 
 		void Init(World* pWorld);
+		void PostInit();
 		void Shutdown();
 
 		void Update();
@@ -23,6 +24,11 @@ namespace solunar
 
 		void* GetSelectedEntity();
 		void SetSelectedEntity(void* pEntity);
+
+		const std::vector<IEditorWindow*>& GetWindows(void) const;
+
+	private:
+		void InitWindows();
 	private:
 		// todo: kirrik -> change to entity id type like uint32_t or something else, storing a pointer is not a good thing at all, it is temporary implementation
 		void* m_pSelectedEntity;
