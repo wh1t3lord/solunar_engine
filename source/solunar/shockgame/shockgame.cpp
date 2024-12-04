@@ -21,6 +21,10 @@
 #include "shockgame/shockprojectilecomponent.h"
 #include "shockgame/demogame.h"
 
+// ShockGame AI
+#include "shockgame/shock_component_ai_behaviourtree.h"
+#include "shockgame/shock_component_ai_round_system.h"
+
 // Engine
 #include "engine/camera.h"
 #include "engine/engine.h"
@@ -249,6 +253,10 @@ void registerShockClasses()
 		OBJECT_GET_TYPEINFO(ShockAIComponent),
 		OBJECT_GET_TYPEINFO(ShockProjectileComponent),
 		OBJECT_GET_TYPEINFO(ShockGameMainMenuComponent),
+
+		// AI
+		OBJECT_GET_TYPEINFO(ShockAIBehaviourTree),
+		OBJECT_GET_TYPEINFO(ShockAIRoundSystem),
 	};
 
 	for (int i = 0; i < sizeof(shockClasses) / sizeof(shockClasses[0]); i++)

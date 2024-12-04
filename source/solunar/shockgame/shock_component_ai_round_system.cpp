@@ -2,7 +2,12 @@
 
 namespace solunar
 {
-	ShockAIRoundSystem::ShockAIRoundSystem() : m_current_round(0), m_max_rounds(0), m_zombies_to_kill(0)
+	IMPLEMENT_OBJECT(ShockAIRoundSystem, LogicComponent);
+
+	ShockAIRoundSystem::ShockAIRoundSystem() : 
+		m_current_round(0), 
+		m_max_rounds(0), 
+		m_zombies_to_kill(0)
 	{
 	}
 
