@@ -32,7 +32,7 @@ public:
 		const glm::vec3& color, bool drawSect, float stepDegrees = float(10.f));
 
 	void drawCone(float radius, float height, int upAxis, const glm::vec3& transform, const glm::vec3& color);
-	
+	void DrawPoly(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec3& color);
 
 	void RenderFrame(View* view);
 
