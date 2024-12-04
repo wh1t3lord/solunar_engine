@@ -16,10 +16,19 @@
 
 #include "stb_sprintf.h"
 
-//#define ENABLE_TRACE_DEBUG
+#define ENABLE_TRACE_DEBUG
 
 namespace solunar
 {
+	namespace tracedbg
+	{
+		static std::vector< std::pair<glm::vec3, glm::vec3> >	g_debugLines;
+		static std::vector< glm::vec3 >							g_debugHits;
+		static float											g_debugTime = 0.0f;
+	}
+
+	bool g_debugTrace = false;
+
 	IMPLEMENT_OBJECT(WeaponComponent, LogicComponent);
 	
 	WeaponComponent::WeaponComponent() :
@@ -62,6 +71,10 @@ namespace solunar
 		static AudioSource* s_reloadSound = nullptr;
 		static IFont* s_font = nullptr;
 
+#ifdef ENABLE_TRACE_DEBUG
+		using namespace tracedbg;
+#endif
+
 		AnimatedMeshComponent* mesh = GetEntity()->GetComponent<AnimatedMeshComponent>();
 		std::shared_ptr<ModelBase> modelBase = mesh->LockModel();
 		AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
@@ -86,10 +99,7 @@ namespace solunar
 			m_inited = true;
 		}
 
-		static std::vector< std::pair<glm::vec3, glm::vec3> > debugLines;
-		static std::vector< glm::vec3 > debugHits;
-		static float debugTime = 0.0f;
-		debugTime += dt;
+		tracedbg::g_debugTime += dt;
 
 		Camera* camera = CameraProxy::GetInstance();
 
@@ -182,7 +192,7 @@ namespace solunar
 				glm::vec3 rayStart = camera->GetPosition() + r + camera->GetDirection();
 				glm::vec3 rayEnd = camera->GetPosition() + r + camera->GetDirection() * 1000.0f;
 
-				//debugLines.push_back(std::make_pair(rayStart, rayEnd));
+				//g_debugLines.push_back(std::make_pair(rayStart, rayEnd));
 
 				RayCastResult rq = {};
 				if (GetWorld()->RayCast(rq, rayStart, rayEnd))
@@ -191,34 +201,40 @@ namespace solunar
 					Core::Msg("WeaponComponent::Update(): shot entity 0x%p", entity);
 
 #ifdef ENABLE_TRACE_DEBUG
-					debugLines.push_back(std::make_pair(rayStart, rq.m_hitPosition));
-					debugHits.push_back(rq.m_hitPosition);
+					if (g_debugTrace)
+					{
+						g_debugLines.push_back(std::make_pair(rayStart, rq.m_hitPosition));
+						g_debugHits.push_back(rq.m_hitPosition);
+					}
 #endif // ENABLE_TRACE_DEBUG
 				}
 			}
 		}
 
 #ifdef ENABLE_TRACE_DEBUG
-		for (auto& it : debugLines)
+		if (g_debugTrace)
 		{
-			g_debugRender.DrawLine(it.first, it.second, glm::vec3(1.0f, 0.0f, 0.0f));
-		}
-
-		for (auto& it : debugHits)
-		{
-			g_debugRender.drawAxis(it);
-		}
-
-		if (debugTime >= 12.0f)
-		{
-			if (!debugLines.empty())
-				debugLines.clear();
-
-			if (!debugHits.empty())
-				debugHits.clear();
-
-			debugTime = 0.0f;
+			for (auto& it : g_debugLines)
+			{
+				g_debugRender.DrawLine(it.first, it.second, glm::vec3(1.0f, 0.0f, 0.0f));
 			}
+
+			for (auto& it : g_debugHits)
+			{
+				g_debugRender.drawAxis(it);
+			}
+
+			if (g_debugTime >= 12.0f)
+			{
+				if (!g_debugLines.empty())
+					g_debugLines.clear();
+
+				if (!g_debugHits.empty())
+					g_debugHits.clear();
+
+				g_debugTime = 0.0f;
+			}
+		}
 #endif
 
 		if (isFireAniFinished) {

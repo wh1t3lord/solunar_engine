@@ -24,6 +24,7 @@
 // Engine
 #include "engine/camera.h"
 #include "engine/engine.h"
+#include "engine/console.h"
 
 // Graphics
 #include "graphics/fontmanager.h"
@@ -207,6 +208,13 @@ void ViewmodelAnimationController::Update(float dt)
 {
 }
 
+// Command for toggle weapon trace debug
+void Command_DebugTrace()
+{
+	g_debugTrace = !g_debugTrace;
+	Core::Msg("Game: Trace debugging is %s", g_debugTrace ? "true" : "false");
+}
+
 // More beautiful way to register classes
 void registerGameClasses()
 {
@@ -247,6 +255,13 @@ void registerShockClasses()
 		TypeManager::GetInstance()->RegisterType(shockClasses[i]);
 }
 
+void registerGameCommands()
+{
+	ConsoleCommandManager* cmdmgr = ConsoleCommandManager::GetInstance();
+
+	cmdmgr->RegisterCommand("debugtrace", &Command_DebugTrace);
+}
+
 #define DEMO_GAME
 
 ShockGameInterface::ShockGameInterface()
@@ -261,6 +276,9 @@ void ShockGameInterface::Initialize()
 {
 	Core::Msg("Initializing game");
 
+	// register game commands
+	registerGameCommands();
+	
 	// register game objects
 	registerGameClasses();
 

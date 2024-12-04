@@ -36,5 +36,10 @@ namespace solunar {
 	
 		WeaponsType m_type;
 	};
+
+	// Global flag to enable the trace debugging from weapons,
+	//  if ENABLE_TRACE_DEBUG is enabled
+	extern bool g_debugTrace;
+
 }
 #endif // ! WEAPONCOMPONENT_H
