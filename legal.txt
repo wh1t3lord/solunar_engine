@@ -1,3 +1,13 @@
+Game and engine programming, idea and models:
+Kirill "zvenigorodskya"
+
+AI, editor and engine fixes:
+Pavel "wh1t3lord"
+@wh1t3lord
+
+Additional world models:
+Andrey
+
 Shotgun model and animations:
 
 Shotgun Animated
