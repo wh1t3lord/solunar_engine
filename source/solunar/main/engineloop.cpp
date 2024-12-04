@@ -108,11 +108,11 @@ namespace solunar {
 				continue;
 
 			tinyxml2::XMLElement* component = doc.NewElement("Class");
-			component->SetAttribute("classname", it->GetEntityClassName());
-
+			component->SetAttribute("classname", it->GetClassName());
+			
 			if (it->m_baseInfo)
-				component->SetAttribute("baseClassname", it->m_baseInfo->GetEntityClassName());
-
+				component->SetAttribute("baseClassname", it->m_baseInfo->GetClassName());
+			
 			pRoot->InsertFirstChild(component);
 
 			std::vector<IProperty*> properties;

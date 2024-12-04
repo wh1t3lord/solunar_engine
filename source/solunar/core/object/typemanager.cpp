@@ -16,7 +16,7 @@ Object* CreateObjectPrivate(const TypeInfo* typeInfo)
 	Object* pObject = (Object*)pAllocator->allocate(typeInfo->GetClassSize(), typeInfo->GetClassAlign());
 
 	StaticConstructor_t objectConstructor = typeInfo->GetStaticConstructor();
-	Assert3(objectConstructor, "Failed to create object without static constructor", typeInfo->GetEntityClassName());
+	Assert3(objectConstructor, "Failed to create object without static constructor", typeInfo->GetClassName());
 
 	objectConstructor(pObject);
 
@@ -32,7 +32,7 @@ const TypeInfo* TypeManager::GetTypeInfoByName(const char* name)
 {
 	for (auto it : m_registeredTypes)
 	{
-		if (strcmp(it->GetEntityClassName(), name) == 0)
+		if (strcmp(it->GetClassName(), name) == 0)
 			return it;
 	}
 
@@ -74,7 +74,7 @@ Object* TypeManager::CreateObjectByTypeInfo(const TypeInfo* typeInfo)
 
 void TypeManager::RegisterType(const TypeInfo* typeInfo)
 {
-	Core::Msg("TypeManager: registered type %s", typeInfo->GetEntityClassName());
+	Core::Msg("TypeManager: registered type %s", typeInfo->GetClassName());
 	m_registeredTypes.push_back(typeInfo);
 }
 

@@ -234,7 +234,7 @@ void DrawEntityPropertyWindow(Entity* entity)
 	{
 		if (entity)
 		{
-			ImGui::Text("%s", entity->GetTypeInfo()->GetEntityClassName());
+			ImGui::Text("%s", entity->GetTypeInfo()->GetClassName());
 			std::vector<IProperty*> properties;
 			PropertyManager::GetInstance()->GetProperties(entity->GetTypeInfo(), properties);
 			DrawProperties(properties, entity);
@@ -250,7 +250,7 @@ void DrawEntityPropertyWindow(Entity* entity)
 			for (int i = 0; i < components.size(); i++)
 			{
 				ImGui::Separator();
-				ImGui::Text("%s", components[i]->GetTypeInfo()->GetEntityClassName());
+				ImGui::Text("%s", components[i]->GetTypeInfo()->GetClassName());
 
 				properties.clear();
 

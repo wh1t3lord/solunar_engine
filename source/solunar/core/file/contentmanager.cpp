@@ -93,7 +93,7 @@ std::weak_ptr<SerializableObject> ContentManager::Load(const std::string& filena
 		DataStreamPtr stream = contentDevice->OpenStream(filename);
 		if (!stream)
 		{
-			Core::Msg("ContentManager: failed to load %s from file \"%s\"", pTypeInfo->GetEntityClassName(),
+			Core::Msg("ContentManager: failed to load %s from file \"%s\"", pTypeInfo->GetClassName(),
 				filename.c_str());
 
 			return std::weak_ptr<SerializableObject>();
@@ -103,7 +103,7 @@ std::weak_ptr<SerializableObject> ContentManager::Load(const std::string& filena
 
 		std::shared_ptr<SerializableObject> object = std::shared_ptr<SerializableObject>(objectInstance, ObjectDeleter);
 		object->Load(stream);
-		Core::Msg("ContentManager: loaded %s %s", pTypeInfo->GetEntityClassName(), filename.c_str());
+		Core::Msg("ContentManager: loaded %s %s", pTypeInfo->GetClassName(), filename.c_str());
 		m_content.emplace(filename, object);
 	}
 
@@ -116,7 +116,7 @@ std::weak_ptr<SerializableObject> ContentManager::Load(const std::string& filena
 //	ASSERT(object);
 //	ASSERT2(object->IsA(SerializableObject::GetStaticTypeInfo()), "Canno't Load object because it doesn't inherit from SerializableObject");
 //
-//	Core::Msg("[content]: loading existed %s %s", object->getTypeInfo()->GetEntityClassName(), filename.c_str());
+//	Core::Msg("[content]: loading existed %s %s", object->getTypeInfo()->GetClassName(), filename.c_str());
 //
 //	ContentDevice* contentDevice = findContentDevice();
 //

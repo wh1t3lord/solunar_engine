@@ -78,7 +78,7 @@ namespace solunar
 				continue;
 
 			tinyxml2::XMLElement* entityElement = element.InsertNewChildElement("Entity");
-			entityElement->SetAttribute("className", it->GetTypeInfo()->GetEntityClassName());
+			entityElement->SetAttribute("className", it->GetTypeInfo()->GetClassName());
 			it->SaveXML(*entityElement);
 		}
 	}
