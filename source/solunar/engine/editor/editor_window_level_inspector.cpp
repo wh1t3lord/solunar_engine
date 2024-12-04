@@ -102,7 +102,7 @@ void solunar::EditorWindow_LevelInspector::Draw(World* pWorld)
 					Entity* entity = entities[i];
 
 					char node_name[64];
-					sprintf(node_name, sizeof(node_name), "%s##%p", entity->GetTypeInfo()->GetEntityClassName(), entity);
+					sprintf(node_name, sizeof(node_name), "%s##%p", entity->GetTypeInfo()->GetClassName(), entity);
 
 					if (ImGui::TreeNode(node_name))
 					{
@@ -113,7 +113,7 @@ void solunar::EditorWindow_LevelInspector::Draw(World* pWorld)
 							if (pComponent)
 							{
 								char component_name[64];
-								sprintf(component_name, sizeof(component_name), "%s##%p", pComponent->GetTypeInfo()->GetEntityClassName(), pComponent);
+								sprintf(component_name, sizeof(component_name), "%s##%p", pComponent->GetTypeInfo()->GetClassName(), pComponent);
 
 								if (ImGui::TreeNode(component_name))
 								{
@@ -145,7 +145,7 @@ void solunar::EditorWindow_LevelInspector::Draw(World* pWorld)
 					if (pLight)
 					{
 						char node_name[64];
-						sprintf(node_name, sizeof(node_name), "%s##%p", entity->GetTypeInfo()->GetEntityClassName(), entity);
+						sprintf(node_name, sizeof(node_name), "%s##%p", entity->GetTypeInfo()->GetClassName(), entity);
 
 						if (ImGui::TreeNode(node_name))
 						{
@@ -156,7 +156,7 @@ void solunar::EditorWindow_LevelInspector::Draw(World* pWorld)
 								if (pComponent)
 								{
 									char component_name[64];
-									sprintf(component_name, sizeof(component_name), "%s##%p", pComponent->GetTypeInfo()->GetEntityClassName(), pComponent);
+									sprintf(component_name, sizeof(component_name), "%s##%p", pComponent->GetTypeInfo()->GetClassName(), pComponent);
 
 									if (ImGui::TreeNode(component_name))
 									{
