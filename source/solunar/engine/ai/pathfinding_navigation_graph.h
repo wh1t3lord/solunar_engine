@@ -53,7 +53,7 @@ namespace solunar
 			neighbour			unsigned char
 			...
 
-			REGION CENTERS, size=(total_nodes_count * sizeof(float)*3)
+			REGION CENTERS, size=(max_region_count * sizeof(float)*3)
 
 		1:	x	float
 			y	float

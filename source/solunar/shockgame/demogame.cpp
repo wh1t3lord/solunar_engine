@@ -24,6 +24,7 @@
 #include "engine/editor/editor_manager.h"
 #include "engine/editor/editor_window_level_inspector.h"
 #include "engine/editor/editor_window_entity_editor.h"
+#include "engine/editor/editor_window_ai_navigation_builder.h"
 
 namespace solunar
 {
@@ -137,6 +138,7 @@ void GameManager::OnWorldLoad(const std::string& worldName, World* pLoadedWorld)
 		{
 			g_editorManager->RegisterWindow(mem_new<EditorWindow_LevelInspector>(EditorWindow_LevelInspector()));
 			g_editorManager->RegisterWindow(mem_new<EditorWindow_EntityEditor>(EditorWindow_EntityEditor()));
+			g_editorManager->RegisterWindow(mem_new<EditorWindow_AINavigationBuilder>(EditorWindow_AINavigationBuilder()));
 		}
 	}
 }
