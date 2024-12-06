@@ -132,6 +132,7 @@ namespace solunar
 		const std::vector<RigidBodyComponent*>& physicsEntities = m_physicsWorld->GetRigidBodies();
 		for (auto it : physicsEntities)
 		{
+			it->UpdateEntityTranslationDirty();
 			it->UpdateBodyTranslationDirty();
 		}
 	}

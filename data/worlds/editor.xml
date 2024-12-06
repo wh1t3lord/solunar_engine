@@ -43,6 +43,7 @@
 		</AnimatedMeshComponent>
 		<RigidBodyComponent>
 			<Static value="false"/>
+			<Mass value="80"/>
 		</RigidBodyComponent>
 		<BoxShapeComponent>
 			<Position x="0.0" y="0.8" z="0.0"/>
