@@ -380,21 +380,21 @@ void ShockPlayerController::UpdateCamera(float dt)
 
 		g_weaponVelocity = btVectorToGlm(m_rigidBody->GetCharacterController()->getLinearVelocity());
 
-		static char buf[128];
-		sprintf(buf, "Vel %f %f %f", g_weaponVelocity.x, g_weaponVelocity.y, g_weaponVelocity.z);
-		ImGui::GetForegroundDrawList()->AddText(ImVec2(200.f, 200.f), 0xff0000ff, buf);
+		//static char buf[128];
+		//sprintf(buf, "Vel %f %f %f", g_weaponVelocity.x, g_weaponVelocity.y, g_weaponVelocity.z);
+		//ImGui::GetForegroundDrawList()->AddText(ImVec2(200.f, 200.f), 0xff0000ff, buf);
 
 		float bob = V_CalcBob();
 
-		sprintf(buf, "bob %f", bob);
-		ImGui::GetForegroundDrawList()->AddText(ImVec2(200.f, 225.f), 0xff0000ff, buf);
+		//sprintf(buf, "bob %f", bob);
+		//ImGui::GetForegroundDrawList()->AddText(ImVec2(200.f, 225.f), 0xff0000ff, buf);
 
 		// local space
 		glm::vec3 weaponPosition = g_weaponOffset;
 		weaponPosition.x += bob;
 		weaponPosition.z += bob;
-		sprintf(buf, "pos %f %f %f", weaponPosition.x, weaponPosition.y, weaponPosition.z);
-		ImGui::GetForegroundDrawList()->AddText(ImVec2(200.f, 250.f), 0xff0000ff, buf);
+		//sprintf(buf, "pos %f %f %f", weaponPosition.x, weaponPosition.y, weaponPosition.z);
+		//ImGui::GetForegroundDrawList()->AddText(ImVec2(200.f, 250.f), 0xff0000ff, buf);
 		m_weaponEntity->SetPosition(weaponPosition);
 
 		//m_weaponEntity->setRotation(glm::slerp(rot, m_weaponEntity->getRotation(), 55.0f * dt));
