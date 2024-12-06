@@ -14,6 +14,10 @@ class ConsoleCommandManager : public Singleton<ConsoleCommandManager>
 public:
 	void RegisterCommand(const char* name, ConsoleCommand* command);
 
+	void PrintHelp();
+
+	static void Command_Help();
+
 private:
 	friend class Console;
 
@@ -44,7 +48,7 @@ public:
 
 	void OnRender();
 
-	static void Cmd_ToggleConsole();
+	static void Command_ToggleConsole();
 
 private:
 	std::vector<char> m_consoleText;

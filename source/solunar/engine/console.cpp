@@ -8,6 +8,7 @@
 namespace solunar
 {
 
+
 std::unique_ptr<Console> g_console = std::make_unique<Console>();
 
 Console::Console() :
@@ -21,7 +22,8 @@ Console::~Console()
 
 void Console::Init()
 {
-	ConsoleCommandManager::GetInstance()->RegisterCommand("toggleconsole", &Console::Cmd_ToggleConsole);
+	ConsoleCommandManager::GetInstance()->RegisterCommand("help", &ConsoleCommandManager::Command_Help);
+	ConsoleCommandManager::GetInstance()->RegisterCommand("toggleconsole", &Console::Command_ToggleConsole);
 }
 
 void Console::Shutdown()
@@ -132,7 +134,7 @@ void Console::OnRender()
 #endif
 }
 
-void Console::Cmd_ToggleConsole()
+void Console::Command_ToggleConsole()
 {
 	g_console->ToggleConsole();
 }
@@ -148,6 +150,20 @@ void ConsoleCommandManager::RegisterCommand(const char* name, ConsoleCommand* co
 	reg.name = name;
 	reg.command = command;
 	m_commands.push_back(reg);
+}
+
+void ConsoleCommandManager::PrintHelp()
+{
+	Core::Msg("Command list:");
+
+	int numCommands = (int)m_commands.size();
+	for (int i = 0; i < numCommands; i++)
+		Core::Msg("%s", m_commands[i].name);
+}
+
+void ConsoleCommandManager::Command_Help()
+{
+	ConsoleCommandManager::GetInstance()->PrintHelp();
 }
 
 bool ConsoleCommandManager::Execute(const char* text)
