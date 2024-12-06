@@ -2,6 +2,7 @@
 #include "shockgame/shockplayercontroller.h"
 
 #include "core/file/contentmanager.h"
+#include "core/timer.h"
 
 #include "engine/inputmanager.h"
 #include "engine/console.h"
@@ -62,6 +63,8 @@ struct WeaponInfo
 	int reload_last_one_Ani;
 };
 
+static glm::vec3 g_weaponOffset = glm::vec3(0.2f, -0.25f, -0.3f);
+
 Entity* CreateWeapon(Entity* cameraEntity)
 {
 	// create weapon
@@ -86,6 +89,49 @@ Entity* CreateWeapon(Entity* cameraEntity)
 	//Component* viewmodelComponent = (Component*)TypeManager::getInstance()->createObjectByName("ViewmodelAnimationController");
 	//m_weaponEntity->addComponent(viewmodelComponent);
 	return weaponEntity;
+}
+
+static glm::vec3 g_prevWeaponPos;
+static glm::vec3 g_currentWeaponPos;
+static glm::vec3 g_weaponVelocity;
+
+// Quakeworld bob code, this fixes jitters in the mutliplayer since the clock (pparams->time) isn't quite linear
+float V_CalcBob()
+{
+	static	double	bobtime;
+	static float	bob;
+	float			cycle;
+	static float	lasttime;
+	const float		cl_bob = 0.01f;
+	const float		cl_bobup = 0.5f;
+	const float		cl_bobcycle = 0.8f;
+	glm::vec3		vel;
+
+	bobtime += Timer::GetInstance()->GetDelta();
+	cycle = bobtime - (int)(bobtime / cl_bobcycle) * cl_bobcycle;
+	cycle /= cl_bobcycle;
+
+	if (cycle < cl_bobup)
+	{
+		cycle = maths::PI * cycle / cl_bobup;
+	}
+	else
+	{
+		cycle = maths::PI + maths::PI * (cycle - cl_bobup) / (1.0 - cl_bobup);
+	}
+
+	// bob is proportional to simulated velocity in the xy plane
+	// (don't count Z, or jumping messes it up)
+	//VectorCopy(pparams->simvel, vel);
+	vel = g_weaponVelocity;
+	vel[1] = 0;
+
+	bob = sqrt(vel[0] * vel[0] + vel[2] * vel[2]);//* cl_bob;
+	bob = bob * 0.3 + bob * 0.7 * sin(cycle);
+	bob = min(bob, 4.0f);
+	bob = max(bob, -7.0f);
+	return bob;
+
 }
 
 ShockPlayerController::ShockPlayerController() :
@@ -325,10 +371,38 @@ void ShockPlayerController::UpdateCamera(float dt)
 
 	glm::quat rot = glm::eulerAngleYX(glm::radians(-m_camera->m_yaw), glm::radians(m_camera->m_pitch));
 
-	//m_weaponEntity->setRotation(glm::slerp(rot, m_weaponEntity->getRotation(), 55.0f * dt));
 	if (m_weaponEntity)
+	{
+		g_currentWeaponPos = m_weaponEntity->GetWorldPosition();
+
+		//g_weaponVelocity = (g_currentWeaponPos - g_prevWeaponPos) / dt;
+		//g_weaponVelocity = glm::normalize(g_weaponVelocity);
+
+		g_weaponVelocity = btVectorToGlm(m_rigidBody->GetCharacterController()->getLinearVelocity());
+
+		static char buf[128];
+		sprintf(buf, "Vel %f %f %f", g_weaponVelocity.x, g_weaponVelocity.y, g_weaponVelocity.z);
+		ImGui::GetForegroundDrawList()->AddText(ImVec2(200.f, 200.f), 0xff0000ff, buf);
+
+		float bob = V_CalcBob();
+
+		sprintf(buf, "bob %f", bob);
+		ImGui::GetForegroundDrawList()->AddText(ImVec2(200.f, 225.f), 0xff0000ff, buf);
+
+		// local space
+		glm::vec3 weaponPosition = g_weaponOffset;
+		weaponPosition.x += bob;
+		weaponPosition.z += bob;
+		sprintf(buf, "pos %f %f %f", weaponPosition.x, weaponPosition.y, weaponPosition.z);
+		ImGui::GetForegroundDrawList()->AddText(ImVec2(200.f, 250.f), 0xff0000ff, buf);
+		m_weaponEntity->SetPosition(weaponPosition);
+
+		//m_weaponEntity->setRotation(glm::slerp(rot, m_weaponEntity->getRotation(), 55.0f * dt));
 		m_weaponEntity->SetRotation(rot);
 
+		g_prevWeaponPos = g_currentWeaponPos;
+	}
+		
 #if 0
 	 glm::vec3 cameraDirection = CameraProxy::GetInstance()->GetDirection();
 	 glm::vec3 pos = GetEntity()->GetPosition();
@@ -386,7 +460,7 @@ void ShockPlayerController::UpdateMovement(float dt)
 		 // apply impulse to rigid body
 		 //m_rigidBody->ApplyImpulse(dir);
 		 if (glm::length(dir) >= 0.01f)
-			m_rigidBody->SetDirection(glm::normalize(dir) * dt * 2.0f);
+			m_rigidBody->SetDirection(glm::normalize(dir) * dt * 4.0f);
 		 //m_rigidBody->SetPositionForce(getEntity()->getPosition());
 		
 	}
@@ -403,7 +477,7 @@ void ShockPlayerController::UpdateMovement(float dt)
 		 glm::vec3 cameraDirection = m_camera->GetDirection(); // camera->GetDirection();
 		 cameraDirection.y = 0.0f;
 		 
-		 m_rigidBody->GetCharacterController()->jump(glmVectorToBt((upVector + cameraDirection) * jumpPower));
+		 m_rigidBody->GetCharacterController()->jump(glmVectorToBt(upVector * jumpPower));
 	}
 	
 	m_rigidBody->Update(dt);
