@@ -5,8 +5,8 @@ namespace solunar {
 
 void BoundingBox::SetIdentity()
 {
-	m_min = glm::vec3(-1.0f);
-	m_max = glm::vec3(1.0f);
+	m_min = glm::vec3(-0.1f);
+	m_max = glm::vec3(0.1f);
 }
 
 BoundingBox& BoundingBox::transformAABB(const glm::mat4& modelMatrix)

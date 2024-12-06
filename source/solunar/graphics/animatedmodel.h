@@ -146,6 +146,7 @@ public:
 
 	/** Node accessing */
 	int GetNodeByName(const std::string& name);
+	int GetRootNodeId() { return m_rootNodeId; }
 	void SetNodeScale(int nodeid, const glm::vec3& scale);
 
 	void DebugRender(const glm::mat4& modelMatrix);

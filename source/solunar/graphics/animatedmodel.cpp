@@ -122,6 +122,8 @@ void AnimatedModel::RegisterObject()
 AnimatedModel::AnimatedModel() :
 	m_animationId(-1)
 {
+	m_boundingBox.SetIdentity();
+
 	for (int i = 0; i < sizeof(m_bonesMatrices) / sizeof(m_bonesMatrices[0]); i++)
 	{
 		m_bonesMatrices[i] = glm::mat4(1.0f);
@@ -236,7 +238,7 @@ void AnimatedModel::Load_GLTF(const std::shared_ptr<DataStream>& stream)
 		}
 
 		// Bounding box calculation
-
+#if 0
 		BoundingBox AABB;
 		AABB.SetIdentity();
 
@@ -247,6 +249,13 @@ void AnimatedModel::Load_GLTF(const std::shared_ptr<DataStream>& stream)
 		}
 
 		m_boundingBox = AABB;
+#else
+		for (size_t o = 0; o < vtxCount; o++) {
+			//positions[o].z = -positions[o].z;  // Sparkle uses LH Y+
+			m_boundingBox.m_min = glm::min(positions[o], m_boundingBox.m_min);
+			m_boundingBox.m_max = glm::max(positions[o], m_boundingBox.m_max);
+		}
+#endif
 
 		// calculate vertices
 		std::vector<AnimatedVertex> vertices;
@@ -865,7 +874,7 @@ void AnimatedModel::DebugRender(const glm::mat4& modelMatrix)
 			size_t numJoints = skin.m_joints.size();
 			for (size_t i = 0; i < numJoints; ++i)
 			{
-				const glm::mat4 trans = modelMatrix * GetNodeMatrix(skin.m_joints[i]) * skin.m_inverseBindMatrices[i];
+				const glm::mat4 trans = modelMatrix * GetNodeMatrix(skin.m_joints[i]);
 
 				g_debugRender.PushModelMatrix(trans);
 				g_debugRender.drawAxis(glm::vec3(0.0f));
