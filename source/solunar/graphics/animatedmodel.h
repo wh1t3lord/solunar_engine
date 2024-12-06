@@ -152,6 +152,8 @@ public:
 
 	bool HasSkin() { return m_skins.size(); }
 
+	size_t GetAnimationCount() { return m_animations.size(); }
+
 private:
 	std::vector<AnimatedSubMesh*> m_subMeshes;
 	std::vector<Animation> m_animations;

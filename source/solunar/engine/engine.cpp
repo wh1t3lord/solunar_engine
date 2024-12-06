@@ -179,6 +179,9 @@ namespace solunar
 		World* world = Engine::ms_world;
 		if (world)
 		{
+			if (!world->IsWorldInitialized())
+				world->Initialize();
+
 			world->Update_PreEntityUpdate();
 			world->Update_PhysicsEntity();
 			world->Update_LogicEntity();

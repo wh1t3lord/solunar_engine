@@ -17,7 +17,7 @@ namespace solunar
 	IMPLEMENT_OBJECT(World, SerializableObject);
 
 	World::World() :
-		m_physicsWorld(nullptr), m_graphicsWorld(nullptr)
+		m_physicsWorld(nullptr), m_graphicsWorld(nullptr), m_isWorldInitialized(false)
 	{
 		m_physicsWorld = mem_new<PhysicsWorld>();
 		m_graphicsWorld = mem_new<GraphicsWorld>();
@@ -153,6 +153,22 @@ namespace solunar
 	void World::TogglePhysicsDebugDraw()
 	{
 		m_physicsWorld->ToggleDebugDraw();
+	}
+
+	void World::Initialize()
+	{
+		if (m_isWorldInitialized)
+			Core::Error("World::Initialize: Calling function on already initialized world is unacceptable");
+
+		const std::vector<Entity*>& entities = m_entityManager.GetEntities();
+		for (auto entity : entities)
+		{
+			const std::vector<Component*>& components = entity->GetAllComponents();
+			for (auto component : components)
+				component->OnInit();
+		}
+
+		m_isWorldInitialized = true;
 	}
 
 	bool World::RayCast(RayCastResult& rayResult, const glm::vec3& rayStart, const glm::vec3& rayEnd, const int collisionFilter /* =-1*/)

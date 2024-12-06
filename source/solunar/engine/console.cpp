@@ -106,14 +106,15 @@ void Console::OnRender()
 		window_pos_pivot.x = (corner & 1) ? 1.0f : 0.0f;
 		window_pos_pivot.y = (corner & 2) ? 1.0f : 0.0f;
 		ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
+		ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x - work_pos.y - PAD, work_pos.y + PAD));
 		window_flags |= ImGuiWindowFlags_NoMove;
 	}
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-
-	ImGui::SetNextWindowBgAlpha(0.0f);
+	//ImGui::SetNextWindowBgAlpha(0.0f);
 	if (ImGui::Begin("Console", 0, ms_kOverlayWindowFlags))
 	{
+		//ImGui::GetWindowDrawList()->AddRectFilled(ImGui::GetWindowSize(), ImVec2(0.0f, 0.0f), 0xff0000ff);
 
 		ImGui::Text(">");
 

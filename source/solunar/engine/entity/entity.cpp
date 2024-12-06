@@ -278,7 +278,7 @@ Component* Entity::GetComponentByTypeInfo(const TypeInfo* typeinfo)
 	return nullptr;
 }
 
-std::vector<Component*> Entity::GetAllComponents()
+const std::vector<Component*>& Entity::GetAllComponents()
 {
 	return m_components;
 }

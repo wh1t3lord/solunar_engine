@@ -682,6 +682,8 @@ int AnimatedModel::GetCurrentAnimationId()
 
 void AnimatedModel::PlayAnimation(int index, bool looped)
 {
+	Assert(index != -1);
+
 	m_animationId = index;
 	m_currentAnimation = &m_animations[m_animationId];
 	m_playLooped = looped;

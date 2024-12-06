@@ -25,6 +25,8 @@ public:
 	virtual void OnEntitySet(Entity* entity);
 	virtual void OnWorldSet(World* world);
 
+	virtual void OnInit();
+
 	virtual void OnEntityRemove();
 
 	Entity* GetEntity() { return m_entity; }

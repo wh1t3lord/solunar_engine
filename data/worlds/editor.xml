@@ -37,10 +37,10 @@
 		<Position x="-1.75" y="0" z="-8.88"/>
 		<Rotation x="0" y="0" z="0"/>
 		<Scale x="1" y="1" z="1"/>
-		<MeshComponent>
-			<Model filename="models/zombie_static.model"/>
+		<AnimatedMeshComponent>
+			<Model filename="models/zombie.glb"/>
 			<CastShadow value="true"/>
-		</MeshComponent>
+		</AnimatedMeshComponent>
 		<RigidBodyComponent>
 			<Static value="false"/>
 		</RigidBodyComponent>

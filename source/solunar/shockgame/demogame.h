@@ -70,7 +70,7 @@ private:
 	CameraFirstPersonComponent* m_camera;
 };
 
-void Debug_Draw3DText(const char* text, const glm::vec3& position, const glm::vec4& color);
+void Debug_Draw3DText(const char* text, const glm::vec3& position, const glm::vec4& color, float y = 0.0f);
 
 class GameManager
 {

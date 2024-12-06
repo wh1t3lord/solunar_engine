@@ -354,7 +354,10 @@ void ShockPlayerController::UpdateCamera(float dt)
 void ShockPlayerController::UpdateMovement(float dt)
 {
 	if (g_console->IsToggled())
+	{
+		m_rigidBody->SetDirection(glm::vec3(0.0f));
 		return;
+	}
 
 	glm::vec3 moveVector = glm::vec3(0.0f);
 	 
