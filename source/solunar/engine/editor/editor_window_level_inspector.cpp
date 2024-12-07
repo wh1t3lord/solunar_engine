@@ -206,3 +206,13 @@ void solunar::EditorWindow_LevelInspector::SetShow(bool status)
 {
 	m_show = status;
 }
+
+int solunar::EditorWindow_LevelInspector::GetEditingMode()
+{
+	return -1;
+}
+
+void solunar::EditorWindow_LevelInspector::UpdateEditingMode(InputManager* pInputManager, World* pWorld)
+{
+
+}

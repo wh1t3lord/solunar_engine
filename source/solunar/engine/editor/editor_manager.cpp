@@ -1,6 +1,7 @@
 #include "editor_manager.h"
 #include "editor_window.h"
 #include "inputmanager.h"
+#include "engine.h"
 
 namespace solunar
 {
@@ -44,6 +45,20 @@ namespace solunar
 				pWindow->Init();
 			}
 		}
+
+		IEditorWindow* pWindow = GetWindowByEditingMode(EditingMode::kEditingMode_AIGraphNavigation);
+		
+		if (pWindow)
+		{
+			this->m_pEditingMode_AINavigationGraph = pWindow;
+		}
+
+		pWindow = GetWindowByEditingMode(EditingMode::kEditingMode_ObjectSelection);
+
+		if (pWindow)
+		{
+			this->m_pEditingMode_ObjectSelection = pWindow;
+		}
 	}
 
 	void EditorManager::UpdateEditingModes()
@@ -61,8 +76,6 @@ namespace solunar
 		case EditingMode::kEditingMode_AIGraphNavigation:
 		{
 			this->UpdateEditingMode_AIGraphNavigation();
-
-
 
 			break;
 		}
@@ -90,16 +103,15 @@ namespace solunar
 	void EditorManager::UpdateEditingMode_AIGraphNavigation()
 	{
 		Assert(this->m_current_editing_mode == EditingMode::kEditingMode_AIGraphNavigation && "you can't call this method if your editing mode is different!");
+		Assert(this->m_pEditingMode_AINavigationGraph && "you must obtain window at initialization stage");
 
 		auto* pInputManager = InputManager::GetInstance();
 
 		if (pInputManager)
 		{
-			bool isLMBPressed = pInputManager->IsMouseButtonPressed(MouseButtons::MOUSE_BUTTON_LEFT);
-
-			if (isLMBPressed)
+			if (this->m_pEditingMode_AINavigationGraph)
 			{
-
+				this->m_pEditingMode_AINavigationGraph->UpdateEditingMode(pInputManager, Engine::ms_world);
 			}
 		}
 	}
@@ -107,8 +119,34 @@ namespace solunar
 	void EditorManager::UpdateEditingMode_ObjectSelection()
 	{
 		Assert(this->m_current_editing_mode == EditingMode::kEditingMode_ObjectSelection && "you can't call this method if your editing mode is different!");
+		Assert(this->m_pEditingMode_ObjectSelection && "you must obtain window at initialization stage");
 
+		auto* pInputManager = InputManager::GetInstance();
 
+		if (pInputManager)
+		{
+			if (this->m_pEditingMode_ObjectSelection)
+			{
+				this->m_pEditingMode_ObjectSelection->UpdateEditingMode(pInputManager, Engine::ms_world);
+			}
+		}
+	}
+
+	IEditorWindow* EditorManager::GetWindowByEditingMode(EditingMode mode)
+	{
+		IEditorWindow* pResult = 0;
+
+		auto it = std::find_if(this->m_windows.begin(), this->m_windows.end(), [mode](IEditorWindow* pWindow) {
+			if (!pWindow)
+				return false;
+
+			return static_cast<EditingMode>(pWindow->GetEditingMode()) == mode;
+		});
+
+		if (it != this->m_windows.end())
+			pResult = *it;
+
+		return pResult;
 	}
 
 	void EditorManager::Shutdown()

@@ -48,8 +48,11 @@ namespace solunar
 		bool IsShow(void) const override;
 		void SetShow(bool status) override;
 
+		int GetEditingMode() override;
+		void UpdateEditingMode(InputManager* pInputManager, World* pWorld) override;
 	private:
 		void UpdateStats(BuilderConfig_ManualGraph& conf);
+		void AddNodeOnSurface(const glm::vec3& world_pos);
 
 	private:
 		bool m_show;

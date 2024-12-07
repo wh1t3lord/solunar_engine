@@ -13,7 +13,8 @@ namespace solunar
 	{
 		kEditingMode_AIGraphNavigation,
 		kEditingMode_ObjectSelection,
-		kEditingMode_NoSelection // unable to select anything on screen, but editor's GUI i working
+		kEditingMode_NoSelection, // unable to select anything on screen, but editor's GUI i working
+		kEditingMode_Null // reserved for windows
 	};
 
 	class EditorManager : public Singleton<EditorManager>
@@ -47,6 +48,8 @@ namespace solunar
 		void UpdateEditingMode_ObjectSelection();
 
 
+		IEditorWindow* GetWindowByEditingMode(EditingMode mode);
+
 
 	private:
 		bool m_object_selection_enabled;
@@ -56,6 +59,8 @@ namespace solunar
 		// todo: kirrik -> change to entity id type like uint32_t or something else, storing a pointer is not a good thing at all, it is temporary implementation
 		void* m_pSelectedEntity;
 		World* m_pWorld;
+		IEditorWindow* m_pEditingMode_AINavigationGraph;
+		IEditorWindow* m_pEditingMode_ObjectSelection;
 		std::vector<IEditorWindow*> m_windows;
 	};
 	

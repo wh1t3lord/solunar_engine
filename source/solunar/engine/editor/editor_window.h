@@ -4,6 +4,7 @@
 namespace solunar 
 {
 	class World;
+	class InputManager;
 }
 
 namespace solunar
@@ -18,6 +19,12 @@ namespace solunar
 		virtual const char* GetName(void) const = 0;
 		virtual bool IsShow(void) const = 0;
 		virtual void SetShow(bool status) = 0;
+
+		virtual int GetEditingMode() = 0;
+
+		// calls only when editor's editing mode == GetEditingMode()
+		// it supposed that only one window can have one unique editing mode
+		virtual void UpdateEditingMode(InputManager* pInputManager, World* pWorld) = 0;
 	};
 }
 

@@ -44,7 +44,7 @@ namespace solunar
 		Core::Init();
 
 		// create game content device
-		g_gameContentDevice = mem_new<ContentDevice>("data");
+		g_gameContentDevice = mem_new<ContentDevice>("data", appGetCurrentDir());
 
 		// mount game content device
 		g_contentManager->MountDevice(g_gameContentDevice, "game");

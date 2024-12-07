@@ -2,6 +2,9 @@
 #include "imgui.h"
 #include "ai\pathfinding_navigation_graph.h"
 #include "editor_manager.h"
+#include "inputmanager.h"
+#include "camera.h"
+#include "entity/world.h"
 
 #undef max
 #undef min
@@ -145,6 +148,35 @@ namespace solunar
 		m_show = status;
 	}
 
+	int EditorWindow_AINavigationBuilder::GetEditingMode()
+	{
+		return EditingMode::kEditingMode_AIGraphNavigation;
+	}
+
+	void EditorWindow_AINavigationBuilder::UpdateEditingMode(InputManager* pInputManager, World* pWorld)
+	{
+		bool is_LMB_pressed = pInputManager->IsMouseButtonPressed(MouseButtons::MOUSE_BUTTON_LEFT);
+
+		if (is_LMB_pressed)
+		{
+			Camera* pCamera = CameraProxy::GetInstance();
+
+			if (pCamera)
+			{
+				const glm::vec2& mouse_pos = pInputManager->GetCursorPos();
+				glm::vec3 ray_pos = pCamera->GetScreenRay(mouse_pos.x, mouse_pos.y);
+ 
+
+				RayCastResult rc_result;
+
+				if (pWorld->RayCast(rc_result, ray_pos, ray_pos * 100.0f))
+				{
+					this->AddNodeOnSurface(rc_result.m_hitPosition);
+				}
+			}
+		}
+	}
+
 	void EditorWindow_AINavigationBuilder::UpdateStats(BuilderConfig_ManualGraph& conf)
 	{
 		if (conf.was_changed_controls)
@@ -187,6 +219,11 @@ namespace solunar
 			conf.memory_allocation_after_compilation += conf.max_possible_total_nodes * sizeof(float) * 3;
 
 		}
+	}
+
+	void EditorWindow_AINavigationBuilder::AddNodeOnSurface(const glm::vec3& world_pos)
+	{
+
 	}
 
 	const char* convert_enum_navtype_to_text(eNavigationType type)

@@ -368,7 +368,8 @@ void EditorCameraComponent::Update(float delta)
 	
 		// ray pick
 
-		if (input->IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
+		// no, not handling it here
+		if (false && input->IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
 		{
 			Camera* camera = CameraProxy::GetInstance();
 			glm::vec3 rayBegin = camera->GetPosition() + camera->GetDirection();
