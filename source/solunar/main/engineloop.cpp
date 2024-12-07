@@ -296,7 +296,7 @@ namespace solunar {
 					if (ImGui::BeginMenu("Editing Modes##Editor"))
 					{
 						bool is_selected_navgraph = g_editorManager->IsAINavigationEditingEnabled();
-						if (ImGui::MenuItem("Navigation Graph", 0, &is_selected_navgraph))
+						if (ImGui::MenuItem("Navigation Graph##Editor", 0, &is_selected_navgraph))
 						{
 							g_editorManager->SetAINavigationEditingEnabled(!g_editorManager->IsAINavigationEditingEnabled());
 						}
