@@ -2,6 +2,8 @@
 #include "editor_window.h"
 #include "inputmanager.h"
 #include "engine.h"
+#include "camera.h"
+#include "entity\cameracomponent.h"
 
 namespace solunar
 {
@@ -10,8 +12,11 @@ namespace solunar
 	EditorManager::EditorManager() :
 		m_object_selection_enabled(false),
 		m_ai_navigation_editing_enabled(false),
+		m_game_simulate(false),
 		m_current_editing_mode(EditingMode::kEditingMode_NoSelection),
 		m_pWorld(nullptr),
+		m_pEditingMode_AINavigationGraph(nullptr),
+		m_pEditingMode_ObjectSelection(nullptr),
 		m_pSelectedEntity(nullptr)
 	{
 	}
@@ -132,6 +137,68 @@ namespace solunar
 		}
 	}
 
+	void EditorManager::UpdateCamera()
+	{
+		if (!this->m_game_simulate)
+		{
+			CameraProxy* pCamera = CameraProxy::GetInstance();
+
+			if (pCamera)
+			{
+				InputManager* pInputManager = InputManager::GetInstance();
+
+				if (pInputManager)
+				{
+					if (pInputManager->IsPressed(KeyboardKeys::KEY_W))
+					{
+						glm::vec3 pos= pCamera->GetCameraComponent()->GetEntity()->GetPosition();
+						pos += pCamera->GetDirection() * 0.02f;
+						pCamera->GetCameraComponent()->GetEntity()->SetPosition(pos);
+					}
+
+					if (pInputManager->IsPressed(KeyboardKeys::KEY_S))
+					{
+						glm::vec3 pos = pCamera->GetCameraComponent()->GetEntity()->GetPosition();
+						pos -= pCamera->GetDirection() * 0.02f;
+						pCamera->GetCameraComponent()->GetEntity()->SetPosition(pos);
+					}
+
+					if (pInputManager->IsPressed(KeyboardKeys::KEY_D))
+					{
+						glm::vec3 pos = pCamera->GetCameraComponent()->GetEntity()->GetPosition();
+						pos.x += 0.02f;
+						pCamera->GetCameraComponent()->GetEntity()->SetPosition(pos);
+					}
+
+					if (pInputManager->IsPressed(KeyboardKeys::KEY_A))
+					{
+						glm::vec3 pos = pCamera->GetCameraComponent()->GetEntity()->GetPosition();
+						pos.x -= 0.02f;
+						pCamera->GetCameraComponent()->GetEntity()->SetPosition(pos);
+					}
+
+					if (pInputManager->IsMouseButtonPressed(MouseButtons::MOUSE_BUTTON_RIGHT))
+					{
+						g_engineData.m_shouldCaptureMouse = true;
+						g_engineData.m_shouldHideMouse = true;
+					}
+					else
+					{
+						g_engineData.m_shouldCaptureMouse = false;
+						g_engineData.m_shouldHideMouse = false;
+
+						// todo: typo ne ok, because if you handle input by g_engineData thus
+						// you have to debug your state and disable/enable because InputManager
+						// it is not right to manually call it here if you comment last two lines of code
+						// the cursor will hide and only alt/tab will reveive it and it is not okay :(
+						InputManager::GetInstance()->SetCursorHiding(false);
+						InputManager::GetInstance()->SetCursorCapture(false);
+					}
+				}
+			}
+		}
+	}
+
 	IEditorWindow* EditorManager::GetWindowByEditingMode(EditingMode mode)
 	{
 		IEditorWindow* pResult = 0;
@@ -176,6 +243,8 @@ namespace solunar
 		}
 
 		this->UpdateEditingModes();
+
+		this->UpdateCamera();
 	}
 
 	void EditorManager::RegisterWindow(IEditorWindow* pWindow)
@@ -216,4 +285,18 @@ namespace solunar
 	bool EditorManager::IsObjectSelectionEnabled(void) const { return this->m_object_selection_enabled; }
 
 	void EditorManager::SetObjectSelectionEnabled(bool value) { this->m_object_selection_enabled = value; if (value) this->m_current_editing_mode = EditingMode::kEditingMode_ObjectSelection; }
+
+	bool EditorManager::IsSimulate(void) const
+	{
+		return this->m_game_simulate;
+	}
+
+	void EditorManager::SetSimulate(bool value)
+	{
+		this->m_game_simulate = value;
+
+		this->m_current_editing_mode = EditingMode::kEditingMode_NoSelection;
+		this->m_ai_navigation_editing_enabled = false;
+		this->m_object_selection_enabled = false;
+	}
 }

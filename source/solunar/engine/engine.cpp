@@ -179,9 +179,18 @@ namespace solunar
 		World* world = Engine::ms_world;
 		if (world)
 		{
+			bool simulating = true;
+			if (g_editorManager)
+			{
+				simulating = g_editorManager->IsSimulate();
+			}
+
 			world->Update_PreEntityUpdate();
-			world->Update_PhysicsEntity();
-			world->Update_LogicEntity();
+			if (simulating)
+			{
+				world->Update_PhysicsEntity();
+				world->Update_LogicEntity();
+			}
 		}
 
 		if (g_engineData.m_editor)

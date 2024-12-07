@@ -99,11 +99,14 @@ namespace solunar
 	{
 		g_fGainedFocus = true;
 
-		if (g_engineData.m_shouldCaptureMouse)
-			InputManager::GetInstance()->SetCursorCapture(true);
+		if (!g_engineData.m_editor)
+		{
+			if (g_engineData.m_shouldCaptureMouse)
+				InputManager::GetInstance()->SetCursorCapture(true);
 
-		if (g_engineData.m_shouldHideMouse)
-			InputManager::GetInstance()->SetCursorHiding(true);
+			if (g_engineData.m_shouldHideMouse)
+				InputManager::GetInstance()->SetCursorHiding(true);
+		}
 	}
 
 	LRESULT CALLBACK wndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)

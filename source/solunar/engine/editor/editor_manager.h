@@ -41,12 +41,16 @@ namespace solunar
 		bool IsObjectSelectionEnabled(void) const;
 		void SetObjectSelectionEnabled(bool value);
 
+		bool IsSimulate(void) const;
+		void SetSimulate(bool value);
+
 	private:
 		void InitWindows();
 		void UpdateEditingModes();
 		void UpdateEditingMode_AIGraphNavigation();
 		void UpdateEditingMode_ObjectSelection();
 
+		void UpdateCamera();
 
 		IEditorWindow* GetWindowByEditingMode(EditingMode mode);
 
@@ -54,7 +58,7 @@ namespace solunar
 	private:
 		bool m_object_selection_enabled;
 		bool m_ai_navigation_editing_enabled;
-
+		bool m_game_simulate;
 		EditingMode m_current_editing_mode;
 		// todo: kirrik -> change to entity id type like uint32_t or something else, storing a pointer is not a good thing at all, it is temporary implementation
 		void* m_pSelectedEntity;
