@@ -1,6 +1,7 @@
 #include "editor_window_ai_navigation_builder.h"
 #include "imgui.h"
 #include "ai\pathfinding_navigation_graph.h"
+#include "editor_manager.h"
 
 #undef max
 #undef min
@@ -29,6 +30,11 @@ namespace solunar
 	{
 		if (ImGui::Begin("[AI] - Navigation Builder"))
 		{
+			bool is_editing = g_editorManager->IsAINavigationEditingEnabled();
+			ImGui::Checkbox("Graph Editing", &is_editing);
+			g_editorManager->SetAINavigationEditingEnabled(is_editing);
+
+			ImGui::SameLine();
 			ImGui::Button("Build");
 			ImGui::SameLine();
 			ImGui::Button("Clear");
