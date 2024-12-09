@@ -1,0 +1,1 @@
+@bin\win64\game_rwdi.exe -quit -modelConvert %1
