@@ -71,6 +71,11 @@ namespace solunar
 		g_renderer->SetRenderMode(modeToSet);
 	}
 
+	void Command_ShowPoly()
+	{
+		g_renderer->ToggleShowingWireframe();
+	}
+
 	void DrawLoadscreen()
 	{
 		std::weak_ptr<TextureMap> loadscreen = g_contentManager->LoadObject<TextureMap>("textures/loadscreen.jpg");
@@ -226,6 +231,7 @@ namespace solunar
 	void Renderer::Init()
 	{
 		ConsoleCommandManager::GetInstance()->RegisterCommand("togglermode", &Command_ToggleRMode);
+		ConsoleCommandManager::GetInstance()->RegisterCommand("showpoly", &Command_ShowPoly);
 
 		View* view = CameraProxy::GetInstance()->GetView();
 
