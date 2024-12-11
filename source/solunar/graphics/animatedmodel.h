@@ -146,11 +146,14 @@ public:
 
 	/** Node accessing */
 	int GetNodeByName(const std::string& name);
+	int GetRootNodeId() { return m_rootNodeId; }
 	void SetNodeScale(int nodeid, const glm::vec3& scale);
 
 	void DebugRender(const glm::mat4& modelMatrix);
 
 	bool HasSkin() { return m_skins.size(); }
+
+	size_t GetAnimationCount() { return m_animations.size(); }
 
 private:
 	std::vector<AnimatedSubMesh*> m_subMeshes;

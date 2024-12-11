@@ -40,8 +40,13 @@ DataStreamPtr ContentDevice::OpenStream(const std::string& filename)
 	path += "/";
 	path += filename;
 
+	// open an stream from packfile
 	if (g_fileSystemPack.exist(filename))
 		return g_fileSystemPack.openStream(filename, true);
+
+	// open an stream from absolute path
+	if (g_fileSystem->Exist(filename.c_str()))
+		return std::make_shared<FileStream>(filename);
 
 	if (!g_fileSystem->Exist(path.c_str()))
 		return DataStreamPtr(nullptr);

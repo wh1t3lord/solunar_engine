@@ -185,6 +185,9 @@ namespace solunar
 				simulating = g_editorManager->IsSimulate();
 			}
 
+			if (!world->IsWorldInitialized())
+				world->Initialize();
+
 			world->Update_PreEntityUpdate();
 			if (simulating)
 			{

@@ -155,6 +155,15 @@ namespace solunar {
 
 	void AnimatedMeshComponent::Render()
 	{
+#if 1
+		const BoundingBox& bbox = LockAnimatedModel()->GetBoundingBox();
+		GetEntity()->SetBoundingBox(bbox);
+#else
+		BoundingBox bbox = LockAnimatedModel()->GetBoundingBox();
+		bbox.transformAABB(LockAnimatedModel()->GetNodeMatrix(LockAnimatedModel()->GetRootNodeId()));
+		GetEntity()->SetBoundingBox(bbox);
+#endif
+
 		return;
 
 		if (!m_model.expired())

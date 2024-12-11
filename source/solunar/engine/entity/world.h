@@ -47,6 +47,9 @@ namespace solunar
 
 		void TogglePhysicsDebugDraw();
 
+		void Initialize();
+		bool IsWorldInitialized() { return m_isWorldInitialized; }
+
 		// Casting functions
 
 		bool RayCast(RayCastResult& rayResult, const glm::vec3& rayStart, const glm::vec3& rayEnd, const int collisionFilter = -1);
@@ -57,6 +60,7 @@ namespace solunar
 
 		GraphicsWorld* m_graphicsWorld;
 		PhysicsWorld* m_physicsWorld;
+		bool m_isWorldInitialized;
 	};
 
 }

@@ -85,21 +85,7 @@ void UsableAreaComponent::Update(float delta)
 #endif
 }
 
-void Debug_Draw3DText(const char* text, const glm::vec3& position, const glm::vec4& color)
-{
-	View* view = CameraProxy::GetInstance()->GetView();
-
-	glm::vec4 vp = glm::vec4(0.0f, 0.0f, (float)view->m_width, (float)view->m_height);
-	glm::vec3 proj = glm::project(position, view->m_view, view->m_projection, vp);
-	if (proj.z >= 1.0f)
-		return; // clip
-
-	proj.y = ((float)view->m_height - 1.0f - proj.y);
-
-	g_fontManager->DrawSystemFontShadowed(text, proj.x, proj.y, color);
-}
-
-void Debug_Draw3DText_Y(const char* text, const glm::vec3& position, const glm::vec4& color, float y = 0.0f)
+void Debug_Draw3DText(const char* text, const glm::vec3& position, const glm::vec4& color, float y /*= 0.0f*/)
 {
 	View* view = CameraProxy::GetInstance()->GetView();
 
@@ -112,7 +98,6 @@ void Debug_Draw3DText_Y(const char* text, const glm::vec3& position, const glm::
 
 	g_fontManager->DrawSystemFontShadowed(text, proj.x, proj.y, color);
 }
-
 
 static GameManager s_GameManager;
 GameManager* g_GameManager = &s_GameManager;
@@ -248,7 +233,7 @@ void DrawEntityPropertyWindow(Entity* entity)
 			}
 
 			// components
-			std::vector<Component*> components = entity->GetAllComponents();
+			const std::vector<Component*>& components = entity->GetAllComponents();
 			for (int i = 0; i < components.size(); i++)
 			{
 				ImGui::Separator();
@@ -429,7 +414,7 @@ void EditorCameraComponent::Update(float delta)
 		{
 			char buf[256];
 			snprintf(buf, sizeof(buf), "Entity: 0x%p", g_SelectedEntity);
-			Debug_Draw3DText_Y(buf, g_SelectedEntity->GetWorldPosition(), glm::vec4(1.0f), -25.0f);
+			Debug_Draw3DText(buf, g_SelectedEntity->GetWorldPosition(), glm::vec4(1.0f), -25.0f);
 
 			bool isLight = !!g_SelectedEntity->GetComponent<LightComponent>();
 			bool isMesh = !!g_SelectedEntity->GetComponent<MeshComponent>();
@@ -437,7 +422,7 @@ void EditorCameraComponent::Update(float delta)
 			if (isLight)
 			{
 				snprintf(buf, sizeof(buf), "Light");
-				Debug_Draw3DText_Y(buf, g_SelectedEntity->GetWorldPosition(), glm::vec4(1.0f), -50.0f);
+				Debug_Draw3DText(buf, g_SelectedEntity->GetWorldPosition(), glm::vec4(1.0f), -50.0f);
 
 				BoundingBox bbox = g_SelectedEntity->GetBoundingBox();
 				g_debugRender.drawBoundingBox(bbox, glm::vec3(1.0f, 0.5f, 0.0f));
@@ -446,7 +431,7 @@ void EditorCameraComponent::Update(float delta)
 			if (isMesh)
 			{
 				snprintf(buf, sizeof(buf), "Mesh");
-				Debug_Draw3DText_Y(buf, g_SelectedEntity->GetWorldPosition(), glm::vec4(1.0f), -50.0f);
+				Debug_Draw3DText(buf, g_SelectedEntity->GetWorldPosition(), glm::vec4(1.0f), -50.0f);
 			}
 		}
 

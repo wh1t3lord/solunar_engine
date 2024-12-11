@@ -8,6 +8,7 @@
 namespace solunar
 {
 
+
 std::unique_ptr<Console> g_console = std::make_unique<Console>();
 
 Console::Console() :
@@ -21,7 +22,8 @@ Console::~Console()
 
 void Console::Init()
 {
-	ConsoleCommandManager::GetInstance()->RegisterCommand("toggleconsole", &Console::Cmd_ToggleConsole);
+	ConsoleCommandManager::GetInstance()->RegisterCommand("help", &ConsoleCommandManager::Command_Help);
+	ConsoleCommandManager::GetInstance()->RegisterCommand("toggleconsole", &Console::Command_ToggleConsole);
 }
 
 void Console::Shutdown()
@@ -106,14 +108,15 @@ void Console::OnRender()
 		window_pos_pivot.x = (corner & 1) ? 1.0f : 0.0f;
 		window_pos_pivot.y = (corner & 2) ? 1.0f : 0.0f;
 		ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);
+		ImGui::SetNextWindowSize(ImVec2(io.DisplaySize.x - work_pos.y - PAD, work_pos.y + PAD));
 		window_flags |= ImGuiWindowFlags_NoMove;
 	}
 
 	ImGui::PushStyleVar(ImGuiStyleVar_WindowBorderSize, 0.0f);
-
-	ImGui::SetNextWindowBgAlpha(0.0f);
+	//ImGui::SetNextWindowBgAlpha(0.0f);
 	if (ImGui::Begin("Console", 0, ms_kOverlayWindowFlags))
 	{
+		//ImGui::GetWindowDrawList()->AddRectFilled(ImGui::GetWindowSize(), ImVec2(0.0f, 0.0f), 0xff0000ff);
 
 		ImGui::Text(">");
 
@@ -131,7 +134,7 @@ void Console::OnRender()
 #endif
 }
 
-void Console::Cmd_ToggleConsole()
+void Console::Command_ToggleConsole()
 {
 	g_console->ToggleConsole();
 }
@@ -147,6 +150,20 @@ void ConsoleCommandManager::RegisterCommand(const char* name, ConsoleCommand* co
 	reg.name = name;
 	reg.command = command;
 	m_commands.push_back(reg);
+}
+
+void ConsoleCommandManager::PrintHelp()
+{
+	Core::Msg("Command list:");
+
+	int numCommands = (int)m_commands.size();
+	for (int i = 0; i < numCommands; i++)
+		Core::Msg("%s", m_commands[i].name);
+}
+
+void ConsoleCommandManager::Command_Help()
+{
+	ConsoleCommandManager::GetInstance()->PrintHelp();
 }
 
 bool ConsoleCommandManager::Execute(const char* text)

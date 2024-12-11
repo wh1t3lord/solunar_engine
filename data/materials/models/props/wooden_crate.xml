@@ -1,0 +1,10 @@
+<Material>
+    <Shader>diffuse</Shader>
+    <AlbedoTexture filename="textures/models/props/prop_wooden_crate_albedo.jpg"/>
+    <NormalTexture filename="textures/models/props/prop_wooden_crate_normal.jpg"/>
+    <SpecularTexture filename=""/>
+    <RenderState>
+        <DepthWrite value="true"/>
+        <SelfIllumination value="false"/>
+    </RenderState>
+</Material>

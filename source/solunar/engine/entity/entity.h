@@ -54,7 +54,7 @@ public:
 	Component* CreateComponentByTypeInfo(const TypeInfo* typeinfo);
 	Component* GetComponentByTypeInfo(const TypeInfo* typeinfo);
 
-	std::vector<Component*> GetAllComponents();
+	const std::vector<Component*>& GetAllComponents();
 
 	void AddComponent(Component* component);
 	void UpdateWorldTransform();

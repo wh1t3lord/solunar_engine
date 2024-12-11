@@ -249,15 +249,37 @@ namespace solunar
 			Core::Error("ModelBase::saveBinary: invalid filename.");
 
 		//std::string modelfilename = oldFilename.substr(0, extensionPos);
+
+#if 0
 		std::string modelfilename = "data/";
 		modelfilename += oldFilename.substr(0, extensionPos);
 		modelfilename += ".model";
+#else
+		std::string modelfilename = oldFilename.substr(0, extensionPos);
+		if (modelfilename.find("data/") != std::string::npos)
+		{
+			modelfilename.clear();
+			modelfilename = "data/";
+			modelfilename += oldFilename.substr(0, extensionPos);
+			modelfilename += ".model";
+		}
+		else
+		{
+			modelfilename += ".model";
+		}
+#endif
 
+#define DELETE_OLD_MODEL
+
+#ifndef DELETE_OLD_MODEL
 		if (g_fileSystem->Exist(modelfilename.c_str()))
 			return;
-
-		//DataStreamPtr stream = g_fileSystem->openStream(modelfilename, false);
-		//DataStreamPtr stream = std::make_shared<FileStream>(modelfilename, "wb");
+#else
+		if (g_fileSystem->Exist(modelfilename.c_str()))
+		{
+			DeleteFileA(modelfilename.c_str());
+		}
+#endif // !DELETE_OLD_MODEL
 
 		FileHandle file = g_fileSystem->Create(modelfilename.c_str());
 

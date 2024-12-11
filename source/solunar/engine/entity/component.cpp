@@ -46,6 +46,10 @@ void Component::OnWorldSet(World* world)
 	m_world = world;
 }
 
+void Component::OnInit()
+{
+}
+
 void Component::OnEntityRemove()
 {
 	m_entity = nullptr;

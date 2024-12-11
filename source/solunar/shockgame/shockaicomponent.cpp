@@ -22,6 +22,7 @@ BEGIN_PROPERTY_REGISTER(ShockAIComponent)
 END_PROPERTY_REGISTER(ShockAIComponent)
 
 ShockAIComponent::ShockAIComponent() :
+	m_animatedComponent(nullptr),
 	m_aiType(ShockAIType_None),
 	m_fire(false),
 	m_disable(false)
@@ -30,6 +31,25 @@ ShockAIComponent::ShockAIComponent() :
 
 ShockAIComponent::~ShockAIComponent()
 {
+}
+
+void ShockAIComponent::OnInit()
+{
+	Entity* entity = GetEntity();
+
+	m_animatedComponent = entity->GetComponent<AnimatedMeshComponent>();
+	if (!m_animatedComponent)
+	{
+		Core::Msg("ShockAIComponent::OnInit: entity 0x%p doesn't have animated mesh component!", entity);
+		return;
+	}
+	
+	// Initialize animations
+	std::shared_ptr<AnimatedModel> animatedModel = m_animatedComponent->LockAnimatedModel();
+	m_zombieData.m_idleAnimation = animatedModel->GetAnimationByName("idle");
+	m_zombieData.m_walkAnimation = animatedModel->GetAnimationByName("walk");
+	m_zombieData.m_attackAnimation = animatedModel->GetAnimationByName("attack");
+	m_zombieData.m_dieAnimation = animatedModel->GetAnimationByName("die");
 }
 
 void ShockAIComponent::Update(float dt)
@@ -94,8 +114,6 @@ void ShockAIComponent::updateFire(float dt)
 
 void ShockAIComponent::UpdateZombie(float dt)
 {
-	g_debugRender.drawBoundingBox(GetEntity()->GetBoundingBox(), glm::vec3(1.0f, 0.0f, 0.0f));
-
 	glm::vec3 direction = glm::normalize(g_Player->GetPosition() - GetEntity()->GetPosition());
 	
 	/*
@@ -106,8 +124,10 @@ void ShockAIComponent::UpdateZombie(float dt)
 	*/
 
 	RigidBodyComponent* rigidBody = (RigidBodyComponent*)GetEntity()->GetComponentByTypeInfo(RigidBodyComponent::GetStaticTypeInfo());
-	if (rigidBody)
-		rigidBody->SetLinearVelocity(direction * 12.0f);
+
+	// to whitelord: uncomment this to move entity !!!!
+//	if (rigidBody)
+//		rigidBody->SetLinearVelocity(direction * 2.0f);
 
 	// rotate camera torwads to player
 	glm::vec3 playerPos = g_Player->GetPosition();
@@ -118,6 +138,45 @@ void ShockAIComponent::UpdateZombie(float dt)
 
 	glm::quat rotation = glm::quatLookAt(glm::normalize(playerPos - characterPos), glm::vec3(0.0f, 1.0f, 0.0f));
 	GetEntity()->SetRotation(rotation);
+
+	if (m_animatedComponent)
+		UpdateZombie_AnimationController(dt);
+}
+
+void ShockAIComponent::UpdateZombie_AnimationController(float dt)
+{
+	// cycle of playing anims
+#if 0
+	static int playingAnimationId = 0;
+
+	std::shared_ptr<AnimatedModel> animatedModel = m_animatedComponent->LockAnimatedModel();
+	if (animatedModel->IsStoped())
+	{
+		if (playingAnimationId >= animatedModel->GetAnimationCount())
+			playingAnimationId = 0;
+
+		animatedModel->PlayAnimation( playingAnimationId );
+
+		playingAnimationId++;
+	}
+#endif
+
+	std::shared_ptr<AnimatedModel> animatedModel = m_animatedComponent->LockAnimatedModel();
+	if (animatedModel->IsStoped())
+	{
+		animatedModel->PlayAnimation( m_zombieData.m_idleAnimation );
+	}
+
+	animatedModel->Update(dt);
+
+	// debug stuff
+#if 0
+	static char debugText[128];
+	sprintf(debugText, "Animation: %s", animatedModel->GetCurrentAnimation()->m_name.c_str());
+	Debug_Draw3DText(debugText, GetEntity()->GetPosition(), glm::vec4(1.f,1.f,1.f,1.f), -50.0f);
+	sprintf(debugText, "Time: %f", animatedModel->GetCurrentTime());
+	Debug_Draw3DText(debugText, GetEntity()->GetPosition(), glm::vec4(1.f, 1.f, 1.f, 1.f), -25.0f);
+#endif
 }
 
 void ShockAIComponent::LoadXML(tinyxml2::XMLElement& element)
