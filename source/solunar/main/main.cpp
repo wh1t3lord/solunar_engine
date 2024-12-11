@@ -13,7 +13,10 @@
 #include "graphics/graphicsoptions.h"
 #include "graphics/view.h"
 
+#include "engine/editor/editor_manager.h"
+
 #include "main/win32_keys.h"
+
 
 #include "backends/imgui_impl_win32.h"
 #include <engine/inputmanager_win32.h>
@@ -116,8 +119,26 @@ namespace solunar
 		switch (Msg)
 		{
 		case WM_CLOSE:
-			PostQuitMessage(0);
-			return 0;
+			if (g_engineData.m_editor)
+			{
+				EngineStateManager::GetInstance()->OnCloseApplication();
+
+				if (g_editorManager)
+				{
+					if (g_editorManager->IsNeedToCloseApplication())
+					{
+						PostQuitMessage(0);
+						return 0;
+					}
+				}
+
+				return 0;
+			}
+			else
+			{
+				PostQuitMessage(0); 
+				return 0;
+			}
 
 		case WM_KEYDOWN:
 		{

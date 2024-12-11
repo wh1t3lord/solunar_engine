@@ -505,6 +505,17 @@ namespace solunar {
 		if (g_forceQuit)
 			return false;
 
+		if (g_engineData.m_editor)
+		{
+			if (g_editorManager)
+			{
+				if (g_editorManager->IsNeedToCloseApplication())
+				{
+					return false;
+				}
+			}
+		}
+
 		if (g_slowdown)
 			Sleep(100);
 

@@ -4,6 +4,7 @@
 #include "engine.h"
 #include "camera.h"
 #include "entity\cameracomponent.h"
+#include "imgui.h"
 
 namespace solunar
 {
@@ -13,6 +14,8 @@ namespace solunar
 		m_object_selection_enabled(false),
 		m_ai_navigation_editing_enabled(false),
 		m_game_simulate(false),
+		m_close_application(false),
+		m_show_modal_close_application_window(false),
 		m_current_editing_mode(EditingMode::kEditingMode_NoSelection),
 		m_pWorld(nullptr),
 		m_pEditingMode_AINavigationGraph(nullptr),
@@ -216,6 +219,41 @@ namespace solunar
 		return pResult;
 	}
 
+	void EditorManager::ShowModalWindowOnCloseApplication()
+	{
+		if (!this->m_show_modal_close_application_window)
+			return;
+
+		bool show = this->m_show_modal_close_application_window;
+
+		if (show)
+		{
+			ImGui::OpenPopup("Close Editor?");
+		}
+
+		ImVec2 center = ImGui::GetMainViewport()->GetCenter();
+		ImGui::SetNextWindowPos(center, ImGuiCond_Appearing, ImVec2(0.5f, 0.5f));
+
+		if (ImGui::BeginPopupModal("Close Editor?", 0, ImGuiWindowFlags_AlwaysAutoResize))
+		{
+			if (ImGui::Button("Yes##ModalCloseEditor"))
+			{
+				this->m_close_application = true;
+				this->m_show_modal_close_application_window = false;
+			}
+			ImGui::SetItemDefaultFocus();
+			ImGui::SameLine();
+			if (ImGui::Button("No##ModalCloseEditor"))
+			{
+				this->m_close_application = false;
+				this->m_show_modal_close_application_window = false;
+				EngineStateManager::GetInstance()->RestoreState();
+			}
+
+			ImGui::EndPopup();
+		}
+	}
+
 	void EditorManager::Shutdown()
 	{
 		for (IEditorWindow* pWindow : m_windows)
@@ -231,6 +269,8 @@ namespace solunar
 
 	void EditorManager::Update()
 	{
+		this->ShowModalWindowOnCloseApplication();
+
 		for (IEditorWindow* pWindow : m_windows)
 		{
 			if (pWindow)
@@ -298,5 +338,16 @@ namespace solunar
 		this->m_current_editing_mode = EditingMode::kEditingMode_NoSelection;
 		this->m_ai_navigation_editing_enabled = false;
 		this->m_object_selection_enabled = false;
+	}
+
+	void EditorManager::OnCloseApplication()
+	{
+		if (!this->m_show_modal_close_application_window)
+			this->m_show_modal_close_application_window = true;
+	}
+
+	bool EditorManager::IsNeedToCloseApplication() const
+	{
+		return this->m_close_application;
 	}
 }
