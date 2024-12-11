@@ -21,7 +21,8 @@ namespace solunar
 		const char* GetName(void) const override;
 		bool IsShow(void) const override;
 		void SetShow(bool status) override;
-
+		int GetEditingMode() override;
+		void UpdateEditingMode(InputManager* pInputManager, World* pWorld) override;
 	private:
 		bool m_show;
 		int m_selected_type;

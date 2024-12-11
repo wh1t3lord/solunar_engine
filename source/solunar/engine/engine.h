@@ -33,6 +33,7 @@ namespace solunar
 		None,
 		Running,
 		LoadWorld,
+		CloseApplication,
 
 		Count
 	};
@@ -47,6 +48,11 @@ namespace solunar
 		void LoadEmptyWorld();
 	
 		void Update();
+
+		void OnCloseApplication();
+
+		// returns to Running
+		void RestoreState();
 
 	private:
 		void OnStateSwitch();

@@ -109,10 +109,10 @@ namespace solunar {
 
 			tinyxml2::XMLElement* component = doc.NewElement("Class");
 			component->SetAttribute("classname", it->GetClassName());
-			
+
 			if (it->m_baseInfo)
 				component->SetAttribute("baseClassname", it->m_baseInfo->GetClassName());
-			
+
 			pRoot->InsertFirstChild(component);
 
 			std::vector<IProperty*> properties;
@@ -245,9 +245,9 @@ namespace solunar {
 							{
 								std::string filename = ofn.lpstrFile;
 
-								filename = filename.substr(filename.rfind('\\')+1);
+								filename = filename.substr(filename.rfind('\\') + 1);
 
-								EngineStateManager::GetInstance()->LoadWorld("worlds/"+ filename);
+								EngineStateManager::GetInstance()->LoadWorld("worlds/" + filename);
 							}
 #else
 #error provide implementation
@@ -292,6 +292,25 @@ namespace solunar {
 
 						ImGui::EndMenu();
 					}
+
+					if (ImGui::BeginMenu("Editing Modes##Editor"))
+					{
+						bool is_selected_navgraph = g_editorManager->IsAINavigationEditingEnabled();
+						if (ImGui::MenuItem("Navigation Graph##Editor", 0, &is_selected_navgraph))
+						{
+							g_editorManager->SetAINavigationEditingEnabled(!g_editorManager->IsAINavigationEditingEnabled());
+						}
+
+						bool is_selected_objectsel = g_editorManager->IsObjectSelectionEnabled();
+						if (ImGui::MenuItem("Object Selection##Editor",0, &is_selected_objectsel))
+						{
+							g_editorManager->SetObjectSelectionEnabled(!g_editorManager->IsObjectSelectionEnabled());
+						}
+						
+						ImGui::EndMenu();
+					}
+
+
 
 					ImGui::Separator();
 
@@ -355,6 +374,8 @@ namespace solunar {
 
 		if (g_showShockPlayerDebug)
 			shockGamePlayerDebug(&g_showShockPlayerDebug);
+
+		// todo: add image buttons for editing modes
 
 		DebugOverlay::render();
 	}
@@ -483,6 +504,17 @@ namespace solunar {
 
 		if (g_forceQuit)
 			return false;
+
+		if (g_engineData.m_editor)
+		{
+			if (g_editorManager)
+			{
+				if (g_editorManager->IsNeedToCloseApplication())
+				{
+					return false;
+				}
+			}
+		}
 
 		if (g_slowdown)
 			Sleep(100);

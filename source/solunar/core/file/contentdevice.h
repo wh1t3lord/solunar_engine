@@ -12,7 +12,7 @@ namespace solunar
 class ContentDevice
 {
 public:
-	ContentDevice(const std::string& path);
+	ContentDevice(const std::string& dirname, const std::string& working_directory);
 	~ContentDevice();
 
 	DataStreamPtr OpenStream(const std::string& filename);
@@ -21,6 +21,7 @@ public:
 
 private:
 	std::string m_path;
+	char m_working_path[1024];
 };
 
 extern ContentDevice* g_contentDevice;

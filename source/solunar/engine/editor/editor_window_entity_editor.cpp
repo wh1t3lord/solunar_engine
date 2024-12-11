@@ -71,4 +71,14 @@ namespace solunar
 	{
 		m_show = status;
 	}
+
+	int EditorWindow_EntityEditor::GetEditingMode()
+	{
+		return EditingMode::kEditingMode_ObjectSelection;
+	}
+
+	void EditorWindow_EntityEditor::UpdateEditingMode(InputManager* pInputManager, World* pWorld)
+	{
+
+	}
 }

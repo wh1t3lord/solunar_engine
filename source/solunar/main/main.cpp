@@ -13,7 +13,10 @@
 #include "graphics/graphicsoptions.h"
 #include "graphics/view.h"
 
+#include "engine/editor/editor_manager.h"
+
 #include "main/win32_keys.h"
+
 
 #include "backends/imgui_impl_win32.h"
 #include <engine/inputmanager_win32.h>
@@ -44,7 +47,7 @@ namespace solunar
 		Core::Init();
 
 		// create game content device
-		g_gameContentDevice = mem_new<ContentDevice>("data");
+		g_gameContentDevice = mem_new<ContentDevice>("data", appGetCurrentDir());
 
 		// mount game content device
 		g_contentManager->MountDevice(g_gameContentDevice, "game");
@@ -99,11 +102,14 @@ namespace solunar
 	{
 		g_fGainedFocus = true;
 
-		if (g_engineData.m_shouldCaptureMouse)
-			InputManager::GetInstance()->SetCursorCapture(true);
+		if (!g_engineData.m_editor)
+		{
+			if (g_engineData.m_shouldCaptureMouse)
+				InputManager::GetInstance()->SetCursorCapture(true);
 
-		if (g_engineData.m_shouldHideMouse)
-			InputManager::GetInstance()->SetCursorHiding(true);
+			if (g_engineData.m_shouldHideMouse)
+				InputManager::GetInstance()->SetCursorHiding(true);
+		}
 	}
 
 	LRESULT CALLBACK wndProc(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
@@ -113,8 +119,26 @@ namespace solunar
 		switch (Msg)
 		{
 		case WM_CLOSE:
-			PostQuitMessage(0);
-			return 0;
+			if (g_engineData.m_editor)
+			{
+				EngineStateManager::GetInstance()->OnCloseApplication();
+
+				if (g_editorManager)
+				{
+					if (g_editorManager->IsNeedToCloseApplication())
+					{
+						PostQuitMessage(0);
+						return 0;
+					}
+				}
+
+				return 0;
+			}
+			else
+			{
+				PostQuitMessage(0); 
+				return 0;
+			}
 
 		case WM_KEYDOWN:
 		{

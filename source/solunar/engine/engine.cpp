@@ -179,12 +179,21 @@ namespace solunar
 		World* world = Engine::ms_world;
 		if (world)
 		{
+			bool simulating = true;
+			if (g_editorManager)
+			{
+				simulating = g_editorManager->IsSimulate();
+			}
+
 			if (!world->IsWorldInitialized())
 				world->Initialize();
 
 			world->Update_PreEntityUpdate();
-			world->Update_PhysicsEntity();
-			world->Update_LogicEntity();
+			if (simulating)
+			{
+				world->Update_PhysicsEntity();
+				world->Update_LogicEntity();
+			}
 		}
 
 		if (g_engineData.m_editor)
@@ -238,13 +247,30 @@ namespace solunar
 		OnStateSwitch();
 	}
 
+	void EngineStateManager::OnCloseApplication()
+	{
+		if (g_engineData.m_editor)
+		{
+			if (g_editorManager)
+			{
+				m_nextState = EngineState::CloseApplication;
+			}
+		}
+	}
+
+	void EngineStateManager::RestoreState()
+	{
+		m_nextState = EngineState::Running;
+	}
+
 	void EngineStateManager::OnStateSwitch()
 	{
 		static const char* s_stateNames[(int)EngineState::Count] =
 		{
 			"None",
 			"Running",
-			"LoadWorld"
+			"LoadWorld",
+			"CloseApplication"
 		};
 
 		Core::Msg("Engine: Switching to state %s", s_stateNames[(int)m_nextState]);
@@ -283,7 +309,17 @@ namespace solunar
 			m_worldName.clear();
 
 			break;
-
+		case EngineState::CloseApplication:
+		{
+			if (g_engineData.m_editor)
+			{
+				if (g_editorManager)
+				{
+					g_editorManager->OnCloseApplication();
+				}
+			}
+			break;
+		}
 		default:
 			break;
 		}
