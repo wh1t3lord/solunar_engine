@@ -19,6 +19,13 @@ namespace solunar
 
 	class EditorManager : public Singleton<EditorManager>
 	{
+		struct EditorCamera
+		{
+			float yaw{};
+			float pitch{};
+			glm::vec3 direction{};
+		};
+
 	public:
 		EditorManager();
 		~EditorManager();
@@ -40,6 +47,8 @@ namespace solunar
 
 		bool IsObjectSelectionEnabled(void) const;
 		void SetObjectSelectionEnabled(bool value);
+
+		void DisableEditing();
 
 		bool IsSimulate(void) const;
 		void SetSimulate(bool value);
@@ -71,6 +80,7 @@ namespace solunar
 		World* m_pWorld;
 		IEditorWindow* m_pEditingMode_AINavigationGraph;
 		IEditorWindow* m_pEditingMode_ObjectSelection;
+		EditorCamera m_cam;
 		std::vector<IEditorWindow*> m_windows;
 	};
 	

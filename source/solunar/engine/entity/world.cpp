@@ -10,6 +10,7 @@
 #include "engine/physics/shapescomponent.h"
 #include "editor\editor_window.h"
 #include "engine\engine.h"
+#include "editor/editor_manager.h"
 #include <imgui.h>
 
 namespace solunar
@@ -182,6 +183,9 @@ namespace solunar
 			rayCallback.m_collisionFilterMask = kCollisionFilterAllMask;
 		else
 			rayCallback.m_collisionFilterMask = collisionFilter;
+
+		if (g_engineData.m_editor && !g_editorManager->GetInstance()->IsSimulate())
+			m_physicsWorld->GetWorld()->updateAabbs();
 
 		m_physicsWorld->GetWorld()->rayTest(glmVectorToBt(rayStart), glmVectorToBt(rayEnd), rayCallback);
 		if (rayCallback.hasHit())

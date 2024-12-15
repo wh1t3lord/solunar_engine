@@ -19,23 +19,41 @@ namespace solunar
 		{
 			struct Node
 			{
+				bool selected=false;
 				unsigned char id;
+				glm::vec3 position;
 				std::vector<unsigned char> neighbours;
 			};
 
-			bool was_changed_controls;
+			struct SelectedNode
+			{
+				unsigned char region_id;
+				unsigned char id;
+			};
+
+			bool need_to_update_stats;
+			// per region
 			unsigned char max_nodes_count;
 			unsigned char max_regions_count;
 			unsigned char max_nodes_neighbour_per_node_count;
 
 
 			unsigned char real_max_neighbours_count_for_one_node;
+			// adds neighbour for each
+			bool node_creation_flag_bidirectional;
+			bool node_creation_flag_onedirectional;
+			bool is_selecting_node_mode;
+			SelectedNode selected_node;
+			// for picking our nodes on scene
+			float node_collision_radius;
 			int total_nodes;
 			int max_possible_total_nodes;
 			size_t memory_allocation_after_compilation;
-
+			Node* pHoveredNode;
 			// key=region|value=Node
 			std::unordered_map<unsigned char, std::vector<Node>> nodes;
+			std::vector<glm::vec3> m_centers_of_regions;
+			glm::vec3 m_debug_region_colors[255];
 		};
 
 	public:
@@ -52,7 +70,22 @@ namespace solunar
 		void UpdateEditingMode(InputManager* pInputManager, World* pWorld) override;
 	private:
 		void UpdateStats(BuilderConfig_ManualGraph& conf);
-		void AddNodeOnSurface(const glm::vec3& world_pos);
+		
+		// Editing
+		void AddNodeOnSurface(const glm::vec3& world_pos, const glm::vec3& normal);
+		void UpdateCentersOfRegions();
+
+		void ClearNodes();
+
+		void DrawDebug();
+		void DrawDebugNode(unsigned char region_id, const BuilderConfig_ManualGraph::Node& node, const glm::vec3& node_world_pos);
+
+
+		void InitConfig_ManualGraph(BuilderConfig_ManualGraph& config);
+
+		void UpdateSelectingNode();
+
+		bool RayIntersectionSphereNode(const glm::vec3& ray_origin, const glm::vec3& ray_dir, const glm::vec3& sphere_pos, float sphere_radius, float& t, glm::vec3& point);
 
 	private:
 		bool m_show;

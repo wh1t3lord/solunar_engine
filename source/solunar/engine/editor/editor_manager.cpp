@@ -10,6 +10,24 @@ namespace solunar
 {
 	EditorManager* g_editorManager = nullptr;
 
+	float wrapBetween2(float value, float min, float max) {
+		// Algorithm from http://stackoverflow.com/a/5852628/599884
+
+		if (min > max) {
+			// Swap min and max
+			float temp = min;
+			min = max;
+			max = temp;
+		}
+
+		float range = max - min;
+		if (range == 0) {
+			return max;
+		}
+
+		return (float)(value - range * floor((value - min) / range));
+	}
+
 	EditorManager::EditorManager() :
 		m_object_selection_enabled(false),
 		m_ai_navigation_editing_enabled(false),
@@ -20,7 +38,8 @@ namespace solunar
 		m_pWorld(nullptr),
 		m_pEditingMode_AINavigationGraph(nullptr),
 		m_pEditingMode_ObjectSelection(nullptr),
-		m_pSelectedEntity(nullptr)
+		m_pSelectedEntity(nullptr),
+		m_cam{}
 	{
 	}
 
@@ -166,17 +185,19 @@ namespace solunar
 						pCamera->GetCameraComponent()->GetEntity()->SetPosition(pos);
 					}
 
+					constexpr glm::vec3 _kYAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+
 					if (pInputManager->IsPressed(KeyboardKeys::KEY_D))
 					{
 						glm::vec3 pos = pCamera->GetCameraComponent()->GetEntity()->GetPosition();
-						pos.x += 0.02f;
+						pos += glm::normalize(glm::cross(pCamera->GetDirection(), _kYAxis)) * 0.02f;
 						pCamera->GetCameraComponent()->GetEntity()->SetPosition(pos);
 					}
 
 					if (pInputManager->IsPressed(KeyboardKeys::KEY_A))
 					{
 						glm::vec3 pos = pCamera->GetCameraComponent()->GetEntity()->GetPosition();
-						pos.x -= 0.02f;
+						pos -= glm::normalize(glm::cross(pCamera->GetDirection(), _kYAxis)) * 0.02f;
 						pCamera->GetCameraComponent()->GetEntity()->SetPosition(pos);
 					}
 
@@ -184,6 +205,30 @@ namespace solunar
 					{
 						g_engineData.m_shouldCaptureMouse = true;
 						g_engineData.m_shouldHideMouse = true;
+
+						glm::vec2 delta = pInputManager->GetDeltaCursorPos();
+
+						float xoffset = delta.x;
+						float yoffset = delta.y;
+
+						xoffset *= 0.1f;
+						yoffset *= 0.1f;
+
+						m_cam.yaw += xoffset;
+						m_cam.pitch += yoffset;
+
+						m_cam.pitch = glm::clamp(m_cam.pitch, -89.0f, 89.0f);
+						m_cam.yaw = wrapBetween2(m_cam.yaw, -180.0f, 180.0f);
+						m_cam.pitch = wrapBetween2(m_cam.pitch, -180.0f, 180.0f);
+
+						glm::vec3 front;
+						front.x = cos(glm::radians(m_cam.yaw)) * cos(glm::radians(m_cam.pitch));
+						front.y = sin(glm::radians(m_cam.pitch));
+						front.z = sin(glm::radians(m_cam.yaw)) * cos(glm::radians(m_cam.pitch));
+
+						m_cam.direction = glm::normalize(front);
+
+						pCamera->GetCameraComponent()->SetDirection(m_cam.direction);
 					}
 					else
 					{
@@ -325,6 +370,13 @@ namespace solunar
 	bool EditorManager::IsObjectSelectionEnabled(void) const { return this->m_object_selection_enabled; }
 
 	void EditorManager::SetObjectSelectionEnabled(bool value) { this->m_object_selection_enabled = value; if (value) this->m_current_editing_mode = EditingMode::kEditingMode_ObjectSelection; }
+
+	void EditorManager::DisableEditing()
+	{
+		this->m_ai_navigation_editing_enabled = false;
+		this->m_object_selection_enabled = false;
+		this->m_current_editing_mode = EditingMode::kEditingMode_NoSelection;
+	}
 
 	bool EditorManager::IsSimulate(void) const
 	{

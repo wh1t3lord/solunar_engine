@@ -31,7 +31,7 @@ void D3D11Device::Create()
 
 	UINT deviceCreationFlags = 0;
 #ifndef NDEBUG
-	deviceCreationFlags |= D3D11_CREATE_DEVICE_DEBUG;
+//	deviceCreationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
 	HRESULT hr = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_HARDWARE, 0, deviceCreationFlags, &needFeatureLevel, 1, D3D11_SDK_VERSION,
