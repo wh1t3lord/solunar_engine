@@ -85,6 +85,32 @@ extern GameManager* g_GameManager;
 
 extern Entity* g_Player;
 
+class FadeRenderer
+{
+public:
+	static FadeRenderer* GetInstance();
+
+public:
+	void SetFade(float time, bool isOut);
+
+	void Draw();
+
+private:
+	float m_time;
+	float m_currentTime;
+	bool m_isOut;
+};
+
+class PlayerSpawnComponent : public Component
+{
+public:
+	DECLARE_OBJECT(PlayerSpawnComponent);
+
+public:
+	PlayerSpawnComponent();
+	~PlayerSpawnComponent();
+};
+
 }
 
 

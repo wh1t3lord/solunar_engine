@@ -103,6 +103,8 @@ namespace solunar
 
 	void World::Update_PreEntityUpdate()
 	{
+		m_entityManager.Update();
+
 		const std::vector<Entity*>& entities = m_entityManager.GetEntities();
 		for (auto it : entities)
 		{
@@ -170,6 +172,8 @@ namespace solunar
 		}
 
 		m_isWorldInitialized = true;
+
+		m_entityManager.OnWorldLoaded();
 	}
 
 	bool World::RayCast(RayCastResult& rayResult, const glm::vec3& rayStart, const glm::vec3& rayEnd, const int collisionFilter /* =-1*/)

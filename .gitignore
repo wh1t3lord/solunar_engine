@@ -9,3 +9,4 @@ engine_output.txt
 imgui.ini
 imgui_log.txt
 GameSettings.ini
+data/shaders/pc

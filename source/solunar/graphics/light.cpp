@@ -24,7 +24,7 @@ namespace solunar
 		m_ambientColor = glm::vec3(1.0f);
 		m_specularColor = glm::vec3(1.0f);
 	//	m_shininess = 128;
-		m_radius = 50.0f;
+		m_radius = 12.0f;
 	}
 
 	LightComponent::~LightComponent()

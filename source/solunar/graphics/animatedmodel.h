@@ -155,6 +155,8 @@ public:
 
 	size_t GetAnimationCount() { return m_animations.size(); }
 
+	std::shared_ptr< AnimatedModel > Clone();
+
 private:
 	std::vector<AnimatedSubMesh*> m_subMeshes;
 	std::vector<Animation> m_animations;
@@ -171,6 +173,8 @@ private:
 	int m_animationId;
 
 	BoundingBox m_boundingBox;
+
+	bool m_iAmClone = false;
 
 public:
 	glm::mat4 m_bonesMatrices[MAX_JOINTS];

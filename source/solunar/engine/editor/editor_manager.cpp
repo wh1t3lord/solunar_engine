@@ -184,6 +184,11 @@ namespace solunar
 					{
 						g_engineData.m_shouldCaptureMouse = true;
 						g_engineData.m_shouldHideMouse = true;
+
+						glm::vec2 mousePos = pInputManager->GetCursorPos();
+
+						glm::vec2 deltaMousePos = pInputManager->GetDeltaCursorPos();
+					 	dynamicCast<CameraFirstPersonComponent>(pCamera->GetCameraComponent())->updateFromMousePosition(deltaMousePos);
 					}
 					else
 					{
