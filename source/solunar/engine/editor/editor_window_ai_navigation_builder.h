@@ -20,6 +20,8 @@ namespace solunar
 			struct Node
 			{
 				bool selected=false;
+				bool hovered = false;
+				unsigned char region_id;
 				unsigned char id;
 				glm::vec3 position;
 				std::vector<unsigned char> neighbours;
@@ -43,17 +45,23 @@ namespace solunar
 			bool node_creation_flag_bidirectional;
 			bool node_creation_flag_onedirectional;
 			bool is_selecting_node_mode;
-			SelectedNode selected_node;
+			bool is_linking_node_mode;
 			// for picking our nodes on scene
 			float node_collision_radius;
 			int total_nodes;
 			int max_possible_total_nodes;
 			size_t memory_allocation_after_compilation;
 			Node* pHoveredNode;
+			Node* pSelectedNode;
+
+			// linking is between two nodes 1 and 2 so left and right terminology
+			Node* pLinkLeft;
+			Node* pLinkRight;
+
 			// key=region|value=Node
 			std::unordered_map<unsigned char, std::vector<Node>> nodes;
 			std::vector<glm::vec3> m_centers_of_regions;
-			glm::vec3 m_debug_region_colors[255];
+			glm::vec3 debug_region_colors[255];
 		};
 
 	public:
@@ -84,6 +92,7 @@ namespace solunar
 		void InitConfig_ManualGraph(BuilderConfig_ManualGraph& config);
 
 		void UpdateSelectingNode();
+		void UpdateDeletingNode();
 
 		bool RayIntersectionSphereNode(const glm::vec3& ray_origin, const glm::vec3& ray_dir, const glm::vec3& sphere_pos, float sphere_radius, float& t, glm::vec3& point);
 

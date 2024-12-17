@@ -17,7 +17,8 @@ namespace solunar
 {
 	constexpr float _kMGLengthOfRoot = 0.5f;
 	constexpr float _kMGLengthOfArrow = 0.25f;
-	glm::vec3 _kMGSelectedNodeColor = glm::vec3(1.0f, 0.8f, 0.07f);
+	glm::vec3 _kMGHoveredNodeColor = glm::vec3(1.0f, 1.0f, 0.0f);
+	glm::vec3 _kMGSelectedNodeColor = glm::vec3(1.0f, 0.0f, 0.0f);
 
 	EditorWindow_AINavigationBuilder::EditorWindow_AINavigationBuilder(void) : IEditorWindow(), m_show(false), m_current_type(eNavigationType::kNavigationManualGraph)
 	{
@@ -214,6 +215,7 @@ namespace solunar
 		SHORT lbm_state = GetAsyncKeyState(VK_LBUTTON);
 
 		this->UpdateSelectingNode();
+		this->UpdateDeletingNode();
 
 		if (
 			lbm_state & 0x01 && 
@@ -311,17 +313,18 @@ namespace solunar
 			OutputDebugStringA(buf);
 #endif
 
-			if (this->m_conf_mg.selected_node.region_id != unsigned char(-1))
+			if (this->m_conf_mg.pSelectedNode)
 			{
-				Assert(this->m_conf_mg.nodes.find(this->m_conf_mg.selected_node.region_id) != this->m_conf_mg.nodes.end() && "can't be because for selecting node you had to add node to storage!!! Something is broken");
+				Assert(this->m_conf_mg.nodes.find(this->m_conf_mg.pSelectedNode->region_id) != this->m_conf_mg.nodes.end() && "can't be because for selecting node you had to add node to storage!!! Something is broken");
 
 				if (
-					this->m_conf_mg.nodes[this->m_conf_mg.selected_node.region_id].size() < this->m_conf_mg.max_nodes_count)
+					this->m_conf_mg.nodes[this->m_conf_mg.pSelectedNode->region_id].size() < this->m_conf_mg.max_nodes_count)
 				{
 					BuilderConfig_ManualGraph::Node instance;
-					instance.id = this->m_conf_mg.nodes[this->m_conf_mg.selected_node.region_id].size();
+					instance.id = this->m_conf_mg.nodes[this->m_conf_mg.pSelectedNode->region_id].size();
 					instance.position = world_pos;
-					this->m_conf_mg.nodes[this->m_conf_mg.selected_node.region_id].push_back(instance);
+					instance.region_id = this->m_conf_mg.pSelectedNode->region_id;
+					this->m_conf_mg.nodes[this->m_conf_mg.pSelectedNode->region_id].push_back(instance);
 				}
 			}
 			else
@@ -356,6 +359,7 @@ namespace solunar
 					BuilderConfig_ManualGraph::Node instance;
 					instance.id = this->m_conf_mg.nodes[free_region].size();
 					instance.position = world_pos;
+					instance.region_id = free_region;
 					this->m_conf_mg.nodes[free_region].push_back(instance);
 				}
 			}
@@ -435,7 +439,10 @@ namespace solunar
 		const glm::vec3& node_world_pos
 	)
 	{
-		glm::vec3 color_for_region = this->m_conf_mg.m_debug_region_colors[region_id];
+		glm::vec3 color_for_region = this->m_conf_mg.debug_region_colors[region_id];
+
+		if (node.hovered)
+			color_for_region = _kMGHoveredNodeColor;
 
 		if (node.selected)
 			color_for_region = _kMGSelectedNodeColor;
@@ -458,9 +465,6 @@ namespace solunar
 		config.total_nodes = 0;
 		config.memory_allocation_after_compilation = 0;
 
-
-		config.selected_node.id = unsigned char(-1);
-		config.selected_node.region_id = unsigned char(-1);
 		config.node_collision_radius = _kMGLengthOfArrow;
 
 		config.node_creation_flag_bidirectional = false;
@@ -468,18 +472,34 @@ namespace solunar
 		config.is_selecting_node_mode = false;
 
 		config.pHoveredNode = nullptr;
+		config.pSelectedNode = nullptr;
+		config.pLinkLeft = nullptr;
+		config.pLinkRight = nullptr;
 
 		for (int i = 0; i < 255; ++i)
 		{
-			config.m_debug_region_colors[i].x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-			config.m_debug_region_colors[i].y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-			config.m_debug_region_colors[i].z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+			config.debug_region_colors[i].x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+			config.debug_region_colors[i].y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+			config.debug_region_colors[i].z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 
-			if (config.m_debug_region_colors[i] == _kMGSelectedNodeColor)
+			if (config.debug_region_colors[i] == _kMGSelectedNodeColor)
 			{
-				config.m_debug_region_colors[i].x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				config.m_debug_region_colors[i].y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				config.m_debug_region_colors[i].z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+				while (config.debug_region_colors[i] == _kMGSelectedNodeColor)
+				{
+					config.debug_region_colors[i].x = static_cast <float>(rand()) / static_cast <float>(RAND_MAX);
+					config.debug_region_colors[i].y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+					config.debug_region_colors[i].z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+				}
+			}
+
+			if (config.debug_region_colors[i] == _kMGHoveredNodeColor)
+			{
+				while (config.debug_region_colors[i] == _kMGHoveredNodeColor)
+				{
+					config.debug_region_colors[i].x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+					config.debug_region_colors[i].y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+					config.debug_region_colors[i].z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+				}
 			}
 		}
 	}
@@ -492,6 +512,17 @@ namespace solunar
 		{
 			if (this->m_conf_mg.is_selecting_node_mode)
 			{
+				SHORT state = GetAsyncKeyState(VK_LBUTTON);
+
+				if (state & 0x01)
+				{
+					if (this->m_conf_mg.pSelectedNode)
+					{
+						this->m_conf_mg.pSelectedNode->selected = false;
+						this->m_conf_mg.pSelectedNode = nullptr;
+					}
+				}
+
 				POINT cursor;
 				GetCursorPos(&cursor);
 				glm::vec3 ray_dir = CameraProxy::GetInstance()->GetScreenRay(cursor.x, cursor.y);
@@ -524,8 +555,8 @@ namespace solunar
 						}
 						else
 						{
-							if (node.selected)
-								node.selected = false;
+							if (node.hovered)
+								node.hovered = false;
 						}
 					}
 				}
@@ -533,10 +564,23 @@ namespace solunar
 				if (pClosestNode)
 				{
 					if (this->m_conf_mg.pHoveredNode)
-						this->m_conf_mg.pHoveredNode->selected = false;
+						this->m_conf_mg.pHoveredNode->hovered = false;
 
 					this->m_conf_mg.pHoveredNode = pClosestNode;
-					pClosestNode->selected = true;
+					pClosestNode->hovered = true;
+				}
+
+				if (this->m_conf_mg.pHoveredNode)
+				{
+					SHORT state = GetAsyncKeyState(VK_LBUTTON);
+
+					if (state & 0x01)
+					{
+						this->m_conf_mg.pHoveredNode->hovered = false;
+						this->m_conf_mg.pSelectedNode = this->m_conf_mg.pHoveredNode;
+						this->m_conf_mg.pHoveredNode = nullptr;
+						this->m_conf_mg.pSelectedNode->selected = true;
+					}
 				}
 			}
 
@@ -547,6 +591,35 @@ namespace solunar
 			Assert(!"not implemented!");
 			break;
 		}
+		}
+	}
+
+	void EditorWindow_AINavigationBuilder::UpdateDeletingNode()
+	{
+		if (this->m_conf_mg.pSelectedNode)
+		{
+			SHORT delete_state = GetAsyncKeyState(VK_DELETE);
+
+			if (delete_state & 0x01)
+			{
+				if (this->m_conf_mg.nodes.find(this->m_conf_mg.pSelectedNode->region_id) != this->m_conf_mg.nodes.end())
+				{
+					unsigned char id = this->m_conf_mg.pSelectedNode->id;
+					auto& nodes = this->m_conf_mg.nodes[this->m_conf_mg.pSelectedNode->region_id];
+					auto iter = std::find_if(nodes.begin(), nodes.end(), [id](const BuilderConfig_ManualGraph::Node& node) -> bool {
+						return node.id == id;
+						});
+
+					Assert(iter != nodes.end() && "something is wrong, element must persist in vector");
+
+					if (iter != nodes.end())
+					{
+						nodes.erase(iter);
+					}
+
+					this->m_conf_mg.pSelectedNode = nullptr;
+				}
+			}
 		}
 	}
 
