@@ -9,12 +9,6 @@
 namespace solunar
 {
 
-enum ShaderType
-{
-	ShaderType_Vertex,
-	ShaderType_Pixel
-};
-
 class D3D11Include : public ID3DInclude
 {
 public:
