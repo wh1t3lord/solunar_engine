@@ -172,4 +172,27 @@
             <Radius value="1.6"/>
         </PointLightComponent>
     </Entity>
+    <Entity className="Entity">
+        <Position x="2.1670568" y="1.3319253" z="3.8053551"/>
+        <Rotation x="-0" y="0" z="0"/>
+        <Scale x="1" y="1" z="1"/>
+        <PointLightComponent>
+            <AmbientColor r="0" g="0" b="0"/>
+            <Color r="1" g="1" b="1"/>
+            <SpecularColor r="0" g="0" b="0"/>
+            <Radius value="6.5"/>
+        </PointLightComponent>
+    </Entity>
+	
+    <Entity className="Entity">
+        <Position x="-0.17" y="1.3319253" z="-6.06"/>
+        <Rotation x="-0" y="0" z="0"/>
+        <Scale x="1" y="1" z="1"/>
+        <PointLightComponent>
+            <AmbientColor r="0" g="0" b="0"/>
+            <Color r="1" g="1" b="1"/>
+            <SpecularColor r="0" g="0" b="0"/>
+            <Radius value="4"/>
+        </PointLightComponent>
+    </Entity>
 </World>

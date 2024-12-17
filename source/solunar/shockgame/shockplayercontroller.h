@@ -16,6 +16,7 @@ struct ShockPlayerStats
 	float m_endurance;
 	float m_health;
 	float m_mana;
+	int m_money;
 };
 
 class ShockPlayerController : public PlayerControllerComponent
@@ -34,6 +35,10 @@ public:
 	void Update(float dt) override;
 
 	void doHit(float amount);
+
+	Entity* GetActiveWeaponEntity() { return m_activeWeaponEntity; }
+
+	const ShockPlayerStats& GetPlayerStats() { return m_playerStats; }
 
 private:
 	void ActivateCamera();
@@ -54,6 +59,8 @@ private:
 
 	Entity* m_weaponEntity;
 	AnimatedMeshComponent* m_weaponMesh;
+
+	Entity* m_activeWeaponEntity;
 
 	glm::vec3 m_weaponSwayAngles;
 
