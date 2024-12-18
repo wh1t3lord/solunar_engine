@@ -96,6 +96,9 @@ namespace solunar
 
 		bool RayIntersectionSphereNode(const glm::vec3& ray_origin, const glm::vec3& ray_dir, const glm::vec3& sphere_pos, float sphere_radius, float& t, glm::vec3& point);
 
+		bool isLeftMouseButtonPressed();
+		bool isRightMouseButtonPressed();
+
 	private:
 		bool m_show;
 		eNavigationType m_current_type;

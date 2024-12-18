@@ -512,16 +512,8 @@ namespace solunar
 		{
 			if (this->m_conf_mg.is_selecting_node_mode)
 			{
-				SHORT state = GetAsyncKeyState(VK_LBUTTON);
-
-				if (state & 0x01)
-				{
-					if (this->m_conf_mg.pSelectedNode)
-					{
-						this->m_conf_mg.pSelectedNode->selected = false;
-						this->m_conf_mg.pSelectedNode = nullptr;
-					}
-				}
+				if (this->isRightMouseButtonPressed())
+					return;
 
 				POINT cursor;
 				GetCursorPos(&cursor);
@@ -570,12 +562,26 @@ namespace solunar
 					pClosestNode->hovered = true;
 				}
 
-				if (this->m_conf_mg.pHoveredNode)
-				{
-					SHORT state = GetAsyncKeyState(VK_LBUTTON);
+				bool was_pressed_lbm = isLeftMouseButtonPressed();
 
-					if (state & 0x01)
+				if (was_pressed_lbm)
+				{
+					if (!this->m_conf_mg.pHoveredNode)
 					{
+						if (this->m_conf_mg.pSelectedNode)
+						{
+							this->m_conf_mg.pSelectedNode->selected = false;
+							this->m_conf_mg.pSelectedNode = nullptr;
+						}
+					}
+					else
+					{
+						if (this->m_conf_mg.pSelectedNode)
+						{
+							this->m_conf_mg.pSelectedNode->selected = false;
+							this->m_conf_mg.pSelectedNode = nullptr;
+						}
+
 						this->m_conf_mg.pHoveredNode->hovered = false;
 						this->m_conf_mg.pSelectedNode = this->m_conf_mg.pHoveredNode;
 						this->m_conf_mg.pHoveredNode = nullptr;
@@ -648,6 +654,18 @@ namespace solunar
 		point = ray_origin + t * ray_dir;
 		t1 = t;
 		return true;
+	}
+
+	bool EditorWindow_AINavigationBuilder::isLeftMouseButtonPressed()
+	{
+		auto button = GetSystemMetrics(SM_SWAPBUTTON) ? VK_RBUTTON : VK_LBUTTON;
+		return GetAsyncKeyState(button)<0;
+	}
+
+	bool EditorWindow_AINavigationBuilder::isRightMouseButtonPressed()
+	{
+		auto button = GetSystemMetrics(SM_SWAPBUTTON) ? VK_LBUTTON : VK_RBUTTON;
+		return GetAsyncKeyState(button) < 0;
 	}
 
 	const char* convert_enum_navtype_to_text(eNavigationType type)
