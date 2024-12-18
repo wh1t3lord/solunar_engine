@@ -323,7 +323,7 @@ void ShockPlayerController::InitializeCamera()
 	// m_camera = m_cameraNode->createComponentByType<CameraFirstPersonComponent>();
 
 	m_cameraEntity = GetEntity()->CreateChild();
-	m_cameraEntity->SetPosition(glm::vec3(0.0f, 1.0f, 0.0f));
+	m_cameraEntity->SetPosition(glm::vec3(0.0f, 0.6f, 0.0f));
 
 	m_camera = m_cameraEntity->CreateComponent<CameraFirstPersonComponent>();
 	//m_camera = getEntity()->createComponent<CameraFirstPersonComponent>();
