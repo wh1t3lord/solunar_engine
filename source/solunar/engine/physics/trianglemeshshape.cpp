@@ -10,6 +10,8 @@
 #include <assimp/scene.h>
 #include <assimp/postprocess.h>
 
+#define DISABLE_ASSIMP
+
 namespace solunar
 {
 
@@ -64,6 +66,7 @@ struct CollisionMeshAssImp
 	glm::mat4 transform;
 };
 
+#ifndef DISABLE_ASSIMP
 static glm::mat4 Assimp2Glm(const aiMatrix4x4& from)
 {
 	return glm::mat4(
@@ -117,6 +120,7 @@ static void ProccessNode(std::vector<CollisionMeshAssImp>& submeshes, aiNode* no
 		ProccessNode(submeshes, node->mChildren[i], scene);
 	}
 }
+#endif // !DISABLE_ASSIMP
 
 inline btVector3 getBulletVectorFromGlm(const glm::vec3& vec)
 {
@@ -129,6 +133,8 @@ ATTRIBUTE_ALIGNED16(class)
 HackCompoundShape : public btCompoundShape
 {
 public:
+	BT_DECLARE_ALIGNED_ALLOCATOR();
+
 	HackCompoundShape() {}
 	~HackCompoundShape()
 	{
@@ -216,6 +222,7 @@ void TriangleMeshShapeComponent::CreateShapeInternal()
 
 void TriangleMeshShapeComponent::CreateShapeInternal_AssImp()
 {
+#ifndef DISABLE_ASSIMP
 	DataStreamPtr stream = g_contentManager->OpenStream(m_filename);
 	if (!stream)
 	{
@@ -284,6 +291,9 @@ void TriangleMeshShapeComponent::CreateShapeInternal_AssImp()
 	}
 
 	Core::Msg("TriangleMeshShapeComponent(%s): %i triangles %i bytes", m_filename.c_str(), trianglesCount, trianglesCount * sizeof(glm::vec3));
+#else
+	Core::Error("TriangleMeshShapeComponent::CreateShapeInternal_AssImp: Assimp import is disabled");
+#endif // !DISABLE_ASSIMP
 }
 
 void TriangleMeshShapeComponent::CreateShapeInternal_Model()
