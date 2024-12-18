@@ -26,11 +26,11 @@ D3D11Device::~D3D11Device()
 void D3D11Device::Create()
 {
 	// lock feature level at shader model 4.0 (NVidia Geforce 8400+ hardware)
-	D3D_FEATURE_LEVEL needFeatureLevel = D3D_FEATURE_LEVEL_11_0;
+	D3D_FEATURE_LEVEL needFeatureLevel = D3D_FEATURE_LEVEL_10_0;
 	D3D_FEATURE_LEVEL featureLevel = (D3D_FEATURE_LEVEL)0;
 
 	UINT deviceCreationFlags = 0;
-#ifndef NDEBUG
+#ifdef _DEBUG
 	deviceCreationFlags |= D3D11_CREATE_DEVICE_DEBUG;
 #endif
 
@@ -50,7 +50,7 @@ void D3D11Device::Create()
 
 			stringBuffer, kStringBufferSize, NULL);
 
-#ifdef MASTER_GOLD_BUILD
+#ifdef FINAL_BUILD
 		Core::Error("Failed to create DirectX 11 Device. Error: %s\nMake sure you has install DirectX 11 Runtime already\nand you video card drivers\nare up to date.",
 			stringBuffer);
 #else
@@ -58,7 +58,7 @@ void D3D11Device::Create()
 #endif
 	}
 
-#ifdef MASTER_GOLD_BUILD
+#ifdef FINAL_BUILD
 	// Ok, device created but feature level is low to us
 	if (featureLevel < D3D_FEATURE_LEVEL_10_0)
 		Core::Error("Missing DirectX 11 features level.\nPlease sure you'r video card drivers is up to date\nor support DirectX 10.");
