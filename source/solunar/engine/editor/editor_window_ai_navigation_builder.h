@@ -19,12 +19,12 @@ namespace solunar
 		{
 			struct Node
 			{
-				bool selected=false;
+				bool selected = false;
 				bool hovered = false;
 				unsigned char region_id;
 				unsigned char id;
 				glm::vec3 position;
-				std::vector<unsigned char> neighbours;
+				std::vector<Node*> neighbours;
 			};
 
 			struct SelectedNode
@@ -45,7 +45,8 @@ namespace solunar
 			bool node_creation_flag_bidirectional;
 			bool node_creation_flag_onedirectional;
 			bool is_selecting_node_mode;
-			bool is_linking_node_mode;
+			bool is_linking_node_onedirectional;
+			bool is_linking_node_bidirectional;
 			// for picking our nodes on scene
 			float node_collision_radius;
 			int total_nodes;
@@ -78,7 +79,7 @@ namespace solunar
 		void UpdateEditingMode(InputManager* pInputManager, World* pWorld) override;
 	private:
 		void UpdateStats(BuilderConfig_ManualGraph& conf);
-		
+
 		// Editing
 		void AddNodeOnSurface(const glm::vec3& world_pos, const glm::vec3& normal);
 		void UpdateCentersOfRegions();
@@ -86,19 +87,25 @@ namespace solunar
 		void ClearNodes();
 
 		void DrawDebug();
-		void DrawDebugNode(unsigned char region_id, const BuilderConfig_ManualGraph::Node& node, const glm::vec3& node_world_pos);
-
+		void DrawDebugNode(unsigned char region_id, const BuilderConfig_ManualGraph::Node& node);
+		void DrawDebugNodeConnections(
+			unsigned char region_id,
+			const BuilderConfig_ManualGraph::Node& node
+		);
 
 		void InitConfig_ManualGraph(BuilderConfig_ManualGraph& config);
 
 		void UpdateSelectingNode();
 		void UpdateDeletingNode();
+		void UpdateLinkingNode();
 
 		bool RayIntersectionSphereNode(const glm::vec3& ray_origin, const glm::vec3& ray_dir, const glm::vec3& sphere_pos, float sphere_radius, float& t, glm::vec3& point);
 
 		bool isLeftMouseButtonPressed();
 		bool isRightMouseButtonPressed();
-
+		bool isDeleteKeyButtonPressed();
+		bool isLAltKeyButtonPressed();
+		bool isLCtrlKeyButtonPressed();
 	private:
 		bool m_show;
 		eNavigationType m_current_type;

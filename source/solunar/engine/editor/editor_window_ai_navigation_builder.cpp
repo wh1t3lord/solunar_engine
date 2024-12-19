@@ -17,7 +17,6 @@ namespace solunar
 {
 	constexpr float _kMGLengthOfRoot = 0.5f;
 	constexpr float _kMGLengthOfArrow = 0.25f;
-	glm::vec3 _kMGHoveredNodeColor = glm::vec3(1.0f, 1.0f, 0.0f);
 	glm::vec3 _kMGSelectedNodeColor = glm::vec3(1.0f, 0.0f, 0.0f);
 
 	EditorWindow_AINavigationBuilder::EditorWindow_AINavigationBuilder(void) : IEditorWindow(), m_show(false), m_current_type(eNavigationType::kNavigationManualGraph)
@@ -106,13 +105,49 @@ namespace solunar
 
 				ImGui::Text("\tMax possible nodes: %d", this->m_conf_mg.max_possible_total_nodes);
 				ImGui::Text("\tCreated nodes: %d", this->m_conf_mg.total_nodes);
-				ImGui::Text("\tMemory be used in game: %d bytes (%d Kb)", this->m_conf_mg.memory_allocation_after_compilation, this->m_conf_mg.memory_allocation_after_compilation / 1024);
+				ImGui::Text("\tMemory be used: ");
+
+				ImGui::Text("\t\treal: %d bytes (%d Kb)", 0, 0);
+				ImGui::Text("\t\testimated: %d bytes (%d Kb)", this->m_conf_mg.memory_allocation_after_compilation, this->m_conf_mg.memory_allocation_after_compilation / 1024);
 
 				if (ImGui::CollapsingHeader("Editing"))
 				{
-					if (ImGui::Checkbox("Selecting Mode", &this->m_conf_mg.is_selecting_node_mode)) 
+					if (ImGui::Checkbox("Selecting Mode", &this->m_conf_mg.is_selecting_node_mode))
 					{
-						
+						if (!this->m_conf_mg.is_selecting_node_mode)
+						{
+							if (this->m_conf_mg.pHoveredNode)
+							{
+								this->m_conf_mg.pHoveredNode->hovered = false;
+								this->m_conf_mg.pHoveredNode = nullptr;
+							}
+
+							if (this->m_conf_mg.pSelectedNode)
+							{
+								this->m_conf_mg.pSelectedNode->selected = false;
+								this->m_conf_mg.pSelectedNode = nullptr;
+							}
+						}
+					}
+
+					if (this->m_conf_mg.is_selecting_node_mode)
+					{
+						if (this->m_conf_mg.pHoveredNode)
+						{
+							ImGui::Text("Hovered Node:");
+
+							ImGui::Text("\tid: %d", this->m_conf_mg.pHoveredNode->id);
+							ImGui::Text("\tregion id: %d", this->m_conf_mg.pHoveredNode->region_id);
+						}
+
+
+						if (this->m_conf_mg.pSelectedNode)
+						{
+							ImGui::Text("Selected Node:");
+
+							ImGui::Text("\tid: %d", this->m_conf_mg.pSelectedNode->id);
+							ImGui::Text("\tregion id: %d", this->m_conf_mg.pSelectedNode->region_id);
+						}
 					}
 
 					ImGui::Text("Node Creation:");
@@ -126,6 +161,12 @@ namespace solunar
 
 					if (this->m_conf_mg.node_creation_flag_bidirectional)
 						this->m_conf_mg.node_creation_flag_onedirectional = false;
+
+
+					ImGui::Text("Linking:");
+
+					ImGui::Checkbox("One-direction", &this->m_conf_mg.is_linking_node_onedirectional);
+					ImGui::Checkbox("Bi-direction", &this->m_conf_mg.is_linking_node_bidirectional);
 				}
 
 				if (ImGui::CollapsingHeader("Details"))
@@ -216,12 +257,13 @@ namespace solunar
 
 		this->UpdateSelectingNode();
 		this->UpdateDeletingNode();
+		this->UpdateLinkingNode();
 
 		if (
-			lbm_state & 0x01 && 
-			!ImGui::IsAnyItemHovered() && 
+			lbm_state & 0x01 &&
+			!ImGui::IsAnyItemHovered() &&
 			!ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)
-		)
+			)
 		{
 			Camera* pCamera = CameraProxy::GetInstance();
 
@@ -419,7 +461,8 @@ namespace solunar
 
 				for (const auto& node : nodes)
 				{
-					this->DrawDebugNode(region_and_nodes.first, node, node.position);
+					this->DrawDebugNode(region_and_nodes.first, node);
+					this->DrawDebugNodeConnections(region_and_nodes.first, node);
 				}
 			}
 
@@ -435,14 +478,13 @@ namespace solunar
 
 	void EditorWindow_AINavigationBuilder::DrawDebugNode(
 		unsigned char region_id,
-		const BuilderConfig_ManualGraph::Node& node,
-		const glm::vec3& node_world_pos
+		const BuilderConfig_ManualGraph::Node& node
 	)
 	{
 		glm::vec3 color_for_region = this->m_conf_mg.debug_region_colors[region_id];
 
 		if (node.hovered)
-			color_for_region = _kMGHoveredNodeColor;
+			color_for_region = glm::vec3(1.0f, 1.0f, 1.0f) - color_for_region;
 
 		if (node.selected)
 			color_for_region = _kMGSelectedNodeColor;
@@ -453,6 +495,25 @@ namespace solunar
 		g_debugRender.DrawLine(node.position + glm::vec3(0.0f, _kMGLengthOfRoot, 0.0f), node.position + glm::vec3(0.0f, 0.0f, _kMGLengthOfArrow), color_for_region);
 		g_debugRender.DrawLine(node.position + glm::vec3(0.0f, _kMGLengthOfRoot, 0.0f), node.position + glm::vec3(0.0f, 0.0f, -_kMGLengthOfArrow), color_for_region);
 
+	}
+
+	void EditorWindow_AINavigationBuilder::DrawDebugNodeConnections(unsigned char region_id, const BuilderConfig_ManualGraph::Node& node)
+	{
+		for (const auto* pNode : node.neighbours)
+		{
+			if (pNode)
+			{
+				glm::vec3 color_connection = (this->m_conf_mg.debug_region_colors[pNode->region_id] + this->m_conf_mg.debug_region_colors[node.region_id]) * 0.5f;
+
+				g_debugRender.DrawLine(node.position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f), pNode->position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f), color_connection);
+
+				glm::vec3 right = (pNode->position - node.position);
+				right = glm::cross(right, glm::vec3(0.0, 1.0, 0.0));
+				right = glm::normalize(right);
+				g_debugRender.DrawLine(pNode->position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f), (pNode->position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f) + (right * _kMGLengthOfArrow)) - (glm::normalize((pNode->position - node.position)) * 0.3f), this->m_conf_mg.debug_region_colors[pNode->region_id]);
+				g_debugRender.DrawLine(pNode->position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f), (pNode->position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f) + (right * -_kMGLengthOfArrow)) - (glm::normalize((pNode->position - node.position)) * 0.3f), this->m_conf_mg.debug_region_colors[pNode->region_id]);
+			}
+		}
 	}
 
 	void EditorWindow_AINavigationBuilder::InitConfig_ManualGraph(BuilderConfig_ManualGraph& config)
@@ -470,7 +531,8 @@ namespace solunar
 		config.node_creation_flag_bidirectional = false;
 		config.node_creation_flag_onedirectional = false;
 		config.is_selecting_node_mode = false;
-
+		config.is_linking_node_bidirectional = false;
+		config.is_linking_node_onedirectional = false;
 		config.pHoveredNode = nullptr;
 		config.pSelectedNode = nullptr;
 		config.pLinkLeft = nullptr;
@@ -482,24 +544,9 @@ namespace solunar
 			config.debug_region_colors[i].y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 			config.debug_region_colors[i].z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
 
-			if (config.debug_region_colors[i] == _kMGSelectedNodeColor)
+			if (config.debug_region_colors[i].x > 0.5f)
 			{
-				while (config.debug_region_colors[i] == _kMGSelectedNodeColor)
-				{
-					config.debug_region_colors[i].x = static_cast <float>(rand()) / static_cast <float>(RAND_MAX);
-					config.debug_region_colors[i].y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-					config.debug_region_colors[i].z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				}
-			}
-
-			if (config.debug_region_colors[i] == _kMGHoveredNodeColor)
-			{
-				while (config.debug_region_colors[i] == _kMGHoveredNodeColor)
-				{
-					config.debug_region_colors[i].x = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-					config.debug_region_colors[i].y = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-					config.debug_region_colors[i].z = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
-				}
+				config.debug_region_colors[i].x *= 0.5f;
 			}
 		}
 	}
@@ -512,7 +559,8 @@ namespace solunar
 		{
 			if (this->m_conf_mg.is_selecting_node_mode)
 			{
-				if (this->isRightMouseButtonPressed())
+				if (this->isRightMouseButtonPressed() || (ImGui::IsAnyItemHovered() ||
+					ImGui::IsWindowHovered(ImGuiHoveredFlags_AnyWindow)))
 					return;
 
 				POINT cursor;
@@ -548,7 +596,12 @@ namespace solunar
 						else
 						{
 							if (node.hovered)
+							{
 								node.hovered = false;
+
+								if (node.id == this->m_conf_mg.pHoveredNode->id && node.region_id == this->m_conf_mg.pHoveredNode->region_id)
+									this->m_conf_mg.pHoveredNode = nullptr;
+							}
 						}
 					}
 				}
@@ -592,7 +645,7 @@ namespace solunar
 
 			break;
 		}
-		default: 
+		default:
 		{
 			Assert(!"not implemented!");
 			break;
@@ -604,14 +657,30 @@ namespace solunar
 	{
 		if (this->m_conf_mg.pSelectedNode)
 		{
-			SHORT delete_state = GetAsyncKeyState(VK_DELETE);
+			bool was_pressed_delete = isDeleteKeyButtonPressed();
 
-			if (delete_state & 0x01)
+			if (was_pressed_delete)
 			{
 				if (this->m_conf_mg.nodes.find(this->m_conf_mg.pSelectedNode->region_id) != this->m_conf_mg.nodes.end())
 				{
 					unsigned char id = this->m_conf_mg.pSelectedNode->id;
+					unsigned char region_id = this->m_conf_mg.pSelectedNode->region_id;
 					auto& nodes = this->m_conf_mg.nodes[this->m_conf_mg.pSelectedNode->region_id];
+
+					for (auto& pair : this->m_conf_mg.nodes)
+					{
+						for (auto& node : pair.second)
+						{
+							auto iter = std::find_if(node.neighbours.begin(), node.neighbours.end(), [id, region_id](const BuilderConfig_ManualGraph::Node* pNode)->bool {
+								Assert(pNode && "deadling reference can't be!");
+								return pNode->id == id && pNode->region_id == region_id;
+								});
+
+							if (iter != node.neighbours.end())
+								node.neighbours.erase(iter);
+						}
+					}
+
 					auto iter = std::find_if(nodes.begin(), nodes.end(), [id](const BuilderConfig_ManualGraph::Node& node) -> bool {
 						return node.id == id;
 						});
@@ -624,8 +693,112 @@ namespace solunar
 					}
 
 					this->m_conf_mg.pSelectedNode = nullptr;
+
+					this->m_conf_mg.need_to_update_stats = true;
 				}
 			}
+		}
+	}
+
+	void EditorWindow_AINavigationBuilder::UpdateLinkingNode()
+	{
+		switch (this->m_current_type)
+		{
+		case eNavigationType::kNavigationManualGraph:
+		{
+			if (this->m_conf_mg.is_selecting_node_mode)
+			{
+				if (isLAltKeyButtonPressed() && isLCtrlKeyButtonPressed())
+				{
+					this->m_conf_mg.is_linking_node_bidirectional = false;
+					this->m_conf_mg.is_linking_node_onedirectional = false;
+					return;
+				}
+
+				if (!this->m_conf_mg.pHoveredNode)
+					return;
+
+				if (!this->m_conf_mg.pSelectedNode)
+					return;
+
+				if (isLCtrlKeyButtonPressed())
+				{
+					this->m_conf_mg.is_linking_node_bidirectional = true;
+					this->m_conf_mg.is_linking_node_onedirectional = true;
+				}
+
+				if (isLAltKeyButtonPressed())
+				{
+					this->m_conf_mg.is_linking_node_bidirectional = false;
+					this->m_conf_mg.is_linking_node_onedirectional = true;
+				}
+
+
+				// adds HoveredNode to SelectedNode
+				if (this->m_conf_mg.is_linking_node_onedirectional)
+				{
+					if (this->m_conf_mg.pHoveredNode && this->m_conf_mg.pSelectedNode)
+					{
+						if ((this->m_conf_mg.pHoveredNode->region_id == this->m_conf_mg.pSelectedNode->region_id && this->m_conf_mg.pHoveredNode->id != this->m_conf_mg.pSelectedNode->id) || (this->m_conf_mg.pHoveredNode->region_id != this->m_conf_mg.pSelectedNode->region_id))
+						{
+							unsigned char region_id = this->m_conf_mg.pHoveredNode->region_id;
+							unsigned char id = this->m_conf_mg.pHoveredNode->id;
+
+							auto iter = std::find_if(
+								this->m_conf_mg.pSelectedNode->neighbours.begin(),
+								this->m_conf_mg.pSelectedNode->neighbours.end(),
+								[id, region_id](const BuilderConfig_ManualGraph::Node* pNode)->bool {
+									return pNode->id == id && pNode->region_id == region_id;
+								});
+
+							// add only if wasn't added
+							if (iter == this->m_conf_mg.pSelectedNode->neighbours.end())
+							{
+								this->m_conf_mg.pSelectedNode->neighbours.push_back(this->m_conf_mg.pHoveredNode);
+							}
+						}
+					}
+				}
+
+				// adds SelectedNode to HoveredNode
+				if (this->m_conf_mg.is_linking_node_bidirectional)
+				{
+					if (this->m_conf_mg.pHoveredNode && this->m_conf_mg.pSelectedNode)
+					{
+						if (this->m_conf_mg.pHoveredNode->region_id != this->m_conf_mg.pSelectedNode->region_id && this->m_conf_mg.pHoveredNode->id != this->m_conf_mg.pSelectedNode->id)
+						{
+							unsigned char region_id = this->m_conf_mg.pSelectedNode->region_id;
+							unsigned char id = this->m_conf_mg.pSelectedNode->id;
+
+							auto iter = std::find_if(
+								this->m_conf_mg.pHoveredNode->neighbours.begin(),
+								this->m_conf_mg.pHoveredNode->neighbours.end(),
+								[id, region_id](const BuilderConfig_ManualGraph::Node* pNode)->bool {
+									return pNode->id == id && pNode->region_id == region_id;
+								});
+
+							// add only if wasn't added
+							if (iter == this->m_conf_mg.pHoveredNode->neighbours.end())
+							{
+								this->m_conf_mg.pHoveredNode->neighbours.push_back(this->m_conf_mg.pSelectedNode);
+							}
+						}
+					}
+				}
+
+
+				this->m_conf_mg.is_linking_node_bidirectional = false;
+				this->m_conf_mg.is_linking_node_onedirectional = false;
+
+			}
+
+			break;
+		}
+		default:
+		{
+			Assert(!"Not implemented");
+			break;
+		}
 		}
 	}
 
@@ -636,7 +809,7 @@ namespace solunar
 		float c = glm::dot(m, m) - sphere_radius * sphere_radius;
 
 		// Exit if r’s origin outside s (c > 0) and r pointing away from s (b > 0) 
-		if (c > 0.0f && b > 0.0f) 
+		if (c > 0.0f && b > 0.0f)
 			return false;
 
 		float discr = b * b - c;
@@ -648,7 +821,7 @@ namespace solunar
 		float t = -b - sqrt(discr);
 
 		// If t is negative, ray started inside sphere so clamp t to zero 
-		if (t < 0.0f) 
+		if (t < 0.0f)
 			t = 0.0f;
 
 		point = ray_origin + t * ray_dir;
@@ -659,13 +832,28 @@ namespace solunar
 	bool EditorWindow_AINavigationBuilder::isLeftMouseButtonPressed()
 	{
 		auto button = GetSystemMetrics(SM_SWAPBUTTON) ? VK_RBUTTON : VK_LBUTTON;
-		return GetAsyncKeyState(button)<0;
+		return GetAsyncKeyState(button) < 0;
 	}
 
 	bool EditorWindow_AINavigationBuilder::isRightMouseButtonPressed()
 	{
 		auto button = GetSystemMetrics(SM_SWAPBUTTON) ? VK_LBUTTON : VK_RBUTTON;
 		return GetAsyncKeyState(button) < 0;
+	}
+
+	bool EditorWindow_AINavigationBuilder::isDeleteKeyButtonPressed()
+	{
+		return GetAsyncKeyState(VK_DELETE) < 0;
+	}
+
+	bool EditorWindow_AINavigationBuilder::isLAltKeyButtonPressed()
+	{
+		return GetAsyncKeyState(VK_LMENU) < 0;
+	}
+
+	bool EditorWindow_AINavigationBuilder::isLCtrlKeyButtonPressed()
+	{
+		return GetAsyncKeyState(VK_LCONTROL) < 0;
 	}
 
 	const char* convert_enum_navtype_to_text(eNavigationType type)
