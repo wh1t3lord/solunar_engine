@@ -96,9 +96,9 @@ namespace solunar
 
 	void PhysicsWorld::Step(float delta)
 	{
-		m_world->stepSimulation(delta);
-		//m_world->stepSimulation(delta, 12, m_stepTime);
-#if 0
+	//	m_world->stepSimulation(delta);
+	//	m_world->stepSimulation(delta, 12, m_stepTime);
+#if 1
 		if (delta < 0.01f)
 		{
 			m_accumulatedTime += delta;

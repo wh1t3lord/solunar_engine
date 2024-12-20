@@ -250,7 +250,7 @@ float V_CalcBob()
 	// bob is proportional to simulated velocity in the xy plane
 	// (don't count Z, or jumping messes it up)
 	//VectorCopy(pparams->simvel, vel);
-	vel = g_weaponVelocity;
+	vel = g_weaponVelocity * 4.0f;
 	vel[1] = 0;
 
 	bob = sqrt(vel[0] * vel[0] + vel[2] * vel[2]);//* cl_bob;
@@ -670,7 +670,14 @@ void ShockPlayerController::UpdateLogic(float dt)
 
 			proj.y = ((float)view->m_height - 1.0f - proj.y);
 
-			const char* label = "Press E to use (600$)";
+			static char s_LabelBuffer[128];
+
+			if (usableArea)
+				stbsp_snprintf(s_LabelBuffer, sizeof(s_LabelBuffer), "Press E to use (%i$)", usableArea->GetCost());
+			else
+				strcpy(s_LabelBuffer, "");
+
+			const char* label = s_LabelBuffer;
 			const ImVec2 label_size = ImGui::CalcTextSize(label, NULL, true);
 
 			ShockPlayerHUD::ms_HealthFont->DrawText(label, proj.x - label_size.x, proj.y + 64.0f, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));

@@ -243,6 +243,20 @@ namespace solunar
 					Core::Error("Material::LoadXML: failed to load material. Wrong value in the \"SelfIllumination\" element. Possible only true/false.");
 				}
 			}
+
+			tinyxml2::XMLElement* firstperson = renderState->FirstChildElement("FirstPersonWeapon");
+			if (firstperson) {
+				const tinyxml2::XMLAttribute* firstpersonAttribute = firstperson->FindAttribute("value");
+				if (strcmp(firstpersonAttribute->Value(), "true") == 0) {
+					m_isFirstPersonWeapon = true;
+				}
+				else if (strcmp(firstpersonAttribute->Value(), "false") == 0) {
+					m_isFirstPersonWeapon = false;
+				}
+				else {
+					Core::Error("Material::LoadXML: failed to load material. Wrong value in the \"FirstPersonWeapon\" element. Possible only true/false.");
+				}
+			}
 		} else {
 			Core::Error("Material::LoadXML: failed to load material. Doesnt exist \"RenderState\" element.");
 		}

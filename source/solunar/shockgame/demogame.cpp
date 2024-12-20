@@ -1,6 +1,8 @@
 #include "shockgamepch.h"
 #include "shockgame/demogame.h"
 
+#include "core/timer.h"
+
 #include "engine/engine.h"
 #include "engine/inputmanager.h"
 #include "engine/camera.h"
@@ -41,6 +43,7 @@ END_PROPERTY_REGISTER(UsableAreaComponent)
 UsableAreaComponent::UsableAreaComponent()
 {
 	m_isInited = false;
+	m_cost = 0;
 }
 
 UsableAreaComponent::~UsableAreaComponent()
@@ -57,12 +60,19 @@ void UsableAreaComponent::LoadXML(tinyxml2::XMLElement& element)
 		if (error == tinyxml2::XML_SUCCESS)
 			m_scriptName = scriptName;
 	}
+
+	const tinyxml2::XMLElement* costElement = element.FirstChildElement("Cost");
+	if (costElement)
+		costElement->QueryIntAttribute("value", &m_cost);
 }
 
 void UsableAreaComponent::SaveXML(tinyxml2::XMLElement& element)
 {
 	tinyxml2::XMLElement* scriptElement = element.InsertNewChildElement("Script");
 	scriptElement->SetAttribute("value", m_scriptName.c_str());
+
+	tinyxml2::XMLElement* costElement = element.InsertNewChildElement("Script");
+	costElement->SetAttribute("value", m_cost);
 }
 
 void UsableAreaComponent::OnInit()
@@ -130,8 +140,13 @@ void GameManager::OnWorldLoad(const std::string& worldName, World* pLoadedWorld)
 			Entity* editorEntity = pLoadedWorld->CreateEntity();
 			editorEntity->CreateComponent<EditorCameraComponent>();
 		}
-		else // player creation
+		else
 		{
+			// level manager
+			g_ShelterLevelManager = pLoadedWorld->CreateEntity()->CreateComponent<ShelterLevelManagerComponent>();
+
+			// player creation
+
 			std::vector<Entity*> playerEntities = pLoadedWorld->GetEntityManager().GetEntitiesWithComponent<ShockPlayerController>();
 			if (!playerEntities.empty())
 			{
@@ -153,6 +168,7 @@ void GameManager::OnWorldLoad(const std::string& worldName, World* pLoadedWorld)
 			Entity* player = pLoadedWorld->CreateEntity();
 			player->SetPosition(spawnerEntities[0]->GetWorldPosition());
 			player->CreateComponent<ShockPlayerController>();
+
 		}
 	}
 }
@@ -570,7 +586,7 @@ FadeRenderer* FadeRenderer::GetInstance()
 void FadeRenderer::SetFade(float time, bool isOut)
 {
 	m_currentTime = isOut ? time : 0.0f;
-	m_time = isOut ? 0.0f : time;
+	m_time = time;
 	m_isOut = isOut;
 }
 
@@ -578,15 +594,25 @@ void FadeRenderer::Draw()
 {
 	if (m_isOut)
 	{
-		//if (m_currentTime>=maths::EPSILON)
+		if (m_currentTime>=0.0001f)
+			m_currentTime -= Timer::GetInstance()->GetDelta();
 	}
-	
+	else
+	{
+		if (m_currentTime <= m_time)
+			m_currentTime += Timer::GetInstance()->GetDelta();
+	}
+
+	// don't draw on reach time * 2
+	if (m_currentTime >= m_time * 2.0f)
+		return;
+
 	ImGuiIO& io = ImGui::GetIO();
 
 	float a = m_currentTime / m_time;
 	ImU32 color = IM_COL32(0, 0, 0, a * 255);
 
-	ImGui::GetForegroundDrawList()->AddRectFilled(ImVec2(0.0f, 0.0f), io.DisplaySize, color);
+	ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(0.0f, 0.0f), io.DisplaySize, color);
 }
 
 IMPLEMENT_OBJECT(PlayerSpawnComponent, Component);
@@ -597,6 +623,52 @@ PlayerSpawnComponent::PlayerSpawnComponent()
 
 PlayerSpawnComponent::~PlayerSpawnComponent()
 {
+}
+
+IMPLEMENT_OBJECT(DoorCoverComponent, LogicComponent);
+
+DoorCoverComponent::DoorCoverComponent()
+{
+}
+
+DoorCoverComponent::~DoorCoverComponent()
+{
+}
+
+ShelterLevelManagerComponent* g_ShelterLevelManager = nullptr;
+
+IMPLEMENT_OBJECT(ShelterLevelManagerComponent, LogicComponent);
+
+ShelterLevelManagerComponent::ShelterLevelManagerComponent()
+{
+}
+
+ShelterLevelManagerComponent::~ShelterLevelManagerComponent()
+{
+}
+
+void ShelterLevelManagerComponent::OnInit()
+{
+	// initialize fade
+	FadeRenderer::GetInstance()->SetFade(4.0f, true);
+}
+
+void ShelterLevelManagerComponent::OnEntitySet(Entity* entity)
+{
+	g_ShelterLevelManager = this;
+}
+
+void ShelterLevelManagerComponent::OnEntityRemove()
+{
+	g_ShelterLevelManager = nullptr;
+}
+
+void ShelterLevelManagerComponent::Update(float dt)
+{
+
+
+	// draw fade
+	FadeRenderer::GetInstance()->Draw();
 }
 
 }

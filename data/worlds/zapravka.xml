@@ -124,6 +124,7 @@
 			<Size x="0.05" y="0.2" z="0.45"/>
 		</BoxShapeComponent>
 		<UsableAreaComponent>
+			<Cost value="1400"/>
 			<Script value="give_weapon weapon_shotgun"/>
 		</UsableAreaComponent>		
 		<Entity>

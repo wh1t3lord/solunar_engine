@@ -22,13 +22,14 @@ public:
 	// Update component once per frame.
 	void Update(float delta) override;
 
-
 	void OnInit();
 
 	const std::string& GetScriptName() { return m_scriptName; }
+	const int GetCost() { return m_cost; }
 
 private:
 	std::string m_scriptName;
+	int m_cost;
 	bool m_isInited;
 };
 
@@ -110,6 +111,34 @@ public:
 	PlayerSpawnComponent();
 	~PlayerSpawnComponent();
 };
+
+class DoorCoverComponent : public LogicComponent
+{
+	DECLARE_OBJECT(DoorCoverComponent);
+public:
+	DoorCoverComponent();
+	~DoorCoverComponent();
+
+
+
+};
+
+class ShelterLevelManagerComponent : public LogicComponent
+{
+	DECLARE_OBJECT(ShelterLevelManagerComponent);
+public:
+	ShelterLevelManagerComponent();
+	~ShelterLevelManagerComponent();
+
+	void OnInit() override;
+
+	void OnEntitySet(Entity* entity) override;
+	void OnEntityRemove() override;
+
+	void Update(float dt) override;
+};
+
+extern ShelterLevelManagerComponent* g_ShelterLevelManager;
 
 }
 
