@@ -131,6 +131,11 @@ namespace solunar
 		World* world = g_typeManager->CreateObject<World>();
 		world->LoadXML(*worldElement);
 
+		if (g_engineData.m_editor)
+		{
+			g_editorManager->SetWorldXML(data, length);
+		}
+
 		ms_world = world;
 
 		delete[] data;
@@ -263,6 +268,11 @@ namespace solunar
 		m_nextState = EngineState::Running;
 	}
 
+	const std::string& EngineStateManager::GetWorldName() const
+	{
+		return this->m_worldName;
+	}
+
 	void EngineStateManager::OnStateSwitch()
 	{
 		static const char* s_stateNames[(int)EngineState::Count] =
@@ -306,7 +316,7 @@ namespace solunar
 			}
 
 			m_nextState = EngineState::Running;
-			m_worldName.clear();
+		//	m_worldName.clear();
 
 			break;
 		case EngineState::CloseApplication:

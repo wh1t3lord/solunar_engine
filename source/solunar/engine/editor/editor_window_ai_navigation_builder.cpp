@@ -8,7 +8,8 @@
 #include "graphics\debugrenderer.h"
 #include "entity/cameracomponent.h"
 #include <random>
-
+#include "engine.h"
+#include "core/file/contentmanager.h"
 
 #undef max
 #undef min
@@ -19,6 +20,40 @@ namespace solunar
 	constexpr float _kMGLengthOfArrow = 0.25f;
 	glm::vec3 _kMGSelectedNodeColor = glm::vec3(1.0f, 0.0f, 0.0f);
 
+
+	constexpr const char* _kManualGraphName = "Manual Graph";
+	constexpr const char* _kAutoGridName = "Auto Grid";
+	constexpr const char* _kNavMeshName = "Navigation Mesh";
+
+	//serialization
+	//tags
+	constexpr const char* _kSerializationTag_AI = "AI";
+	constexpr const char* _kSerializationTag_AIBackend = "AIBackend";
+	constexpr const char* _kSerializationTag_AIGraphData = "AIGraphData";
+	constexpr const char* _kSerializationTag_Graph = "Graph";
+	constexpr const char* _kSerializationTag_Node = "Node";
+	constexpr const char* _kSerializationTag_NodeNeigbour = "NodeNeigbour";
+
+
+	//attributes
+	constexpr const char* _kSerializationAttribute_NavigationType = "NavigationType";
+	constexpr const char* _kSerializationAttribute_AIDataStorageTagName = "AIDataStorageTagName";
+	constexpr const char* _kSerializationAttribute_MaxNodeCount = "MaxNodeCount";
+	constexpr const char* _kSerializationAttribute_MaxRegionCount = "MaxRegionCount";
+	constexpr const char* _kSerializationAttribute_MaxNeighboursPerNode = "MaxNeighboursPerNode";
+	constexpr const char* _kSerializationAttribute_AISolver = "AISolver";
+	constexpr const char* _kSerializationAttribute_NodesCount = "NodesCount";
+	constexpr const char* _kSerializationAttribute_RegionsCount = "RegionsCount";
+	constexpr const char* _kSerializationAttribute_id = "id";
+	constexpr const char* _kSerializationAttribute_region_id = "region_id";
+	constexpr const char* _kSerializationAttribute_abs_id = "abs_id";
+	constexpr const char* _kSerializationAttribute_neighbours_count = "neighbours_count";
+	constexpr const char* _kSerializationAttribute_pos_x = "pos_x";
+	constexpr const char* _kSerializationAttribute_pos_y = "pos_y";
+	constexpr const char* _kSerializationAttribute_pos_z = "pos_z";
+
+
+
 	EditorWindow_AINavigationBuilder::EditorWindow_AINavigationBuilder(void) : IEditorWindow(), m_show(false), m_current_type(eNavigationType::kNavigationManualGraph)
 	{
 		std::memset(&this->m_conf_mg, 1, sizeof(unsigned char) * 3 + sizeof(bool));
@@ -26,6 +61,15 @@ namespace solunar
 
 	EditorWindow_AINavigationBuilder::~EditorWindow_AINavigationBuilder(void)
 	{
+		for (auto& pair : this->m_conf_mg.nodes)
+		{
+			for (auto* pNode : pair.second)
+			{
+				delete pNode;
+			}
+
+			pair.second.clear();
+		}
 	}
 
 	void EditorWindow_AINavigationBuilder::Init(void)
@@ -187,17 +231,17 @@ namespace solunar
 						sprintf(region_name, sizeof(region_name), "Region - %d", pair.first);
 						if (ImGui::CollapsingHeader(region_name))
 						{
-							for (const auto& node : pair.second)
+							for (const auto* pNode : pair.second)
 							{
-								sprintf(node_name, sizeof(node_name), "Node: %d (reg:%d)", node.id, pair.first);
+								sprintf(node_name, sizeof(node_name), "Node: %d (reg:%d)", pNode->id, pair.first);
 								ImGui::Text(node_name);
 
 
-								sprintf(button_move_to_name, sizeof(button_move_to_name), "Move To##%d", node.id);
+								sprintf(button_move_to_name, sizeof(button_move_to_name), "Move To##%d", pNode->id);
 								if (ImGui::Button(button_move_to_name))
 								{
 									// strage behaviour setting world pos but it is not correct position like it is expected 1:1
-									CameraProxy::GetInstance()->GetCameraComponent()->GetEntity()->SetPosition(node.position);
+									CameraProxy::GetInstance()->GetCameraComponent()->GetEntity()->SetPosition(pNode->position);
 								}
 
 								ImGui::Separator();
@@ -295,7 +339,395 @@ namespace solunar
 
 	void EditorWindow_AINavigationBuilder::Compile()
 	{
-		MessageBoxA(nullptr, "Compilation Status", "Compilation was successful!", MB_OK | MB_ICONINFORMATION);
+		auto& xml_doc = g_editorManager->GetWorldXML();
+
+		auto* tag_world = xml_doc.FirstChildElement("World");
+
+		if (tag_world)
+		{
+			auto* p_existed = tag_world->FirstChildElement(_kSerializationTag_AI);
+			if (p_existed)
+				tag_world->DeleteChild(p_existed);
+
+			auto* tag_ai = tag_world->InsertNewChildElement(_kSerializationTag_AI);
+
+			if (tag_ai)
+			{
+				auto* tag_backend = tag_ai->InsertNewChildElement(_kSerializationTag_AIBackend);
+
+				if (tag_backend)
+				{
+					tag_backend->SetAttribute(_kSerializationAttribute_NavigationType, convert_enum_navtype_to_text(this->m_current_type));
+
+					switch (this->m_current_type)
+					{
+					case eNavigationType::kNavigationManualGraph:
+					{
+						tag_backend->SetAttribute(_kSerializationAttribute_AIDataStorageTagName, _kSerializationTag_AIGraphData);
+						tag_backend->SetAttribute(_kSerializationAttribute_MaxNodeCount, this->m_conf_mg.max_nodes_count);
+						tag_backend->SetAttribute(_kSerializationAttribute_MaxRegionCount, this->m_conf_mg.max_regions_count);
+						tag_backend->SetAttribute(_kSerializationAttribute_MaxNeighboursPerNode, this->m_conf_mg.max_nodes_neighbour_per_node_count);
+						break;
+					}
+					default:
+					{
+						Assert(!"not implemented!");
+						break;
+					}
+					}
+
+					tag_backend->SetAttribute(_kSerializationAttribute_AISolver, "Astar");
+				}
+
+				switch (this->m_current_type)
+				{
+				case eNavigationType::kNavigationManualGraph:
+				{
+					auto* tag_ai_data = tag_ai->InsertNewChildElement(_kSerializationTag_AIGraphData);
+
+					if (tag_ai_data)
+					{
+						auto* tag_graph_root = tag_ai_data->InsertNewChildElement(_kSerializationTag_Graph);
+
+						if (tag_graph_root)
+						{
+							int total_children = 0;
+							int regions_count = this->m_conf_mg.nodes.size();
+							for (const auto& pair : this->m_conf_mg.nodes)
+							{
+								total_children += pair.second.size();
+							}
+
+							tag_graph_root->SetAttribute(_kSerializationAttribute_NodesCount, total_children);
+							tag_graph_root->SetAttribute(_kSerializationAttribute_RegionsCount, regions_count);
+
+
+
+							int abs_id_indexer = 0;
+							// compiling abs ids
+							for (auto& pair : this->m_conf_mg.nodes)
+							{
+								for (auto* pNode : pair.second)
+								{
+									pNode->abs_id = abs_id_indexer;
+									++abs_id_indexer;
+								}
+							}
+
+							for (const auto& pair : this->m_conf_mg.nodes)
+							{
+								for (const auto* pNode : pair.second)
+								{
+									auto* tag_node = tag_graph_root->InsertNewChildElement(_kSerializationTag_Node);
+
+									if (tag_node)
+									{
+										constexpr unsigned char _kMaxUC = std::numeric_limits<unsigned char>::max();
+										tag_node->SetAttribute(_kSerializationAttribute_id, pNode->id);
+										tag_node->SetAttribute(_kSerializationAttribute_region_id, pNode->region_id);
+										tag_node->SetAttribute(_kSerializationAttribute_abs_id, pNode->abs_id);
+										tag_node->SetAttribute(_kSerializationAttribute_neighbours_count, pNode->neighbours.size());
+
+										tag_node->SetAttribute(_kSerializationAttribute_pos_x, pNode->position.x);
+										tag_node->SetAttribute(_kSerializationAttribute_pos_y, pNode->position.y);
+										tag_node->SetAttribute(_kSerializationAttribute_pos_z, pNode->position.z);
+
+
+										for (const auto* pNodeN : pNode->neighbours)
+										{
+											auto* tag_neighbour = tag_node->InsertNewChildElement(_kSerializationTag_NodeNeigbour);
+
+											if (tag_neighbour)
+											{
+												tag_neighbour->SetAttribute(_kSerializationAttribute_id, pNodeN->id);
+												tag_neighbour->SetAttribute(_kSerializationAttribute_region_id, pNodeN->region_id);
+												tag_neighbour->SetAttribute(_kSerializationAttribute_abs_id, pNodeN->abs_id);
+											}
+										}
+
+									}
+
+								}
+							}
+						}
+					}
+
+					break;
+				}
+				default:
+				{
+					Assert(!"not implemeneted!");
+					break;
+				}
+				}
+			}
+
+
+		}
+
+		const char* pWorkingPath = g_contentManager->GetInstance()->GetWorkingPath("game");
+		const std::string& srcPath = (pWorkingPath + std::string("/data/"));
+		const std::string& fullPath = srcPath + EngineStateManager::GetInstance()->GetWorldName();
+		auto status = xml_doc.SaveFile(fullPath.c_str());
+
+		if (status == tinyxml2::XML_SUCCESS)
+		{
+			MessageBoxA(nullptr, "Successful!", "Compilation", MB_OK | MB_ICONINFORMATION);
+		}
+		else
+		{
+			MessageBoxA(nullptr, "Failed!", "Compilation", MB_OK | MB_ICONERROR);
+		}
+
+	}
+
+	void EditorWindow_AINavigationBuilder::Load(tinyxml2::XMLElement& tagWorld)
+	{
+		if (strcmp(tagWorld.Name(), "World") != 0)
+		{
+			Assert(!"wrong document?!");
+
+			Core::Error("FAILED to obtain data for AI map editor Can't load data");
+			return;
+		}
+
+		switch (this->m_current_type)
+		{
+		case eNavigationType::kNavigationManualGraph:
+		{
+			for (auto& pair : this->m_conf_mg.nodes)
+			{
+				for (auto* pNode : pair.second)
+				{
+					delete pNode;
+				}
+
+				pair.second.clear();
+			}
+
+			this->m_conf_mg.nodes.clear();
+
+			break;
+		}
+		default:
+		{
+			Assert(!"noot impleented!");
+			break;
+		}
+		}
+
+		auto* tag_ai = tagWorld.FirstChildElement(_kSerializationTag_AI);
+
+		if (tag_ai)
+		{
+			auto* tag_ai_backend = tag_ai->FirstChildElement(_kSerializationTag_AIBackend);
+
+			if (tag_ai_backend)
+			{
+				auto* attr_navigation_type = tag_ai_backend->FindAttribute(_kSerializationAttribute_NavigationType);
+
+				if (attr_navigation_type)
+				{
+					this->m_current_type = convert_string_to_navtype(attr_navigation_type->Value());
+				}
+
+				switch (this->m_current_type)
+				{
+				case eNavigationType::kNavigationManualGraph:
+				{
+					auto* attr_max_nodes_count = tag_ai_backend->FindAttribute(_kSerializationAttribute_MaxNodeCount);
+
+					if (attr_max_nodes_count)
+					{
+						this->m_conf_mg.max_nodes_count = attr_max_nodes_count->IntValue();
+					}
+
+					auto* attr_max_region_count = tag_ai_backend->FindAttribute(_kSerializationAttribute_MaxRegionCount);
+
+					if (attr_max_region_count)
+					{
+						this->m_conf_mg.max_regions_count = attr_max_region_count->IntValue();
+					}
+
+					auto* attr_max_neighbours_per_node = tag_ai_backend->FindAttribute(_kSerializationAttribute_MaxNeighboursPerNode);
+
+					if (attr_max_neighbours_per_node)
+					{
+						this->m_conf_mg.max_nodes_neighbour_per_node_count = static_cast<unsigned char>(attr_max_neighbours_per_node->IntValue());
+					}
+
+					auto* attr_storage_tag = tag_ai_backend->FindAttribute(_kSerializationAttribute_AIDataStorageTagName);
+
+					if (attr_storage_tag)
+					{
+						const char* pAIGraphStorageTagName = attr_storage_tag->Value();
+						auto* tag_ai_graph_data = tag_ai->FirstChildElement(pAIGraphStorageTagName);
+
+						if (tag_ai_graph_data)
+						{
+							auto* tag_graph = tag_ai_graph_data->FirstChildElement(_kSerializationTag_Graph);
+
+							if (tag_graph)
+							{
+								auto* attr_nodes_count = tag_graph->FindAttribute(_kSerializationAttribute_NodesCount);
+
+								if (attr_nodes_count)
+								{
+									int nodes_count = attr_nodes_count->IntValue();
+
+									auto* iter = tag_graph->FirstChildElement();
+
+									if (!iter)
+									{
+										Core::Warning("Your graph is empty, no data to load!");
+										return;
+									}
+
+									for (int i = 0; i < nodes_count; ++i)
+									{
+										auto* attr_id = iter->FindAttribute(_kSerializationAttribute_id);
+										auto* attr_region_id = iter->FindAttribute(_kSerializationAttribute_region_id);
+										// no need because in editor we recalculate abs_id field
+										// auto* attr_abs_id = iter->FindAttribute(_kSerializationAttribute_abs_id);
+										auto* attr_pos_x = iter->FindAttribute(_kSerializationAttribute_pos_x);
+										auto* attr_pos_y = iter->FindAttribute(_kSerializationAttribute_pos_y);
+										auto* attr_pos_z = iter->FindAttribute(_kSerializationAttribute_pos_z);
+
+										if (attr_id && attr_region_id && attr_pos_x && attr_pos_y && attr_pos_z)
+										{
+											unsigned char id = static_cast<unsigned char>(attr_id->IntValue());
+											unsigned char region_id = static_cast<unsigned char>(attr_region_id->IntValue());
+
+											float pos_x = attr_pos_x->FloatValue();
+											float pos_y = attr_pos_y->FloatValue();
+											float pos_z = attr_pos_z->FloatValue();
+
+											BuilderConfig_ManualGraph::Node* pInstance = new BuilderConfig_ManualGraph::Node();
+
+											pInstance->id = id;
+											pInstance->region_id = region_id;
+
+											pInstance->position.x = pos_x;
+											pInstance->position.y = pos_y;
+											pInstance->position.z = pos_z;
+
+											this->m_conf_mg.nodes[region_id].push_back(pInstance);
+										}
+										else
+										{
+											Core::Warning("Invalid data of Node abs id = %d (can't load node)", i);
+										}
+
+										iter = iter->NextSiblingElement();
+									}
+
+									iter = tag_graph->FirstChildElement();
+									for (int i = 0; i < nodes_count; ++i)
+									{
+										auto* attr_id = iter->FindAttribute(_kSerializationAttribute_id);
+										auto* attr_region_id = iter->FindAttribute(_kSerializationAttribute_region_id);
+
+										unsigned char id = static_cast<unsigned char>(attr_id->IntValue());
+										unsigned char region_id = static_cast<unsigned char>(attr_region_id->IntValue());
+
+										auto node = std::find_if(this->m_conf_mg.nodes[region_id].begin(), this->m_conf_mg.nodes[region_id].end(), [id](const BuilderConfig_ManualGraph::Node* pElement) -> bool {
+											Assert(pElement && "can't be!");
+											return pElement->id == id;
+										});
+
+										Assert(node != this->m_conf_mg.nodes[region_id].end() && "lol it is broken! Can't be!!");
+
+										auto* attr_neighbour_count = iter->FindAttribute(_kSerializationAttribute_neighbours_count);
+
+										if (attr_neighbour_count)
+										{
+											unsigned char nc = static_cast<unsigned char>(attr_neighbour_count->IntValue());
+
+											auto* iter_n = iter->FirstChildElement();
+
+											if (iter_n)
+											{
+												for (unsigned char j = 0; j < nc; ++j)
+												{
+													auto* attr_neighbour_id = iter_n->FindAttribute(_kSerializationAttribute_id);
+													auto* attr_neighbour_region_id = iter_n->FindAttribute(_kSerializationAttribute_region_id);
+													
+													if (attr_neighbour_id && attr_neighbour_region_id)
+													{
+														unsigned char neighbour_node_id = static_cast<unsigned char>(attr_neighbour_id->IntValue());
+														unsigned char neighbour_region_id = static_cast<unsigned char>(attr_neighbour_region_id->IntValue());
+
+														auto neighbour_node = std::find_if(this->m_conf_mg.nodes[neighbour_region_id].begin(), this->m_conf_mg.nodes[neighbour_region_id].end(), [neighbour_node_id](const BuilderConfig_ManualGraph::Node* pNode) -> bool {
+															Assert(pNode && "can't be!");
+															return pNode->id == neighbour_node_id;
+													});
+
+														Assert(neighbour_node != this->m_conf_mg.nodes[neighbour_region_id].end() && "can't be!");
+
+														if (neighbour_node != this->m_conf_mg.nodes[neighbour_region_id].end())
+														{
+															(*node)->neighbours.push_back(*neighbour_node);
+														}
+													}
+													else
+													{
+														Core::Warning("Invalid neighbour node, parent abs id = %d", i);
+													}
+
+													iter_n = iter_n->NextSiblingElement();
+												}
+											}
+											else
+											{
+												Core::Warning("FAILED to obtain neighbours but count is presented!! abs id = %d", i);
+											}
+										}
+
+										iter = iter->NextSiblingElement();
+									}
+								}
+								else
+								{
+									Core::Warning("FAILED to obtain attribute %s Can't load data", _kSerializationAttribute_NodesCount);
+								}
+							}
+							else
+							{
+								Core::Warning("FAILED to obtain tag %s Can't load data", _kSerializationTag_Graph);
+							}
+
+						}
+					}
+					else
+					{
+						Core::Warning("FAILED can't obtain data about graph because attribute AIDataStorageTagName is missing! Can't load data");
+					}
+
+					break;
+				}
+				default:
+				{
+					Assert(!"not implemented");
+
+					Core::Warning("Other navigation types not supported yet. Can't load data!");
+
+					return;
+				}
+				}
+			}
+			else
+			{
+				Core::Warning("FAILED to obtain ai backend tag! Can't load data");
+			}
+		}
+		else
+		{
+			Core::Warning("FAILED to obtain AI tag! Can't load data");
+		}
+
+
+		this->m_conf_mg.need_to_update_stats = true;
+		this->UpdateStats(this->m_conf_mg);
 	}
 
 	void EditorWindow_AINavigationBuilder::UpdateStats(BuilderConfig_ManualGraph& conf)
@@ -309,9 +741,9 @@ namespace solunar
 			unsigned char max_neighbours_count = 0;
 			for (const auto& pair : conf.nodes)
 			{
-				for (const BuilderConfig_ManualGraph::Node& node : pair.second)
+				for (const BuilderConfig_ManualGraph::Node* pNode : pair.second)
 				{
-					size_t neighbours_count = node.neighbours.size();
+					size_t neighbours_count = pNode->neighbours.size();
 					if (neighbours_count > max_neighbours_count)
 					{
 						max_neighbours_count = static_cast<unsigned char>(neighbours_count);
@@ -371,10 +803,33 @@ namespace solunar
 				if (
 					this->m_conf_mg.nodes[this->m_conf_mg.pSelectedNode->region_id].size() < this->m_conf_mg.max_nodes_count)
 				{
-					BuilderConfig_ManualGraph::Node instance;
-					instance.id = this->m_conf_mg.nodes[this->m_conf_mg.pSelectedNode->region_id].size();
-					instance.position = world_pos;
-					instance.region_id = this->m_conf_mg.pSelectedNode->region_id;
+					// todo: heuristic is not so optimal but gurantees that id is unique
+					bool free_ids[std::numeric_limits<unsigned char>::max()];
+					memset(free_ids, 0, sizeof(free_ids));
+
+					for (const auto* pNode : this->m_conf_mg.nodes[this->m_conf_mg.pSelectedNode->region_id])
+					{
+						free_ids[pNode->id] = true;
+					}
+
+					constexpr unsigned char _kMAX = std::numeric_limits<unsigned char>::max();
+					unsigned char free_id = -1;
+					for (unsigned char i = 0; i < _kMAX; ++i)
+					{
+						if (!free_ids[i])
+						{
+							free_id = i;
+							break;
+						}
+					}
+
+					Assert(free_id != unsigned char(-1) && "failed to obtain unique id, means no free space left!!!!!!!! You should've handle it...");
+
+					BuilderConfig_ManualGraph::Node* instance = new BuilderConfig_ManualGraph::Node();
+					instance->id = free_id;
+					instance->position = world_pos;
+					instance->region_id = this->m_conf_mg.pSelectedNode->region_id;
+					instance->abs_id = -1;
 					this->m_conf_mg.nodes[this->m_conf_mg.pSelectedNode->region_id].push_back(instance);
 				}
 			}
@@ -407,10 +862,32 @@ namespace solunar
 
 				if (free_region != unsigned char(-1))
 				{
-					BuilderConfig_ManualGraph::Node instance;
-					instance.id = this->m_conf_mg.nodes[free_region].size();
-					instance.position = world_pos;
-					instance.region_id = free_region;
+
+					bool free_ids[std::numeric_limits<unsigned char>::max()];
+					memset(free_ids, 0, sizeof(free_ids));
+
+					for (const auto* pNode : this->m_conf_mg.nodes[free_region])
+					{
+						free_ids[pNode->id] = true;
+					}
+
+					constexpr unsigned char _kMAX = std::numeric_limits<unsigned char>::max();
+					unsigned char free_id = -1;
+					for (unsigned char i = 0; i < _kMAX; ++i)
+					{
+						if (!free_ids[i])
+						{
+							free_id = i; break;
+						}
+					}
+
+					Assert(free_id != unsigned char(-1) && "failed to obtain unique id, means no free space left!!!!!!!! You should've handle it...");
+
+					BuilderConfig_ManualGraph::Node* instance = new BuilderConfig_ManualGraph::Node();
+					instance->id = free_id;
+					instance->position = world_pos;
+					instance->region_id = free_region;
+					instance->abs_id = -1;
 					this->m_conf_mg.nodes[free_region].push_back(instance);
 				}
 			}
@@ -466,12 +943,12 @@ namespace solunar
 		{
 			for (const auto& region_and_nodes : this->m_conf_mg.nodes)
 			{
-				const std::vector<BuilderConfig_ManualGraph::Node>& nodes = region_and_nodes.second;
+				const std::vector<BuilderConfig_ManualGraph::Node*>& nodes = region_and_nodes.second;
 
-				for (const auto& node : nodes)
+				for (const auto* pNode : nodes)
 				{
-					this->DrawDebugNode(region_and_nodes.first, node);
-					this->DrawDebugNodeConnections(region_and_nodes.first, node);
+					this->DrawDebugNode(region_and_nodes.first, pNode);
+					this->DrawDebugNodeConnections(region_and_nodes.first, pNode);
 				}
 			}
 
@@ -487,45 +964,48 @@ namespace solunar
 
 	void EditorWindow_AINavigationBuilder::DrawDebugNode(
 		unsigned char region_id,
-		const BuilderConfig_ManualGraph::Node& node
+		const BuilderConfig_ManualGraph::Node* pNode
 	)
 	{
 		glm::vec3 color_for_region = this->m_conf_mg.debug_region_colors[region_id];
 
-		if (node.hovered)
+		if (pNode->hovered)
 			color_for_region = glm::vec3(1.0f, 1.0f, 1.0f) - color_for_region;
 
-		if (node.selected)
+		if (pNode->selected)
 			color_for_region = _kMGSelectedNodeColor;
 
-		g_debugRender.DrawLine(node.position, node.position + glm::vec3(0.0f, _kMGLengthOfRoot, 0.0f), color_for_region);
-		g_debugRender.DrawLine(node.position + glm::vec3(0.0f, _kMGLengthOfRoot, 0.0f), node.position + glm::vec3(_kMGLengthOfArrow, 0.0f, 0.0f), color_for_region);
-		g_debugRender.DrawLine(node.position + glm::vec3(0.0f, _kMGLengthOfRoot, 0.0f), node.position + glm::vec3(-_kMGLengthOfArrow, 0.0f, 0.0f), color_for_region);
-		g_debugRender.DrawLine(node.position + glm::vec3(0.0f, _kMGLengthOfRoot, 0.0f), node.position + glm::vec3(0.0f, 0.0f, _kMGLengthOfArrow), color_for_region);
-		g_debugRender.DrawLine(node.position + glm::vec3(0.0f, _kMGLengthOfRoot, 0.0f), node.position + glm::vec3(0.0f, 0.0f, -_kMGLengthOfArrow), color_for_region);
+		g_debugRender.DrawLine(pNode->position, pNode->position + glm::vec3(0.0f, _kMGLengthOfRoot, 0.0f), color_for_region);
+		g_debugRender.DrawLine(pNode->position + glm::vec3(0.0f, _kMGLengthOfRoot, 0.0f), pNode->position + glm::vec3(_kMGLengthOfArrow, 0.0f, 0.0f), color_for_region);
+		g_debugRender.DrawLine(pNode->position + glm::vec3(0.0f, _kMGLengthOfRoot, 0.0f), pNode->position + glm::vec3(-_kMGLengthOfArrow, 0.0f, 0.0f), color_for_region);
+		g_debugRender.DrawLine(pNode->position + glm::vec3(0.0f, _kMGLengthOfRoot, 0.0f), pNode->position + glm::vec3(0.0f, 0.0f, _kMGLengthOfArrow), color_for_region);
+		g_debugRender.DrawLine(pNode->position + glm::vec3(0.0f, _kMGLengthOfRoot, 0.0f), pNode->position + glm::vec3(0.0f, 0.0f, -_kMGLengthOfArrow), color_for_region);
 
 	}
 
-	void EditorWindow_AINavigationBuilder::DrawDebugNodeConnections(unsigned char region_id, const BuilderConfig_ManualGraph::Node& node)
+	void EditorWindow_AINavigationBuilder::DrawDebugNodeConnections(unsigned char region_id, const BuilderConfig_ManualGraph::Node* pNode)
 	{
-		for (const auto& neighbour_node : node.neighbours)
+		for (const auto* pNodeNeighbour : pNode->neighbours)
 		{
-			glm::vec3 color_connection = (this->m_conf_mg.debug_region_colors[neighbour_node.region_id] + this->m_conf_mg.debug_region_colors[node.region_id]) * 0.5f;
+			glm::vec3 color_connection = (this->m_conf_mg.debug_region_colors[pNodeNeighbour->region_id] + this->m_conf_mg.debug_region_colors[pNode->region_id]) * 0.5f;
 
-			g_debugRender.DrawLine(node.position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f), neighbour_node.position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f), color_connection);
+			glm::vec3 from_me_to_neigbour_dir = (pNodeNeighbour->position - pNode->position);
+			from_me_to_neigbour_dir = glm::normalize(from_me_to_neigbour_dir);
 
-			glm::vec3 right = (neighbour_node.position - node.position);
+			g_debugRender.DrawLine(pNode->position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f) + (from_me_to_neigbour_dir * _kMGLengthOfArrow), pNodeNeighbour->position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f) - (from_me_to_neigbour_dir * _kMGLengthOfArrow), color_connection);
+
+			glm::vec3 right = (pNodeNeighbour->position - pNode->position);
 			right = glm::cross(right, glm::vec3(0.0, 1.0, 0.0));
 			right = glm::normalize(right);
-			g_debugRender.DrawLine(neighbour_node.position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f), (neighbour_node.position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f) + (right * _kMGLengthOfArrow)) - (glm::normalize((neighbour_node.position - node.position)) * 0.3f), this->m_conf_mg.debug_region_colors[neighbour_node.region_id]);
-			g_debugRender.DrawLine(neighbour_node.position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f), (neighbour_node.position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f) + (right * -_kMGLengthOfArrow)) - (glm::normalize((neighbour_node.position - node.position)) * 0.3f), this->m_conf_mg.debug_region_colors[neighbour_node.region_id]);
+			g_debugRender.DrawLine(pNodeNeighbour->position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f) - (from_me_to_neigbour_dir * _kMGLengthOfArrow), (pNodeNeighbour->position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f) + (right * _kMGLengthOfArrow)) - (glm::normalize((pNodeNeighbour->position - pNode->position)) * 0.6f), this->m_conf_mg.debug_region_colors[pNodeNeighbour->region_id]);
+			g_debugRender.DrawLine(pNodeNeighbour->position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f) - (from_me_to_neigbour_dir * _kMGLengthOfArrow), (pNodeNeighbour->position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f) + (right * -_kMGLengthOfArrow)) - (glm::normalize((pNodeNeighbour->position - pNode->position)) * 0.6f), this->m_conf_mg.debug_region_colors[pNodeNeighbour->region_id]);
 		}
 	}
 
 	void EditorWindow_AINavigationBuilder::InitConfig_ManualGraph(BuilderConfig_ManualGraph& config)
 	{
-		config.max_nodes_count = 16;
-		config.max_regions_count = 4;
+		config.max_nodes_count = 32;
+		config.max_regions_count = 8;
 		config.max_nodes_neighbour_per_node_count = 4;
 		config.max_possible_total_nodes = config.max_nodes_count * config.max_regions_count;
 		config.need_to_update_stats = false;
@@ -580,14 +1060,14 @@ namespace solunar
 				{
 					auto& nodes = regionid_and_nodes.second;
 
-					for (auto& node : nodes)
+					for (auto* pNode : nodes)
 					{
 						float t;
 						glm::vec3 point_of_intersection;
 						if (this->RayIntersectionSphereNode(
 							ray_begin,
 							ray_dir,
-							node.position,
+							pNode->position,
 							this->m_conf_mg.node_collision_radius,
 							t,
 							point_of_intersection
@@ -595,17 +1075,17 @@ namespace solunar
 						{
 							if (t < t_min)
 							{
-								pClosestNode = &node;
+								pClosestNode = pNode;
 								t_min = t;
 							}
 						}
 						else
 						{
-							if (node.hovered)
+							if (pNode->hovered)
 							{
-								node.hovered = false;
+								pNode->hovered = false;
 
-								if (node.id == this->m_conf_mg.pHoveredNode->id && node.region_id == this->m_conf_mg.pHoveredNode->region_id)
+								if (pNode->id == this->m_conf_mg.pHoveredNode->id && pNode->region_id == this->m_conf_mg.pHoveredNode->region_id)
 									this->m_conf_mg.pHoveredNode = nullptr;
 							}
 						}
@@ -675,25 +1155,29 @@ namespace solunar
 
 					for (auto& pair : this->m_conf_mg.nodes)
 					{
-						for (auto& node : pair.second)
+						for (auto* pNode : pair.second)
 						{
-							auto iter = std::find_if(node.neighbours.begin(), node.neighbours.end(), [id, region_id](const BuilderConfig_ManualGraph::Node& pNode)->bool {
-								return pNode.id == id && pNode.region_id == region_id;
+							auto iter = std::find_if(pNode->neighbours.begin(), pNode->neighbours.end(), [id, region_id](const BuilderConfig_ManualGraph::Node* pNode)->bool {
+								return pNode->id == id && pNode->region_id == region_id;
 								});
 
-							if (iter != node.neighbours.end())
-								node.neighbours.erase(iter);
+							if (iter != pNode->neighbours.end())
+							{
+								pNode->neighbours.erase(iter);
+							}
+
 						}
 					}
 
-					auto iter = std::find_if(nodes.begin(), nodes.end(), [id](const BuilderConfig_ManualGraph::Node& node) -> bool {
-						return node.id == id;
+					auto iter = std::find_if(nodes.begin(), nodes.end(), [id](const BuilderConfig_ManualGraph::Node* pNode) -> bool {
+						return pNode->id == id;
 						});
 
 					Assert(iter != nodes.end() && "something is wrong, element must persist in vector");
 
 					if (iter != nodes.end())
 					{
+						delete (*iter);
 						nodes.erase(iter);
 					}
 
@@ -752,14 +1236,14 @@ namespace solunar
 							auto iter = std::find_if(
 								this->m_conf_mg.pSelectedNode->neighbours.begin(),
 								this->m_conf_mg.pSelectedNode->neighbours.end(),
-								[id, region_id](const BuilderConfig_ManualGraph::Node& pNode)->bool {
-									return pNode.id == id && pNode.region_id == region_id;
+								[id, region_id](const BuilderConfig_ManualGraph::Node* pNode)->bool {
+									return pNode->id == id && pNode->region_id == region_id;
 								});
 
 							// add only if wasn't added
 							if (iter == this->m_conf_mg.pSelectedNode->neighbours.end())
 							{
-								this->m_conf_mg.pSelectedNode->neighbours.push_back(*this->m_conf_mg.pHoveredNode);
+								this->m_conf_mg.pSelectedNode->neighbours.push_back(this->m_conf_mg.pHoveredNode);
 							}
 						}
 					}
@@ -770,7 +1254,7 @@ namespace solunar
 				{
 					if (this->m_conf_mg.pHoveredNode && this->m_conf_mg.pSelectedNode)
 					{
-						if (this->m_conf_mg.pHoveredNode->region_id != this->m_conf_mg.pSelectedNode->region_id && this->m_conf_mg.pHoveredNode->id != this->m_conf_mg.pSelectedNode->id)
+						if ((this->m_conf_mg.pHoveredNode->region_id == this->m_conf_mg.pSelectedNode->region_id && this->m_conf_mg.pHoveredNode->id != this->m_conf_mg.pSelectedNode->id) || (this->m_conf_mg.pHoveredNode->region_id != this->m_conf_mg.pSelectedNode->region_id))
 						{
 							unsigned char region_id = this->m_conf_mg.pSelectedNode->region_id;
 							unsigned char id = this->m_conf_mg.pSelectedNode->id;
@@ -778,14 +1262,14 @@ namespace solunar
 							auto iter = std::find_if(
 								this->m_conf_mg.pHoveredNode->neighbours.begin(),
 								this->m_conf_mg.pHoveredNode->neighbours.end(),
-								[id, region_id](const BuilderConfig_ManualGraph::Node& pNode)->bool {
-									return pNode.id == id && pNode.region_id == region_id;
+								[id, region_id](const BuilderConfig_ManualGraph::Node* pNode)->bool {
+									return pNode->id == id && pNode->region_id == region_id;
 								});
 
 							// add only if wasn't added
 							if (iter == this->m_conf_mg.pHoveredNode->neighbours.end())
 							{
-								this->m_conf_mg.pHoveredNode->neighbours.push_back(*this->m_conf_mg.pSelectedNode);
+								this->m_conf_mg.pHoveredNode->neighbours.push_back(this->m_conf_mg.pSelectedNode);
 							}
 						}
 					}
@@ -867,18 +1351,31 @@ namespace solunar
 		{
 		case eNavigationType::kNavigationManualGraph:
 		{
-			return "Manual Graph";
+			return _kManualGraphName;
 		}
 		case eNavigationType::kNavigationAutoGrid:
 		{
-			return "Auto Graph";
+			return _kAutoGridName;
 		}
 		case eNavigationType::kNavigationNavMesh:
 		{
-			return "Navigation Mesh";
+			return _kNavMeshName;
 		}
 		default:
 			return "UNDEFINED_NAVIGATION_TYPE";
 		}
+	}
+	eNavigationType convert_string_to_navtype(const char* text)
+	{
+		eNavigationType result = eNavigationType::kEndOfEnum;
+
+		if (!strcmp(text, _kManualGraphName))
+			result = eNavigationType::kNavigationManualGraph;
+		else if (!strcmp(text, _kNavMeshName))
+			result = eNavigationType::kNavigationNavMesh;
+		else if (!strcmp(text, _kAutoGridName))
+			result = eNavigationType::kNavigationAutoGrid;
+
+		return result;
 	}
 }

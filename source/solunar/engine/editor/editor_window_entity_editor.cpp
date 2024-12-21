@@ -81,4 +81,7 @@ namespace solunar
 	{
 
 	}
+	void EditorWindow_EntityEditor::Load(tinyxml2::XMLElement& tagWorld)
+	{
+	}
 }

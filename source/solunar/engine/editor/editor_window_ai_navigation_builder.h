@@ -23,8 +23,9 @@ namespace solunar
 				bool hovered = false;
 				unsigned char region_id;
 				unsigned char id;
+				int abs_id; // for linear representation on game's side
 				glm::vec3 position;
-				std::vector<Node> neighbours;
+				std::vector<Node*> neighbours;
 			};
 
 			struct SelectedNode
@@ -60,7 +61,7 @@ namespace solunar
 			Node* pLinkRight;
 
 			// key=region|value=Node
-			std::unordered_map<unsigned char, std::vector<Node>> nodes;
+			std::unordered_map<unsigned char, std::vector<Node*>> nodes;
 			std::vector<glm::vec3> m_centers_of_regions;
 			glm::vec3 debug_region_colors[255];
 		};
@@ -79,7 +80,7 @@ namespace solunar
 		void UpdateEditingMode(InputManager* pInputManager, World* pWorld) override;
 
 		void Compile();
-
+		void Load(tinyxml2::XMLElement& tagWorld) override;
 	private:
 		void UpdateStats(BuilderConfig_ManualGraph& conf);
 
@@ -90,10 +91,10 @@ namespace solunar
 		void ClearNodes();
 
 		void DrawDebug();
-		void DrawDebugNode(unsigned char region_id, const BuilderConfig_ManualGraph::Node& node);
+		void DrawDebugNode(unsigned char region_id, const BuilderConfig_ManualGraph::Node* pNode);
 		void DrawDebugNodeConnections(
 			unsigned char region_id,
-			const BuilderConfig_ManualGraph::Node& node
+			const BuilderConfig_ManualGraph::Node* pNode
 		);
 
 		void InitConfig_ManualGraph(BuilderConfig_ManualGraph& config);
@@ -117,6 +118,7 @@ namespace solunar
 	};
 
 	const char* convert_enum_navtype_to_text(eNavigationType type);
+	eNavigationType convert_string_to_navtype(const char* text);
 }
 
 #endif

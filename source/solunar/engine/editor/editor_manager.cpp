@@ -35,10 +35,12 @@ namespace solunar
 		m_close_application(false),
 		m_show_modal_close_application_window(false),
 		m_current_editing_mode(EditingMode::kEditingMode_NoSelection),
+		m_pSelectedEntity(nullptr),
 		m_pWorld(nullptr),
 		m_pEditingMode_AINavigationGraph(nullptr),
 		m_pEditingMode_ObjectSelection(nullptr),
-		m_pSelectedEntity(nullptr),
+		m_p_allocated_memory(nullptr),
+		m_length_of_file(0),
 		m_cam{}
 	{
 	}
@@ -61,6 +63,7 @@ namespace solunar
 	void EditorManager::PostInit()
 	{
 		this->InitWindows();
+		this->Load(*this->GetWorldXML().FirstChildElement());
 	}
 
 	void EditorManager::InitWindows()
@@ -309,6 +312,13 @@ namespace solunar
 			}
 		}
 
+
+		if (this->m_p_allocated_memory)
+		{
+			delete[] this->m_p_allocated_memory;
+			this->m_p_allocated_memory = nullptr;
+		}
+
 		m_windows.clear();
 	}
 
@@ -401,5 +411,43 @@ namespace solunar
 	bool EditorManager::IsNeedToCloseApplication() const
 	{
 		return this->m_close_application;
+	}
+
+	void EditorManager::SetWorldXML(char* data, size_t length_of_file)
+	{
+		if (data)
+		{
+			if (length_of_file)
+			{
+				if (this->m_p_allocated_memory)
+				{
+					delete[] this->m_p_allocated_memory;
+					this->m_p_allocated_memory = nullptr;
+				}
+
+				this->m_p_allocated_memory = new char[length_of_file+1];
+				this->m_p_allocated_memory[length_of_file] = '\0';
+				memcpy(this->m_p_allocated_memory, data, length_of_file);
+
+				auto status = this->m_world_xml.Parse(this->m_p_allocated_memory, length_of_file);
+
+				Assert(status == tinyxml2::XML_SUCCESS);
+			}
+		}
+	}
+	tinyxml2::XMLDocument& EditorManager::GetWorldXML()
+	{
+		return this->m_world_xml;
+	}
+
+	void EditorManager::Load(tinyxml2::XMLElement& tagWorld)
+	{
+		for (IEditorWindow* pWindow : this->m_windows)
+		{
+			if (pWindow)
+			{
+				pWindow->Load(tagWorld);
+			}
+		}
 	}
 }
