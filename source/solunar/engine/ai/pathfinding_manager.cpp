@@ -6,14 +6,12 @@ namespace solunar
 {
 	PathfindingManager* g_aiPathfindingManager = nullptr;
 
-	PathfindingManager::PathfindingManager() : m_pNavigationData(nullptr), m_pSolver(nullptr)
+	PathfindingManager::PathfindingManager() : m_enable_debug_draw(false), m_pNavigationData(nullptr), m_pSolver(nullptr)
 	{
 	}
 
 	PathfindingManager::~PathfindingManager()
 	{
-		Assert(m_pNavigationData && "memory leak, you forgot to delete it in ::Shutdown!");
-		Assert(m_pSolver && "memory leak, you forgot to delete it in ::Shutdown!");
 	}
 
 	void PathfindingManager::Init(IPathfindingNavigationData* pDataImplBackend, IPathfindingSolver* pSolver)
@@ -37,6 +35,20 @@ namespace solunar
 		{
 			mem_delete(m_pSolver);
 			m_pSolver = nullptr;
+		}
+	}
+	void PathfindingManager::ToggleDebugDraw()
+	{
+		this->m_enable_debug_draw = !this->m_enable_debug_draw;
+	}
+	void PathfindingManager::DebugDraw()
+	{
+		if (this->m_enable_debug_draw)
+		{
+			if (this->m_pNavigationData)
+			{
+				this->m_pNavigationData->DebugDraw();
+			}
 		}
 	}
 }

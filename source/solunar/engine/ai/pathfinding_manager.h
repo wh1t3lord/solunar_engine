@@ -9,16 +9,14 @@ namespace solunar
 
 namespace solunar
 {
+
+	constexpr const char* _kPathfindingSolver_Astar = "Astar";
+	constexpr const char* _kPathfindingSerializationAttribute_AISolver = "AISolver";
+
 	enum eSolverBackend 
 	{
 		kSolver_Astar,
 		kSolver_Unknown=-1
-	};
-
-	enum eNavigationDataRepresentationType
-	{
-		kNavigationData_Graph,
-		kNavigationData_Unknown=-1
 	};
 
 
@@ -35,8 +33,11 @@ namespace solunar
 
 		void Shutdown();
 
+		void ToggleDebugDraw();
 
+		void DebugDraw();
 	private:
+		bool m_enable_debug_draw;
 		IPathfindingNavigationData* m_pNavigationData;
 		IPathfindingSolver* m_pSolver;
 	};

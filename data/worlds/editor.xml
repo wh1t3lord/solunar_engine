@@ -170,34 +170,64 @@
         </Entity>
     </Entity>
     <AI>
-        <AIBackend NavigationType="Manual Graph" AIDataStorageTagName="AIGraphData" MaxNodeCount="32" MaxRegionCount="8" AISolver="Astar"/>
+        <AIBackend NavigationType="Manual Graph" AIDataStorageTagName="AIGraphData" MaxNodeCount="32" MaxRegionCount="8" MaxNeighboursPerNode="4" AISolver="Astar"/>
         <AIGraphData>
-            <Graph NodesCount="5" RegionsCount="1">
-                <Node id="0" region_id="0" abs_id="0" neighbours_count="3" pos_x="-2.3595209" pos_y="-0.0091552734" pos_z="4.95193">
+            <Graph NodesCount="12" RegionsCount="1">
+                <Node id="0" region_id="0" abs_id="0" neighbours_count="2" pos_x="-2.3595209" pos_y="-0.0091552734" pos_z="4.95193">
                     <NodeNeigbour id="1" region_id="0" abs_id="1"/>
                     <NodeNeigbour id="3" region_id="0" abs_id="3"/>
-                    <NodeNeigbour id="4" region_id="0" abs_id="4"/>
                 </Node>
-                <Node id="1" region_id="0" abs_id="1" neighbours_count="3" pos_x="-4.2566638" pos_y="-0.0091557503" pos_z="5.0234394">
+                <Node id="1" region_id="0" abs_id="1" neighbours_count="2" pos_x="-4.2566638" pos_y="-0.0091557503" pos_z="5.0234394">
                     <NodeNeigbour id="0" region_id="0" abs_id="0"/>
                     <NodeNeigbour id="2" region_id="0" abs_id="2"/>
-                    <NodeNeigbour id="4" region_id="0" abs_id="4"/>
                 </Node>
                 <Node id="2" region_id="0" abs_id="2" neighbours_count="3" pos_x="-4.1840901" pos_y="-0.0091552734" pos_z="2.9676533">
                     <NodeNeigbour id="1" region_id="0" abs_id="1"/>
                     <NodeNeigbour id="3" region_id="0" abs_id="3"/>
-                    <NodeNeigbour id="4" region_id="0" abs_id="4"/>
+                    <NodeNeigbour id="5" region_id="0" abs_id="4"/>
                 </Node>
                 <Node id="3" region_id="0" abs_id="3" neighbours_count="3" pos_x="-2.2745166" pos_y="-0.0091552734" pos_z="2.9356618">
                     <NodeNeigbour id="2" region_id="0" abs_id="2"/>
                     <NodeNeigbour id="0" region_id="0" abs_id="0"/>
-                    <NodeNeigbour id="4" region_id="0" abs_id="4"/>
+                    <NodeNeigbour id="6" region_id="0" abs_id="5"/>
                 </Node>
-                <Node id="4" region_id="0" abs_id="4" neighbours_count="4" pos_x="-3.2953842" pos_y="-0.0091557503" pos_z="3.9536595">
-                    <NodeNeigbour id="0" region_id="0" abs_id="0"/>
-                    <NodeNeigbour id="3" region_id="0" abs_id="3"/>
+                <Node id="5" region_id="0" abs_id="4" neighbours_count="3" pos_x="-4.4277077" pos_y="-0.0091552734" pos_z="0.86915362">
                     <NodeNeigbour id="2" region_id="0" abs_id="2"/>
-                    <NodeNeigbour id="1" region_id="0" abs_id="1"/>
+                    <NodeNeigbour id="6" region_id="0" abs_id="5"/>
+                    <NodeNeigbour id="8" region_id="0" abs_id="6"/>
+                </Node>
+                <Node id="6" region_id="0" abs_id="5" neighbours_count="3" pos_x="-2.2725477" pos_y="-0.0091547966" pos_z="0.8195188">
+                    <NodeNeigbour id="5" region_id="0" abs_id="4"/>
+                    <NodeNeigbour id="3" region_id="0" abs_id="3"/>
+                    <NodeNeigbour id="9" region_id="0" abs_id="7"/>
+                </Node>
+                <Node id="8" region_id="0" abs_id="6" neighbours_count="3" pos_x="-4.1209426" pos_y="-0.0091552734" pos_z="-0.88052773">
+                    <NodeNeigbour id="5" region_id="0" abs_id="4"/>
+                    <NodeNeigbour id="9" region_id="0" abs_id="7"/>
+                    <NodeNeigbour id="10" region_id="0" abs_id="8"/>
+                </Node>
+                <Node id="9" region_id="0" abs_id="7" neighbours_count="3" pos_x="-2.2954955" pos_y="-0.0091552734" pos_z="-0.86652029">
+                    <NodeNeigbour id="6" region_id="0" abs_id="5"/>
+                    <NodeNeigbour id="8" region_id="0" abs_id="6"/>
+                    <NodeNeigbour id="11" region_id="0" abs_id="9"/>
+                </Node>
+                <Node id="10" region_id="0" abs_id="8" neighbours_count="3" pos_x="-4.1440287" pos_y="-0.0091552734" pos_z="-2.9169669">
+                    <NodeNeigbour id="8" region_id="0" abs_id="6"/>
+                    <NodeNeigbour id="11" region_id="0" abs_id="9"/>
+                    <NodeNeigbour id="13" region_id="0" abs_id="10"/>
+                </Node>
+                <Node id="11" region_id="0" abs_id="9" neighbours_count="3" pos_x="-2.2955749" pos_y="-0.0091552734" pos_z="-2.9635999">
+                    <NodeNeigbour id="10" region_id="0" abs_id="8"/>
+                    <NodeNeigbour id="9" region_id="0" abs_id="7"/>
+                    <NodeNeigbour id="14" region_id="0" abs_id="11"/>
+                </Node>
+                <Node id="13" region_id="0" abs_id="10" neighbours_count="2" pos_x="-4.1448879" pos_y="-0.0091547966" pos_z="-4.9717031">
+                    <NodeNeigbour id="14" region_id="0" abs_id="11"/>
+                    <NodeNeigbour id="10" region_id="0" abs_id="8"/>
+                </Node>
+                <Node id="14" region_id="0" abs_id="11" neighbours_count="2" pos_x="-2.3876307" pos_y="-0.0091552734" pos_z="-4.8235636">
+                    <NodeNeigbour id="13" region_id="0" abs_id="10"/>
+                    <NodeNeigbour id="11" region_id="0" abs_id="9"/>
                 </Node>
             </Graph>
         </AIGraphData>

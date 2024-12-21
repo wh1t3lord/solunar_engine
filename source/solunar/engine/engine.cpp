@@ -24,6 +24,8 @@
 
 #include "engine/editor/editor_manager.h"
 
+#include "ai/pathfinding_manager.h"
+
 namespace solunar
 {
 	EngineData		g_engineData;
@@ -74,6 +76,8 @@ namespace solunar
 
 		if (g_engineData.m_editor)
 			g_editorManager = mem_new<EditorManager>();
+
+		g_aiPathfindingManager = mem_new<PathfindingManager>();
 	}
 
 	void Engine::Shutdown()
@@ -92,6 +96,14 @@ namespace solunar
 
 			mem_delete(g_editorManager);
 			g_editorManager = nullptr;
+		}
+
+		if (g_aiPathfindingManager)
+		{
+			g_aiPathfindingManager->Shutdown();
+
+			mem_delete(g_aiPathfindingManager);
+			g_aiPathfindingManager = nullptr;
 		}
 		
 		g_console->Shutdown();

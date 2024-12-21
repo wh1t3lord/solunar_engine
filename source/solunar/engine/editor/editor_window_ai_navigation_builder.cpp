@@ -21,38 +21,6 @@ namespace solunar
 	glm::vec3 _kMGSelectedNodeColor = glm::vec3(1.0f, 0.0f, 0.0f);
 
 
-	constexpr const char* _kManualGraphName = "Manual Graph";
-	constexpr const char* _kAutoGridName = "Auto Grid";
-	constexpr const char* _kNavMeshName = "Navigation Mesh";
-
-	//serialization
-	//tags
-	constexpr const char* _kSerializationTag_AI = "AI";
-	constexpr const char* _kSerializationTag_AIBackend = "AIBackend";
-	constexpr const char* _kSerializationTag_AIGraphData = "AIGraphData";
-	constexpr const char* _kSerializationTag_Graph = "Graph";
-	constexpr const char* _kSerializationTag_Node = "Node";
-	constexpr const char* _kSerializationTag_NodeNeigbour = "NodeNeigbour";
-
-
-	//attributes
-	constexpr const char* _kSerializationAttribute_NavigationType = "NavigationType";
-	constexpr const char* _kSerializationAttribute_AIDataStorageTagName = "AIDataStorageTagName";
-	constexpr const char* _kSerializationAttribute_MaxNodeCount = "MaxNodeCount";
-	constexpr const char* _kSerializationAttribute_MaxRegionCount = "MaxRegionCount";
-	constexpr const char* _kSerializationAttribute_MaxNeighboursPerNode = "MaxNeighboursPerNode";
-	constexpr const char* _kSerializationAttribute_AISolver = "AISolver";
-	constexpr const char* _kSerializationAttribute_NodesCount = "NodesCount";
-	constexpr const char* _kSerializationAttribute_RegionsCount = "RegionsCount";
-	constexpr const char* _kSerializationAttribute_id = "id";
-	constexpr const char* _kSerializationAttribute_region_id = "region_id";
-	constexpr const char* _kSerializationAttribute_abs_id = "abs_id";
-	constexpr const char* _kSerializationAttribute_neighbours_count = "neighbours_count";
-	constexpr const char* _kSerializationAttribute_pos_x = "pos_x";
-	constexpr const char* _kSerializationAttribute_pos_y = "pos_y";
-	constexpr const char* _kSerializationAttribute_pos_z = "pos_z";
-
-
 
 	EditorWindow_AINavigationBuilder::EditorWindow_AINavigationBuilder(void) : IEditorWindow(), m_show(false), m_current_type(eNavigationType::kNavigationManualGraph)
 	{
@@ -679,7 +647,8 @@ namespace solunar
 											}
 											else
 											{
-												Core::Warning("FAILED to obtain neighbours but count is presented!! abs id = %d", i);
+												if (nc)
+													Core::Warning("FAILED to obtain neighbours but count is presented!! abs id = %d", i);
 											}
 										}
 

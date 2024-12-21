@@ -11,6 +11,9 @@
 #include "editor\editor_window.h"
 #include "engine\engine.h"
 #include "editor/editor_manager.h"
+#include "ai/pathfinding_navigation_graph.h"
+#include "ai/pathfinding_manager.h"
+#include "ai/pathfinding_solver_astar.h"
 #include <imgui.h>
 
 namespace solunar
@@ -68,6 +71,9 @@ namespace solunar
 
 			entityElement = entityElement->NextSiblingElement("Entity");
 		}
+
+
+		this->LoadAI(element);
 	}
 
 	void World::SaveXML(tinyxml2::XMLElement& element)
@@ -123,6 +129,13 @@ namespace solunar
 			if (logicComponent)
 				logicComponent->Update(timerInstance->GetDelta());
 		}
+
+#ifdef _DEBUG
+		if (g_aiPathfindingManager)
+		{
+			g_aiPathfindingManager->DebugDraw();
+		}
+#endif
 	}
 
 	void World::Update_PhysicsEntity()
@@ -155,6 +168,7 @@ namespace solunar
 	void World::TogglePhysicsDebugDraw()
 	{
 		m_physicsWorld->ToggleDebugDraw();
+		g_aiPathfindingManager->ToggleDebugDraw();
 	}
 
 	void World::Initialize()
@@ -224,6 +238,97 @@ namespace solunar
 
 		
 		return entities;
+	}
+
+	void World::LoadAI(tinyxml2::XMLElement& tagWorld)
+	{
+		auto* tag_ai = tagWorld.FirstChildElement(_kSerializationTag_AI);
+
+		if (tag_ai)
+		{
+			auto* tag_ai_backend = tag_ai->FirstChildElement(_kSerializationTag_AIBackend);
+
+			if (tag_ai_backend)
+			{
+				auto* attr_navigation_type = tag_ai_backend->FindAttribute(_kSerializationAttribute_NavigationType);
+
+				if (attr_navigation_type)
+				{
+					if (!strcmp(attr_navigation_type->Value(), _kManualGraphName))
+					{
+						auto* attr_ai_data_storage = tag_ai_backend->FindAttribute(_kSerializationAttribute_AIDataStorageTagName);
+
+						if (attr_ai_data_storage)
+						{
+							const char* pTagAIDataStorageName = attr_ai_data_storage->Value();
+
+							auto* tag_ai_data_storage = tag_ai->FirstChildElement(pTagAIDataStorageName);
+
+							if (tag_ai_data_storage)
+							{
+								auto* attr_ai_solver = tag_ai_backend->FindAttribute(_kPathfindingSerializationAttribute_AISolver);
+
+								if (attr_ai_solver)
+								{
+									if (!strcmp(attr_ai_solver->Value(), _kPathfindingSolver_Astar))
+									{
+										g_aiPathfindingManager->Shutdown();
+
+										PathfindingNavigationStaticGraph* pNavigationData = mem_new<PathfindingNavigationStaticGraph>();
+										PathfindingSolverAstar* pSolver = mem_new<PathfindingSolverAstar>();
+
+										pNavigationData->Init(*tag_ai_data_storage);
+										pSolver->Init(pNavigationData);
+
+										g_aiPathfindingManager->Init(pNavigationData, pSolver);
+
+#ifdef _DEBUG
+										Core::Msg("AI: loaded successfully!");
+#endif
+									}
+									else
+									{
+										Assert(!"not implemented");
+										Core::Error("Unknown ai solver (unsupported by engine)");
+									}
+								}
+								else
+								{
+									Core::Warning("FAILED to obtain ai solver!");
+								}
+							}
+							else
+							{
+								Core::Warning("FAILED to obtain xml-tag, the info is presented but the tag is not!");
+							}
+						}
+						else
+						{
+							Core::Warning("FAILED to obtain tag where ai data is stored!");
+						}
+					}
+					else if (!strcmp(attr_navigation_type->Value(), _kAutoGridName))
+					{
+						Assert(!"not implemented!");
+						Core::Error("not implemented yet");
+					}
+					else if (!strcmp(attr_navigation_type->Value(), _kNavMeshName))
+					{
+						Assert(!"not implemented!");
+						Core::Error("not implemented yet");
+					}
+					else
+					{
+						Assert(!"unknown navigation type, register it");
+						Core::Error("Unknown navigation type (unsupported by engine)");
+					}
+				}
+				else
+				{
+					Core::Warning("FAILED to obtain navigation type!");
+				}
+			}
+		}
 	}
 
 }
