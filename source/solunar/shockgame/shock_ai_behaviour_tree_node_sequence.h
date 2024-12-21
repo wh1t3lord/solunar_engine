@@ -65,8 +65,8 @@ namespace solunar
 			status = pChild->Update(pWorld, pUserStateData, dt);
 		}
 
-		if (status == eBehaviourTreeStatus::kSuccess)
-			status = eBehaviourTreeStatus::kRunning;
+		if (status != eBehaviourTreeStatus::kSuccess)
+			return status;
 
 		++m_success_iter;
 		return status;
@@ -117,6 +117,7 @@ namespace solunar
 			if (m_pChildren[i] == nullptr)
 			{
 				m_pChildren[i] = pChild;
+				pChild->SetParentID(this->GetID());
 				break;
 			}
 		}

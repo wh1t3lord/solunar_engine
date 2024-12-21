@@ -4,6 +4,7 @@
 #include "shockgame/shockplayercontroller.h"
 
 #include "shockgame/demogame.h"
+#include "shockgame/shock_component_ai_behaviourtree.h"
 
 #include "graphics/fontmanager.h"
 #include "graphics/debugrenderer.h"
@@ -60,7 +61,14 @@ void ShockAIComponent::Update(float dt)
 	}
 	else if (m_aiType == ShockAIType_Zombie)
 	{
-		UpdateZombie(dt);
+	//	UpdateZombie(dt);
+
+		ShockAIBehaviourTree* pBT = this->GetEntity()->GetComponent<ShockAIBehaviourTree>();
+
+		if (pBT)
+		{
+			pBT->Update(dt);
+		}
 	}
 }
 

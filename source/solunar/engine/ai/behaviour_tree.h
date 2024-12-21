@@ -98,6 +98,7 @@ namespace solunar
 	public:
 		virtual ~IBehaviourTree() {}
 		virtual void Update(float dt) = 0;
+		virtual void Shutdown() = 0;
 	};
 
 	// choose size per user behaviour tree implementation, it might be very different!
@@ -196,7 +197,7 @@ namespace solunar
 
 		void Init(World* pLoadedWorld, float p_user_priority_timings[eBehaviourTreeNodePriority::kSize] = 0);
 		void Update(float dt) override;
-		void Shutdown();
+		void Shutdown() override;
 
 		const char* GetName(void) const;
 
@@ -297,7 +298,7 @@ namespace solunar
 	inline void BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::Update(float dt)
 	{
 #ifdef _DEBUG
-		Assert(m_priorities[eBehaviourTreeNodePriority::kLow] < 0.0f && "you forgot to call ::Init method!");
+		Assert(m_priorities[eBehaviourTreeNodePriority::kLow] >= 0.0f && "you forgot to call ::Init method!");
 		Assert(m_init_was_called && "must be called ::Init before updating");
 #endif
 
