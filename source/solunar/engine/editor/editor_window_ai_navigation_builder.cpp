@@ -44,7 +44,11 @@ namespace solunar
 			g_editorManager->SetAINavigationEditingEnabled(is_editing);
 
 			ImGui::SameLine();
-			ImGui::Button("Build");
+			if (ImGui::Button("Build##AINavigationBuilder"))
+			{
+				this->Compile();
+			}
+
 			ImGui::SameLine();
 			if (ImGui::Button("Clear"))
 			{
@@ -289,6 +293,11 @@ namespace solunar
 		}
 	}
 
+	void EditorWindow_AINavigationBuilder::Compile()
+	{
+		MessageBoxA(nullptr, "Compilation Status", "Compilation was successful!", MB_OK | MB_ICONINFORMATION);
+	}
+
 	void EditorWindow_AINavigationBuilder::UpdateStats(BuilderConfig_ManualGraph& conf)
 	{
 		if (conf.need_to_update_stats)
@@ -499,20 +508,17 @@ namespace solunar
 
 	void EditorWindow_AINavigationBuilder::DrawDebugNodeConnections(unsigned char region_id, const BuilderConfig_ManualGraph::Node& node)
 	{
-		for (const auto* pNode : node.neighbours)
+		for (const auto& neighbour_node : node.neighbours)
 		{
-			if (pNode)
-			{
-				glm::vec3 color_connection = (this->m_conf_mg.debug_region_colors[pNode->region_id] + this->m_conf_mg.debug_region_colors[node.region_id]) * 0.5f;
+			glm::vec3 color_connection = (this->m_conf_mg.debug_region_colors[neighbour_node.region_id] + this->m_conf_mg.debug_region_colors[node.region_id]) * 0.5f;
 
-				g_debugRender.DrawLine(node.position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f), pNode->position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f), color_connection);
+			g_debugRender.DrawLine(node.position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f), neighbour_node.position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f), color_connection);
 
-				glm::vec3 right = (pNode->position - node.position);
-				right = glm::cross(right, glm::vec3(0.0, 1.0, 0.0));
-				right = glm::normalize(right);
-				g_debugRender.DrawLine(pNode->position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f), (pNode->position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f) + (right * _kMGLengthOfArrow)) - (glm::normalize((pNode->position - node.position)) * 0.3f), this->m_conf_mg.debug_region_colors[pNode->region_id]);
-				g_debugRender.DrawLine(pNode->position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f), (pNode->position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f) + (right * -_kMGLengthOfArrow)) - (glm::normalize((pNode->position - node.position)) * 0.3f), this->m_conf_mg.debug_region_colors[pNode->region_id]);
-			}
+			glm::vec3 right = (neighbour_node.position - node.position);
+			right = glm::cross(right, glm::vec3(0.0, 1.0, 0.0));
+			right = glm::normalize(right);
+			g_debugRender.DrawLine(neighbour_node.position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f), (neighbour_node.position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f) + (right * _kMGLengthOfArrow)) - (glm::normalize((neighbour_node.position - node.position)) * 0.3f), this->m_conf_mg.debug_region_colors[neighbour_node.region_id]);
+			g_debugRender.DrawLine(neighbour_node.position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f), (neighbour_node.position + glm::vec3(0.0f, _kMGLengthOfRoot * 0.5f, 0.0f) + (right * -_kMGLengthOfArrow)) - (glm::normalize((neighbour_node.position - node.position)) * 0.3f), this->m_conf_mg.debug_region_colors[neighbour_node.region_id]);
 		}
 	}
 
@@ -671,9 +677,8 @@ namespace solunar
 					{
 						for (auto& node : pair.second)
 						{
-							auto iter = std::find_if(node.neighbours.begin(), node.neighbours.end(), [id, region_id](const BuilderConfig_ManualGraph::Node* pNode)->bool {
-								Assert(pNode && "deadling reference can't be!");
-								return pNode->id == id && pNode->region_id == region_id;
+							auto iter = std::find_if(node.neighbours.begin(), node.neighbours.end(), [id, region_id](const BuilderConfig_ManualGraph::Node& pNode)->bool {
+								return pNode.id == id && pNode.region_id == region_id;
 								});
 
 							if (iter != node.neighbours.end())
@@ -747,14 +752,14 @@ namespace solunar
 							auto iter = std::find_if(
 								this->m_conf_mg.pSelectedNode->neighbours.begin(),
 								this->m_conf_mg.pSelectedNode->neighbours.end(),
-								[id, region_id](const BuilderConfig_ManualGraph::Node* pNode)->bool {
-									return pNode->id == id && pNode->region_id == region_id;
+								[id, region_id](const BuilderConfig_ManualGraph::Node& pNode)->bool {
+									return pNode.id == id && pNode.region_id == region_id;
 								});
 
 							// add only if wasn't added
 							if (iter == this->m_conf_mg.pSelectedNode->neighbours.end())
 							{
-								this->m_conf_mg.pSelectedNode->neighbours.push_back(this->m_conf_mg.pHoveredNode);
+								this->m_conf_mg.pSelectedNode->neighbours.push_back(*this->m_conf_mg.pHoveredNode);
 							}
 						}
 					}
@@ -773,14 +778,14 @@ namespace solunar
 							auto iter = std::find_if(
 								this->m_conf_mg.pHoveredNode->neighbours.begin(),
 								this->m_conf_mg.pHoveredNode->neighbours.end(),
-								[id, region_id](const BuilderConfig_ManualGraph::Node* pNode)->bool {
-									return pNode->id == id && pNode->region_id == region_id;
+								[id, region_id](const BuilderConfig_ManualGraph::Node& pNode)->bool {
+									return pNode.id == id && pNode.region_id == region_id;
 								});
 
 							// add only if wasn't added
 							if (iter == this->m_conf_mg.pHoveredNode->neighbours.end())
 							{
-								this->m_conf_mg.pHoveredNode->neighbours.push_back(this->m_conf_mg.pSelectedNode);
+								this->m_conf_mg.pHoveredNode->neighbours.push_back(*this->m_conf_mg.pSelectedNode);
 							}
 						}
 					}

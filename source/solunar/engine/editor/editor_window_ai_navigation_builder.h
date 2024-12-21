@@ -24,7 +24,7 @@ namespace solunar
 				unsigned char region_id;
 				unsigned char id;
 				glm::vec3 position;
-				std::vector<Node*> neighbours;
+				std::vector<Node> neighbours;
 			};
 
 			struct SelectedNode
@@ -77,6 +77,9 @@ namespace solunar
 
 		int GetEditingMode() override;
 		void UpdateEditingMode(InputManager* pInputManager, World* pWorld) override;
+
+		void Compile();
+
 	private:
 		void UpdateStats(BuilderConfig_ManualGraph& conf);
 
