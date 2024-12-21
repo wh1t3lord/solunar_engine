@@ -105,6 +105,10 @@ void Console::OnRender()
 		ImVec2 window_pos, window_pos_pivot;
 		window_pos.x = (corner & 1) ? (work_pos.x + work_size.x - PAD) : (work_pos.x + PAD);
 		window_pos.y = (corner & 2) ? (work_pos.y + work_size.y - PAD) : (work_pos.y + PAD);
+
+		if (work_pos.y == 0.0f)
+			work_pos.y = 20.0f;
+
 		window_pos_pivot.x = (corner & 1) ? 1.0f : 0.0f;
 		window_pos_pivot.y = (corner & 2) ? 1.0f : 0.0f;
 		ImGui::SetNextWindowPos(window_pos, ImGuiCond_Always, window_pos_pivot);

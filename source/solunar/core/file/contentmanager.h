@@ -35,6 +35,8 @@ public:
 
 	template <typename T>
 	std::weak_ptr<T> LoadObject(const std::string& filename);
+
+	void AddExisting(const std::string& filename, std::shared_ptr<SerializableObject> object);
 	
 	//void loadExisted(const std::string& filename, std::shared_ptr<SerializableObject> object);
 

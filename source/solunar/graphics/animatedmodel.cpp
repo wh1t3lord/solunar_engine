@@ -661,6 +661,10 @@ void AnimatedModel::CreateHw()
 
 void AnimatedModel::ReleaseHw()
 {
+	// do not delete hardware data when animated model is clone
+	if (m_iAmClone)
+		return;
+
 	for (int i = 0; i < m_subMeshes.size(); i++)
 	{
 		AnimatedSubMesh* submesh = m_subMeshes[i];
@@ -893,6 +897,43 @@ void AnimatedModel::DebugRender(const glm::mat4& modelMatrix)
 		g_debugRender.PopModelMatrix();
 	}
 #endif
+}
+
+std::shared_ptr<AnimatedModel> AnimatedModel::Clone()
+{
+	// create object instance
+	AnimatedModel* pObjectInstance = (AnimatedModel*)TypeManager::GetInstance()->CreateObjectByTypeInfo(AnimatedModel::GetStaticTypeInfo());
+
+	// create from instance the smart pointer
+	std::shared_ptr<AnimatedModel> object = std::shared_ptr<AnimatedModel>(pObjectInstance, ObjectDeleter);
+
+	// set flag
+	object->m_iAmClone = true;
+	
+	// clone everything
+	object->m_subMeshes = m_subMeshes;
+	object->m_animations = m_animations;
+	object->m_skins = m_skins;
+	object->m_nodes = m_nodes;
+	
+	// animation data
+	//object->m_currentAnimation = m_currentAnimation;
+	//object->m_playLooped = m_playLooped;
+	//object->m_play = m_play;
+	//object->m_currentTime = m_currentTime;
+	//object->m_speed = m_speed;
+
+	object->m_rootNodeId = m_rootNodeId;
+	
+	// animation data x2
+	//object->m_animationId = m_animationId;
+	
+	object->m_boundingBox = m_boundingBox;
+
+	// memcpy for bone matrices
+	memcpy(object->m_bonesMatrices, m_bonesMatrices, sizeof(m_bonesMatrices));
+
+	return object;
 }
 
 ///////////////////////////////////////////////////////////

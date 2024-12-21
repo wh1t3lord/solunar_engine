@@ -238,6 +238,9 @@ void registerGameClasses()
 		OBJECT_GET_TYPEINFO(UsableAreaComponent),
 		OBJECT_GET_TYPEINFO(EditorCameraComponent),
 		OBJECT_GET_TYPEINFO(FreeCameraComponent),
+		OBJECT_GET_TYPEINFO(PlayerSpawnComponent),
+		OBJECT_GET_TYPEINFO(DoorCoverComponent),
+		OBJECT_GET_TYPEINFO(ShelterLevelManagerComponent),
 	};
 
 	for (int i = 0; i < sizeof(gameClasses) / sizeof(gameClasses[0]); i++)

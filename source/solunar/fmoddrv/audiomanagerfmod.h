@@ -35,6 +35,8 @@ namespace solunar
 		FMODDrvSingletonStorer m_singletonStorer;
 		FMOD::Studio::System* m_studioSystem;
 
+		FMOD::ChannelGroup* m_sfxChannelGroup;
+
 		std::vector<AudioSource*> m_audioSources;
 	};
 }

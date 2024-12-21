@@ -45,6 +45,8 @@ namespace solunar {
 		const float GetMass() { return m_mass; } 
 		void SetMass(float value) { m_mass = value; }
 
+		const bool IsStatic() { return m_static; }
+
 		btRigidBody* GetSDKBody() { return m_rigidBody; }
 		btCompoundShape* GetCompoundShape() { return m_compoundShape; }
 		PhysicsWorld* GetPhysicsWorld() { return m_physicsWorld; }

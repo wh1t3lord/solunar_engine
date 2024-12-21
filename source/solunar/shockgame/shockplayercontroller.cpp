@@ -41,16 +41,143 @@ class ShockPlayerHUD : public Singleton<ShockPlayerHUD>
 {
 public:
 	static ShockPlayerHUD ms_ShockPlayerHUD;
+	static IFont* ms_HealthFont;
+	static IFont* ms_AmmoFont;
 
 public:
 	void Draw();
+
+private:
+	void DrawInfo();
+	void DrawCrosshair();
 };
 
 ShockPlayerHUD ShockPlayerHUD::ms_ShockPlayerHUD;
+IFont* ShockPlayerHUD::ms_HealthFont = nullptr;
+IFont* ShockPlayerHUD::ms_AmmoFont = nullptr;
 
 void ShockPlayerHUD::Draw()
 {
+	if (!ms_HealthFont)
+		ms_HealthFont = g_fontManager->CreateFont("textures/ui/RobotoMono-Bold.ttf", 32.0f);
 
+	if (!ms_AmmoFont)
+		ms_AmmoFont = g_fontManager->CreateFont("textures/ui/Anton-Regular.ttf", 50.0f);
+
+	DrawInfo();
+	DrawCrosshair();
+}
+
+void ShockPlayerHUD::DrawInfo()
+{
+	if (!g_Player)
+		return;
+
+	ShockPlayerController* shockPlayerController = g_Player->GetComponent<ShockPlayerController>();
+	if (!shockPlayerController)
+		return;
+
+	ShockPlayerStats playerStats = shockPlayerController->GetPlayerStats();
+
+	View* view = CameraProxy::GetInstance()->GetView();
+
+	static char healthText[64];
+	stbsp_snprintf(healthText, sizeof(healthText), "Health: %.0f", playerStats.m_health);
+
+	static char enduranceText[64];
+	stbsp_snprintf(enduranceText, sizeof(enduranceText), "Endurance: %.0f", playerStats.m_endurance);
+
+	static char moneyText[64];
+	stbsp_snprintf(moneyText, sizeof(moneyText), "Money: %i", playerStats.m_money);
+
+	ms_HealthFont->DrawText(healthText, 25.0f, view->m_height - 50.0f, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
+	ms_HealthFont->DrawText(moneyText, view->m_width - 256.0f, view->m_height - 25.0f, glm::vec4(0.0f, 0.5f, 0.0f, 1.0f));
+
+	Entity* weaponEntity = shockPlayerController->GetActiveWeaponEntity();
+	if (!weaponEntity)
+		return;
+
+	WeaponComponent* weaponComponent = weaponEntity->GetComponent<WeaponComponent>();
+	if (!weaponComponent)
+		return;
+
+	static char s_Buffer[256];
+	stbsp_snprintf(s_Buffer, sizeof(s_Buffer), "Ammo: %i", weaponComponent->GetAmmo());
+	ms_AmmoFont->DrawText(s_Buffer, 25.0f, view->m_height - 20.0f, glm::vec4(1.0f, 0.2f, 0.0f, 1.0f));
+}
+
+void ShockPlayerHUD::DrawCrosshair()
+{
+	{
+		View* view = CameraProxy::GetInstance()->GetView();
+
+		ImVec2 pos = ImVec2((float)view->m_width / 2.0f, (float)view->m_height / 2.0f);
+
+		//	ImGui::GetBackgroundDrawList()->AddCircle(pos, 12.0f, 0xff0000ff);
+
+			//{
+			//	ImVec2 p1 = pos;
+			//	p1.x = p1.x - 16.0f;
+			//	ImVec2 p2 = pos;
+			//	p2.x = p2.x + 16.0f;
+			//	ImGui::GetBackgroundDrawList()->AddLine(p1, p2, 0xffffffff);
+			//}
+			//{
+			//	ImVec2 p1 = pos;
+			//	p1.y = p1.y - 16.0f;
+			//	ImVec2 p2 = pos;
+			//	p2.y = p2.y + 16.0f;
+			//	ImGui::GetBackgroundDrawList()->AddLine(p1, p2, 0xffffffff);
+			//}
+
+		const float kVoid = 8.0f;
+		const float kLenght = 24.0f;
+
+		// vertical line
+		{
+			ImVec2 p1 = pos;
+			p1.x = p1.x - kLenght;
+			ImVec2 p2 = pos;
+			p2.x = p2.x - kVoid;
+			ImVec2 p3 = pos;
+			p3.x = p3.x + kVoid;
+			ImVec2 p4 = pos;
+			p4.x = p4.x + kLenght;
+
+			// black
+			ImGui::GetBackgroundDrawList()->AddLine(ImVec2(p1.x - 1.0f, p1.y), ImVec2(p2.x + 1.0f, p2.y), 0xff000000, 3.0f);
+			ImGui::GetBackgroundDrawList()->AddLine(ImVec2(p3.x - 1.0f, p3.y), ImVec2(p4.x + 1.0f, p4.y), 0xff000000, 3.0f);
+
+			// white 
+			ImGui::GetBackgroundDrawList()->AddLine(p1, p2, 0xffffffff);
+			ImGui::GetBackgroundDrawList()->AddLine(p3, p4, 0xffffffff);
+		}
+
+		// horizontal
+		{
+			ImVec2 p1 = pos;
+			p1.y = p1.y - kLenght;
+			ImVec2 p2 = pos;
+			p2.y = p2.y - kVoid;
+			ImVec2 p3 = pos;
+			p3.y = p3.y + kVoid;
+			ImVec2 p4 = pos;
+			p4.y = p4.y + kLenght;
+
+			// black
+			ImGui::GetBackgroundDrawList()->AddLine(ImVec2(p1.x, p1.y - 1.0f), ImVec2(p2.x, p2.y + 1.0f), 0xff000000, 3.0f);
+			ImGui::GetBackgroundDrawList()->AddLine(ImVec2(p3.x, p3.y - 1.0f), ImVec2(p4.x, p4.y + 1.0f), 0xff000000, 3.0f);
+
+			// white 
+			ImGui::GetBackgroundDrawList()->AddLine(p1, p2, 0xffffffff);
+			ImGui::GetBackgroundDrawList()->AddLine(p3, p4, 0xffffffff);
+		}
+
+		//ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(pos.x - 1.0f, pos.y - 1.0f), ImVec2(pos.x + 1.0f, pos.y + 1.0f), 0xff000000, 2.0f);
+		ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(pos.x, pos.y), ImVec2(pos.x + 1.0f, pos.y + 1.0f), 0xffffffff);
+
+		//ImGui::GetBackgroundDrawList()->AddCircle(ImVec2(pos.x - 16.0f, pos.y - 16.0f), ImVec2(pos.x + 16.0f, pos.y + 16.0f), 0xff0000ff);
+	}
 }
 
 struct WeaponInfo
@@ -123,7 +250,7 @@ float V_CalcBob()
 	// bob is proportional to simulated velocity in the xy plane
 	// (don't count Z, or jumping messes it up)
 	//VectorCopy(pparams->simvel, vel);
-	vel = g_weaponVelocity;
+	vel = g_weaponVelocity * 4.0f;
 	vel[1] = 0;
 
 	bob = sqrt(vel[0] * vel[0] + vel[2] * vel[2]);//* cl_bob;
@@ -138,6 +265,7 @@ ShockPlayerController::ShockPlayerController() :
 	m_cameraEntity(nullptr),
 	m_camera(nullptr),
 	m_weaponEntity(nullptr),
+	m_activeWeaponEntity(nullptr),
 	m_weaponMesh(nullptr),
 	m_rigidBody(nullptr),
 	m_flyCam(true)
@@ -195,7 +323,7 @@ void ShockPlayerController::InitializeCamera()
 	// m_camera = m_cameraNode->createComponentByType<CameraFirstPersonComponent>();
 
 	m_cameraEntity = GetEntity()->CreateChild();
-	m_cameraEntity->SetPosition(glm::vec3(0.0f, 1.0f, 0.0f));
+	m_cameraEntity->SetPosition(glm::vec3(0.0f, 0.6f, 0.0f));
 
 	m_camera = m_cameraEntity->CreateComponent<CameraFirstPersonComponent>();
 	//m_camera = getEntity()->createComponent<CameraFirstPersonComponent>();
@@ -299,9 +427,6 @@ void ShockPlayerController::Update(float dt)
 		g_freeCameraEntity->SetPosition(pos);
 	}
 
-	if (!s_font)
-		s_font = g_fontManager->CreateFont("textures/ui/RobotoMono-Bold.ttf", 32.0f);
-
 	g_engineData.m_shouldCaptureMouse = true;
 	//g_engineData.m_shouldHideMouse = false;
 
@@ -321,20 +446,6 @@ void ShockPlayerController::Update(float dt)
 		stbsp_snprintf(healthText, sizeof(healthText), "WE ARE DEAD :((((");
 		g_fontManager->DrawSystemFont(healthText, 500, 500, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
 	}
-
-#if 1
-	static char healthText[64];
-	stbsp_snprintf(healthText, sizeof(healthText), "Health: %.0f", m_playerStats.m_health);
-	
-	static char enduranceText[64];
-	stbsp_snprintf(enduranceText, sizeof(enduranceText), "Endurance: %.0f", m_playerStats.m_endurance);
-
-	static char moneyText[64];
-	stbsp_snprintf(moneyText, sizeof(moneyText), "Money: %i", 100500);
-
-	s_font->DrawText(healthText, 25.0f, view->m_height - 50.0f, glm::vec4(0.0f, 0.5f, 1.0f, 1.0f));
-	s_font->DrawText(moneyText, view->m_width - 256.0f, view->m_height - 25.0f, glm::vec4(0.0f, 0.5f, 0.0f, 1.0f));
-#endif
 
 	// update camera look
 	UpdateCamera(dt);
@@ -543,7 +654,7 @@ void ShockPlayerController::UpdateLogic(float dt)
 						else
 						{
 							m_weaponEntity = CreateWeapon(m_cameraEntity);
-
+							m_activeWeaponEntity = m_weaponEntity;
 							Core::Msg("UsableAreaComponent(Entity 0x%p): command %s %s ok", usableArea->GetEntity(), command.c_str(), argument.c_str());
 						}
 					}
@@ -559,10 +670,17 @@ void ShockPlayerController::UpdateLogic(float dt)
 
 			proj.y = ((float)view->m_height - 1.0f - proj.y);
 
-			const char* label = "Press E to use (600$)";
+			static char s_LabelBuffer[128];
+
+			if (usableArea)
+				stbsp_snprintf(s_LabelBuffer, sizeof(s_LabelBuffer), "Press E to use (%i$)", usableArea->GetCost());
+			else
+				strcpy(s_LabelBuffer, "");
+
+			const char* label = s_LabelBuffer;
 			const ImVec2 label_size = ImGui::CalcTextSize(label, NULL, true);
 
-			s_font->DrawText(label, proj.x - label_size.x, proj.y + 64.0f, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+			ShockPlayerHUD::ms_HealthFont->DrawText(label, proj.x - label_size.x, proj.y + 64.0f, glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
 
 			//ImGui::GetForegroundDrawList()->AddText(ImVec2(proj.x - label_size.x/2.0f, proj.y + 32.0f /*+ label_size.y / 2.0f*/), 0xff0000ff, label);
 
@@ -574,76 +692,7 @@ void ShockPlayerController::UpdateLogic(float dt)
 		}
 	}
 
-	{
-		View* view = CameraProxy::GetInstance()->GetView();
-
-		ImVec2 pos = ImVec2((float)view->m_width / 2.0f, (float)view->m_height / 2.0f);
-		
-	//	ImGui::GetBackgroundDrawList()->AddCircle(pos, 12.0f, 0xff0000ff);
-		
-		//{
-		//	ImVec2 p1 = pos;
-		//	p1.x = p1.x - 16.0f;
-		//	ImVec2 p2 = pos;
-		//	p2.x = p2.x + 16.0f;
-		//	ImGui::GetBackgroundDrawList()->AddLine(p1, p2, 0xffffffff);
-		//}
-		//{
-		//	ImVec2 p1 = pos;
-		//	p1.y = p1.y - 16.0f;
-		//	ImVec2 p2 = pos;
-		//	p2.y = p2.y + 16.0f;
-		//	ImGui::GetBackgroundDrawList()->AddLine(p1, p2, 0xffffffff);
-		//}
-
-		const float kVoid = 8.0f;
-		const float kLenght = 24.0f;
-		
-		// vertical line
-		{
-			ImVec2 p1 = pos;
-			p1.x = p1.x - kLenght;
-			ImVec2 p2 = pos;
-			p2.x = p2.x - kVoid;
-			ImVec2 p3 = pos;
-			p3.x = p3.x + kVoid;
-			ImVec2 p4 = pos;
-			p4.x = p4.x + kLenght;
-
-			// black
-			ImGui::GetBackgroundDrawList()->AddLine(ImVec2(p1.x - 1.0f, p1.y), ImVec2(p2.x + 1.0f, p2.y), 0xff000000, 3.0f);
-			ImGui::GetBackgroundDrawList()->AddLine(ImVec2(p3.x - 1.0f, p3.y), ImVec2(p4.x + 1.0f, p4.y), 0xff000000, 3.0f);
-
-			// white 
-			ImGui::GetBackgroundDrawList()->AddLine(p1, p2, 0xffffffff);
-			ImGui::GetBackgroundDrawList()->AddLine(p3, p4, 0xffffffff);
-		}
-
-		// horizontal
-		{
-			ImVec2 p1 = pos;
-			p1.y = p1.y - kLenght;
-			ImVec2 p2 = pos;
-			p2.y = p2.y - kVoid;
-			ImVec2 p3 = pos;
-			p3.y = p3.y + kVoid;
-			ImVec2 p4 = pos;
-			p4.y = p4.y + kLenght;
-
-			// black
-			ImGui::GetBackgroundDrawList()->AddLine(ImVec2(p1.x, p1.y - 1.0f), ImVec2(p2.x, p2.y + 1.0f), 0xff000000, 3.0f);
-			ImGui::GetBackgroundDrawList()->AddLine(ImVec2(p3.x, p3.y - 1.0f), ImVec2(p4.x, p4.y + 1.0f), 0xff000000, 3.0f);
-
-			// white 
-			ImGui::GetBackgroundDrawList()->AddLine(p1, p2, 0xffffffff);
-			ImGui::GetBackgroundDrawList()->AddLine(p3, p4, 0xffffffff);
-		}
-
-		//ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(pos.x - 1.0f, pos.y - 1.0f), ImVec2(pos.x + 1.0f, pos.y + 1.0f), 0xff000000, 2.0f);
-		ImGui::GetBackgroundDrawList()->AddRectFilled(ImVec2(pos.x, pos.y), ImVec2(pos.x + 1.0f, pos.y + 1.0f), 0xffffffff);
-
-		//ImGui::GetBackgroundDrawList()->AddCircle(ImVec2(pos.x - 16.0f, pos.y - 16.0f), ImVec2(pos.x + 16.0f, pos.y + 16.0f), 0xff0000ff);
-	}
+	ShockPlayerHUD::ms_ShockPlayerHUD.Draw();
 }
 
 void ShockPlayerController::DebugUpdate(float dt)

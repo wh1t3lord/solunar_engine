@@ -21,6 +21,9 @@
 
 #include "core/file/filesystem.h"
 
+#define DISABLE_ASSIMP
+
+#ifndef DISABLE_ASSIMP
 #ifdef _MSC_VER
 #	ifdef _DEBUG
 #		pragma comment(lib, "assimp-vc141-mtd.lib")
@@ -28,6 +31,7 @@
 #		pragma comment(lib, "assimp-vc141-mt.lib")
 #	endif
 #endif // _MSC_VER
+#endif // !DISABLE_ASSIMP
 
 namespace solunar
 {
@@ -74,6 +78,7 @@ namespace solunar
 #endif
 	}
 
+#ifndef DISABLE_ASSIMP
 	SubMesh* ProccessSubMesh(aiMesh* mesh, aiNode* node, const aiScene* scene)
 	{
 		std::vector<Vertex> vertices;
@@ -171,6 +176,7 @@ namespace solunar
 			ProccessNode(submeshes, node->mChildren[i], scene);
 		}
 	}
+#endif // !DISABLE_ASSIMP
 
 	IMPLEMENT_OBJECT(ModelBase, GraphicsObject);
 
@@ -188,6 +194,7 @@ namespace solunar
 		TypeManager::GetInstance()->RegisterObject<ModelBase>();
 	}
 
+#ifndef DISABLE_ASSIMP
 	unsigned int kAssimpFlags =                      // some optimizations and safety checks
 		aiProcess_OptimizeMeshes |                                   // minimize number of meshes
 		aiProcess_PreTransformVertices |                             // apply node matrices
@@ -195,9 +202,11 @@ namespace solunar
 		aiProcess_TransformUVCoords /*|*/ // apply UV transformations
 		/*aiProcess_FlipUVs*/
 		;
+#endif // !DISABLE_ASSIMP
 
 	void ModelBase::Load(const std::shared_ptr<DataStream>& dataStream)
 	{
+#ifndef DISABLE_ASSIMP
 		dataStream->Seek(Seek_End, 0);
 		size_t filesize = dataStream->Tell();
 		dataStream->Seek(Seek_Begin, 0);
@@ -220,6 +229,9 @@ namespace solunar
 		mem_free_array(fileData);
 
 		CreateHw();
+#else
+		Core::Error("ModelBase::Load: Assimp import is disabled");
+#endif // !DISABLE_ASSIMP
 	}
 
 	void ModelBase::Destroy()

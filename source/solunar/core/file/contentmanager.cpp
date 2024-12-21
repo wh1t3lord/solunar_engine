@@ -124,6 +124,13 @@ std::weak_ptr<SerializableObject> ContentManager::Load(const std::string& filena
 	return (*objectInstance).second;
 }
 
+void ContentManager::AddExisting(const std::string& filename, std::shared_ptr<SerializableObject> object)
+{
+	auto objectInstance = m_content.find(filename);
+	Assert(objectInstance == m_content.end());
+	m_content.emplace(filename, object);
+}
+
 //void ContentManager::loadExisted(const std::string& filename, std::shared_ptr<SerializableObject> object)
 //{
 //	ASSERT(object);

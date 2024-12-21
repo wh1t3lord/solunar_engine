@@ -22,7 +22,10 @@ namespace solunar {
 		static void RegisterObject();
 
 		virtual void Update(float dt);
+		virtual void Update_Pistol(float dt);
 		virtual void Update_Shotgun(float dt);
+
+		int GetAmmo() { return m_ammo; }
 
 	private:
 		bool m_inited;

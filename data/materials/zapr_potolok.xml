@@ -1,0 +1,10 @@
+<Material>
+    <Shader>diffuse</Shader>
+    <AlbedoTexture filename="textures/concrete/concrete_19.png"/>
+    <NormalTexture filename="textures/concrete/concrete_19_normal.png"/>
+    <SpecularTexture filename=""/>
+    <RenderState>
+        <DepthWrite value="true"/>
+        <SelfIllumination value="false"/>
+    </RenderState>
+</Material>

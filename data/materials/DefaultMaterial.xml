@@ -1,0 +1,10 @@
+<!-- Default material -->
+<Material>
+	<Shader>diffuse</Shader>
+	<AlbedoTexture filename="textures/common/default.png"/>
+	<NormalTexture filename=""/>
+	<RenderState>
+		<DepthWrite value="true"/>
+		<SelfIllumination value="false"/>
+	</RenderState>
+</Material>

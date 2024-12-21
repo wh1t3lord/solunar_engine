@@ -14,6 +14,10 @@ public:
 
 	void Destroy();
 
+	void Update();
+
+	void OnWorldLoaded();
+
 	Entity* CreateEntity();
 	Entity* CreateEntityEx(const TypeInfo* typeInfo);
 
@@ -26,6 +30,8 @@ public:
 
 private:
 	std::vector<Entity*> m_entities;
+	std::vector<Entity*> m_deferredEntities;
+	bool m_deferredMode;
 };
 
 template<typename T>

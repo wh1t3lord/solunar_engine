@@ -338,9 +338,9 @@ namespace solunar {
 		btTransform startTransform; startTransform.setIdentity();
 		startTransform.setOrigin(glmVectorToBt(GetEntity()->GetPosition()));
 
-		float fRadius = 0.4f;
-		float fHeight = 0.1f;
-		m_capsuleShape = mem_new<btCapsuleShape>(fRadius, fHeight);
+		float fRadius = 0.3f;
+		float fHeight = 1.0f;
+		m_capsuleShape = mem_new<btCapsuleShapeZ>(fRadius, fHeight);
 
 		m_ghostObject = mem_new<btPairCachingGhostObject>();
 		m_ghostObject->setWorldTransform(startTransform);

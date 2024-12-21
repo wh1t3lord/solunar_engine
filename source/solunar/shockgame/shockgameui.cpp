@@ -124,7 +124,9 @@ void VideoModeManager::Init()
 		}
 	}
 
-	pAdapter->Release();
+	if (pAdapter)
+		pAdapter->Release();
+
 	pFactory->EnumAdapters(adapterId, &pAdapter);
 
 	IDXGIOutput* pOutput = NULL;
@@ -229,6 +231,9 @@ void VideoModeManager::Init()
 
 void VideoModeManager::Apply(int idx)
 {
+	if (ms_vidModes.empty())
+		return;
+
 	VideoMode mode = ms_vidModes[idx];
 	GraphicsOptions* opts = &g_graphicsOptions;
 	opts->m_width = mode.width;
@@ -254,21 +259,25 @@ void showSettingsMenu()
 				VideoModeManager::Init();
 
 			static int item_current_idx = VideoModeManager::ms_currentVidMode; // Here we store our selection data as an index.
-			const char* combo_preview_value = VideoModeManager::ms_vidModes[item_current_idx].name.c_str();
-			if (ImGui::BeginCombo("Video Mode", combo_preview_value))
+
+			if (!VideoModeManager::ms_vidModes.empty())
 			{
-				for (int i = 0; i < VideoModeManager::ms_vidModes.size(); i++)
+				const char* combo_preview_value = VideoModeManager::ms_vidModes[item_current_idx].name.c_str();
+				if (ImGui::BeginCombo("Video Mode", combo_preview_value))
 				{
-					const bool is_selected = (item_current_idx == i);
-					if (ImGui::Selectable(VideoModeManager::ms_vidModes[i].name.c_str(), is_selected))
-						item_current_idx = i;
+					for (int i = 0; i < VideoModeManager::ms_vidModes.size(); i++)
+					{
+						const bool is_selected = (item_current_idx == i);
+						if (ImGui::Selectable(VideoModeManager::ms_vidModes[i].name.c_str(), is_selected))
+							item_current_idx = i;
 
-					// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
-					if (is_selected)
-						ImGui::SetItemDefaultFocus();
+						// Set the initial focus when opening the combo (scrolling + keyboard navigation focus)
+						if (is_selected)
+							ImGui::SetItemDefaultFocus();
+					}
+
+					ImGui::EndCombo();
 				}
-
-				ImGui::EndCombo();
 			}
 
 			ImGui::EndTabItem();
@@ -352,7 +361,6 @@ void DemoGameMainMenuComponent::Update(float dt)
 	ImGui::SetNextWindowPos(ImVec2(posX, posY));
 	ImGui::SetNextWindowSize(ImVec2(camera->GetView()->m_width / 2, camera->GetView()->m_height / 2));
 
-
 	ImGui::Begin("Main Menu", nullptr, ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_NoBackground);
 
 	const ImVec2 kButtonSize = ImVec2(128.0f, 32.0f);
@@ -360,7 +368,7 @@ void DemoGameMainMenuComponent::Update(float dt)
 	if (ImGui::Button("New Game", kButtonSize))
 	{
 		MusicManager::GetInstance()->Stop();
-		EngineStateManager::GetInstance()->LoadWorld("worlds/demoworld.xml");
+		EngineStateManager::GetInstance()->LoadWorld("worlds/zapravka.xml");
 	}
 
 	if (ImGui::Button("Settings", kButtonSize))

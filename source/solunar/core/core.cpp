@@ -25,7 +25,7 @@ namespace solunar
 
 	void Core::Msg(const char* msg, ...)
 	{
-		std::lock_guard<std::mutex> lockGuard(g_loggerMutex);
+		//std::lock_guard<std::mutex> lockGuard(g_loggerMutex);
 
 		static char buf[2048 * 2];
 		va_list args;
@@ -39,7 +39,7 @@ namespace solunar
 
 	void Core::Error(const char* msg, ...)
 	{
-		std::lock_guard<std::mutex> lockGuard(g_loggerMutex);
+		//std::lock_guard<std::mutex> lockGuard(g_loggerMutex);
 
 		static char buf[2048 * 2];
 		va_list args;

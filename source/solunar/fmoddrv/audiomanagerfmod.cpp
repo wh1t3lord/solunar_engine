@@ -57,7 +57,8 @@ namespace solunar
 	}
 
 	AudioManagerFMOD::AudioManagerFMOD() :
-		m_studioSystem(nullptr)
+		m_studioSystem(nullptr),
+		m_sfxChannelGroup(nullptr)
 	{
 	}
 
@@ -89,10 +90,19 @@ namespace solunar
 
 		// Initialize music manager.
 		MusicManager::GetInstance()->Init();
+
+		// Create SFX channel group
+		GetFMODSystem()->createChannelGroup( "SFX", &m_sfxChannelGroup );
 	}
 
 	void AudioManagerFMOD::Shutdown()
 	{
+		if (m_sfxChannelGroup)
+		{
+			m_sfxChannelGroup->release();
+			m_sfxChannelGroup = nullptr;
+		}
+
 		MusicManager::GetInstance()->Shutdown();
 
 		// clear sounds
@@ -114,6 +124,7 @@ namespace solunar
 	void AudioManagerFMOD::Update()
 	{
 		//m_fmodSystem->update();
+
 	}
 
 	AudioSource* AudioManagerFMOD::CreateSource(const std::string& filename)
@@ -142,6 +153,7 @@ namespace solunar
 	{
 		FMOD_VECTOR listenerPosition = { position.x, position.y, position.z };
 		GetFMODSystem()->set3DListenerAttributes(0, &listenerPosition, NULL, NULL, NULL);
+		//m_sfxChannelGroup->set3d(0, &listenerPosition, NULL, NULL, NULL);
 	}
 
 	FMOD::System* AudioManagerFMOD::GetFMODSystem()

@@ -4,6 +4,31 @@
 #include "../entity/world.h"
 #include "editor_manager.h"
 
+#include "engine/camera.h"
+#include "engine/engine.h"
+#include "graphics/mesh.h"
+
+#include <imgui.h>
+#include <ImGuizmo.h>
+#include <glm/gtx/matrix_decompose.hpp>
+
+void CreateLight()
+{
+	using namespace solunar;
+
+	Entity* entity = Engine::ms_world->CreateEntity();
+	entity->CreateComponent<PointLightComponent>();
+}
+
+void CreateWall()
+{
+	using namespace solunar;
+
+	Entity* entity = Engine::ms_world->CreateEntity();
+	MeshComponent* mesh = entity->CreateComponent<MeshComponent>();
+	mesh->LoadModel("models/common_wall_2x2.dae");
+}
+
 solunar::EditorWindow_LevelInspector::EditorWindow_LevelInspector() : m_show(false)
 {
 }
@@ -16,6 +41,17 @@ void solunar::EditorWindow_LevelInspector::Init(void)
 {
 }
 
+inline glm::vec3 Glm_GetPositionFromMat4(const glm::mat4& m)
+{
+	glm::vec3 scale = glm::vec3(0.0f);
+	glm::quat orientation = glm::identity<glm::quat>();
+	glm::vec3 position = glm::vec3(0.0f);
+	glm::vec3 skew = glm::vec3(0.0f);
+	glm::vec4 persp = glm::vec4(0.0f);
+	glm::decompose(m, scale, orientation, position, skew, persp);
+	return position;
+}
+
 void solunar::EditorWindow_LevelInspector::Draw(World* pWorld)
 {
 	Assert(pWorld && "must be valid!");
@@ -23,6 +59,8 @@ void solunar::EditorWindow_LevelInspector::Draw(World* pWorld)
 
 	if (ImGui::Begin("Level Inspector"))
 	{
+		if (ImGui::Button("Create Light")) CreateLight();
+
 		/*
 		static ImGuiTreeNodeFlags base_flags = ImGuiTreeNodeFlags_OpenOnArrow | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_SpanAvailWidth;
 		static bool align_label_with_current_x_position = false;
@@ -91,11 +129,14 @@ void solunar::EditorWindow_LevelInspector::Draw(World* pWorld)
 		//	ImGui::TreePop();
 		*/
 
+		
+
 		if (ImGui::BeginTabBar("TabBar##LevelInspector"))
 		{
 			if (ImGui::BeginTabItem("All"))
 			{
 				const std::vector<Entity*>& entities = pWorld->GetEntityManager().GetEntities();
+				int node_clicked = -1;
 
 				for (int i = 0; i < entities.size(); i++)
 				{
@@ -126,9 +167,17 @@ void solunar::EditorWindow_LevelInspector::Draw(World* pWorld)
 
 						ImGui::TreePop();
 					}
+
+					if (ImGui::IsItemClicked() && !ImGui::IsItemToggledOpen())
+						node_clicked = i;
 				}
 
 				ImGui::EndTabItem();
+
+				if (node_clicked != -1)
+				{
+					g_editorManager->SetSelectedEntity(entities[node_clicked]);
+				}
 			}
 
 			if (ImGui::BeginTabItem("Light"))
@@ -190,6 +239,36 @@ void solunar::EditorWindow_LevelInspector::Draw(World* pWorld)
 	}
 
 	ImGui::End();
+
+
+	if (g_editorManager->GetSelectedEntity())
+	{
+		//g_debugRender.drawBoundingBox(g_SelectedEntity->GetBoundingBox(), glm::vec3(0.0f, 0.0f, 1.0f));
+
+		Entity* g_SelectedEntity = (Entity*)g_editorManager->GetSelectedEntity();
+
+		static glm::mat4 objectMatrix = g_SelectedEntity->GetWorldTranslation();
+
+		View* view = CameraProxy::GetInstance()->GetView();
+
+		glm::mat4 cameraView = view->m_view;
+		glm::mat4 cameraProj = view->m_projection;
+
+		static int g_CurrentGizmoOperation = ImGuizmo::TRANSLATE;
+		static int g_CurrentGizmoMode = ImGuizmo::WORLD;
+
+		if (ImGuizmo::Manipulate(
+			&cameraView[0][0],
+			&cameraProj[0][0],
+			(ImGuizmo::OPERATION)g_CurrentGizmoOperation,
+			(ImGuizmo::MODE)g_CurrentGizmoMode,
+			&objectMatrix[0][0]))
+		{
+			glm::vec3 pos = Glm_GetPositionFromMat4(objectMatrix);
+			g_SelectedEntity->SetPosition(pos);
+
+		}
+	}
 }
 
 const char* solunar::EditorWindow_LevelInspector::GetName(void) const

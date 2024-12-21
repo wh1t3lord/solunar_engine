@@ -2,9 +2,91 @@
 #include "imgui.h"
 #include "editor_manager.h"
 #include "engine.h"
+#include <graphics/light.h>
 
 namespace solunar
 {
+	static void DrawProperties(const std::vector<IProperty*>& properties, Object* object)
+	{
+		for (int i = 0; i < properties.size(); i++)
+		{
+			IProperty* property = properties[i];
+			if (property->GetType() == PropertyType_Float)
+			{
+				float value;
+				PropertyGetValue(object, property, value);
+				ImGui::DragFloat(property->GetName(), &value);
+			}
+			if (property->GetType() == PropertyType_Vector3)
+			{
+				glm::vec3 value;
+				PropertyGetValue(object, property, value);
+				ImGui::DragFloat3(property->GetName(), &value[0]);
+			}
+			if (property->GetType() == PropertyType_Vector4)
+			{
+				glm::vec4 value;
+				PropertyGetValue(object, property, value);
+				ImGui::DragFloat4(property->GetName(), &value[0]);
+			}
+			if (property->GetType() == PropertyType_Quaternion)
+			{
+				glm::quat value;
+				PropertyGetValue(object, property, value);
+				ImGui::DragFloat4(property->GetName(), &value[0]);
+			}
+			if (property->GetType() == PropertyType_String)
+			{
+				std::string value;
+				PropertyGetValue(object, property, value);
+				ImGui::InputText(property->GetName(), (char*)value.c_str(), value.size() + 1);
+			}
+			if (property->GetType() == PropertyType_Bool)
+			{
+				bool value;
+				PropertyGetValue(object, property, value);
+				ImGui::Checkbox(property->GetName(), &value);
+			}
+		}
+	}
+
+	static void DrawEntityPropertyWindow(Entity* entity)
+	{
+	//	if (ImGui::Begin("Entity Properties"))
+		{
+			if (entity)
+			{
+				ImGui::Text("%s", entity->GetTypeInfo()->GetClassName());
+				std::vector<IProperty*> properties;
+				PropertyManager::GetInstance()->GetProperties(entity->GetTypeInfo(), properties);
+				DrawProperties(properties, entity);
+
+				PointLightComponent* pl = entity->GetComponent<PointLightComponent>();
+				if (pl)
+				{
+					ImGui::DragFloat("RADIUS", &pl->m_radius, 0.1f);
+				}
+
+				// components
+				const std::vector<Component*>& components = entity->GetAllComponents();
+				for (int i = 0; i < components.size(); i++)
+				{
+					ImGui::Separator();
+					ImGui::Text("%s", components[i]->GetTypeInfo()->GetClassName());
+
+					properties.clear();
+
+					PropertyManager::GetInstance()->GetProperties(components[i]->GetTypeInfo(), properties);
+
+					DrawProperties(properties, components[i]);
+				}
+			}
+		}
+
+//		ImGui::End();
+	}
+
+
 	EditorWindow_EntityEditor::EditorWindow_EntityEditor() : m_show(false), m_selected_type(0)
 	{
 	}
@@ -51,6 +133,8 @@ namespace solunar
 
 					ImGui::EndTabBar();
 				}
+			
+				DrawEntityPropertyWindow(pSelectedEntity);
 			}
 		}
 

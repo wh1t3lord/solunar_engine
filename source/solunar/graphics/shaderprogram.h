@@ -3,7 +3,13 @@
 
 namespace solunar
 {
-	
+
+enum ShaderType
+{
+	ShaderType_Vertex,
+	ShaderType_Pixel
+};
+
 class ShaderProgramManager;
 
 class IShaderProgram

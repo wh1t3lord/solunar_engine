@@ -6,6 +6,8 @@
 
 #include "engine/entity/world.h"
 
+#define HACK_CLONE_ANIMATEDMODEL
+
 namespace solunar {
 
 	IMPLEMENT_OBJECT(MeshComponent, Component);
@@ -118,10 +120,23 @@ namespace solunar {
 			if (filenameAttribute && strlen(filenameAttribute->Value()) > 0)
 			{
 				m_filename = filenameAttribute->Value();
-				m_model = g_contentManager->LoadObject<AnimatedModel>(m_filename);
 
+#ifndef HACK_CLONE_ANIMATEDMODEL
+				m_model = g_contentManager->LoadObject<AnimatedModel>(m_filename);
+#else
+				std::weak_ptr<AnimatedModel> model = g_contentManager->LoadObject<AnimatedModel>(m_filename);
+		
+				std::shared_ptr<AnimatedModel> modelClone = model.lock()->Clone();
+
+				static int cloneIndex = 0;
+				g_contentManager->AddExisting(m_filename + std::to_string(cloneIndex), modelClone);
+				cloneIndex++;
+
+				m_model = std::weak_ptr<AnimatedModel>(modelClone);
+#endif
 				// guarantee cast, trust me 
 				std::weak_ptr<AnimatedModel> animatedModel = dynamicCastWeakPtr<AnimatedModel, ModelBase>(m_model);
+				
 
 				Entity* entity = GetEntity();
 				if (entity)

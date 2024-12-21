@@ -61,28 +61,31 @@ namespace solunar
 
 	void WeaponComponent::Update(float dt)
 	{
+		if (m_type == WeaponsType::Pistol)
+			Update_Pistol(dt);
+
 		if (m_type == WeaponsType::Shotgun)
 			Update_Shotgun(dt);
+	}
+
+	void WeaponComponent::Update_Pistol(float dt)
+	{
 	}
 
 	void WeaponComponent::Update_Shotgun(float dt)
 	{
 		static AudioSource* s_fireSound = nullptr;
 		static AudioSource* s_reloadSound = nullptr;
-		static IFont* s_font = nullptr;
 
 #ifdef ENABLE_TRACE_DEBUG
 		using namespace tracedbg;
 #endif
-
 		AnimatedMeshComponent* mesh = GetEntity()->GetComponent<AnimatedMeshComponent>();
 		std::shared_ptr<ModelBase> modelBase = mesh->LockModel();
 		AnimatedModel* animatedModel = dynamicCast<AnimatedModel>(modelBase.get());
 		if (!m_inited) {
 			s_fireSound = AudioManager::GetInstance()->CreateSource("sounds/sfx/weapons/shotgun_fire.wav");
 			s_reloadSound = AudioManager::GetInstance()->CreateSource("sounds/sfx/weapons/shotgun_reload.wav");
-
-			s_font = g_fontManager->CreateFont("textures/ui/Anton-Regular.ttf", 50.0f);
 
 			m_idleAni = animatedModel->GetAnimationByName("idle");
 			m_fireAni = animatedModel->GetAnimationByName("fire");
@@ -243,22 +246,15 @@ namespace solunar
 
 		animatedModel->Update(dt);
 
-		View* view = CameraProxy::GetInstance()->GetView();
-
-		static char buf[256];
-
-		stbsp_snprintf(buf, sizeof(buf), "Ammo: %i", m_ammo);
-		s_font->DrawText(buf, 25.0f, view->m_height - 20.0f, glm::vec4(1.0f, 0.2f, 0.0f, 1.0f));
-
 #if 0
-		stbsp_snprintf(buf, sizeof(buf), "--- Viewmodel ---");
-		g_fontManager->DrawSystemFontShadowed(buf, (float)view->m_width - 300.0f, 100.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		stbsp_snprintf(s_Buffer, sizeof(s_Buffer), "--- Viewmodel ---");
+		g_fontManager->DrawSystemFontShadowed(s_Buffer, (float)view->m_width - 300.0f, 100.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-		stbsp_snprintf(buf, sizeof(buf), "Animation: %s", animatedModel->GetCurrentAnimation() ? animatedModel->GetCurrentAnimation()->m_name.c_str() : "NO ANIMATION");
-		g_fontManager->DrawSystemFontShadowed(buf, (float)view->m_width - 300.0f, 125.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		stbsp_snprintf(s_Buffer, sizeof(s_Buffer), "Animation: %s", animatedModel->GetCurrentAnimation() ? animatedModel->GetCurrentAnimation()->m_name.c_str() : "NO ANIMATION");
+		g_fontManager->DrawSystemFontShadowed(s_Buffer, (float)view->m_width - 300.0f, 125.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 
-		stbsp_snprintf(buf, sizeof(buf), "Time: %.2f", animatedModel->GetCurrentTime());
-		g_fontManager->DrawSystemFontShadowed(buf, (float)view->m_width - 300.0f, 140.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
+		stbsp_snprintf(s_Buffer, sizeof(s_Buffer), "Time: %.2f", animatedModel->GetCurrentTime());
+		g_fontManager->DrawSystemFontShadowed(s_Buffer, (float)view->m_width - 300.0f, 140.0f, glm::vec4(1.0f, 1.0f, 1.0f, 1.0f));
 #endif
 	}
 }

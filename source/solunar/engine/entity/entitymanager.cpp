@@ -5,7 +5,8 @@
 namespace solunar
 {
 
-EntityManager::EntityManager()
+EntityManager::EntityManager() :
+	m_deferredMode(false)
 {
 }
 
@@ -30,17 +31,48 @@ void EntityManager::Destroy()
 	}
 }
 
+void EntityManager::Update()
+{
+	if (!m_deferredMode)
+		return;
+
+	if (!m_deferredEntities.empty())
+	{
+		for (auto entity : m_deferredEntities)
+		{
+			m_entities.push_back(entity);
+		}
+
+		m_deferredEntities.clear();
+	}
+}
+
+void EntityManager::OnWorldLoaded()
+{
+	m_deferredMode = true;
+}
+
 Entity* EntityManager::CreateEntity()
 {
 	Entity* entity = g_typeManager->CreateObject<Entity>();
-	m_entities.push_back(entity);
+
+	if (m_deferredMode)
+		m_deferredEntities.push_back(entity);
+	else
+		m_entities.push_back(entity);
+
 	return entity;
 }
 
 Entity* EntityManager::CreateEntityEx(const TypeInfo* typeInfo)
 {
 	Entity* entity = (Entity*)g_typeManager->CreateObjectByTypeInfo(typeInfo);
-	m_entities.push_back(entity);
+	
+	if (m_deferredMode)
+		m_deferredEntities.push_back(entity);
+	else
+		m_entities.push_back(entity);
+
 	return entity;
 }
 
