@@ -26,12 +26,12 @@ namespace solunar
 
 		// if returns -1 it means failed to obtain
 		virtual int GetNearestPoint(
-			Entity* pObject
+			const glm::vec3& object_position
 		) = 0;
 
 		virtual void BuildPathToTarget(
-			Entity* pObject, 
-			Entity* pTarget,
+			const glm::vec3& object_position, 
+			const glm::vec3& target_position,
 			std::vector<int>& nodes
 		) = 0;
 

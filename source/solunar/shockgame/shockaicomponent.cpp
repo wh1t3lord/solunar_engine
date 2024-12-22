@@ -133,7 +133,7 @@ void ShockAIComponent::UpdateZombie(float dt)
 
 	RigidBodyComponent* rigidBody = (RigidBodyComponent*)GetEntity()->GetComponentByTypeInfo(RigidBodyComponent::GetStaticTypeInfo());
 
-	// to whitelord: uncomment this to move entity !!!!
+	// to wh1t3lord: uncomment this to move entity !!!!
 //	if (rigidBody)
 //		rigidBody->SetLinearVelocity(direction * 2.0f);
 

@@ -47,7 +47,7 @@ namespace solunar
 			{
 				this->m_tree_type = ConvertStringToShockBehaviourTree(pBehaviourTreeTypeName);
 
-				this->m_pTree = CreateBehaviourTree(pWorld, this->m_tree_type);
+				this->m_pTree = CreateBehaviourTree(pWorld, this->GetEntity(), this->m_tree_type);
 
 				Assert(this->m_pTree && "out of memory!");
 			}

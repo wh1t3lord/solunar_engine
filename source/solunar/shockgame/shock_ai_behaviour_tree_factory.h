@@ -23,7 +23,7 @@ namespace solunar
 		kUnknown
 	};
 
-	IBehaviourTree* CreateBehaviourTree(World* pLoadedWorld, eShockBehaviourTree type);
+	IBehaviourTree* CreateBehaviourTree(World* pLoadedWorld, Entity* pOwner, eShockBehaviourTree type);
 
 	eShockBehaviourTree ConvertStringToShockBehaviourTree(const char* pRawString);
 	const char* ConvertShockBehaviourTreeToString(eShockBehaviourTree type);

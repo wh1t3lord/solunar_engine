@@ -36,6 +36,10 @@ namespace solunar
 		void ToggleDebugDraw();
 
 		void DebugDraw();
+
+		int GetNearestPoint(const glm::vec3& object_position);
+		const glm::vec3& GetNodePosition(int node_id);
+
 	private:
 		bool m_enable_debug_draw;
 		IPathfindingNavigationData* m_pNavigationData;

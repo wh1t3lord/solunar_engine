@@ -51,4 +51,30 @@ namespace solunar
 			}
 		}
 	}
+	int PathfindingManager::GetNearestPoint(const glm::vec3& object_position)
+	{
+		Assert(this->m_pSolver && "expected to be initialized when you call this method!");
+
+		int result = -1;
+
+		if (this->m_pSolver)
+		{
+			result = this->m_pSolver->GetNearestPoint(object_position);
+		}
+
+		return result;
+	}
+
+	const glm::vec3 _kDef(0.0,0.0,0.0);
+	const glm::vec3& PathfindingManager::GetNodePosition(int node_id)
+	{
+		Assert(this->m_pSolver && "must be implementation!");
+
+		if (this->m_pSolver)
+		{
+			return this->m_pSolver->GetNodePosition(node_id);
+		}
+
+		return _kDef;
+	}
 }

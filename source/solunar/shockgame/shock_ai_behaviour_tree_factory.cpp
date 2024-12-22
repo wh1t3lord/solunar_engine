@@ -10,7 +10,7 @@
 
 namespace solunar
 {
-	IBehaviourTree* CreateBehaviourTree(World* pLoadedWorld, eShockBehaviourTree type)
+	IBehaviourTree* CreateBehaviourTree(World* pLoadedWorld, Entity* pOwner, eShockBehaviourTree type)
 	{
 		Assert(pLoadedWorld && "must be valid!");
 
@@ -24,13 +24,14 @@ namespace solunar
 
 			auto* pInstance = new BehaviourTree<BehaviourTreeLinearAllocator<_kAllocatorReservedNodeCount, _kAllocatorMaxClassNodeSize>, ZombieLogicStateType, _kBehaviourTreeMaxNodesCount>("zombie_tree");
 
-			pInstance->Init(pLoadedWorld);
+			pInstance->Init(pLoadedWorld, pOwner);
 			
-			constexpr unsigned char _kMaxChildrenCountMainSequence = 2;
+			constexpr unsigned char _kMaxChildrenCountMainSequence = 1;
 			constexpr unsigned char _kMaxChildrenCountSubSequence = 2;
-			auto* pSequence = pInstance->AddNode<BehaviourTreeNodeSequence<_kMaxChildrenCountMainSequence>>("zombie_seq_main");
-			pInstance->AddNode<BehaviourTreeActionNodeZombieSearchTarget>(pSequence->GetID(), "zombie_act_search_target");
+			pInstance->AddNode<BehaviourTreeActionNodeZombieSearchTarget>("zombie_act_search_target");
 			
+			auto* pSequence = pInstance->AddNode<BehaviourTreeNodeSequence<_kMaxChildrenCountMainSequence>>("zombie_seq_main");
+
 			auto* pSequenceSub = pInstance->AddNode<BehaviourTreeNodeSequence<_kMaxChildrenCountSubSequence>>(pSequence->GetID(), "zombie_seq_move_+_attack");
 			pInstance->AddNode<BehaviourTreeActionNodeZombieMoveToTarget>(pSequenceSub->GetID(), "zombie_act_move_to_target");
 			pInstance->AddNode<BehaviourTreeActionNodeZombieAttackTarget>(pSequenceSub->GetID(), "zombie_act_attack_target");

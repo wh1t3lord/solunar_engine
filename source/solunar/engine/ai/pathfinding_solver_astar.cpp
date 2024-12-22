@@ -3,7 +3,7 @@
 
 namespace solunar
 {
-	PathfindingSolverAstar::PathfindingSolverAstar(void) : m_pNavigationData(nullptr), m_def_pos(0.0f,0.0f,0.0f)
+	PathfindingSolverAstar::PathfindingSolverAstar(void) : m_pNavigationData(nullptr), m_def_pos(0.0f, 0.0f, 0.0f)
 	{
 	}
 
@@ -26,17 +26,66 @@ namespace solunar
 		Assert(!"Not implemented");
 	}
 
-	int PathfindingSolverAstar::GetNearestPoint(Entity* pObject)
+#undef max
+	int PathfindingSolverAstar::GetNearestPoint(const glm::vec3& object_position)
 	{
 		Assert(this->m_pNavigationData && "early calling, initialize this before call this");
-		Assert(pObject && "you passed an invalid object");
 
 		int result = -1;
 
 		if (!this->m_pNavigationData)
 			return result;
-		
-		if (pObject)
+
+
+		switch (this->m_pNavigationData->GetType())
+		{
+		case eNavigationDataRepresentationType::kNavigationData_Graph_XML:
+		{
+			PathfindingNavigationStaticGraph* pCasted = static_cast<PathfindingNavigationStaticGraph*>(this->m_pNavigationData);
+
+			if (pCasted)
+			{
+				const auto& nodes = pCasted->GetNodes();
+
+				char out[32];
+				float min_dist = std::numeric_limits<float>::max();
+	 
+
+				for (const auto& node : nodes)
+				{
+					float dist = glm::length(object_position - node.world_position);
+
+
+					if (dist < min_dist)
+					{
+						sprintf(out, sizeof(out), "dist: %.3f\n", dist);
+						OutputDebugStringA(out);
+						result = node.id;
+						min_dist = dist;
+					}
+				}
+			}
+
+			break;
+		}
+		default:
+		{
+			Assert(!"not implemeneted yet!");
+			break;
+		}
+		}
+
+
+		return result;
+	}
+
+	void PathfindingSolverAstar::BuildPathToTarget(const glm::vec3& object_position, const glm::vec3& target_position, std::vector<int>& nodes)
+	{
+	}
+
+	const glm::vec3& PathfindingSolverAstar::GetNodePosition(int node_id) const
+	{
+		if (this->m_pNavigationData)
 		{
 			switch (this->m_pNavigationData->GetType())
 			{
@@ -44,30 +93,24 @@ namespace solunar
 			{
 				PathfindingNavigationStaticGraph* pCasted = static_cast<PathfindingNavigationStaticGraph*>(this->m_pNavigationData);
 
-				if (pCasted)
-				{
+				const auto& nodes = pCasted->GetNodes();
 
+				if (node_id > nodes.size() || node_id < 0)
+				{
+					Core::Msg("AI: Can't obtain node by id %d", node_id);
+					return this->m_def_pos;
 				}
-				
-				break;
+
+				return nodes[node_id].world_position;
 			}
 			default:
 			{
-				Assert(!"not implemeneted yet!");
+				Assert(!"not implemented!");
 				break;
 			}
 			}
 		}
 
-		return result;
-	}
-
-	void PathfindingSolverAstar::BuildPathToTarget(Entity* pObject, Entity* pTarget, std::vector<int>& nodes)
-	{
-	}
-
-	const glm::vec3& PathfindingSolverAstar::GetNodePosition(int node_id) const
-	{
 		return this->m_def_pos;
 	}
 }

@@ -50,7 +50,7 @@ namespace solunar
 		BehaviourTreeNode(const char* pDebugName);
 		virtual ~BehaviourTreeNode();
 
-		virtual eBehaviourTreeStatus Update(World* pWorld, void* pUserStateData, float dt);
+		virtual eBehaviourTreeStatus Update(World* pWorld, Entity* pOwner, void* pUserStateData, float dt);
 		virtual void OnEvent(int event_id);
 		virtual BehaviourTreeNode** GetChildren(void);
 		virtual unsigned char GetChildrenMaxCount(void) const;
@@ -195,7 +195,7 @@ namespace solunar
 		BehaviourTree(const char* pDebugName);
 		~BehaviourTree();
 
-		void Init(World* pLoadedWorld, float p_user_priority_timings[eBehaviourTreeNodePriority::kSize] = 0);
+		void Init(World* pLoadedWorld, Entity* pOwner, float p_user_priority_timings[eBehaviourTreeNodePriority::kSize] = 0);
 		void Update(float dt) override;
 		void Shutdown() override;
 
@@ -232,6 +232,7 @@ namespace solunar
 #endif
 		unsigned char m_current_nodes_count;
 		World* m_pWorld;
+		Entity* m_pOwner;
 		float m_priorities[eBehaviourTreeNodePriority::kSize];
 #ifdef _DEBUG
 		char m_debug_name[16];
@@ -252,7 +253,7 @@ namespace solunar
 		m_shutdown_was_called(false),
 		m_init_was_called(false),
 #endif
-		m_current_nodes_count(0), m_pWorld(nullptr), m_priorities{ -1.0f,-1.0f,-1.0f }
+		m_current_nodes_count(0), m_pWorld(nullptr), m_pOwner(nullptr), m_priorities{-1.0f,-1.0f,-1.0f}
 	{
 		static_assert(std::is_pod<UserLogicDataType>::value && "it must be plain class or struct (preferrably struct without set/get methods)");
 		std::memset(&this->m_user_data, 0, sizeof(this->m_user_data));
@@ -272,15 +273,17 @@ namespace solunar
 	}
 
 	template<typename Allocator, typename UserLogicDataType, unsigned char MaxNodesInTree>
-	inline void BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::Init(World* pWorld, float p_user_priority_timings[eBehaviourTreeNodePriority::kSize])
+	inline void BehaviourTree<Allocator, UserLogicDataType, MaxNodesInTree>::Init(World* pWorld, Entity* pOwner, float p_user_priority_timings[eBehaviourTreeNodePriority::kSize])
 	{
 		Assert(pWorld && "must be valid!");
+		Assert(pOwner && "must be valid!");
 
 #ifdef _DEBUG
 		m_init_was_called = true;
 #endif
 
 		this->m_pWorld = pWorld;
+		this->m_pOwner = pOwner;
 
 		if (p_user_priority_timings)
 		{
@@ -314,7 +317,7 @@ namespace solunar
 				{
 					if (pNode->CanUpdate())
 					{
-						pNode->Update(this->m_pWorld, static_cast<void*>(&this->m_user_data), dt);
+						pNode->Update(this->m_pWorld, this->m_pOwner, static_cast<void*>(&this->m_user_data), dt);
 					}
 				}
 				else

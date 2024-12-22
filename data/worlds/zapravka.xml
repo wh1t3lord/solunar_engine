@@ -51,7 +51,7 @@
     </Entity>
     <!-- Test Bolvan -->
     <Entity>
-        <Position x="-1.75" y="0" z="-8.88"/>
+        <Position x="-8.47" y="0" z="-16.62"/>
         <Rotation x="0" y="0" z="0"/>
         <Scale x="1" y="1" z="1"/>
         <AnimatedMeshComponent>
