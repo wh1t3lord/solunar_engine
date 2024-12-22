@@ -77,4 +77,18 @@ namespace solunar
 
 		return _kDef;
 	}
+
+	void PathfindingManager::BuildPathToTarget(const glm::vec3& object_position, const glm::vec3& target_position, int* pRawBuffer, int number_of_elements)
+	{
+		if (!this->m_pSolver)
+			return;
+
+		if (!pRawBuffer)
+			return;
+
+		if (!number_of_elements || number_of_elements < 0)
+			return;
+
+		this->m_pSolver->BuildPathToTarget(object_position, target_position, pRawBuffer, number_of_elements);
+	}
 }

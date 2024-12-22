@@ -35,6 +35,20 @@ namespace solunar
 			std::vector<int>& nodes
 		) = 0;
 
+		virtual void BuildPathToTarget(
+			const glm::vec3& object_position,
+			const glm::vec3& target_position,
+			int* pRawBuffer,
+			int number_of_elements
+		) = 0;
+
+		virtual void BuildPathToTarget(
+			int start_node_id,
+			int goal_node_id,
+			int* pRawBuffer,
+			int number_of_elements
+		) = 0;
+
 		virtual const glm::vec3& GetNodePosition(int node_id) const = 0;
 
 

@@ -46,7 +46,8 @@ namespace solunar
 			if (dist < 0.25f)
 			{
 				pSharedData->need_to_validate_node = false;
-				status = eBehaviourTreeStatus::kSuccess;
+				// means we can't proceed further logic e.g. attack something because we just found our node
+				status = eBehaviourTreeStatus::kFailure;
 
 				pSharedData->current_path_index = -1;
 				pSharedData->current_target_node_id = -1;
@@ -60,9 +61,49 @@ namespace solunar
 		}
 		else
 		{
+			if (pSharedData->current_target_node_id == -1)
+			{
+				pSharedData->current_target_node_id = pSharedData->path[pSharedData->current_path_index];
+			}
 
+			const glm::vec3& entity_position = pOwner->GetPosition();
+
+			const glm::vec3& node_position = g_aiPathfindingManager->GetNodePosition(pSharedData->current_target_node_id);
+
+			float dist = glm::length(entity_position - node_position);
+
+			const glm::vec3& dir = glm::normalize(node_position - entity_position);
+
+			RigidBodyComponent* pBody = pOwner->GetComponent<RigidBodyComponent>();
+
+
+			Assert(pBody && "implementation supposed to have RB");
+
+			if (pBody)
+			{
+				pBody->SetLinearVelocity(dir);
+			}
+
+
+			if (dist < 0.25f)
+			{
+				status = eBehaviourTreeStatus::kRunning;
+
+				pSharedData->current_path_index += 1;
+				pSharedData->current_target_node_id = -1;
+
+				if (pBody)
+				{
+					pBody->SetLinearVelocity(glm::vec3());
+				}
+
+				if (pSharedData->current_path_index == pSharedData->count_of_path)
+				{
+					status = eBehaviourTreeStatus::kSuccess;
+				}
+			}
 		}
 
-		return eBehaviourTreeStatus();
+		return status;
 	}
 }

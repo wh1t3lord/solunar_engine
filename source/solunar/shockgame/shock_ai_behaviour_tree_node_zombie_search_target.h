@@ -27,7 +27,7 @@ namespace solunar
 		bool SearchBarricade();
 		bool ValidateMyNavigationPlacement(Entity* pOwner, ZombieLogicStateType* pSharedData);
 
-		bool SearchHumanToAttack();
+		bool SearchHumanToAttack(World* pWorld, Entity* pOwner, ZombieLogicStateType* pSharedData);
 
 	private:
 		bool m_validated_ai_navigation;

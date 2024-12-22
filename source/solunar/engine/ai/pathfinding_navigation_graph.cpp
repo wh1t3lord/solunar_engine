@@ -163,6 +163,11 @@ namespace solunar
 		return this->m_nodes;
 	}
 
+	const PathfindingNavigationStaticGraphNode& PathfindingNavigationStaticGraph::GetNodeByID(int node_id) const
+	{
+		return this->m_nodes[node_id];
+	}
+
 	eNavigationDataRepresentationType PathfindingNavigationStaticGraph::GetType() const
 	{
 		return eNavigationDataRepresentationType::kNavigationData_Graph_XML;

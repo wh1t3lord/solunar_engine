@@ -14,6 +14,7 @@
 #include "ai/pathfinding_navigation_graph.h"
 #include "ai/pathfinding_manager.h"
 #include "ai/pathfinding_solver_astar.h"
+#include "ai/pathfinding_solver_dijkstra.h"
 #include <imgui.h>
 
 namespace solunar
@@ -279,7 +280,7 @@ namespace solunar
 										g_aiPathfindingManager->Shutdown();
 
 										PathfindingNavigationStaticGraph* pNavigationData = mem_new<PathfindingNavigationStaticGraph>();
-										PathfindingSolverAstar* pSolver = mem_new<PathfindingSolverAstar>();
+										PathfindingSolverDijkstra* pSolver = mem_new<PathfindingSolverDijkstra>();
 
 										pNavigationData->Init(*tag_ai_data_storage);
 										pSolver->Init(pNavigationData);

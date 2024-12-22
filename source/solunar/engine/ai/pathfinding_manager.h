@@ -40,6 +40,13 @@ namespace solunar
 		int GetNearestPoint(const glm::vec3& object_position);
 		const glm::vec3& GetNodePosition(int node_id);
 
+		void BuildPathToTarget(
+			const glm::vec3& object_position,
+			const glm::vec3& target_position,
+			int* pRawBuffer,
+			int number_of_elements
+		);
+
 	private:
 		bool m_enable_debug_draw;
 		IPathfindingNavigationData* m_pNavigationData;

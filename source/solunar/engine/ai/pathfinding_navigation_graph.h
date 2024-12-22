@@ -164,6 +164,7 @@ namespace solunar
 		void Shutdown();
 
 		const std::vector<PathfindingNavigationStaticGraphNode>& GetNodes(void) const;
+		const PathfindingNavigationStaticGraphNode& GetNodeByID(int node_id) const;
 		eNavigationDataRepresentationType GetType() const override;
 
 		void DebugDraw() override;

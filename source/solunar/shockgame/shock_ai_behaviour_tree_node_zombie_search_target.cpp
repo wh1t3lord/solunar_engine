@@ -1,6 +1,7 @@
 #include "shock_ai_behaviour_tree_node_zombie_search_target.h"
 #include "engine/ai/pathfinding_manager.h"
 #include "shock_ai_behaviour_tree_user_data_types.h"
+#include "demogame.h"
 
 namespace solunar
 {
@@ -25,14 +26,24 @@ namespace solunar
 				status = eBehaviourTreeStatus::kSuccess;
 			}
 
+			// if returns here true means we have a free way so we start to search for human
 			if (this->SearchBarricade())
 			{
+				if (this->SearchHumanToAttack(pWorld, pOwner, pSharedData))
+				{
+					status = eBehaviourTreeStatus::kSuccess;
+				}
+			}
+			else
+			{
+				status = eBehaviourTreeStatus::kSuccess;
 			}
 		}
 
 		return status;
 	}
 
+	// todo: someone implement this
 	bool BehaviourTreeActionNodeZombieSearchTarget::SearchBarricade()
 	{
 		return true;
@@ -77,6 +88,10 @@ namespace solunar
 					// todo: we need to kill a such entity!!!
 					if (dist > 7.0f)
 						this->m_validated_ai_navigation = false;
+
+					// we don't need to validate positioning of npc
+					if (dist < 2.0f)
+						this->m_validated_ai_navigation = true;
 				}
 			}
 		}
@@ -84,8 +99,50 @@ namespace solunar
 		return this->m_validated_ai_navigation;
 	}
 
-	bool BehaviourTreeActionNodeZombieSearchTarget::SearchHumanToAttack()
+	bool BehaviourTreeActionNodeZombieSearchTarget::SearchHumanToAttack(World* pWorld, Entity* pOwner, ZombieLogicStateType* pSharedData)
 	{
-		return false;
+		bool result = false;
+
+		if (!pSharedData->need_to_validate_node)
+		{
+			if (pSharedData->current_path_index == -1 || pSharedData->current_path_index==pSharedData->count_of_path)
+			{
+				// search new path
+
+				const std::vector<Entity*>& players = pWorld->GetEntityManager().GetEntitiesWithComponent<PlayerSpawnComponent>();
+
+				auto* pPlayerEntity = players.front();
+
+				const glm::vec3& target_position = pPlayerEntity->GetPosition();
+				const glm::vec3& my_position = pOwner->GetPosition();
+
+				g_aiPathfindingManager->BuildPathToTarget(my_position, target_position, pSharedData->path, sizeof(pSharedData->path) / sizeof(pSharedData->path[0]));
+
+				if (pSharedData->path[0] != -1)
+				{
+					pSharedData->current_path_index = 0;
+					pSharedData->pTarget = pPlayerEntity;
+					pSharedData->current_target_node_id = -1;
+					int size = sizeof(pSharedData->path) / sizeof(pSharedData->path[0]);
+
+					pSharedData->count_of_path = 0;
+					for (int i = 0; i < size; ++i)
+					{
+						if (pSharedData->path[i] != -1)
+							pSharedData->count_of_path += 1;
+						else
+							break;
+					}
+				}
+			}
+			else
+			{
+				// proceede walking
+				result = true;
+			}
+		}
+		
+
+		return result;
 	}
 }

@@ -49,7 +49,7 @@ namespace solunar
 
 				char out[32];
 				float min_dist = std::numeric_limits<float>::max();
-	 
+
 
 				for (const auto& node : nodes)
 				{
@@ -81,6 +81,34 @@ namespace solunar
 
 	void PathfindingSolverAstar::BuildPathToTarget(const glm::vec3& object_position, const glm::vec3& target_position, std::vector<int>& nodes)
 	{
+	}
+
+	void PathfindingSolverAstar::BuildPathToTarget(const glm::vec3& object_position, const glm::vec3& target_position, int* pRawBuffer, int number_of_elements)
+	{
+		int start_node = GetNearestPoint(object_position);
+		int end_node = GetNearestPoint(target_position);
+
+		BuildPathToTarget(start_node, end_node, pRawBuffer, number_of_elements);
+	}
+
+	void PathfindingSolverAstar::BuildPathToTarget(int start_node_id, int goal_node_id, int* pRawBuffer, int number_of_elements)
+	{
+		if (start_node_id == -1)
+			return;
+
+		if (goal_node_id == -1)
+			return;
+
+		if (!pRawBuffer)
+			return;
+
+		if (number_of_elements <= 0)
+			return;
+
+		int current_iter = 0;
+
+
+
 	}
 
 	const glm::vec3& PathfindingSolverAstar::GetNodePosition(int node_id) const
